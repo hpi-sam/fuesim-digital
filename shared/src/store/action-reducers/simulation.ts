@@ -6,9 +6,9 @@ import {
     IsString,
     IsUUID,
     Min,
-    ValidateIf,
 } from 'class-validator';
-import { WritableDraft } from 'immer';
+import { type Immutable, WritableDraft } from 'immer';
+import { z } from 'zod';
 import { newStartCollectingInformationEvent } from '../../simulation/events/start-collecting.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import { nextUUID } from '../../simulation/utils/randomness.js';
@@ -26,7 +26,7 @@ import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import {
     type UUID,
-    uuidArrayValidationOptions,
+    uuidSchema,
     uuidValidationOptions,
 } from '../../utils/uuid.js';
 import {
@@ -75,6 +75,8 @@ import {
     updateRequestVehiclesDelay,
 } from '../../simulation/behaviors/manage-patient-transport-to-hospital.js';
 import { UnloadArrivingVehiclesBehaviorState } from '../../simulation/behaviors/unload-arrived-vehicles.js';
+import { simulatedRegionSchema } from '../../models/simulated-region.js';
+import { simulationBehaviorStateSchema } from '../../simulation/behaviors/simulation-behavior.js';
 import {
     getActivityById,
     getBehaviorById,
@@ -82,104 +84,63 @@ import {
 } from './utils/get-element.js';
 import { logBehavior } from './utils/log.js';
 
-export class UpdateTreatPatientsIntervalsAction implements Action {
-    @IsValue('[TreatPatientsBehavior] Update TreatPatientsIntervals' as const)
-    public readonly type =
-        '[TreatPatientsBehavior] Update TreatPatientsIntervals';
+const updateTreatPatientsIntervalsActionSchema = z.strictObject({
+    type: z.literal('[TreatPatientsBehavior] Update TreatPatientsIntervals'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorStateId: simulationBehaviorStateSchema.shape.id,
+    unknown: z.number().nonnegative().optional(),
+    counted: z.number().nonnegative().optional(),
+    triaged: z.number().nonnegative().optional(),
+    secured: z.number().nonnegative().optional(),
+    countingTimePerPatient: z.number().nonnegative().optional(),
+});
+export type UpdateTreatPatientsIntervalsAction = Immutable<
+    z.infer<typeof updateTreatPatientsIntervalsActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
+const providePersonnelBehaviorUpdateVehiclePrioritiesActionSchema =
+    z.strictObject({
+        type: z.literal('[ProvidePersonnelBehavior] Update VehiclePriorities'),
+        simulatedRegionId: simulatedRegionSchema.shape.id,
+        behaviorId: simulationBehaviorStateSchema.shape.id,
+        priorities: z.array(uuidSchema), // TODO: are those personnel or vehicle uuids?
+    });
+export type ProvidePersonnelBehaviorUpdateVehiclePrioritiesAction = Immutable<
+    z.infer<typeof providePersonnelBehaviorUpdateVehiclePrioritiesActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorStateId!: UUID;
+const unloadArrivingVehiclesBehaviorUpdateUnloadDelayActionSchema =
+    z.strictObject({
+        type: z.literal('[UnloadArrivingVehiclesBehavior] Update UnloadDelay'),
+        simulatedRegionId: simulatedRegionSchema.shape.id,
+        behaviorId: simulationBehaviorStateSchema.shape.id,
+        unloadDelay: z.number().nonnegative(),
+    });
+export type UnloadArrivingVehiclesBehaviorUpdateUnloadDelayAction = Immutable<
+    z.infer<typeof unloadArrivingVehiclesBehaviorUpdateUnloadDelayActionSchema>
+>;
 
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    public readonly unknown?: number;
+const createReportActionSchema = z.strictObject({
+    type: z.literal('[ReportBehavior] Create Report'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    informationType: reportableInformationSchema,
+    interfaceSignallerKey: z.string().nullable(), // TODO: test if validator works out
+});
+export type CreateReportAction = Immutable<
+    z.infer<typeof createReportActionSchema>
+>;
 
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    public readonly counted?: number;
+const updateReportTreatmentStatusChangesActionSchema = z.strictObject({
+    type: z.literal('[ReportBehavior] Update report treatment status changes'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    reportChanges: z.boolean(),
+});
+export type UpdateReportTreatmentStatusChangesAction = Immutable<
+    z.infer<typeof updateReportTreatmentStatusChangesActionSchema>
+>;
 
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    public readonly triaged?: number;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    public readonly secured?: number;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    public readonly countingTimePerPatient?: number;
-}
-
-export class ProvidePersonnelBehaviorUpdateVehiclePrioritiesAction implements Action {
-    @IsValue('[ProvidePersonnelBehavior] Update VehiclePriorities' as const)
-    public readonly type =
-        '[ProvidePersonnelBehavior] Update VehiclePriorities';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsUUID(4, uuidArrayValidationOptions)
-    public readonly priorities!: readonly UUID[];
-}
-
-export class UnloadArrivingVehiclesBehaviorUpdateUnloadDelayAction implements Action {
-    @IsValue('[UnloadArrivingVehiclesBehavior] Update UnloadDelay' as const)
-    public readonly type =
-        '[UnloadArrivingVehiclesBehavior] Update UnloadDelay';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsNumber()
-    @Min(0)
-    public readonly unloadDelay!: number;
-}
-
-export class CreateReportAction implements Action {
-    @IsValue('[ReportBehavior] Create Report')
-    public readonly type = '[ReportBehavior] Create Report';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsZodSchema(reportableInformationSchema)
-    public readonly informationType!: ReportableInformation;
-
-    @IsString()
-    @ValidateIf((_, value) => value !== null)
-    public readonly interfaceSignallerKey!: string | null;
-}
-
-export class UpdateReportTreatmentStatusChangesAction implements Action {
-    @IsValue('[ReportBehavior] Update report treatment status changes')
-    public readonly type =
-        '[ReportBehavior] Update report treatment status changes';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsBoolean()
-    public readonly reportChanges!: boolean;
-}
-
+// TODO@Felix: here
 export class UpdateReportTransferOfCategoryInSingleRegionCompletedAction implements Action {
     @IsValue(
         '[ReportBehavior] Update report transfer of category in single region completed'

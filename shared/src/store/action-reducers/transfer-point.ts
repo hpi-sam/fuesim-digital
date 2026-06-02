@@ -1,13 +1,9 @@
-import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import {
-    type TransferPoint,
-    transferPointSchema,
-} from '../../models/transfer-point.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { transferPointSchema } from '../../models/transfer-point.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import {
@@ -19,7 +15,7 @@ import {
     type MapCoordinates,
     mapCoordinatesSchema,
 } from '../../models/utils/position/map-coordinates.js';
-import { IsValue } from '../../utils/validators/is-value.js';
+import { hospitalSchema } from '../../models/hospital.js';
 import { getElement } from './utils/get-element.js';
 import {
     logTransferPointConnection,
@@ -28,100 +24,82 @@ import {
 import { letElementArrive } from './transfer.js';
 import { calculateDistance } from './utils/calculate-distance.js';
 
-// TODO check: type "TransferPoint" the T is big, in other files, the second word starts with a small letter
+const addTransferPointActionSchema = z.strictObject({
+    type: z.literal('[TransferPoint] Add TransferPoint'),
+    transferPoint: transferPointSchema,
+});
+export type AddTransferPointAction = Immutable<
+    z.infer<typeof addTransferPointActionSchema>
+>;
 
-export class AddTransferPointAction implements Action {
-    @IsValue('[TransferPoint] Add TransferPoint' as const)
-    public readonly type = `[TransferPoint] Add TransferPoint`;
+const moveTransferPointActionSchema = z.strictObject({
+    type: z.literal('[TransferPoint] Move TransferPoint'),
+    transferPointId: transferPointSchema.shape.id,
+    targetPosition: mapCoordinatesSchema,
+});
+export type MoveTransferPointAction = Immutable<
+    z.infer<typeof moveTransferPointActionSchema>
+>;
 
-    @IsZodSchema(transferPointSchema)
-    public readonly transferPoint!: TransferPoint;
-}
+const renameTransferPointActionSchema = z.strictObject({
+    type: z.literal('[TransferPoint] Rename TransferPoint'),
+    transferPointId: transferPointSchema.shape.id,
+    internalName: z.string().optional(),
+    externalName: z.string().optional(),
+});
+export type RenameTransferPointAction = Immutable<
+    z.infer<typeof renameTransferPointActionSchema>
+>;
 
-export class MoveTransferPointAction implements Action {
-    @IsValue('[TransferPoint] Move TransferPoint' as const)
-    public readonly type = '[TransferPoint] Move TransferPoint';
+const removeTransferPointActionSchema = z.strictObject({
+    type: z.literal('[TransferPoint] Remove TransferPoint'),
+    transferPointId: transferPointSchema.shape.id,
+});
+export type RemoveTransferPointAction = Immutable<
+    z.infer<typeof removeTransferPointActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId!: UUID;
+const connectTransferPointsActionSchema = z.strictObject({
+    type: z.literal('[TransferPoint] Connect TransferPoints'),
+    transferPointId1: transferPointSchema.shape.id,
+    transferPointId2: transferPointSchema.shape.id,
+    duration: z.number().optional(),
+});
+export type ConnectTransferPointsAction = Immutable<
+    z.infer<typeof connectTransferPointsActionSchema>
+>;
 
-    @IsZodSchema(mapCoordinatesSchema)
-    public readonly targetPosition!: MapCoordinates;
-}
+const disconnectTransferPointsActionSchema = z.strictObject({
+    type: z.literal('[TransferPoint] Disconnect TransferPoints'),
+    transferPointId1: transferPointSchema.shape.id,
+    transferPointId2: transferPointSchema.shape.id,
+});
+export type DisconnectTransferPointsAction = Immutable<
+    z.infer<typeof disconnectTransferPointsActionSchema>
+>;
 
-export class RenameTransferPointAction implements Action {
-    @IsValue('[TransferPoint] Rename TransferPoint' as const)
-    public readonly type = '[TransferPoint] Rename TransferPoint';
+const connectHospitalActionSchema = z.strictObject({
+    type: z.literal('[TransferPoint] Connect hospital'),
+    hospitalId: hospitalSchema.shape.id,
+    transferPointId: transferPointSchema.shape.id,
+});
+export type ConnectHospitalAction = Immutable<
+    z.infer<typeof connectHospitalActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId!: UUID;
-
-    @IsOptional()
-    @IsString()
-    public readonly internalName?: string;
-
-    @IsOptional()
-    @IsString()
-    public readonly externalName?: string;
-}
-
-export class RemoveTransferPointAction implements Action {
-    @IsValue('[TransferPoint] Remove TransferPoint' as const)
-    public readonly type = '[TransferPoint] Remove TransferPoint';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId!: UUID;
-}
-
-export class ConnectTransferPointsAction implements Action {
-    @IsValue('[TransferPoint] Connect TransferPoints' as const)
-    public readonly type = '[TransferPoint] Connect TransferPoints';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId1!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId2!: UUID;
-
-    @IsOptional()
-    @IsNumber()
-    public readonly duration?: number;
-}
-
-export class DisconnectTransferPointsAction implements Action {
-    @IsValue('[TransferPoint] Disconnect TransferPoints' as const)
-    public readonly type = '[TransferPoint] Disconnect TransferPoints';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId1!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId2!: UUID;
-}
-
-export class ConnectHospitalAction implements Action {
-    @IsValue('[TransferPoint] Connect hospital' as const)
-    public readonly type = '[TransferPoint] Connect hospital';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly hospitalId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId!: UUID;
-}
-
-export class DisconnectHospitalAction implements Action {
-    @IsValue('[TransferPoint] Disconnect hospital' as const)
-    public readonly type = '[TransferPoint] Disconnect hospital';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly hospitalId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId!: UUID;
-}
+const disconnectHospitalActionSchema = z.strictObject({
+    type: z.literal('[TransferPoint] Disconnect hospital'),
+    hospitalId: hospitalSchema.shape.id,
+    transferPointId: transferPointSchema.shape.id,
+});
+export type DisconnectHospitalAction = Immutable<
+    z.infer<typeof disconnectHospitalActionSchema>
+>;
 
 export namespace TransferPointActionReducers {
     export const addTransferPoint: ActionReducer<AddTransferPointAction> = {
-        action: AddTransferPointAction,
+        type: addTransferPointActionSchema.shape.type.value,
+        actionSchema: addTransferPointActionSchema,
         reducer: (draftState, { transferPoint }) => {
             draftState.transferPoints[transferPoint.id] =
                 cloneDeepMutable(transferPoint);
@@ -131,7 +109,8 @@ export namespace TransferPointActionReducers {
     };
 
     export const moveTransferPoint: ActionReducer<MoveTransferPointAction> = {
-        action: MoveTransferPointAction,
+        type: moveTransferPointActionSchema.shape.type.value,
+        actionSchema: moveTransferPointActionSchema,
         reducer: (draftState, { transferPointId, targetPosition }) => {
             changePositionWithId(
                 transferPointId,
@@ -146,7 +125,8 @@ export namespace TransferPointActionReducers {
 
     export const renameTransferPoint: ActionReducer<RenameTransferPointAction> =
         {
-            action: RenameTransferPointAction,
+            type: renameTransferPointActionSchema.shape.type.value,
+            actionSchema: renameTransferPointActionSchema,
             reducer: (
                 draftState,
                 { transferPointId, internalName, externalName }
@@ -170,7 +150,8 @@ export namespace TransferPointActionReducers {
 
     export const connectTransferPoints: ActionReducer<ConnectTransferPointsAction> =
         {
-            action: ConnectTransferPointsAction,
+            type: connectTransferPointsActionSchema.shape.type.value,
+            actionSchema: connectTransferPointsActionSchema,
             reducer: (
                 draftState,
                 { transferPointId1, transferPointId2, duration }
@@ -219,7 +200,8 @@ export namespace TransferPointActionReducers {
 
     export const disconnectTransferPoints: ActionReducer<DisconnectTransferPointsAction> =
         {
-            action: DisconnectTransferPointsAction,
+            type: disconnectTransferPointsActionSchema.shape.type.value,
+            actionSchema: disconnectTransferPointsActionSchema,
             reducer: (draftState, { transferPointId1, transferPointId2 }) => {
                 // We remove the connection from both directions
                 if (transferPointId1 === transferPointId2) {
@@ -254,7 +236,8 @@ export namespace TransferPointActionReducers {
 
     export const removeTransferPoint: ActionReducer<RemoveTransferPointAction> =
         {
-            action: RemoveTransferPointAction,
+            type: removeTransferPointActionSchema.shape.type.value,
+            actionSchema: removeTransferPointActionSchema,
             reducer: (draftState, { transferPointId }) => {
                 // check if transferPoint exists
                 getElement(draftState, 'transferPoint', transferPointId);
@@ -316,7 +299,8 @@ export namespace TransferPointActionReducers {
         };
 
     export const connectHospital: ActionReducer<ConnectHospitalAction> = {
-        action: ConnectHospitalAction,
+        type: connectHospitalActionSchema.shape.type.value,
+        actionSchema: connectHospitalActionSchema,
         reducer: (draftState, { transferPointId, hospitalId }) => {
             // Check if hospital with this Id exists
             getElement(draftState, 'hospital', hospitalId);
@@ -340,7 +324,8 @@ export namespace TransferPointActionReducers {
     };
 
     export const disconnectHospital: ActionReducer<DisconnectHospitalAction> = {
-        action: DisconnectHospitalAction,
+        type: disconnectHospitalActionSchema.shape.type.value,
+        actionSchema: disconnectHospitalActionSchema,
         reducer: (draftState, { hospitalId, transferPointId }) => {
             // Check if hospital with this Id exists
             getElement(draftState, 'hospital', hospitalId);

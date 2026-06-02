@@ -25,7 +25,7 @@ import {
     validateStandardSchema,
     disabled,
 } from '@angular/forms/signals';
-import type { Immutable } from 'immer';
+import { castDraft, type WritableDraft } from 'immer';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
 import { DisplayModelValidationComponent } from '../../../../../../shared/validation/display-model-validation/display-model-validation.component';
@@ -60,11 +60,9 @@ export class MeasureTemplateFormComponent implements OnChanges {
     /**
      * Emits the changed values
      */
-    readonly submitMeasureTemplate = output<
-        Immutable<MeasureTemplateValues> | MeasureTemplateValues
-    >();
+    readonly submitMeasureTemplate = output<MeasureTemplateValues>();
 
-    public readonly values = signal<MeasureTemplateValues>({
+    public readonly values = signal<WritableDraft<MeasureTemplateValues>>({
         name: '',
         properties: [],
         categoryName: '',
@@ -90,19 +88,22 @@ export class MeasureTemplateFormComponent implements OnChanges {
             const initial = this.initialValues();
             this.values.set({
                 ...initial,
-                properties: initial.properties.map((p) => {
-                    switch (p.type) {
-                        case 'manualConfirm':
-                            return {
-                                ...p,
-                                confirmationString: p.confirmationString ?? '',
-                            };
-                        case 'eocLog':
-                            return { ...p, message: p.message ?? '' };
-                        default:
-                            return p;
-                    }
-                }),
+                properties: castDraft(
+                    initial.properties.map((p) => {
+                        switch (p.type) {
+                            case 'manualConfirm':
+                                return {
+                                    ...p,
+                                    confirmationString:
+                                        p.confirmationString ?? '',
+                                };
+                            case 'eocLog':
+                                return { ...p, message: p.message ?? '' };
+                            default:
+                                return p;
+                        }
+                    })
+                ),
             });
         }
     }

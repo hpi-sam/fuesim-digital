@@ -17,7 +17,6 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import { cloneDeepMutable, newMeasureTemplate } from 'fuesim-digital-shared';
-import type { Immutable } from 'immer';
 import { MeasureTemplateFormComponent } from '../measure-template-form/measure-template-form.component';
 import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
@@ -128,7 +127,7 @@ export class MeasureTemplateModalComponent
         properties,
         categoryName,
         replacePrevious,
-    }: Immutable<MeasureTemplateValues> | MeasureTemplateValues) {
+    }: MeasureTemplateValues) {
         const action: AddMeasureTemplateAction | EditMeasureTemplateAction =
             this.isEditMode
                 ? {

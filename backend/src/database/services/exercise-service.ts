@@ -27,7 +27,6 @@ import {
     NotFoundError,
     PermissionDeniedError,
 } from '../../utils/http.js';
-import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 
 export class ExerciseService {
@@ -135,11 +134,7 @@ export class ExerciseService {
                         await accessKeyRepository.generateKey<TrainerKey>(8);
 
                     const migratedImportObject = migrateStateExport(file);
-                    const validationErrors =
-                        validateExerciseExport(migratedImportObject);
-                    if (validationErrors.length > 0) {
-                        throw new ValidationErrorWrapper(validationErrors);
-                    }
+                    validateExerciseExport(migratedImportObject);
 
                     const newInitialState = {
                         ...(migratedImportObject.history?.initialState ??
@@ -190,7 +185,7 @@ export class ExerciseService {
 
                     return activeExercise;
                 } catch (err) {
-                    if (err instanceof ValidationErrorWrapper) {
+                    if (err instanceof ZodError) {
                         throw new ApiError(
                             `The validation of the import failed: ${err.error}`
                         );

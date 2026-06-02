@@ -21,6 +21,7 @@ import { applyAction } from '../store/reduce-exercise-state.js';
 import { ReducerError } from '../store/reducer-error.js';
 import type { UUID } from '../utils/uuid.js';
 import { cloneDeepMutable } from '../utils/clone-deep.js';
+import { validateExerciseState } from '../store/validate-exercise-state.js';
 import { migrations } from './migration-functions.js';
 import type { Migration } from './migration-functions.js';
 
@@ -43,7 +44,6 @@ export function migrateStateExport(
                   initialState: history.initialState,
               }
             : undefined;
-    // TODO Validate migrated states again here
     return {
         ...stateExport,
         dataVersion: currentStateVersion,
@@ -168,6 +168,7 @@ export function applyMigrations<
             migrationsToApply,
             history.initialState
         );
+        validateExerciseState(intermediaryState);
         try {
             const actionsAppliedProperties = produce(
                 { intermediaryState, actionHistory: history.actionHistory },
@@ -175,7 +176,7 @@ export function applyMigrations<
                     draft.actionHistory.forEach((action, index) => {
                         if (action !== null) {
                             const deleteAction = !migrateAction(
-                                migrationsToApply,
+                                migrationsToApply, // TODO validate state here
                                 castImmutable(intermediaryState),
                                 action
                             );
@@ -201,7 +202,7 @@ export function applyMigrations<
                     });
                 }
             );
-            // TODO Validate State here
+            validateExerciseState(actionsAppliedProperties.intermediaryState);
             return {
                 currentState: actionsAppliedProperties.intermediaryState,
                 history: actionsAppliedProperties.actionHistory as any,
@@ -223,7 +224,7 @@ export function applyMigrations<
         migrationsToApply,
         propertiesToMigrate.currentState
     );
-    // TODO validate state here
+    validateExerciseState(currentState);
     return {
         currentState,
         history: undefined,

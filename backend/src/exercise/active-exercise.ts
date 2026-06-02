@@ -22,7 +22,6 @@ import type {
     ExerciseTemplateEntry,
 } from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
-import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
 import { RestoreError } from '../utils/restore-error.js';
 import { ActionWrapper } from './action-wrapper.js';
 import type { ExerciseClientWrapper } from './client-wrapper.js';
@@ -280,13 +279,6 @@ export class ActiveExercise {
         this.pause();
     }
 
-    private validateAction(action: ExerciseAction) {
-        const errors = validateExerciseAction(action);
-        if (errors.length > 0) {
-            throw new ValidationErrorWrapper(errors);
-        }
-    }
-
     public restore(keepActions: boolean): void {
         // Check State Version
         if (this.exercise.stateVersion !== currentStateVersion) {
@@ -297,10 +289,7 @@ export class ActiveExercise {
         }
 
         // Validate initial state
-        const result = validateExerciseState(this.exercise.initialStateString);
-        if (result !== true) {
-            throw new ValidationErrorWrapper([result]);
-        }
+        validateExerciseState(this.exercise.initialStateString);
 
         this.restoreState(keepActions);
     }
@@ -314,7 +303,7 @@ export class ActiveExercise {
         const currentState = cloneDeepMutable(this.exercise.initialStateString);
 
         this.temporaryActionHistory.forEach((actionWrapper) => {
-            this.validateAction(actionWrapper.getAction().actionString);
+            validateExerciseAction(actionWrapper.getAction().actionString);
             try {
                 applyAction(
                     currentState,

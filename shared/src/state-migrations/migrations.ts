@@ -1,11 +1,22 @@
-import { type WritableDraft } from 'immer';
+import {
+    castImmutable,
+    type Immutable,
+    produce,
+    type WritableDraft,
+} from 'immer';
 import { currentStateVersion, type ExerciseState } from '../state.js';
 import { newExerciseState } from '../state.js';
 import type { ParticipantKey } from '../exercise-keys.js';
-import type { MigratedStateExport } from '../export-import/file-format/state-export.js';
-import { StateExport } from '../export-import/file-format/state-export.js';
+import {
+    type StateExport,
+    type MigratedStateExport,
+} from '../export-import/file-format/state-export.js';
 import type { ExerciseAction } from '../store/action-reducers/action-reducers.js';
-import { PartialExport } from '../export-import/file-format/partial-export.js';
+import {
+    type MigratedPartialExport,
+    newMigratedPartialExport,
+    type PartialExport,
+} from '../export-import/file-format/partial-export.js';
 import { applyAction } from '../store/reduce-exercise-state.js';
 import { ReducerError } from '../store/reducer-error.js';
 import type { UUID } from '../utils/uuid.js';
@@ -14,54 +25,45 @@ import { migrations } from './migration-functions.js';
 import type { Migration } from './migration-functions.js';
 
 export function migrateStateExport(
-    stateExportToMigrate: StateExport
-): WritableDraft<MigratedStateExport> {
-    const stateExport = cloneDeepMutable(
-        stateExportToMigrate
-    ) as WritableDraft<MigratedStateExport>;
+    stateExport: StateExport
+): MigratedStateExport {
     const { currentState, history } = applyMigrations(stateExport.dataVersion, {
         currentState: stateExport.currentState,
-        history: stateExport.history
-            ? {
-                  initialState: stateExport.history.initialState,
-                  actions: stateExport.history.actionHistory,
-              }
-            : undefined,
+        history: stateExport.history,
     });
 
-    stateExport.dataVersion = currentStateVersion;
-    stateExport.currentState = currentState;
-    if (stateExport.history) {
-        if (history) {
-            stateExport.history = {
-                actionHistory: history.actions.filter(
-                    // Remove actions that are marked to be removed by the migrations
-                    (action): action is WritableDraft<ExerciseAction> =>
-                        action !== null
-                ),
-                initialState: history.initialState,
-            };
-        } else {
-            stateExport.history = undefined;
-        }
-    }
-    return stateExport;
+    const migratedHistory =
+        stateExport.history && history
+            ? {
+                  actionHistory: history.actions.filter(
+                      // Remove actions that are marked to be removed by the migrations
+                      (action): action is WritableDraft<ExerciseAction> =>
+                          action !== null
+                  ),
+                  initialState: history.initialState,
+              }
+            : undefined;
+    // TODO Validate migrated states again here
+    return {
+        ...stateExport,
+        dataVersion: currentStateVersion,
+        currentState,
+        history: migratedHistory,
+    };
 }
 export function migratePartialExport(
-    partialExportToMigrate: PartialExport,
+    partialExport: PartialExport,
     currentState: ExerciseState
-): PartialExport {
+): MigratedPartialExport {
     // Encapsulate the partial export in a state export and migrate it
-    const mutablePartialExport = cloneDeepMutable(partialExportToMigrate);
-    const dummyState = cloneDeepMutable(
-        newExerciseState('123456' as ParticipantKey)
-    );
-    const stateExport = cloneDeepMutable(
-        new StateExport({
+    const dummyState = newExerciseState('123456' as ParticipantKey);
+    const stateExport = {
+        type: 'complete',
+        currentState: {
             ...dummyState,
-            mapImageTemplates: mutablePartialExport.mapImageTemplates ?? [],
-            patientCategories: mutablePartialExport.patientCategories ?? [],
-            vehicleTemplates: mutablePartialExport.vehicleTemplates ?? [],
+            mapImageTemplates: partialExport.mapImageTemplates ?? [],
+            patientCategories: partialExport.patientCategories ?? [],
+            vehicleTemplates: partialExport.vehicleTemplates ?? [],
             // We need this hotfix since otherwise migration 44 is not happy
             materialTemplates: Object.fromEntries(
                 Object.entries(dummyState.materialTemplates).map(
@@ -77,24 +79,26 @@ export function migratePartialExport(
                     ]
                 )
             ),
-        })
-    );
-    stateExport.fileVersion = mutablePartialExport.fileVersion;
-    stateExport.dataVersion = mutablePartialExport.dataVersion;
-    const migratedStateExport = migrateStateExport(stateExport as StateExport);
+        },
+        fileVersion: partialExport.fileVersion,
+        dataVersion: partialExport.dataVersion,
+    } satisfies StateExport;
+
+    const migratedStateExport = migrateStateExport(stateExport);
+
     // Check for `undefined` in the original partial export here as `undefined` has the meaning of `no changes`
     // compared to `[]` with the meaning of `nothing`. If later choosing to override using this partial export,
     // `undefined` will be ignored while `[]` would remove all existing entries.
     const mapImageTemplates =
-        mutablePartialExport.mapImageTemplates !== undefined
+        partialExport.mapImageTemplates !== undefined
             ? Object.values(migratedStateExport.currentState.mapImageTemplates)
             : undefined;
     const patientCategories =
-        mutablePartialExport.patientCategories !== undefined
+        partialExport.patientCategories !== undefined
             ? migratedStateExport.currentState.patientCategories
             : undefined;
     let vehicleTemplates =
-        mutablePartialExport.vehicleTemplates !== undefined
+        partialExport.vehicleTemplates !== undefined
             ? Object.values(migratedStateExport.currentState.vehicleTemplates)
             : undefined;
 
@@ -120,12 +124,11 @@ export function migratePartialExport(
             }),
         }));
 
-    const migratedPartialExport = new PartialExport(
+    return newMigratedPartialExport(
         patientCategories,
         vehicleTemplates,
         mapImageTemplates
     );
-    return migratedPartialExport;
 }
 
 /**
@@ -134,21 +137,23 @@ export function migratePartialExport(
  * @returns The new state version
  */
 export function applyMigrations<
-    H extends { initialState: object; actions: (object | null)[] } | undefined,
+    H extends
+        | { initialState: object; actionHistory: (object | null)[] }
+        | undefined,
 >(
     dataVersion: number,
     propertiesToMigrate: {
-        currentState: object;
-        history: H;
+        currentState: Immutable<object>;
+        history: Immutable<H>;
     }
 ): {
-    currentState: WritableDraft<ExerciseState>;
+    currentState: ExerciseState;
     history: H extends undefined
         ? undefined
         :
               | {
-                    initialState: WritableDraft<ExerciseState>;
-                    actions: (WritableDraft<ExerciseAction> | null)[];
+                    initialState: ExerciseState;
+                    actions: (ExerciseAction | null)[];
                 }
               | undefined;
 } {
@@ -159,42 +164,47 @@ export function applyMigrations<
 
     const history = propertiesToMigrate.history;
     if (history) {
-        migrateState(migrationsToApply, history.initialState);
-        const intermediaryState = cloneDeepMutable(
+        const intermediaryState = migrateState(
+            migrationsToApply,
             history.initialState
-        ) as WritableDraft<ExerciseState>;
+        );
         try {
-            history.actions.forEach((action, index) => {
-                if (action !== null) {
-                    const deleteAction = !migrateAction(
-                        migrationsToApply,
-                        intermediaryState,
-                        action
-                    );
-                    if (!deleteAction) {
-                        try {
-                            applyAction(
-                                intermediaryState,
-                                action as ExerciseAction
+            const actionsAppliedProperties = produce(
+                { intermediaryState, actionHistory: history.actionHistory },
+                (draft) => {
+                    draft.actionHistory.forEach((action, index) => {
+                        if (action !== null) {
+                            const deleteAction = !migrateAction(
+                                migrationsToApply,
+                                castImmutable(intermediaryState),
+                                action
                             );
-                        } catch (e: unknown) {
-                            if (e instanceof ReducerError) {
-                                const json = JSON.stringify(action);
-                                console.warn(
-                                    `Error while applying action ${json}: ${e.message}`
-                                );
+                            if (!deleteAction) {
+                                try {
+                                    applyAction(
+                                        draft.intermediaryState,
+                                        action as ExerciseAction
+                                    );
+                                } catch (e: unknown) {
+                                    if (e instanceof ReducerError) {
+                                        const json = JSON.stringify(action);
+                                        console.warn(
+                                            `Error while applying action ${json}: ${e.message}`
+                                        );
+                                    }
+                                    throw e;
+                                }
+                            } else {
+                                draft.actionHistory[index] = null;
                             }
-                            throw e;
                         }
-                    } else {
-                        history.actions[index] = null;
-                    }
+                    });
                 }
-            });
+            );
+            // TODO Validate State here
             return {
-                currentState: intermediaryState,
-                // history has been migrated in place
-                history: history as any,
+                currentState: actionsAppliedProperties.intermediaryState,
+                history: actionsAppliedProperties.actionHistory as any,
             };
         } catch (e: unknown) {
             if (e instanceof ReducerError) {
@@ -209,19 +219,26 @@ export function applyMigrations<
             }
         }
     }
-    migrateState(migrationsToApply, propertiesToMigrate.currentState);
-    const currentState =
-        propertiesToMigrate.currentState as WritableDraft<ExerciseState>;
+    const currentState = migrateState(
+        migrationsToApply,
+        propertiesToMigrate.currentState
+    );
+    // TODO validate state here
     return {
         currentState,
-        history: undefined as any,
+        history: undefined,
     };
 }
 
-function migrateState(migrationsToApply: Migration[], currentState: object) {
+function migrateState(
+    migrationsToApply: Migration[],
+    currentState: Immutable<object>
+): ExerciseState {
+    const stateToMigrate = cloneDeepMutable(currentState);
     migrationsToApply.forEach((migration) => {
-        if (migration.state) migration.state(currentState);
+        if (migration.state) migration.state(stateToMigrate);
     });
+    return stateToMigrate as ExerciseState;
 }
 
 /**

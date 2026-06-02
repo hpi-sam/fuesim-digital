@@ -4,7 +4,6 @@ import {
     isAccessKey,
     isExerciseKey,
     isParallelExerciseKey,
-    type ExportImportFile,
 } from 'fuesim-digital-shared';
 import { escapeRegExp } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
@@ -122,7 +121,7 @@ export class LandingPageComponent {
                 // The file dialog has been aborted.
                 return;
             }
-            const importPlain = JSON.parse(importString) as ExportImportFile;
+            const importPlain = JSON.parse(importString);
             const type = importPlain.type;
             if (!['complete', 'partial'].includes(type)) {
                 throw new Error(`Ungültiger Dateityp: \`type === ${type}\``);

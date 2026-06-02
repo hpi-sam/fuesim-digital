@@ -16,7 +16,6 @@ import {
     PostParallelExerciseRequestData,
     TrainerKey,
     type ExerciseTimeline,
-    type StateExport,
     type PatchExerciseTemplateRequestData,
     ExerciseTemplateId,
     ParallelExerciseId,
@@ -48,7 +47,7 @@ export class ApiService {
         );
     }
 
-    public async importExercise(exportedState: StateExport) {
+    public async importExercise(exportedState: object) {
         return lastValueFrom(
             this.httpClient
                 .post(`${httpOrigin}/api/exercise`, exportedState)
@@ -141,7 +140,7 @@ export class ApiService {
         ).then(getExerciseTemplateResponseDataSchema.parse);
     }
 
-    public async importExerciseTemplate(exportedState: StateExport) {
+    public async importExerciseTemplate(exportedState: object) {
         return lastValueFrom(
             this.httpClient.post(
                 `${httpOrigin}/api/exercise_templates/import`,

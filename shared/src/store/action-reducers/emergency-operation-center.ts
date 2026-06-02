@@ -1,77 +1,53 @@
-import {
-    IsBoolean,
-    IsInt,
-    IsOptional,
-    IsString,
-    IsUUID,
-    MaxLength,
-    Min,
-} from 'class-validator';
 import { z } from 'zod';
-import { type Immutable, WritableDraft } from 'immer';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import type { WritableDraft, Immutable } from 'immer';
+import type { ActionReducer } from '../action-reducer.js';
 import type { ExerciseState } from '../../state.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { newEocLogEntry } from '../../models/eoc-log-entry.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    eocLogEntrySchema,
+    newEocLogEntry,
+} from '../../models/eoc-log-entry.js';
+import { type UUID } from '../../utils/uuid.js';
 import {
     type VehicleParameters,
     vehicleParametersSchema,
 } from '../../models/utils/vehicle-parameters.js';
 import { newAlarmGroupStartPoint } from '../../models/utils/start-points.js';
+import { alarmGroupSchema } from '../../models/alarm-group.js';
+import { transferPointSchema } from '../../models/transfer-point.js';
 import { getElement } from './utils/get-element.js';
 import { logAlarmGroupSent } from './utils/log.js';
 import { TransferActionReducers } from './transfer.js';
 import { VehicleActionReducers } from './vehicle.js';
 
-export class AddLogEntryAction implements Action {
-    @IsValue('[Emergency Operation Center] Add Log Entry' as const)
-    public readonly type = '[Emergency Operation Center] Add Log Entry';
-    @IsString()
-    @MaxLength(255)
-    public readonly name!: string;
-    @IsString()
-    @MaxLength(65535)
-    public readonly message!: string;
-    @IsBoolean()
-    public readonly isPrivate: boolean = false;
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id!: UUID;
-}
+export const addLogEntryActionSchema = z.strictObject({
+    type: z.literal('[Emergency Operation Center] Add Log Entry'),
+    name: z.string().max(255),
+    message: z.string().max(65535),
+    isPrivate: z.boolean(),
+    id: eocLogEntrySchema.shape.id,
+});
+export type AddLogEntryAction = Immutable<
+    z.infer<typeof addLogEntryActionSchema>
+>;
 
-export class SendAlarmGroupAction implements Action {
-    @IsValue('[Emergency Operation Center] Send Alarm Group' as const)
-    public readonly type = '[Emergency Operation Center] Send Alarm Group';
-
-    @IsString()
-    @MaxLength(255)
-    public readonly clientName!: string;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly alarmGroupId!: UUID;
-
-    @IsZodSchema(z.array(vehicleParametersSchema))
-    public readonly sortedVehicleParameters!: readonly VehicleParameters[];
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly targetTransferPointId!: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly firstVehiclesCount!: number;
-
-    @IsOptional()
-    @IsUUID(4, uuidValidationOptions)
-    public readonly firstVehiclesTargetTransferPointId: UUID | undefined;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly eocLogId!: UUID;
-}
+export const sendAlarmGroupActionSchema = z.strictObject({
+    type: z.literal('[Emergency Operation Center] Send Alarm Group'),
+    clientName: z.string().max(255),
+    alarmGroupId: alarmGroupSchema.shape.id,
+    sortedVehicleParameters: z.array(vehicleParametersSchema),
+    targetTransferPointId: transferPointSchema.shape.id,
+    firstVehiclesCount: z.int().nonnegative(),
+    firstVehiclesTargetTransferPointId: transferPointSchema.shape.id.optional(),
+    eocLogId: eocLogEntrySchema.shape.id,
+});
+export type SendAlarmGroupAction = Immutable<
+    z.infer<typeof sendAlarmGroupActionSchema>
+>;
 
 export namespace EmergencyOperationCenterActionReducers {
     export const addLogEntry: ActionReducer<AddLogEntryAction> = {
-        action: AddLogEntryAction,
+        type: '[Emergency Operation Center] Add Log Entry',
+        actionSchema: addLogEntryActionSchema,
         reducer: (draftState, { name, message, isPrivate, id }) => {
             const logEntry = newEocLogEntry(
                 id,
@@ -91,7 +67,8 @@ export namespace EmergencyOperationCenterActionReducers {
         },
     };
     export const sendAlarmGroup: ActionReducer<SendAlarmGroupAction> = {
-        action: SendAlarmGroupAction,
+        type: '[Emergency Operation Center] Send Alarm Group',
+        actionSchema: sendAlarmGroupActionSchema,
         reducer: (
             draftState,
             {

@@ -1,8 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import type {
-    ExportImportFile,
-    GetExerciseTemplatesResponseData,
-} from 'fuesim-digital-shared';
+import type { GetExerciseTemplatesResponseData } from 'fuesim-digital-shared';
 import { HttpResourceRef } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
@@ -58,7 +55,7 @@ export class ExerciseTemplateListComponent {
         try {
             const importString = await fileList.item(0)?.text();
             if (importString === undefined) return;
-            const importPlain = JSON.parse(importString) as ExportImportFile;
+            const importPlain = JSON.parse(importString);
             const type = importPlain.type;
             if (type !== 'complete') {
                 this.messageService.postMessage({

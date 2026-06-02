@@ -1,88 +1,90 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsObject, IsOptional, ValidateNested } from 'class-validator';
-import { type ExerciseState, exerciseStateSchema } from '../../state.js';
+import {
+    IsArray,
+    IsInt,
+    IsObject,
+    IsOptional,
+    Min,
+    ValidateNested,
+} from 'class-validator';
+import { z } from 'zod';
+import type { Immutable } from 'immer';
+import {
+    currentStateVersion,
+    type ExerciseState,
+    exerciseStateSchema,
+} from '../../state.js';
 import type { ExerciseAction } from '../../store/action-reducers/action-reducers.js';
 import { IsExerciseAction } from '../../store/validate-exercise-action.js';
-import { IsValue } from '../../utils/validators/is-value.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { BaseExportImportFile } from './base-file.js';
+import { exportImportFileSchema } from './export-import-file.js';
 
-export class StateHistoryCompound {
-    @IsArray()
-    public actionHistory: object[];
-
+export const stateHistoryCompoundSchema = z.object({
+    actionHistory: z.array(z.object()),
     /*
-    This can be some arbitrary object because we can get an invalid or not migrated state
-     */
-    @IsObject()
-    public initialState: object;
+ This can be some arbitrary object because we can get an invalid or not migrated state
+  */
+    initialState: z.object(),
+});
+export type StateHistoryCompound = Immutable<
+    z.infer<typeof stateHistoryCompoundSchema>
+>;
 
-    public constructor(actionHistory: ExerciseAction[], initialState: object) {
-        this.actionHistory = actionHistory;
-        this.initialState = initialState;
-    }
-}
-
-export class MigratedStateHistoryCompound extends StateHistoryCompound {
+export class MigratedStateHistoryCompound {
     @IsArray()
     @IsExerciseAction({ each: true })
-    public override actionHistory: ExerciseAction[];
+    public actionHistory: ExerciseAction[];
 
     /*
     This can be some arbitrary object because we can get an invalid or not migrated state
      */
     @IsObject()
-    public override initialState: ExerciseState;
+    public initialState: ExerciseState;
 
     public constructor(
         actionHistory: ExerciseAction[],
         initialState: ExerciseState
     ) {
-        super(actionHistory, initialState);
         this.actionHistory = actionHistory;
         this.initialState = initialState;
     }
 }
 
-export class StateExport extends BaseExportImportFile {
-    @IsValue('complete' as const)
+export const stateExportSchema = z.object({
+    ...exportImportFileSchema.shape,
+    type: z.literal('complete'),
+    /*
+This can be some arbitrary object because we can get an invalid or not migrated state
+ */
+    currentState: z.any(),
+    history: stateHistoryCompoundSchema.optional(),
+});
+
+export type StateExport = Immutable<z.infer<typeof stateExportSchema>>;
+
+export class MigratedStateExport {
+    @IsInt()
+    @Min(0)
+    public readonly fileVersion: number = 1;
+
+    @IsInt()
+    @Min(0)
+    public readonly dataVersion: number = currentStateVersion;
+
     public readonly type: 'complete' = 'complete';
 
-    /*
-    This can be some arbitrary object because we can get an invalid or not migrated state
-     */
-    @IsObject()
-    public currentState: object;
-
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => StateHistoryCompound)
-    public readonly history?: StateHistoryCompound;
-
-    public constructor(
-        currentState: object,
-        stateHistory?: StateHistoryCompound
-    ) {
-        super();
-        this.currentState = currentState;
-        this.history = stateHistory;
-    }
-}
-
-export class MigratedStateExport extends StateExport {
     @IsZodSchema(exerciseStateSchema)
-    public override currentState: ExerciseState;
+    public currentState: ExerciseState;
 
     @IsOptional()
     @ValidateNested()
     @Type(() => MigratedStateHistoryCompound)
-    public override readonly history?: MigratedStateHistoryCompound;
+    public readonly history?: MigratedStateHistoryCompound;
 
     public constructor(
         currentState: ExerciseState,
         stateHistory?: MigratedStateHistoryCompound
     ) {
-        super(currentState, stateHistory);
         this.currentState = currentState;
         this.history = stateHistory;
     }

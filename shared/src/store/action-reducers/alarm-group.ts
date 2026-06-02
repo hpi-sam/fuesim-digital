@@ -1,98 +1,83 @@
-import { IsNumber, IsString, IsUUID, Min, ValidateIf } from 'class-validator';
-import { WritableDraft } from 'immer';
+import type { WritableDraft, Immutable } from 'immer';
+import { z } from 'zod';
 import { type AlarmGroup, alarmGroupSchema } from '../../models/alarm-group.js';
-import {
-    type AlarmGroupVehicle,
-    alarmGroupVehicleSchema,
-} from '../../models/utils/alarm-group-vehicle.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import { alarmGroupVehicleSchema } from '../../models/utils/alarm-group-vehicle.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
-import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID } from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getElement } from './utils/get-element.js';
 
-export class AddAlarmGroupAction implements Action {
-    @IsValue('[AlarmGroup] Add AlarmGroup' as const)
-    public readonly type = '[AlarmGroup] Add AlarmGroup';
+export const addAlarmGroupActionSchema = z.strictObject({
+    type: z.literal('[AlarmGroup] Add AlarmGroup'),
+    alarmGroup: alarmGroupSchema,
+});
+export type AddAlarmGroupAction = Immutable<
+    z.infer<typeof addAlarmGroupActionSchema>
+>;
 
-    @IsZodSchema(alarmGroupSchema)
-    public readonly alarmGroup!: AlarmGroup;
-}
+export const renameAlarmGroupActionSchema = z.strictObject({
+    type: z.literal('[AlarmGroup] Rename AlarmGroup'),
+    alarmGroupId: alarmGroupSchema.shape.id,
+    name: z.string(),
+});
 
-export class RenameAlarmGroupAction implements Action {
-    @IsValue('[AlarmGroup] Rename AlarmGroup' as const)
-    public readonly type = '[AlarmGroup] Rename AlarmGroup';
+export type RenameAlarmGroupAction = Immutable<
+    z.infer<typeof renameAlarmGroupActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly alarmGroupId!: UUID;
+export const limitAlarmGroupActionSchema = z.strictObject({
+    type: z.literal('[AlarmGroup] Limit AlarmGroup'),
+    alarmGroupId: alarmGroupSchema.shape.id,
+    triggerLimit: z.int().nonnegative().nullable(),
+});
 
-    @IsString()
-    public readonly name!: string;
-}
+export type LimitAlarmGroupAction = Immutable<
+    z.infer<typeof limitAlarmGroupActionSchema>
+>;
 
-export class LimitAlarmGroupAction implements Action {
-    @IsValue('[AlarmGroup] Limit AlarmGroup' as const)
-    public readonly type = '[AlarmGroup] Limit AlarmGroup';
+export const removeAlarmGroupActionSchema = z.strictObject({
+    type: z.literal('[AlarmGroup] Remove AlarmGroup'),
+    alarmGroupId: alarmGroupSchema.shape.id,
+});
+export type RemoveAlarmGroupAction = Immutable<
+    z.infer<typeof removeAlarmGroupActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly alarmGroupId!: UUID;
+export const addAlarmGroupVehicleActionSchema = z.strictObject({
+    type: z.literal('[AlarmGroup] Add AlarmGroupVehicle'),
+    alarmGroupId: alarmGroupSchema.shape.id,
+    alarmGroupVehicle: alarmGroupVehicleSchema,
+});
 
-    @ValidateIf((_, value) => value !== null)
-    @IsNumber()
-    @Min(0)
-    public readonly triggerLimit!: number | null;
-}
+export type AddAlarmGroupVehicleAction = Immutable<
+    z.infer<typeof addAlarmGroupVehicleActionSchema>
+>;
 
-export class RemoveAlarmGroupAction implements Action {
-    @IsValue('[AlarmGroup] Remove AlarmGroup' as const)
-    public readonly type = '[AlarmGroup] Remove AlarmGroup';
+export const editAlarmGroupVehicleActionSchema = z.strictObject({
+    type: z.literal('[AlarmGroup] Edit AlarmGroupVehicle'),
+    alarmGroupId: alarmGroupSchema.shape.id,
+    alarmGroupVehicleId: alarmGroupVehicleSchema.shape.id,
+    time: z.int().nonnegative(),
+    name: z.string(),
+});
+export type EditAlarmGroupVehicleAction = Immutable<
+    z.infer<typeof editAlarmGroupVehicleActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly alarmGroupId!: UUID;
-}
-export class AddAlarmGroupVehicleAction implements Action {
-    @IsValue('[AlarmGroup] Add AlarmGroupVehicle' as const)
-    public readonly type = '[AlarmGroup] Add AlarmGroupVehicle';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly alarmGroupId!: UUID;
-
-    @IsZodSchema(alarmGroupVehicleSchema)
-    public readonly alarmGroupVehicle!: AlarmGroupVehicle;
-}
-export class EditAlarmGroupVehicleAction implements Action {
-    @IsValue('[AlarmGroup] Edit AlarmGroupVehicle' as const)
-    public readonly type = '[AlarmGroup] Edit AlarmGroupVehicle';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly alarmGroupId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly alarmGroupVehicleId!: UUID;
-
-    @IsNumber()
-    @Min(0)
-    public readonly time!: number;
-
-    @IsString()
-    public readonly name!: string;
-}
-export class RemoveAlarmGroupVehicleAction implements Action {
-    @IsValue('[AlarmGroup] Remove AlarmGroupVehicle' as const)
-    public readonly type = '[AlarmGroup] Remove AlarmGroupVehicle';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly alarmGroupId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly alarmGroupVehicleId!: UUID;
-}
+export const removeAlarmGroupVehicleActionSchema = z.strictObject({
+    type: z.literal('[AlarmGroup] Remove AlarmGroupVehicle'),
+    alarmGroupId: alarmGroupSchema.shape.id,
+    alarmGroupVehicleId: alarmGroupVehicleSchema.shape.id,
+});
+export type RemoveAlarmGroupVehicleAction = Immutable<
+    z.infer<typeof removeAlarmGroupVehicleActionSchema>
+>;
 
 export namespace AlarmGroupActionReducers {
     export const addAlarmGroup: ActionReducer<AddAlarmGroupAction> = {
-        action: AddAlarmGroupAction,
+        type: '[AlarmGroup] Add AlarmGroup',
+        actionSchema: addAlarmGroupActionSchema,
         reducer: (draftState, { alarmGroup }) => {
             draftState.alarmGroups[alarmGroup.id] =
                 cloneDeepMutable(alarmGroup);
@@ -102,7 +87,8 @@ export namespace AlarmGroupActionReducers {
     };
 
     export const renameAlarmGroup: ActionReducer<RenameAlarmGroupAction> = {
-        action: RenameAlarmGroupAction,
+        type: '[AlarmGroup] Rename AlarmGroup',
+        actionSchema: renameAlarmGroupActionSchema,
         reducer: (draftState, { alarmGroupId, name }) => {
             const alarmGroup = getElement(
                 draftState,
@@ -116,7 +102,8 @@ export namespace AlarmGroupActionReducers {
     };
 
     export const limitAlarmGroup: ActionReducer<LimitAlarmGroupAction> = {
-        action: LimitAlarmGroupAction,
+        type: '[AlarmGroup] Limit AlarmGroup',
+        actionSchema: limitAlarmGroupActionSchema,
         reducer: (draftState, { alarmGroupId, triggerLimit }) => {
             const alarmGroup = getElement(
                 draftState,
@@ -130,7 +117,8 @@ export namespace AlarmGroupActionReducers {
     };
 
     export const removeAlarmGroup: ActionReducer<RemoveAlarmGroupAction> = {
-        action: RemoveAlarmGroupAction,
+        type: '[AlarmGroup] Remove AlarmGroup',
+        actionSchema: removeAlarmGroupActionSchema,
         reducer: (draftState, { alarmGroupId }) => {
             getElement(draftState, 'alarmGroup', alarmGroupId);
             delete draftState.alarmGroups[alarmGroupId];
@@ -141,7 +129,8 @@ export namespace AlarmGroupActionReducers {
 
     export const addAlarmGroupVehicle: ActionReducer<AddAlarmGroupVehicleAction> =
         {
-            action: AddAlarmGroupVehicleAction,
+            type: '[AlarmGroup] Add AlarmGroupVehicle',
+            actionSchema: addAlarmGroupVehicleActionSchema,
             reducer: (draftState, { alarmGroupId, alarmGroupVehicle }) => {
                 const alarmGroup = getElement(
                     draftState,
@@ -157,7 +146,8 @@ export namespace AlarmGroupActionReducers {
 
     export const editAlarmGroupVehicle: ActionReducer<EditAlarmGroupVehicleAction> =
         {
-            action: EditAlarmGroupVehicleAction,
+            type: '[AlarmGroup] Edit AlarmGroupVehicle',
+            actionSchema: editAlarmGroupVehicleActionSchema,
             reducer: (
                 draftState,
                 { alarmGroupId, alarmGroupVehicleId, time, name }
@@ -180,7 +170,8 @@ export namespace AlarmGroupActionReducers {
 
     export const removeAlarmGroupVehicle: ActionReducer<RemoveAlarmGroupVehicleAction> =
         {
-            action: RemoveAlarmGroupVehicleAction,
+            type: '[AlarmGroup] Remove AlarmGroupVehicle',
+            actionSchema: removeAlarmGroupVehicleActionSchema,
             reducer: (draftState, { alarmGroupId, alarmGroupVehicleId }) => {
                 const alarmGroup = getElement(
                     draftState,

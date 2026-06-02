@@ -1,37 +1,25 @@
-import { plainToInstance } from 'class-transformer';
-import type { ValidationError } from 'class-validator';
-import { validateSync } from 'class-validator';
-import type { ExportImportFile } from '../export-import/file-format/export-import-file.js';
-import { StateExport } from '../export-import/file-format/state-export.js';
-import { PartialExport } from '../export-import/file-format/partial-export.js';
-import type { Constructor } from '../utils/constructor.js';
-import { defaultValidateOptions } from './validation-options.js';
+import { exportImportFileSchema } from '../export-import/file-format/export-import-file.js';
+import type { StateExport } from '../export-import/file-format/state-export.js';
+import { stateExportSchema } from '../export-import/file-format/state-export.js';
+import {
+    type PartialExport,
+    partialExportSchema,
+} from '../export-import/file-format/partial-export.js';
 
 /**
  *
- * @param exportImportFile A json object that should be checked for validity.
- * @returns An array of errors validating {@link exportImportFile}. An empty array indicates a valid `ExportImportFile` object.
+ * @param exportImportFile A JSON object that should be checked for validity.
+ * @returns Correctly typed partial or state export.
  */
 export function validateExerciseExport(
-    exportImportFile: ExportImportFile
-): (ValidationError | string)[] {
-    // Be aware that `exportImportFile` could be any json object. We need to program defensively here.
-    if (typeof exportImportFile.type !== 'string') {
-        return ['Export/import type is not a string.'];
+    exportImportFile: object
+): PartialExport | StateExport {
+    const parsedFile = exportImportFileSchema.parse(exportImportFile);
+    switch (parsedFile.type) {
+        case 'partial':
+            return partialExportSchema.parse(exportImportFile);
+        case 'complete': {
+            return stateExportSchema.parse(exportImportFile);
+        }
     }
-    const exportImportClass = { complete: StateExport, partial: PartialExport }[
-        exportImportFile.type
-    ];
-    // if the exportImportFile.type is not a valid exportImportClass type, the exportImportClass is undefined.
-    // Defensive, see comment above
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!exportImportClass) {
-        return [`Unknown export/import type: ${exportImportFile.type}`];
-    }
-
-    const exportImportFileInstance = plainToInstance(
-        exportImportClass as Constructor<ExportImportFile>,
-        exportImportFile
-    );
-    return validateSync(exportImportFileInstance, defaultValidateOptions);
 }

@@ -11,7 +11,6 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
-    PartialExport,
     migratePartialExport,
     transferPointImage,
     validateExerciseExport,
@@ -211,19 +210,16 @@ export class TrainerMapEditorComponent implements OnInit {
                 // The file dialog has been aborted.
                 return;
             }
-            const importedPlainObject = JSON.parse(
-                importedText
-            ) as PartialExport;
+            const importedPlainObject = JSON.parse(importedText);
+
+            const partialExport = validateExerciseExport(importedPlainObject);
+            if (partialExport.type !== 'partial') {
+                throw Error('');
+            }
             const migratedPartialExport = migratePartialExport(
-                importedPlainObject,
+                partialExport,
                 selectStateSnapshot(selectExerciseState, this.store)
             );
-            const validation = validateExerciseExport(migratedPartialExport);
-            if (validation.length > 0) {
-                throw Error(
-                    `PartialExport is invalid:\n${validation.join('\n')}`
-                );
-            }
             openPartialImportOverwriteModal(
                 this.ngbModalService,
                 migratedPartialExport

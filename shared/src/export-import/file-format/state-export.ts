@@ -1,22 +1,6 @@
-import { Type } from 'class-transformer';
-import {
-    IsArray,
-    IsInt,
-    IsObject,
-    IsOptional,
-    Min,
-    ValidateNested,
-} from 'class-validator';
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import {
-    currentStateVersion,
-    type ExerciseState,
-    exerciseStateSchema,
-} from '../../state.js';
-import type { ExerciseAction } from '../../store/action-reducers/action-reducers.js';
-import { IsExerciseAction } from '../../store/validate-exercise-action.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { exerciseStateSchema } from '../../state.js';
 import { exportImportFileSchema } from './export-import-file.js';
 
 export const stateHistoryCompoundSchema = z.object({
@@ -30,25 +14,16 @@ export type StateHistoryCompound = Immutable<
     z.infer<typeof stateHistoryCompoundSchema>
 >;
 
-export class MigratedStateHistoryCompound {
-    @IsArray()
-    @IsExerciseAction({ each: true })
-    public actionHistory: ExerciseAction[];
-
+export const migratedStateHistoryCompoundSchema = z.object({
+    actionHistory: z.array(exerciseActionSchema),
     /*
     This can be some arbitrary object because we can get an invalid or not migrated state
      */
-    @IsObject()
-    public initialState: ExerciseState;
-
-    public constructor(
-        actionHistory: ExerciseAction[],
-        initialState: ExerciseState
-    ) {
-        this.actionHistory = actionHistory;
-        this.initialState = initialState;
-    }
-}
+    initialState: exerciseStateSchema,
+});
+export type MigratedStateHistoryCompound = Immutable<
+    z.infer<typeof migratedStateHistoryCompoundSchema>
+>;
 
 export const stateExportSchema = z.object({
     ...exportImportFileSchema.shape,
@@ -62,30 +37,11 @@ This can be some arbitrary object because we can get an invalid or not migrated 
 
 export type StateExport = Immutable<z.infer<typeof stateExportSchema>>;
 
-export class MigratedStateExport {
-    @IsInt()
-    @Min(0)
-    public readonly fileVersion: number = 1;
-
-    @IsInt()
-    @Min(0)
-    public readonly dataVersion: number = currentStateVersion;
-
-    public readonly type: 'complete' = 'complete';
-
-    @IsZodSchema(exerciseStateSchema)
-    public currentState: ExerciseState;
-
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => MigratedStateHistoryCompound)
-    public readonly history?: MigratedStateHistoryCompound;
-
-    public constructor(
-        currentState: ExerciseState,
-        stateHistory?: MigratedStateHistoryCompound
-    ) {
-        this.currentState = currentState;
-        this.history = stateHistory;
-    }
-}
+export const migratedStateExportSchema = z.object({
+    ...exportImportFileSchema.shape,
+    currentState: exerciseStateSchema,
+    history: migratedStateHistoryCompoundSchema.optional(),
+});
+export type MigratedStateExport = Immutable<
+    z.infer<typeof migratedStateExportSchema>
+>;

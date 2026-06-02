@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import { IsZodSchema } from '../../../utils/validators/is-zod-object.js';
 import { transferPositionSchema } from './transfer-position.js';
 import { mapPositionSchema } from './map-position.js';
 import { simulatedRegionPositionSchema } from './simulated-region-position.js';
@@ -16,8 +15,3 @@ export const positionSchema = z.union([
     transferPositionSchema,
     vehiclePositionSchema,
 ]);
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export function IsPosition() {
-    return IsZodSchema(positionSchema);
-}

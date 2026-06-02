@@ -112,7 +112,7 @@ export class ExerciseClientWrapper extends ClientWrapper {
         }
         this.relatedExerciseClient = existingClient;
         this.chosenExercise.setClientActive(this);
-        return existingClient.id;
+        return existingClient?.id ?? null;
     }
 
     /**

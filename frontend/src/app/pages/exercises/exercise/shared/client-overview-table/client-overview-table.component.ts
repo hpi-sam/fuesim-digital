@@ -8,6 +8,7 @@ import {
     NgbDropdownMenu,
     NgbDropdownButtonItem,
     NgbDropdownItem,
+    NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
@@ -34,6 +35,7 @@ import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
         AsyncPipe,
         SpecificRoleDisplayNamePipe,
         ValuesPipe,
+        NgbTooltip,
     ],
 })
 export class ClientOverviewTableComponent {
@@ -70,6 +72,13 @@ export class ClientOverviewTableComponent {
             type: '[Client] Set waitingroom',
             clientId,
             shouldBeInWaitingRoom,
+        });
+    }
+
+    public removeClient(clientId: UUID): void {
+        this.exerciseService.proposeAction({
+            type: '[Client] Remove client',
+            clientId,
         });
     }
 }

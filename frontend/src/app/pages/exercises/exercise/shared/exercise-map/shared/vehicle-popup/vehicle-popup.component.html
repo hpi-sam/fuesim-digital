@@ -1,6 +1,13 @@
 @if (vehicle$ | async; as vehicle) {
     <h5 class="popover-header">
         {{ vehicle.name }}
+
+        @if (currentRole() === 'trainer') {
+            <app-help-button
+                url="2_exercises/3_exercise_elements.html#fahrzeuge-mit-personal-und-material"
+            />
+        }
+
         <button
             (click)="closePopup()"
             type="button"
@@ -8,7 +15,7 @@
         ></button>
     </h5>
     <div class="popover-body">
-        @if ((currentRole$ | async) === 'trainer') {
+        @if (currentRole() === 'trainer') {
             <div class="mb-3">
                 <label class="form-label">Fahrzeugname</label>
                 <app-vehicle-name-editor [vehicleId]="vehicle.id" />

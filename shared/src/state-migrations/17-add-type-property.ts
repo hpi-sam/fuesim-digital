@@ -192,7 +192,12 @@ export const addTypeProperty17: Migration = {
             };
             patientCategories: {
                 type: 'patientCategory';
-                patientTemplates: { type: 'patientTemplate' }[];
+                patientTemplates: {
+                    type: 'patientTemplate';
+                    healthStates: {
+                        [key: UUID]: { type: 'patientHealthState' };
+                    };
+                }[];
             }[];
             patients: {
                 [key: UUID]: {
@@ -280,6 +285,11 @@ export const addTypeProperty17: Migration = {
                 patientCategory.type = 'patientCategory';
                 patientCategory.patientTemplates.forEach((patientTemplate) => {
                     patientTemplate.type = 'patientTemplate';
+                    Object.values(patientTemplate.healthStates).forEach(
+                        (healthState) => {
+                            healthState.type = 'patientHealthState';
+                        }
+                    );
                 });
             }
         );

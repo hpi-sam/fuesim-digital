@@ -22,10 +22,10 @@ export function registerControlParallelExerciseHandler(
         }
         switch (action) {
             case 'start':
-                await clientWrapper.start();
+                clientWrapper.start();
                 break;
             case 'pause':
-                await clientWrapper.pause();
+                clientWrapper.pause();
                 break;
         }
         callback({

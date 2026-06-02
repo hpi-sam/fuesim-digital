@@ -19,7 +19,7 @@ services:
             # Example
             # - ./about:/usr/local/app/frontend/assets/about
     db:
-        image: postgres:18
+        image: docker.io/postgres:18
         volumes:
             - db:/var/lib/postgresql
         # Use this to expose the database to your host machine

@@ -18,12 +18,19 @@ import { selectExerciseState } from '../../../../../state/application/selectors/
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { FormatDurationPipe } from '../../../../../shared/pipes/format-duration.pipe';
+import { HelpButtonComponent } from '../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-time-travel',
     templateUrl: './time-travel.component.html',
     styleUrls: ['./time-travel.component.scss'],
-    imports: [ExerciseMapComponent, FormsModule, AsyncPipe, FormatDurationPipe],
+    imports: [
+        ExerciseMapComponent,
+        FormsModule,
+        AsyncPipe,
+        FormatDurationPipe,
+        HelpButtonComponent,
+    ],
 })
 export class TimeTravelComponent implements OnDestroy {
     private readonly modalService = inject(NgbModal);

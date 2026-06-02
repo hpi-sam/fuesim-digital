@@ -55,6 +55,7 @@ This project is currently developed as a [bachelor project](https://hpi.de/en/st
 7. Connect an OpenID-Connect provider for authentication in the `.env` file.
 8. (Optional) We have a list of recommended [vscode](https://code.visualstudio.com/) extensions. We strongly recommend you to use them if you are developing. You can see them via [the `@recommended` filter in the extensions panel](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
 9. (Optional) We have prepared default settings, tasks and debug configurations for VS Code. You can find them in `.vscode/*.example`. Crete a copy of those files removing the `.example` and adjust them to your needs. The files without `.example`-Extensions are untracked so your adjustments won't be committed automatically.
+10. (Optional) If you want to edit the docs, setup `mdbook` by running `npm run docs:setup` in the project dir.
 
 ## Starting for development
 
@@ -152,6 +153,10 @@ We are using [cypress](https://www.npmjs.com/package/cypress) to run the end-to-
 To run the tests locally, it is recommended to use the vscode [task](https://code.visualstudio.com/docs/editor/tasks) `Start all & cypress`. Alternatively, you can start the frontend and backend manually and then run `npm run cy:open` in `/frontend`.
 
 If you only want to check whether the tests pass, you can run `npm run cy:run` in `/frontend` instead.
+
+## Documentation
+
+In the `docs` folder, a documentation built using `mdbook` lives. If you add new features or change existing behavior, you should update the documentation there. To use `mdbook`, you have to install Rust and the `cargo` tool. Then you can setup the `mdbook` using `npm run docs:setup`. To serve the docs in development, use `npm run docs:serve`. To lint the docs, use `npm run docs:lint`. To build the HTML output of the docs, run `npm run docs:build`. Further usage information about `mdbooks` can be found in the [summary](./docs/src/SUMMARY.md).
 
 ## Benchmarking
 

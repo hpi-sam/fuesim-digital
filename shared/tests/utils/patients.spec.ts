@@ -14,7 +14,7 @@ import {
 import { SpatialTree } from '../../src/models/utils/spatial-tree.js';
 
 export function addPatient(
-    state: ExerciseState,
+    state: WritableDraft<ExerciseState>,
     pretriageStatus: PatientStatus,
     realStatus: PatientStatus,
     position?: Position,

@@ -90,7 +90,7 @@ export type SetVisibleStatusAction = Immutable<
 const setUserTextActionSchema = z.strictObject({
     type: z.literal('[Patient] Set Remarks'),
     patientId: patientSchema.shape.id,
-    remarks: z.string(), // TODO
+    remarks: z.string().max(65535),
 });
 export type SetUserTextAction = Immutable<
     z.infer<typeof setUserTextActionSchema>
@@ -99,7 +99,7 @@ export type SetUserTextAction = Immutable<
 const setCustomQRCodeActionSchema = z.strictObject({
     type: z.literal('[Patient] Set Custom QR Code'),
     patientId: patientSchema.shape.id,
-    customQRCode: z.string(), // TODO
+    customQRCode: z.string().max(65535),
 });
 export type SetCustomQRCodeAction = Immutable<
     z.infer<typeof setCustomQRCodeActionSchema>

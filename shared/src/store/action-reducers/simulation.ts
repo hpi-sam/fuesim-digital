@@ -57,8 +57,6 @@ import {
 } from './utils/get-element.js';
 import { logBehavior } from './utils/log.js';
 
-// TODO@Felix: check for @IsInt() decorators
-
 const updateTreatPatientsIntervalsActionSchema = z.strictObject({
     type: z.literal('[TreatPatientsBehavior] Update TreatPatientsIntervals'),
     simulatedRegionId: simulatedRegionSchema.shape.id,
@@ -182,7 +180,7 @@ const changeAutomaticDistributionLimitActionSchema = z.strictObject({
     type: z.literal('[AutomaticDistributionBehavior] Change Limit'),
     simulatedRegionId: simulatedRegionSchema.shape.id,
     behaviorId: simulationBehaviorStateSchema.shape.id,
-    vehicleType: z.string(), // TODO: narrow?
+    vehicleType: z.string(),
     newLimit: z.int().nonnegative(),
 });
 
@@ -205,7 +203,7 @@ const addAutomaticDistributionDestinationActionSchema = z.strictObject({
     type: z.literal('[AutomaticDistributionBehavior] Add Destination'),
     simulatedRegionId: simulatedRegionSchema.shape.id,
     behaviorId: simulationBehaviorStateSchema.shape.id,
-    destinationId: uuidSchema, // TODO@Felix: what destinations?
+    destinationId: uuidSchema,
 });
 export type AddAutomaticDistributionDestinationAction = Immutable<
     z.infer<typeof addAutomaticDistributionDestinationActionSchema>
@@ -225,7 +223,7 @@ const removeAutomaticDistributionDestinationActionSchema = z.strictObject({
     type: z.literal('[AutomaticDistributionBehavior] Remove Destination'),
     simulatedRegionId: simulatedRegionSchema.shape.id,
     behaviorId: simulationBehaviorStateSchema.shape.id,
-    destinationId: uuidSchema, // TODO
+    destinationId: uuidSchema,
 });
 export type RemoveAutomaticDistributionDestinationAction = Immutable<
     z.infer<typeof removeAutomaticDistributionDestinationActionSchema>
@@ -277,7 +275,7 @@ const sendTransferRequestEventActionSchema = z.strictObject({
     behaviorId: simulationBehaviorStateSchema.shape.id,
     vehicleId: vehicleSchema.shape.id,
     destinationType: transferDestinationTypeSchema,
-    destinationId: uuidSchema, // TODO
+    destinationId: uuidSchema,
     patients: uuidSetSchema,
 });
 export type SendTransferRequestEventAction = Immutable<
@@ -290,7 +288,7 @@ const transferVehiclesActionSchema = z.strictObject({
     behaviorId: simulationBehaviorStateSchema.shape.id,
     requestedVehicles: resourceDescriptionSchema,
     destinationType: transferDestinationTypeSchema,
-    destinationId: uuidSchema, // TODO
+    destinationId: uuidSchema,
 });
 export type TransferVehiclesAction = Immutable<
     z.infer<typeof transferVehiclesActionSchema>

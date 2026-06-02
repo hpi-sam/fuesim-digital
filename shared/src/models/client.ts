@@ -26,6 +26,6 @@ export function newClient(
         role,
         viewRestrictedToViewportId: undefined,
         isInWaitingRoom,
-        isActive: false,
+        isActive: true,
     };
 }

@@ -1,4 +1,5 @@
-import { IsUUID } from 'class-validator';
+import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     acceptRadiogram,
     markRadiogramDone,
@@ -6,14 +7,14 @@ import {
 } from '../../models/radiogram/radiogram-helpers-mutable.js';
 import { newVehicleResource } from '../../models/utils/rescue-resource.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { newVehiclesSentEvent } from '../../simulation/events/vehicles-sent.js';
 import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
 import { createRadiogramActionTag } from '../../models/utils/tag-helpers.js';
 import type { ResourceRequestRadiogram } from '../../models/radiogram/resource-request-radiogram.js';
+import { clientSchema } from '../../models/client.js';
+import { radiogramSchema } from '../../models/radiogram/radiogram.js';
 import {
     getElement,
     getElementByPredicate,
@@ -22,57 +23,54 @@ import {
 } from './utils/get-element.js';
 import { logRadiogram } from './utils/log.js';
 
-export class AcceptRadiogramAction implements Action {
-    @IsValue('[Radiogram] Accept radiogram' as const)
-    public readonly type = '[Radiogram] Accept radiogram';
+const acceptRadiogramActionSchema = z.strictObject({
+    type: z.literal('[Radiogram] Accept radiogram'),
+    radiogramId: radiogramSchema.shape.id,
+    clientId: clientSchema.shape.id,
+});
+export type AcceptRadiogramAction = Immutable<
+    z.infer<typeof acceptRadiogramActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly radiogramId!: UUID;
+const returnRadiogramActionSchema = z.strictObject({
+    type: z.literal('[Radiogram] Return radiogram'),
+    radiogramId: radiogramSchema.shape.id,
+});
+export type ReturnRadiogramAction = Immutable<
+    z.infer<typeof returnRadiogramActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly clientId!: UUID;
-}
-
-export class ReturnRadiogramAction implements Action {
-    @IsValue('[Radiogram] Return radiogram' as const)
-    public readonly type = '[Radiogram] Return radiogram';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly radiogramId!: UUID;
-}
-
-export class MarkDoneRadiogramAction implements Action {
-    @IsValue('[Radiogram] Mark as done' as const)
-    public readonly type = '[Radiogram] Mark as done';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly radiogramId!: UUID;
-
+const markDoneRadiogramActionSchema = z.strictObject({
+    type: z.literal('[Radiogram] Mark as done'),
+    radiogramId: radiogramSchema.shape.id,
     // Migration would be borderline impossible so we save it now, even if we do not need it yet
-    @IsUUID(4, uuidValidationOptions)
-    public readonly clientId!: UUID;
-}
+    clientId: clientSchema.shape.id,
+});
+export type MarkDoneRadiogramAction = Immutable<
+    z.infer<typeof markDoneRadiogramActionSchema>
+>;
 
-export class AcceptResourceRequestRadiogramAction implements Action {
-    @IsValue('[Radiogram] Accept resource request' as const)
-    public readonly type = '[Radiogram] Accept resource request';
+const acceptResourceRequestRadiogramActionSchema = z.strictObject({
+    type: z.literal('[Radiogram] Accept resource request'),
+    radiogramId: radiogramSchema.shape.id,
+});
+export type AcceptResourceRequestRadiogramAction = Immutable<
+    z.infer<typeof acceptResourceRequestRadiogramActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly radiogramId!: UUID;
-}
-
-export class DenyResourceRequestRadiogramAction implements Action {
-    @IsValue('[Radiogram] Deny resource request' as const)
-    public readonly type = '[Radiogram] Deny resource request';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly radiogramId!: UUID;
-}
+const denyResourceRequestRadiogramActionSchema = z.strictObject({
+    type: z.literal('[Radiogram] Deny resource request'),
+    radiogramId: radiogramSchema.shape.id,
+});
+export type DenyResourceRequestRadiogramAction = Immutable<
+    z.infer<typeof denyResourceRequestRadiogramActionSchema>
+>;
 
 export namespace RadiogramActionReducers {
     export const acceptRadiogramReducer: ActionReducer<AcceptRadiogramAction> =
         {
-            action: AcceptRadiogramAction,
+            type: acceptRadiogramActionSchema.shape.type.value,
+            actionSchema: acceptRadiogramActionSchema,
             reducer: (draftState, { radiogramId, clientId }) => {
                 acceptRadiogram(draftState, radiogramId, clientId);
                 return draftState;
@@ -82,7 +80,8 @@ export namespace RadiogramActionReducers {
 
     export const returnRadiogramReducer: ActionReducer<ReturnRadiogramAction> =
         {
-            action: ReturnRadiogramAction,
+            type: returnRadiogramActionSchema.shape.type.value,
+            actionSchema: returnRadiogramActionSchema,
             reducer: (draftState, { radiogramId }) => {
                 returnRadiogram(draftState, radiogramId);
                 return draftState;
@@ -91,7 +90,8 @@ export namespace RadiogramActionReducers {
         };
 
     export const markDoneReducer: ActionReducer<MarkDoneRadiogramAction> = {
-        action: MarkDoneRadiogramAction,
+        type: markDoneRadiogramActionSchema.shape.type.value,
+        actionSchema: markDoneRadiogramActionSchema,
         reducer: (draftState, { radiogramId }) => {
             const radiogram = getExerciseRadiogramById(draftState, radiogramId);
             if (radiogram.type === 'resourceRequestRadiogram') {
@@ -136,7 +136,8 @@ export namespace RadiogramActionReducers {
 
     export const acceptResourceRequestRadiogramReducer: ActionReducer<AcceptResourceRequestRadiogramAction> =
         {
-            action: AcceptResourceRequestRadiogramAction,
+            type: acceptResourceRequestRadiogramActionSchema.shape.type.value,
+            actionSchema: acceptResourceRequestRadiogramActionSchema,
             reducer: (draftState, { radiogramId }) => {
                 const radiogram = getRadiogramById<ResourceRequestRadiogram>(
                     draftState,
@@ -185,7 +186,8 @@ export namespace RadiogramActionReducers {
 
     export const denyResourceRequestRadiogramReducer: ActionReducer<DenyResourceRequestRadiogramAction> =
         {
-            action: DenyResourceRequestRadiogramAction,
+            type: denyResourceRequestRadiogramActionSchema.shape.type.value,
+            actionSchema: denyResourceRequestRadiogramActionSchema,
             reducer: (draftState, { radiogramId }) => {
                 const radiogram = getRadiogramById<ResourceRequestRadiogram>(
                     draftState,

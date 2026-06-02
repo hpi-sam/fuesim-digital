@@ -1,72 +1,52 @@
-import { IsString, IsUUID, IsInt, IsArray } from 'class-validator';
-import { WritableDraft } from 'immer';
+import type { WritableDraft, Immutable } from 'immer';
+import { z } from 'zod';
 import type { ExerciseState } from '../../state.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import {
     type VehicleTemplate,
     vehicleTemplateSchema,
 } from '../../models/vehicle-template.js';
-import {
-    type UUID,
-    uuidArrayValidationOptions,
-    uuidValidationOptions,
-} from '../../utils/uuid.js';
-import {
-    type ImageProperties,
-    imagePropertiesSchema,
-} from '../../models/utils/image-properties.js';
+import { type UUID } from '../../utils/uuid.js';
+import { imagePropertiesSchema } from '../../models/utils/image-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { materialTemplateSchema } from '../../models/material-template.js';
+import { personnelTemplateSchema } from '../../models/personnel-template.js';
 
-export class AddVehicleTemplateAction implements Action {
-    @IsValue('[VehicleTemplate] Add vehicleTemplate')
-    public readonly type = '[VehicleTemplate] Add vehicleTemplate';
+const addVehicleTemplateActionSchema = z.strictObject({
+    type: z.literal('[VehicleTemplate] Add vehicleTemplate'),
+    vehicleTemplate: vehicleTemplateSchema,
+});
+export type AddVehicleTemplateAction = Immutable<
+    z.infer<typeof addVehicleTemplateActionSchema>
+>;
 
-    @IsZodSchema(vehicleTemplateSchema)
-    public readonly vehicleTemplate!: VehicleTemplate;
-}
+const editVehicleTemplateActionSchema = z.strictObject({
+    type: z.literal('[VehicleTemplate] Edit vehicleTemplate'),
+    id: vehicleTemplateSchema.shape.id,
+    name: z.string(),
+    vehicleType: vehicleTemplateSchema.shape.vehicleType,
+    patientCapacity: z.number(),
+    image: imagePropertiesSchema,
+    materialTemplateIds: z.array(materialTemplateSchema.shape.id),
+    personnelTemplateIds: z.array(personnelTemplateSchema.shape.id),
+});
+export type EditVehicleTemplateAction = Immutable<
+    z.infer<typeof editVehicleTemplateActionSchema>
+>;
 
-export class EditVehicleTemplateAction implements Action {
-    @IsValue('[VehicleTemplate] Edit vehicleTemplate')
-    public readonly type = '[VehicleTemplate] Edit vehicleTemplate';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id!: UUID;
-
-    @IsString()
-    public readonly name!: string;
-
-    @IsString()
-    public readonly vehicleType!: string;
-
-    @IsInt()
-    public readonly patientCapacity!: number;
-
-    @IsZodSchema(imagePropertiesSchema)
-    public readonly image!: ImageProperties;
-
-    @IsUUID(4, uuidArrayValidationOptions)
-    @IsArray()
-    public readonly materialTemplateIds!: readonly UUID[];
-
-    @IsUUID(4, uuidArrayValidationOptions)
-    @IsArray()
-    public readonly personnelTemplateIds!: readonly UUID[];
-}
-
-export class DeleteVehicleTemplateAction implements Action {
-    @IsValue('[VehicleTemplate] Delete vehicleTemplate')
-    public readonly type = '[VehicleTemplate] Delete vehicleTemplate';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id!: UUID;
-}
+const deleteVehicleTemplateActionSchema = z.strictObject({
+    type: z.literal('[VehicleTemplate] Delete vehicleTemplate'),
+    id: vehicleTemplateSchema.shape.id,
+});
+export type DeleteVehicleTemplateAction = Immutable<
+    z.infer<typeof deleteVehicleTemplateActionSchema>
+>;
 
 export namespace VehicleTemplateActionReducers {
     export const addVehicleTemplate: ActionReducer<AddVehicleTemplateAction> = {
-        action: AddVehicleTemplateAction,
+        type: addVehicleTemplateActionSchema.shape.type.value,
+        actionSchema: addVehicleTemplateActionSchema,
         reducer: (draftState, { vehicleTemplate }) => {
             if (draftState.vehicleTemplates[vehicleTemplate.id]) {
                 throw new ReducerError(
@@ -82,7 +62,8 @@ export namespace VehicleTemplateActionReducers {
 
     export const editVehicleTemplate: ActionReducer<EditVehicleTemplateAction> =
         {
-            action: EditVehicleTemplateAction,
+            type: editVehicleTemplateActionSchema.shape.type.value,
+            actionSchema: editVehicleTemplateActionSchema,
             reducer: (
                 draftState,
                 {
@@ -112,7 +93,8 @@ export namespace VehicleTemplateActionReducers {
 
     export const deleteVehicleTemplate: ActionReducer<DeleteVehicleTemplateAction> =
         {
-            action: DeleteVehicleTemplateAction,
+            type: deleteVehicleTemplateActionSchema.shape.type.value,
+            actionSchema: deleteVehicleTemplateActionSchema,
             reducer: (draftState, { id }) => {
                 getVehicleTemplate(draftState, id);
                 delete draftState.vehicleTemplates[id];

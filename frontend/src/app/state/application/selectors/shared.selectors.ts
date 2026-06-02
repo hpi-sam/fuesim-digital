@@ -24,7 +24,6 @@ import {
 } from 'fuesim-digital-shared';
 
 import { pickBy } from 'lodash-es';
-import type { Immutable } from 'immer';
 import type { AppState } from '../../app.state';
 import type { CateringLine } from '../../../shared/types/catering-line';
 import type { ScoutableIndicator } from '../../../shared/types/scoutable-indicator';
@@ -83,16 +82,15 @@ export const selectRestrictedViewport = createSelector(
  */
 function selectVisibleElementsFactory<
     Element extends WithPosition,
-    Elements extends Immutable<{ readonly [key: UUID]: Element }> = Immutable<{
+    Elements extends { readonly [key: UUID]: Element } = {
         readonly [key: UUID]: Element;
-    }>,
+    },
 >(
     selectElements: (state: AppState) => Elements,
-    isInViewportHelper: (
-        element: Immutable<Element>,
-        viewport: Viewport
-    ) => boolean = (element, viewport) =>
-        isInViewport(viewport, currentCoordinatesOf(element))
+    isInViewportHelper: (element: Element, viewport: Viewport) => boolean = (
+        element,
+        viewport
+    ) => isInViewport(viewport, currentCoordinatesOf(element))
 ) {
     return createSelector(
         selectRestrictedViewport,

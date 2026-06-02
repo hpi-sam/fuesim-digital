@@ -1,4 +1,3 @@
-import type { Immutable } from 'immer';
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
 import { newMaterialFromTemplate } from '../models/material.js';
 import { newPersonnelFromTemplate } from '../models/personnel.js';
@@ -22,12 +21,12 @@ import type { PersonnelTemplate } from '../models/personnel-template.js';
 // Be aware that `uuid()` is nondeterministic and cannot be used in a reducer function.
 export function createVehicleParameters(
     vehicleId: UUID,
-    vehicleTemplate: Immutable<VehicleTemplate>,
-    materialTemplates: Immutable<{ [key in UUID]: MaterialTemplate }>,
-    personnelTemplates: Immutable<{
+    vehicleTemplate: VehicleTemplate,
+    materialTemplates: { [key in UUID]: MaterialTemplate },
+    personnelTemplates: {
         [key in UUID]: PersonnelTemplate;
-    }>,
-    vehiclePosition: Immutable<MapCoordinates>
+    },
+    vehiclePosition: MapCoordinates
 ): VehicleParameters {
     const materials = vehicleTemplate.materialTemplateIds
         .map((materialTemplateId: UUID) => {

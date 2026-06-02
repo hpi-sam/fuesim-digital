@@ -6,7 +6,7 @@ import { changePositionWithId } from '../../models/utils/position/position-helpe
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { materialSchema } from '../../models/material.js';
 
-export const moveMaterialActionSchema = z.strictObject({
+const moveMaterialActionSchema = z.strictObject({
     type: z.literal('[Material] Move material'),
     materialId: materialSchema.shape.id,
     targetPosition: mapCoordinatesSchema,
@@ -17,7 +17,7 @@ export type MoveMaterialAction = Immutable<
 
 export namespace MaterialActionReducers {
     export const moveMaterial: ActionReducer<MoveMaterialAction> = {
-        type: '[Material] Move material',
+        type: moveMaterialActionSchema.shape.type.value,
         actionSchema: moveMaterialActionSchema,
         reducer: (draftState, { materialId, targetPosition }) => {
             changePositionWithId(

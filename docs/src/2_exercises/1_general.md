@@ -109,7 +109,7 @@ Auf der Startseite gibt es (neben dem Button zum [Anlegen einer neuen Übung](#�
 
 ### Vorlagen importieren
 
-Um bereits erstellte Patienten, Fahrzeuge und Bilder (siehe [Übungselemente](3_exercise_elements.md)) wiederzuverwenden, gibt es am oberen Rand des [Editors](2_user_interfaces.md#editor) den Button <kbd>Vorlagen importieren</kbd>.
+Um bereits erstellte Patienten, Fahrzeuge und Bilder (siehe [Übungselemente](3_exercise_elements.md)) wiederzuverwenden, gibt es am oberen Rand des [Editors](2_user_interfaces.md#editor-nur-in-übungsleitenden-ansicht)) den Button <kbd>Vorlagen importieren</kbd>.
 
 Nach Klick auf diesen Button muss eine Vorlage `.json`-Datei ausgewählt werden. Bevor der Import erfolgt, muss entschieden werden, ob die bestehenden Patienten-, Fahrzeug- und Bildvorlagen ergänzt oder ob sie gelöscht und vollständig durch die neuen überschrieben werden sollen.
 
@@ -121,7 +121,7 @@ Nach Klick auf diesen Button muss eine Vorlage `.json`-Datei ausgewählt werden.
 
 ## Übungseinstellungen
 
-Übungsleitende können in der [unteren Menüleiste](2_user_interfaces.md#untere-menüleiste-nur-in-übungsleitungs-ansicht) den Punkt <kbd>Einstellungen</kbd> wählen. Es öffnet sich ein Fenster, in dem globale Einstellungen für die aktuelle Übung vorgenommen werden können.
+Übungsleitende können in der [unteren Menüleiste](2_user_interfaces.md#untere-menüleiste-nur-in-übungsleitenden-ansicht) den Punkt <kbd>Einstellungen</kbd> wählen. Es öffnet sich ein Fenster, in dem globale Einstellungen für die aktuelle Übung vorgenommen werden können.
 
 Die meisten Einstellungen werden sofort nach Eingabe übernommen, lediglich die Änderungen der Kartenserver-Adressen müssen noch manuell bestätigt werden.
 
@@ -176,6 +176,6 @@ Im Feld <kbd>**Präfix der Patienten-IDs**</kbd> kann ein Präfix eingegeben wer
 
 ![Einstellungsfenster](./general_settings4.png)
 
-In diesem Bereich kann eine optionale Statusanzeige für [Fahrzeuge](3_exercise_elements.md#fahrzeuge) aktiviert werden.
+In diesem Bereich kann eine optionale Statusanzeige für [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) aktiviert werden.
 
 Sofern aktiviert, zeigt die Statusanzeige über jedem Fahrzeug an, wie viele Patienten sich aktuell im Fahrzeug befinden und wie viele Plätze es insgesamt bietet. Sie kann optional in der Farbe der Sichtungskategorie des Patienten angezeigt werden, bei mehreren Patienten wird die Kategorie mit der höchsten Priorität gewählt.

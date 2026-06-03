@@ -134,7 +134,7 @@ Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-
     - **Statistik**: Fenster mit den [Statistiken](5_evaluation.md#statistiken) zur aktuellen Übung. Beinhaltet auch ein detailliertes Protokoll.
     - **Aufzeichnung**: Schließt die Übungsansicht und öffnet stattdessen die Replay-Ansicht, in der die [Aufzeichnung](5_evaluation.md#aufzeichnung) der aktuellen Übung betrachtet werden kann.
 
-## Leitellenansicht (für Teilnehmende)
+## Leitstellenansicht (für Teilnehmende)
 
 Teilnehmende, die von den Übungsleitenden der Rolle <kbd>Leitstelle</kbd> zugeordnet wurden, sehen diese Oberfläche.
 

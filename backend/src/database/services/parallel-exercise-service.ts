@@ -194,7 +194,11 @@ export class ParallelExerciseService {
             id,
             session
         );
-        return activeExercises.map((exercise) => {
+        return this.getParallelExerciseInstanceSummaries(activeExercises);
+    }
+
+    public getParallelExerciseInstanceSummaries(exercises: ActiveExercise[]) {
+        return exercises.map((exercise) => {
             const state = exercise.exercise.currentStateString;
             return parallelExerciseInstanceSummarySchema.parse({
                 participantKey: exercise.participantKey,
@@ -204,7 +208,9 @@ export class ParallelExerciseService {
                 currentStatus: state.currentStatus,
                 lastLogEntry: state.lastLogEntry,
                 isActive: Object.values(state.clients).some(
-                    (client) => client.role.mainRole === 'participant'
+                    (client) =>
+                        client.role.mainRole === 'participant' &&
+                        client.isActive
                 ),
             });
         });

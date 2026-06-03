@@ -8,6 +8,8 @@ import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectPatient } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { PatientHeaderComponent } from '../../../../../../../shared/components/patient-header/patient-header.component';
 import { PatientsDetailsComponent } from '../../../../../../../shared/components/patients-details/patients-details.component';
+import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors.js';
+import { HelpButtonComponent } from '../../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-patient-popup',
@@ -18,6 +20,7 @@ import { PatientsDetailsComponent } from '../../../../../../../shared/components
         PatientHeaderComponent,
         PatientsDetailsComponent,
         AsyncPipe,
+        HelpButtonComponent,
     ],
 })
 export class PatientPopupComponent implements OnInit {
@@ -28,6 +31,8 @@ export class PatientPopupComponent implements OnInit {
     public patientId!: UUID;
     patient$!: Observable<Patient>;
     public openScoutInfo!: boolean;
+
+    readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
 
     ngOnInit() {
         this.patient$ = this.store.select(createSelectPatient(this.patientId));

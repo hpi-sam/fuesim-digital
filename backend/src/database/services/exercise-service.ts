@@ -63,7 +63,7 @@ export class ExerciseService {
         return new Set(this.exerciseMap.values());
     }
 
-    public async loadExercise(activeExercise: ActiveExercise) {
+    public loadExercise(activeExercise: ActiveExercise) {
         this.exerciseMap.set(activeExercise.participantKey, activeExercise);
         this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
         this.exerciseMap.set(activeExercise.exercise.id, activeExercise);
@@ -94,7 +94,10 @@ export class ExerciseService {
                 const trainerKey =
                     await accessKeyRepository.generateKey<TrainerKey>(8);
 
-                const initialState = ExerciseState.create(participantKey);
+                const initialState: ExerciseState = {
+                    ...ExerciseState.create(participantKey),
+                    type: optionalData.templateId ? 'template' : 'standalone',
+                };
                 const exerciseInsert = {
                     ...optionalData,
                     participantKey,
@@ -109,7 +112,7 @@ export class ExerciseService {
                 if (!exerciseEntry) throw new ApiError();
 
                 const activeExercise = new ActiveExercise(exerciseEntry);
-                await this.loadExercise(activeExercise);
+                this.loadExercise(activeExercise);
                 return activeExercise;
             }
         );
@@ -149,6 +152,12 @@ export class ExerciseService {
                     newInitialState.participantKey = participantKey;
                     newCurrentState.participantKey = participantKey;
 
+                    const exerciseType = optionalData.templateId
+                        ? 'template'
+                        : 'standalone';
+                    newInitialState.type = exerciseType;
+                    newCurrentState.type = exerciseType;
+
                     const exerciseInsert = {
                         ...optionalData,
                         participantKey,
@@ -181,10 +190,8 @@ export class ExerciseService {
                             '[Exercise] Tick'
                     ).length;
 
-                    // The actions haven't been saved in the database yet -> keep them
-                    activeExercise.restore(true);
-
-                    await this.loadExercise(activeExercise);
+                    activeExercise.restoreState();
+                    this.loadExercise(activeExercise);
 
                     return activeExercise;
                 } catch (err) {
@@ -241,41 +248,12 @@ export class ExerciseService {
                         async (exerciseEntity) => {
                             const exercise = new ActiveExercise(exerciseEntity);
                             exercise.template = exerciseEntity.template ?? null;
-
-                            // Load all actions
-                            pushAll(
-                                exercise.temporaryActionHistory,
-                                (
-                                    await this.actionRepository
-                                        .withConnection(exerciseRepoTransaction)
-                                        .getActionsForExerciseId(
-                                            exerciseEntity.id
-                                        )
-                                ).map(
-                                    (actionEntity) =>
-                                        new ActionWrapper(
-                                            actionEntity.actionString,
-                                            actionEntity.emitterId,
-                                            exercise,
-                                            actionEntity.index,
-                                            actionEntity.id
-                                        )
-                                )
-                            );
+                            exercise.resetStopped();
+                            this.loadExercise(exercise);
                             return exercise;
                         }
                     )
                 );
-                await Promise.all(
-                    // The actions have already been saved in the database -> do not keep them
-                    exercises.map(async (exercise) => exercise.restore(false))
-                );
-                exercises.forEach((exercise) => {
-                    this.exerciseMap.set(exercise.participantKey, exercise);
-                    this.exerciseMap.set(exercise.trainerKey, exercise);
-                    this.exerciseMap.set(exercise.exercise.id, exercise);
-                    this.loadExercise(exercise);
-                });
                 return exercises;
             }
         );

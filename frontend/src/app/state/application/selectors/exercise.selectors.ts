@@ -59,6 +59,13 @@ export const selectTransferPoints = selectPropertyFactory('transferPoints');
 export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
 export const selectClients = selectPropertyFactory('clients');
+export const selectActiveClients = createSelector(
+    selectClients,
+    (clients) =>
+        Object.fromEntries(
+            Object.entries(clients).filter(([, client]) => client.isActive)
+        ) as typeof clients
+);
 export const selectRadiograms = selectPropertyFactory('radiograms');
 export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
 export const selectDrawings = selectPropertyFactory('drawings');

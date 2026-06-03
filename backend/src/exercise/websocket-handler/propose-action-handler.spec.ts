@@ -19,11 +19,10 @@ describe('propose action', () => {
         const exerciseKeys = await createExercise(environment);
 
         await environment.withWebsocket(async (socket) => {
-            const join = await socket.emit(
-                'joinExercise',
-                exerciseKeys.trainerKey,
-                'Name'
-            );
+            const join = await socket.emit('joinExercise', {
+                exerciseKey: exerciseKeys.trainerKey,
+                clientName: 'Name',
+            });
 
             expect(join.success).toBe(true);
 
@@ -40,11 +39,10 @@ describe('propose action', () => {
         const exerciseKeys = await createExercise(environment);
 
         await environment.withWebsocket(async (socket) => {
-            const join = await socket.emit(
-                'joinExercise',
-                exerciseKeys.trainerKey,
-                'Name'
-            );
+            const join = await socket.emit('joinExercise', {
+                exerciseKey: exerciseKeys.trainerKey,
+                clientName: 'Name',
+            });
 
             expect(join.success).toBe(true);
 
@@ -61,11 +59,10 @@ describe('propose action', () => {
         const exerciseKeys = await createExercise(environment);
 
         await environment.withWebsocket(async (socket) => {
-            const join = await socket.emit(
-                'joinExercise',
-                exerciseKeys.trainerKey,
-                'Name'
-            );
+            const join = await socket.emit('joinExercise', {
+                exerciseKey: exerciseKeys.trainerKey,
+                clientName: 'Name',
+            });
 
             expect(join.success).toBe(true);
 
@@ -82,11 +79,10 @@ describe('propose action', () => {
         const exerciseKeys = await createExercise(environment);
 
         await environment.withWebsocket(async (socket) => {
-            const join = await socket.emit(
-                'joinExercise',
-                exerciseKeys.participantKey,
-                'Name'
-            );
+            const join = await socket.emit('joinExercise', {
+                exerciseKey: exerciseKeys.participantKey,
+                clientName: 'Name',
+            });
 
             expect(join.success).toBe(true);
 

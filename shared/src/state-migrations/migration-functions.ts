@@ -48,11 +48,12 @@ import { participantIdToKey47 } from './47-participant-id-to-key.js';
 import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
 import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addScoutables50 } from './50-add-scoutables.js';
-import { addTechnicalChallenges53 } from './53-add-technical-challenges.js';
-import { extendScoutables54 } from './54-extend-scoutables.js';
 import { addUUIDtoAddEocLogEntryAction51 } from './51-add-uuid-to-add-eoc-log-action.js';
 import { fixInfinity52 } from './52-fix-infinity.js';
-import { addMeasures55 } from './55-add-measures.js';
+import { addIsActiveToClient53 } from './53-add-is-active-to-client.js';
+import { addTechnicalChallenges54 } from './54-add-technical-challenges.js';
+import { extendScoutables55 } from './55-extend-scoutables.js';
+import { addMeasures56 } from './56-add-measures.js';
 
 /**
  * Migrate a single action
@@ -131,7 +132,8 @@ export const migrations: {
     50: addScoutables50,
     51: addUUIDtoAddEocLogEntryAction51,
     52: fixInfinity52,
-    53: addTechnicalChallenges53,
-    54: extendScoutables54,
-    55: addMeasures55,
+    53: addIsActiveToClient53,
+    54: addTechnicalChallenges54,
+    55: extendScoutables55,
+    56: addMeasures56,
 };

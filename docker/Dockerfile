@@ -1,6 +1,21 @@
 # set path
 ARG PRODUCTION_PATH="/usr/local/app"
 
+FROM rust AS docs-builder
+
+# needed to use PRODUCTION_PATH before the first FROM
+ARG PRODUCTION_PATH
+
+RUN cargo install mdbook
+
+# add the source code to app
+COPY ./docs $PRODUCTION_PATH/docs
+
+# set workdir
+WORKDIR $PRODUCTION_PATH/docs
+
+RUN mdbook build
+
 # Use official node image as the base image
 FROM node:24.13.0-trixie-slim AS builder
 
@@ -52,7 +67,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends nginx && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --chmod=+x ./docker/docker-entrypoint.sh /docker-entrypoint.sh
+COPY ./docker/docker-entrypoint.sh /docker-entrypoint.sh
 
 # nginx conf
 COPY ./docker/nginx-fuesim-digital.conf /etc/nginx/sites-available/default
@@ -71,6 +86,9 @@ COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/drizzle $
 COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/drizzle.config.ts $PRODUCTION_PATH/backend/drizzle.config.ts
 COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/node_modules $PRODUCTION_PATH/backend/node_modules
 COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/package.json $PRODUCTION_PATH/backend
+
+# copy docs
+COPY --chown=www-data:www-data --from=docs-builder $PRODUCTION_PATH/docs/book $PRODUCTION_PATH/frontend/about/help
 
 # set correct working directory for docker-entrypoint.sh
 WORKDIR $PRODUCTION_PATH/backend

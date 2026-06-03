@@ -5,10 +5,9 @@ import type {
     ExerciseKey,
     ParticipantKey,
     TrainerKey,
+    ExerciseState,
 } from 'fuesim-digital-shared';
 import {
-    ExerciseState,
-    validateExerciseState,
     applyAction,
     cloneDeepMutable,
     reduceExerciseState,
@@ -207,7 +206,8 @@ export class ActiveExercise {
         });
         if (
             this.clients.size === 0 &&
-            this.exercise.currentStateString.currentStatus === 'running'
+            this.exercise.currentStateString.currentStatus === 'running' &&
+            this.exercise.parallelExerciseId === null
         ) {
             // Pause the exercise
             this.applyAction(
@@ -217,6 +217,39 @@ export class ActiveExercise {
                 null
             );
         }
+    }
+
+    public setClientInactive(clientWrapper: ExerciseClientWrapper) {
+        if (!this.clients.has(clientWrapper)) {
+            return;
+        }
+        const client = clientWrapper.client!;
+        const inactiveAction: ExerciseAction = {
+            type: '[Client] Set client inactive',
+            clientId: client.id,
+        };
+        this.applyAction(inactiveAction, client.id, () => {
+            this.clients.delete(clientWrapper);
+        });
+        if (
+            this.clients.size === 0 &&
+            this.exercise.currentStateString.currentStatus === 'running' &&
+            this.exercise.parallelExerciseId === null
+        ) {
+            this.applyAction({ type: '[Exercise] Pause' }, null);
+        }
+    }
+
+    public setClientActive(clientWrapper: ExerciseClientWrapper) {
+        if (clientWrapper.client === undefined) {
+            return;
+        }
+        const activeAction: ExerciseAction = {
+            type: '[Client] Set client active',
+            clientId: clientWrapper.client.id,
+        };
+        this.applyAction(activeAction, clientWrapper.client.id);
+        this.clients.add(clientWrapper);
     }
 
     public start() {
@@ -285,31 +318,11 @@ export class ActiveExercise {
         }
     }
 
-    public restore(keepActions: boolean): void {
-        // Check State Version
-        if (this.exercise.stateVersion !== ExerciseState.currentStateVersion) {
-            throw new RestoreError(
-                `The exercise was created with an incompatible version of the state (got version ${this.exercise.stateVersion}, required version ${ExerciseState.currentStateVersion})`,
-                this.exercise.id
-            );
-        }
-
-        // Validate initial state
-        const errors = validateExerciseState(this.exercise.initialStateString);
-        if (errors.length > 0) {
-            throw new ValidationErrorWrapper(errors);
-        }
-
-        this.restoreState(keepActions);
-    }
-
     /**
-     * @param keepActions This indicates whether to keep the actions that were applied while restoring in the array (when `true`) or to remove them (when `false` and when the database gets used)
      * Recreates the {@link currentState} by applying all actions from {@link temporaryActionHistory} to the {@link initialState}
      * as well as adding actions to the end to gracefully mark the end of the previous exercise session.
      */
-    private restoreState(keepActions: boolean) {
-        // TODO: switch to use cloneDeep() and then produce()
+    public restoreState() {
         let currentState = cloneDeepMutable(this.exercise.initialStateString);
 
         this.temporaryActionHistory.forEach((actionWrapper) => {
@@ -336,13 +349,11 @@ export class ActiveExercise {
         this.incrementIdGenerator.setCurrent(
             this.temporaryActionHistory.length
         );
-        if (!keepActions) {
-            // Remove all actions to not save them again in the database
-            this.temporaryActionHistory.splice(
-                0,
-                this.temporaryActionHistory.length
-            );
-        }
+        this.resetStopped();
+    }
+
+    /** Adds actions to the end to gracefully mark the end of the previous exercise session.**/
+    public resetStopped() {
         // Pause exercise
         if (this.exercise.currentStateString.currentStatus === 'running')
             this.reduce(

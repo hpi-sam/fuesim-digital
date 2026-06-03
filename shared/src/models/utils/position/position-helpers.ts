@@ -4,6 +4,7 @@ import type { SimulatedRegion } from '../../simulated-region.js';
 import type { Transfer } from '../transfer.js';
 import type { UUID } from '../../../utils/uuid.js';
 import { getElement } from '../../../store/action-reducers/utils/get-element.js';
+import type { StartPoint } from '../start-points.js';
 import type { MapCoordinates } from './map-coordinates.js';
 import type { MapPosition } from './map-position.js';
 import type { Position } from './position.js';
@@ -22,6 +23,16 @@ export function isInVehicle(withPosition: WithPosition): boolean {
 export function isInTransfer(withPosition: WithPosition): boolean {
     return isPositionInTransfer(withPosition.position);
 }
+export function isInTransferFromAlarmgroup(
+    withPosition: WithPosition
+): boolean {
+    return (
+        isPositionInTransfer(withPosition.position) &&
+        isAlarmgroupStartPoint(
+            transferOfPosition(withPosition.position).startPoint
+        )
+    );
+}
 export function isInSimulatedRegion(withPosition: WithPosition): boolean {
     return isPositionInSimulatedRegion(withPosition.position);
 }
@@ -38,6 +49,10 @@ export function isWithinExtent(
         lowerRightCorner.y <= coordinates.y &&
         coordinates.y <= upperLeftCorner.y
     );
+}
+
+export function isAlarmgroupStartPoint(startPoint: StartPoint) {
+    return startPoint.type === 'alarmGroupStartPoint';
 }
 
 export function isInSpecificVehicle(

@@ -18,6 +18,7 @@ import {
     currentStateOf,
     isInSpecificSimulatedRegion,
     isInTransfer,
+    isInTransferFromAlarmgroup,
     nestedCoordinatesOf,
     scoutableElementTypes,
 } from 'fuesim-digital-shared';
@@ -58,6 +59,13 @@ export const selectTransferPoints = selectPropertyFactory('transferPoints');
 export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
 export const selectClients = selectPropertyFactory('clients');
+export const selectActiveClients = createSelector(
+    selectClients,
+    (clients) =>
+        Object.fromEntries(
+            Object.entries(clients).filter(([, client]) => client.isActive)
+        ) as typeof clients
+);
 export const selectRadiograms = selectPropertyFactory('radiograms');
 export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
 export const selectDrawings = selectPropertyFactory('drawings');
@@ -244,6 +252,14 @@ export function createSelectVehiclesInOperationalSection(
         )
     );
 }
+
+export const selectVehiclesOnLocation = createSelector(
+    selectVehicles,
+    (vehicles) =>
+        Object.values(vehicles)
+            .filter((vehicle) => !isInTransferFromAlarmgroup(vehicle))
+            .sort((a, b) => a.name.localeCompare(b.name))
+);
 
 export const selectVehiclesInTransfer = createSelector(
     selectVehicles,

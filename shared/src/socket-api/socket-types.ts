@@ -17,8 +17,13 @@ export interface ServerToClientEvents {
 // The last argument is always expected to be the callback function. (To be able to use it in advanced typings)
 export interface ClientToServerEvents {
     joinExercise: (
-        exerciseKey: ExerciseKey,
-        clientName: string,
+        payload: {
+            exerciseKey: ExerciseKey;
+            /** Present on fresh join; absent on reconnect. */
+            clientName?: string;
+            /** Present on reconnect attempt; absent on fresh join. */
+            clientId?: UUID;
+        },
         callback: (
             response: SocketResponse<JoinExerciseResponseDataInput>
         ) => void

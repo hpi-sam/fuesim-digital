@@ -10,6 +10,7 @@ import {
 import { selectStateSnapshot } from '../state/get-state-snapshot';
 import { ExerciseService } from './exercise.service';
 import { TimeTravelService } from './time-travel.service';
+import { getReconnectToken } from './reconnect-token';
 
 /**
  * This service encapsulates the logic for switching between the live exercise, timeTravel and an empty state (e.g. on the landing page).
@@ -60,10 +61,13 @@ export class ApplicationService {
      * Rejoin this exercise with the same credentials as the last time
      */
     public async rejoinExercise() {
-        return this.joinExercise(
-            selectStateSnapshot(selectExerciseKey, this.store)!,
-            selectStateSnapshot(selectLastClientName, this.store)!
-        );
+        const exerciseKey = selectStateSnapshot(selectExerciseKey, this.store)!;
+        const clientName = selectStateSnapshot(
+            selectLastClientName,
+            this.store
+        )!;
+        const storedClientId = getReconnectToken(exerciseKey) ?? undefined;
+        return this.joinExercise(exerciseKey, clientName, storedClientId);
     }
 
     public async startTimeTravel(

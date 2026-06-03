@@ -5,12 +5,13 @@ import {
     lowerRightCornerOf,
     isInViewport,
     getBoundingBox,
+    coordinateStringToNumber,
 } from 'fuesim-digital-shared';
 import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';
 import OlMap from 'ol/Map';
-import { Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { z } from 'zod';
 import type { Coordinate } from 'ol/coordinate';
@@ -41,6 +42,7 @@ import {
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import { ScoutableIndicatorsFeatureManager } from '../feature-managers/scoutable-indicators-feature-manager';
+import type { MessageService } from '../../../../../../core/messages/message.service';
 import type { DrawingInteractionService } from '../../../../../../core/drawing-interaction.service';
 import { DrawingFeatureManager } from '../feature-managers/drawing-feature-manager';
 import type { FeatureManager } from './feature-manager';
@@ -49,14 +51,6 @@ import { OlMapInteractionsManager } from './ol-map-interactions-manager';
 import { SatelliteLayerManager } from './satellite-layer-manager';
 import { DrawingInteractionHandler } from './drawing-interaction-handler';
 import type { PopupService } from './popup.service';
-
-export const coordinateStringSchema = z
-    .string()
-    .regex(/^-?\d{1,3}(.\d+)?$/u, 'Die Eingabe ist keine gültige Koordinate.');
-const coordinateStringToNumber = z.codec(coordinateStringSchema, z.number(), {
-    decode: (str) => Number.parseFloat(str),
-    encode: (num) => num.toFixed(6),
-});
 
 export const olMapCoordinatesSchema = z.object({
     longitude: coordinateStringToNumber,
@@ -71,6 +65,7 @@ export class OlMapManager {
     private featureManagers: FeatureManager<any>[];
     private readonly mapInteractionsManager: OlMapInteractionsManager;
     private static readonly defaultZoom = 20;
+    public readonly lockZoom$ = new BehaviorSubject(false);
     private readonly destroy$ = new Subject<void>();
 
     /**
@@ -98,6 +93,7 @@ export class OlMapManager {
         private readonly transferLinesService: TransferLinesService,
         private readonly popupManager: PopupManager,
         private readonly popupService: PopupService,
+        private readonly messageService: MessageService,
         private readonly drawingInteractionService: DrawingInteractionService
     ) {
         this._olMap = new OlMap({
@@ -158,10 +154,24 @@ export class OlMapManager {
             this.layerFeatureManagerDictionary,
             this.featureNameFeatureManagerDictionary
         );
+
+        this.lockZoom$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(
+                (lockZoom) => (this.mapInteractionsManager.lockZoom = lockZoom)
+            );
     }
 
     public get olMap(): OlMap {
         return this._olMap;
+    }
+
+    public toggleZoomLock() {
+        this.lockZoom$.next(!this.lockZoom$.value);
+        this.messageService.postMessage({
+            title: `Zoom per Touchscreen ${this.lockZoom$.value ? 'gesperrt' : 'freigegeben'}`,
+            color: 'info',
+        });
     }
 
     private isInViewport(coordinate: Coordinate, viewport: Viewport): boolean {

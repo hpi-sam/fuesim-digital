@@ -8,4 +8,8 @@ export interface Environment {
      * The port the backend websocket server listens on
      */
     websocketPort: number;
+    /**
+     * The URL at which the docs can be found
+     */
+    docsUrl: string;
 }

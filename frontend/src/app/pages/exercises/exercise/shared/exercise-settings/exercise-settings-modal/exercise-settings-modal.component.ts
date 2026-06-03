@@ -13,9 +13,10 @@ import {
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { UrlValidatorDirective } from '../../../../../../shared/validation/url-validator.directive';
-import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
 import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
+import { TileServerSelectorComponent } from '../tile-server-selector/tile-server-selector.component';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-exercise-settings-modal',
@@ -24,11 +25,12 @@ import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/ap
     imports: [
         FormsModule,
         UrlValidatorDirective,
-        AutofocusDirective,
         DisplayValidationComponent,
         NgbTooltip,
         AppSaveOnTypingDirective,
         AsyncPipe,
+        TileServerSelectorComponent,
+        HelpButtonComponent,
     ],
 })
 export class ExerciseSettingsModalComponent {

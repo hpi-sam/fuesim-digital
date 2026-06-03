@@ -7,8 +7,8 @@ import {
 } from '@angular/forms/signals';
 import { z } from 'zod';
 import { FormsModule } from '@angular/forms';
+import { coordinateStringSchema } from 'fuesim-digital-shared';
 import {
-    coordinateStringSchema,
     OlMapCoordinatesInput,
     olMapCoordinatesSchema,
 } from '../../exercise-map/utility/ol-map-manager';

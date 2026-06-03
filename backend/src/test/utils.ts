@@ -27,7 +27,6 @@ import { UserRepository } from '../database/repositories/user-repository.js';
 import { SessionRepository } from '../database/repositories/session-repository.js';
 import { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 import type { OidcService } from '../auth/oidc-service.js';
-import { AccessKeyService } from '../database/services/access-key-service.js';
 import { AccessKeyRepository } from '../database/repositories/access-key-repository.js';
 import type { Services } from '../database/services/index.js';
 import { ParallelExerciseService } from '../database/services/parallel-exercise-service.js';
@@ -205,7 +204,6 @@ export function createTestEnvironment(): TestEnvironment {
     let exerciseService: ExerciseService;
     let authService: AuthService;
     let exerciseManagerService: ExerciseManagerService;
-    let accessKeyService: AccessKeyService;
     let exerciseRepository: ExerciseRepository;
     let actionRepository: ActionRepository;
     let userRepository: UserRepository;
@@ -230,11 +228,9 @@ export function createTestEnvironment(): TestEnvironment {
             databaseService.databaseConnection
         );
 
-        accessKeyService = new AccessKeyService(accessKeyRepository);
         exerciseService = new ExerciseService(
             exerciseRepository,
-            actionRepository,
-            accessKeyService
+            actionRepository
         );
         userRepository = new UserRepository(databaseService.databaseConnection);
         sessionRepository = new SessionRepository(
@@ -251,7 +247,6 @@ export function createTestEnvironment(): TestEnvironment {
         );
         parallelExerciseService = new ParallelExerciseService(
             parallelExerciseRepository,
-            accessKeyService,
             exerciseManagerService,
             exerciseService,
             actionRepository
@@ -270,7 +265,6 @@ export function createTestEnvironment(): TestEnvironment {
             exerciseManagerService,
             exerciseService,
             parallelExerciseService,
-            accessKeyService,
             databaseService,
         };
         environment.init(repositories, services);

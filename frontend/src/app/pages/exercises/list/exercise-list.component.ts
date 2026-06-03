@@ -6,12 +6,18 @@ import { ApiService } from '../../../core/api.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { ExerciseCardComponent } from '../../../shared/components/exercise-card/exercise-card.component';
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
+import { HelpButtonComponent } from '../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-exercise-list',
     templateUrl: './exercise-list.component.html',
     styleUrls: ['./exercise-list.component.scss'],
-    imports: [HeaderComponent, ExerciseCardComponent, FooterComponent],
+    imports: [
+        HeaderComponent,
+        ExerciseCardComponent,
+        FooterComponent,
+        HelpButtonComponent,
+    ],
 })
 export class ExerciseListComponent {
     private readonly apiService = inject(ApiService);

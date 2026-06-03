@@ -4,4 +4,5 @@ export const environment: Environment = {
     production: true,
     httpPort: 3201,
     websocketPort: 3200,
+    docsUrl: '/about/help',
 };

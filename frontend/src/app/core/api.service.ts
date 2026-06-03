@@ -21,7 +21,7 @@ import {
     ExerciseTemplateId,
     ParallelExerciseId,
     PatchParallelExerciseRequestData,
-    GroupParticipantKey,
+    ParallelExerciseKey,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -206,7 +206,7 @@ export class ApiService {
         );
     }
 
-    public async parallelExerciseExists(key: GroupParticipantKey) {
+    public async parallelExerciseExists(key: ParallelExerciseKey) {
         return lastValueFrom(
             this.httpClient
                 .get(`${httpOrigin}/api/parallel_exercises/join/${key}`)

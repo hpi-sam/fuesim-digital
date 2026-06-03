@@ -1,0 +1,10 @@
+[book]
+title = "Anleitung für die FüSim Digital"
+authors = ["Jonathan Weth", "Christian Schäffer"]
+language = "de"
+
+[build]
+create-missing = false
+
+[output.html]
+additional-css = ["theme/bootstrap-icons.min.css"]

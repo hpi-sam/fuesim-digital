@@ -7,7 +7,6 @@ describe('migration', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {
-        await environment.repositories.accessKeyRepository.freeAll();
         environment.services.exerciseService.TESTING_getExerciseMap().clear();
     });
 

@@ -4,35 +4,18 @@
 </div>
 <div class="modal-body">
     <div class="card">
-        <div class="card-header">Karte</div>
+        <div class="card-header d-flex justify-content-between">
+            Karte
+            <app-help-button url="2_exercises/1_general.html#karte" />
+        </div>
         <div class="card-body">
             <div class="form-group mb-3">
                 <label class="form-label mb-1">Serveradresse:</label>
-                <p class="small text-muted mb-2">
-                    <!-- Yes, this is seemingly the only way to escape curly braces https://github.com/angular/angular/issues/11859 -->
-                    Unter dieser Adresse werden die Karten-Kacheln geladen. Die
-                    URL muss die Platzhalter für die Koordinaten
-                    <code>{{ '{' }}x{{ '}' }}</code
-                    >, <code>{{ '{' }}y{{ '}' }}</code> oder
-                    <code>{{ '{' }}-y{{ '}' }}</code
-                    >, sowie der Zoomstufe
-                    <code>{{ '{' }}z{{ '}' }}</code> enthalten. Bitte beachten
-                    Sie die Lizenzbedingungen der entsprechenden Karten-Server.
-                </p>
-                <input
-                    #tileUrlInput="ngModel"
-                    [(ngModel)]="tileMapProperties.tileUrl"
-                    [appAutofocus]="true"
-                    appUrlValidator
-                    [pattern]="tileUrlRegex"
-                    required
-                    type="url"
-                    class="form-control"
-                    placeholder="https://a.tile.openstreetmap.de/{z}/{x}/{y}.png"
+                <app-tile-server-selector
+                    [(url)]="tileMapProperties.tileUrl"
+                    description="die Kartenansicht"
+                    [autofocus]="true"
                 />
-                <app-display-validation
-                    [ngModelInput]="tileUrlInput"
-                ></app-display-validation>
             </div>
             <div class="form-group mb-3">
                 <label class="form-label">Maximaler Zoom:</label>
@@ -63,36 +46,19 @@
     </div>
     <br />
     <div class="card">
-        <div class="card-header">Einsatzübersicht</div>
+        <div class="card-header d-flex justify-content-between">
+            Einsatzübersicht
+            <app-help-button
+                url="2_exercises/1_general.html#einsatzübersicht"
+            />
+        </div>
         <div class="card-body">
             <div class="form-group mb-3">
                 <label class="form-label mb-1">Serveradresse:</label>
-                <p class="small text-muted mb-2">
-                    <!-- Yes, this is seemingly the only way to escape curly braces https://github.com/angular/angular/issues/11859 -->
-                    Unter dieser Adresse werden die Karten-Kacheln für die
-                    Einsatzübersicht geladen. Die URL muss die Platzhalter für
-                    die Koordinaten
-                    <code>{{ '{' }}x{{ '}' }}</code
-                    >, <code>{{ '{' }}y{{ '}' }}</code> oder
-                    <code>{{ '{' }}-y{{ '}' }}</code
-                    >, sowie der Zoomstufe
-                    <code>{{ '{' }}z{{ '}' }}</code> enthalten. Bitte beachten
-                    Sie die Lizenzbedingungen der entsprechenden Karten-Server.
-                </p>
-                <input
-                    #operationsMapTileUrlInput="ngModel"
-                    [(ngModel)]="operationsMapProperties.tileUrl"
-                    [appAutofocus]="true"
-                    appUrlValidator
-                    [pattern]="tileUrlRegex"
-                    required
-                    type="url"
-                    class="form-control"
-                    placeholder="https://a.tile.openstreetmap.de/{z}/{x}/{y}.png"
+                <app-tile-server-selector
+                    [(url)]="operationsMapProperties.tileUrl"
+                    description="die Einsatzübersicht"
                 />
-                <app-display-validation
-                    [ngModelInput]="operationsMapTileUrlInput"
-                ></app-display-validation>
             </div>
             <div class="form-group mb-3">
                 <label class="form-label mb-1">
@@ -106,7 +72,6 @@
                 <input
                     #operationsUrlInput="ngModel"
                     [(ngModel)]="operationsMapProperties.dataUrl"
-                    [appAutofocus]="true"
                     appUrlValidator
                     required
                     type="url"
@@ -142,7 +107,10 @@
     <br />
     @if (configuration$ | async; as configuration) {
         <div class="card">
-            <div class="card-header">Patienten</div>
+            <div class="card-header d-flex justify-content-between">
+                Patienten
+                <app-help-button url="2_exercises/1_general.html#patienten" />
+            </div>
             <div class="card-body">
                 <div class="form-group mb-3">
                     Mit Vorsichtung üben?
@@ -216,7 +184,12 @@
     <br />
     @if (configuration$ | async; as configuration) {
         <div class="card">
-            <div class="card-header">Statusanzeige für Fahrzeuge</div>
+            <div class="card-header d-flex justify-content-between">
+                Statusanzeige für Fahrzeuge
+                <app-help-button
+                    url="2_exercises/1_general.html#statusanzeige-für-fahrzeuge"
+                />
+            </div>
             <div class="card-body">
                 <p class="small text-muted">
                     Die Statusanzeige zeigt über jedem Fahrzeug an, wie viele

@@ -31,3 +31,5 @@ benchmark/data/*
 
 # mitigate accidental commit of files in source-code
 frontend/src/assets/source-code/*
+
+docs/book

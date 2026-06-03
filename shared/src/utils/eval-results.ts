@@ -1,80 +1,44 @@
 import { z } from 'zod';
 import {
-    CombinedEvalCriterion,
-    CriterionNode,
+    AndEvalCriterion,
+    BoolEvalCriterion,
     EvalCriterion,
     evalCriterionSchema,
+    FirstTrueAtEvalCriterion,
+    isNumberEvalCriterion,
+    NotEvalCriterion,
+    OrEvalCriterion,
     PatientAtStatusEvalCriterion,
     ReachTechnicalChallengeStateEvalCriterion,
     ViewScoutableEvalCriterion,
     XPatientsAtStatusEvalCriterion,
 } from '../models/evaluation-criterion.js';
 import { Patient, Scoutable, TechnicalChallenge } from '../models/index.js';
-import { UUID, uuidSchema } from './uuid.js';
+import { uuid, UUID, uuidSchema } from './uuid.js';
 
-export const evalResultSchema = z.strictObject({
+export const evalResultBaseSchema = z.strictObject({
+    id: uuidSchema,
     criterionId: uuidSchema,
-    criterion: evalCriterionSchema,
-    isCompleted: z.boolean(),
-    count: z.number().nullable(),
+    timestamp: z.number(),
 });
+export const numberEvalResultSchema = z.strictObject({
+    ...evalResultBaseSchema.shape,
+    type: z.literal('numberEvalResult'),
+    num: z.number(),
+});
+export type NumberEvalResult = z.infer<typeof numberEvalResultSchema>;
+export const boolEvalResultSchema = z.strictObject({
+    ...evalResultBaseSchema.shape,
+    type: z.literal('boolEvalResult'),
+    isCompleted: z.boolean(),
+});
+export type BoolEvalResult = z.infer<typeof boolEvalResultSchema>;
+export const evalResultSchema = z.discriminatedUnion('type', [
+    numberEvalResultSchema,
+    boolEvalResultSchema,
+]);
 export type EvalResult = z.infer<typeof evalResultSchema>;
 
-export function getIsCompletedFromCriterionNode(
-    tree: CriterionNode,
-    evalCriteria: {
-        [key: string]: EvalCriterion;
-    },
-    technicalChallenges: { [key: string]: TechnicalChallenge },
-    patients: { [key: string]: Patient },
-    scoutables: { [key: string]: Scoutable },
-    currentTime: number
-): boolean {
-    function shortIsCompletedFromNode(tree: CriterionNode): boolean {
-        return getIsCompletedFromCriterionNode(
-            tree,
-            evalCriteria,
-            technicalChallenges,
-            patients,
-            scoutables,
-            currentTime
-        );
-    }
-    let isCompleted = false;
-    switch (tree.type) {
-        case 'andNode': {
-            for (let i = 0; i < tree.children.length; i += 1) {
-                if (!shortIsCompletedFromNode(tree.children[i]!))
-                    isCompleted = false;
-            }
-            break;
-        }
-        case 'orNode': {
-            for (let i = 0; i < tree.children.length; i += 1) {
-                if (shortIsCompletedFromNode(tree.children[i]!))
-                    isCompleted = true;
-            }
-            break;
-        }
-        case 'notNode': {
-            return !shortIsCompletedFromNode(tree.child);
-        }
-        case 'leafNode': {
-            const criterion = Object.values(evalCriteria).filter(
-                (crit) => crit.id === tree.criterionId
-            )[0] as EvalCriterion;
-            return getEvalResultFromCriterion(
-                criterion,
-                evalCriteria,
-                technicalChallenges,
-                patients,
-                scoutables,
-                currentTime
-            ).isCompleted;
-        }
-    }
-    return isCompleted;
-}
 export function getEvalResultFromCriterion(
     evalCriterion: EvalCriterion,
     evalCriteria: { [key: string]: EvalCriterion },
@@ -83,8 +47,27 @@ export function getEvalResultFromCriterion(
     scoutables: { [key: string]: Scoutable },
     currentTime: number
 ): EvalResult {
+    function shortCritToRes(evalCriterion: EvalCriterion): EvalResult {
+        return getEvalResultFromCriterion(
+            evalCriterion,
+            evalCriteria,
+            technicalChallenges,
+            patients,
+            scoutables,
+            currentTime
+        );
+    }
+    /* TODO @JohannesPotzi @Jogius : This reduces redundant visits to criteria in the tree. Can we do Better? */
+    if (evalCriterion.results.length >= 1) {
+        const latestResult = evalCriterion.results.at(
+            evalCriterion.results.length - 1
+        )!;
+        if (latestResult.timestamp === currentTime) {
+            return latestResult;
+        }
+    }
     let isCompleted = false;
-    let count = -1;
+    let num = null;
     switch (evalCriterion.criterionType) {
         case 'doMeasureXTimesEvalCriterion': {
             /* TODO @JohannesPotzi @Jogius */
@@ -111,10 +94,10 @@ export function getEvalResultFromCriterion(
         }
         case 'xPatientsAtStatusEvalCriterion': {
             const criterion = evalCriterion as XPatientsAtStatusEvalCriterion;
-            count = Object.values(patients).filter(
+            num = Object.values(patients).filter(
                 (patient) => patient.realStatus === criterion.targetStatus
             ).length;
-            isCompleted = count === criterion.count;
+            isCompleted = num === criterion.targetCount;
             break;
         }
         case 'viewScoutableEvalCriterion': {
@@ -123,27 +106,69 @@ export function getEvalResultFromCriterion(
             isCompleted = scoutable.viewedByParticipants;
             break;
         }
-        case 'combinedEvalCriterion': {
-            const criterion = evalCriterion as CombinedEvalCriterion;
-            isCompleted = getIsCompletedFromCriterionNode(
-                criterion.combinedEvalCriteriaTree,
-                evalCriteria,
-                technicalChallenges,
-                patients,
-                scoutables,
-                currentTime
-            );
+        case 'andEvalCriterion': {
+            const Criterion = evalCriterion as AndEvalCriterion;
+            isCompleted = true;
+            for (let i = 0; i < Criterion.children.length; i += 1) {
+                const res = shortCritToRes(
+                    evalCriteria[Criterion.children[i]!]!
+                );
+                if (res.type !== 'boolEvalResult' || !res.isCompleted) {
+                    isCompleted = false;
+                    break;
+                }
+            }
+            break;
+        }
+        case 'orEvalCriterion': {
+            const Criterion = evalCriterion as OrEvalCriterion;
+            isCompleted = false;
+            for (let i = 0; i < Criterion.children.length; i += 1) {
+                const res = shortCritToRes(
+                    evalCriteria[Criterion.children[i]!]!
+                );
+                if (res.type !== 'boolEvalResult') {
+                    break;
+                } else if (res.isCompleted) {
+                    isCompleted = true;
+                    break;
+                }
+            }
+            break;
+        }
+        case 'notEvalCriterion': {
+            const criterion = evalCriterion as NotEvalCriterion;
+            const res = shortCritToRes(criterion);
+            isCompleted =
+                res.type === 'boolEvalResult' ? res.isCompleted : true;
             break;
         }
         default:
             break;
     }
-    return {
-        criterionId: evalCriterion.id,
-        criterion: evalCriterion,
-        isCompleted: isCompleted,
-        count: count !== -1 ? count : null,
-    };
+    const id = uuid();
+    if (isNumberEvalCriterion(evalCriterion)) {
+        if (!num) {
+            console.log(
+                '[logic Error]: trying to return result of numberCriterion' +
+                    evalCriterion.id +
+                    ' without calculating the number value.'
+            );
+            num = 0;
+        }
+        return {
+            id: id,
+            criterionId: evalCriterion.id,
+            num: num,
+            timestamp: currentTime,
+        } as NumberEvalResult;
+    } else
+        return {
+            id: uuid(),
+            criterionId: evalCriterion.id,
+            isCompleted: isCompleted,
+            timestamp: currentTime,
+        } as BoolEvalResult;
 }
 export function getEvalResultsFromCriteria(
     evalCriteria: { [key: string]: EvalCriterion },

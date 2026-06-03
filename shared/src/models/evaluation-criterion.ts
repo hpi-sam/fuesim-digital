@@ -18,6 +18,7 @@ export const boolEvalCriterionIdSchema = uuidSchema.brand(
     'BoolEvalCriterionId'
 );
 export type BoolEvalCriterionId = z.infer<typeof boolEvalCriterionIdSchema>;
+
 export const numberEvalCriterionIdSchema = uuidSchema.brand(
     'NumberEvalcriterionId'
 );
@@ -39,18 +40,21 @@ export const andEvalCriterionSchema = z.strictObject({
     children: z.array(boolEvalCriterionIdSchema),
 });
 export type AndEvalCriterion = z.infer<typeof andEvalCriterionSchema>;
+
 export const orEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('orEvalCriterion'),
     children: z.array(boolEvalCriterionIdSchema),
 });
 export type OrEvalCriterion = z.infer<typeof orEvalCriterionSchema>;
+
 export const notEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('notEvalCriterion'),
     child: boolEvalCriterionIdSchema,
 });
 export type NotEvalCriterion = z.infer<typeof notEvalCriterionSchema>;
+
 /* TODO @JohannesPotzi @Jogius : maybe generalise this and include an operator? */
 export const greaterThanEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -61,6 +65,7 @@ export const greaterThanEvalCriterionSchema = z.strictObject({
 export type GreaterThanEvalCriterion = z.infer<
     typeof greaterThanEvalCriterionSchema
 >;
+
 export const numberEvalCriterionBaseSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
     results: z.array(numberEvalResultSchema),
@@ -188,6 +193,7 @@ export const evalCriterionSchema = z.union([
     numberEvalCriterionSchema,
 ]);
 export type EvalCriterion = z.infer<typeof evalCriterionSchema>;
+
 export type BoolEvalCriterionType = BoolEvalCriterion['criterionType'];
 export const boolEvalCritrionTypes = [
     'andEvalCriterion',
@@ -200,6 +206,7 @@ export const boolEvalCritrionTypes = [
     'viewScoutableEvalCriterion',
     'xPatientsAtStatusEvalCriterion',
 ] satisfies BoolEvalCriterionType[];
+
 export type NumberEvalCriterionType = NumberEvalCriterion['criterionType'];
 export const numberEvalCriterionTypes = [
     'constNumEvalCriterion',
@@ -207,6 +214,7 @@ export const numberEvalCriterionTypes = [
     'firstTrueAtEvalCriterion',
     'timeStampEvalCriterion',
 ] satisfies NumberEvalCriterionType[];
+
 export type EvalcriterionType = BoolEvalCriterionType | NumberEvalCriterionType;
 
 /* TODO @JohannesPotzi @Jogius : Zu überarbeiten. */
@@ -301,7 +309,6 @@ export function newViewScoutableEvalCriterion(
         targetScoutableId,
     };
 }
-
 export function isNumberEvalCriterion(evalCriterion: EvalCriterion): boolean {
     return numberEvalCriterionTypes.find(
         (type) => type === evalCriterion.criterionType

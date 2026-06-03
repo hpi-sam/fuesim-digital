@@ -27,12 +27,14 @@ export const numberEvalResultSchema = z.strictObject({
     num: z.number(),
 });
 export type NumberEvalResult = z.infer<typeof numberEvalResultSchema>;
+
 export const boolEvalResultSchema = z.strictObject({
     ...evalResultBaseSchema.shape,
     type: z.literal('boolEvalResult'),
     isCompleted: z.boolean(),
 });
 export type BoolEvalResult = z.infer<typeof boolEvalResultSchema>;
+
 export const evalResultSchema = z.discriminatedUnion('type', [
     numberEvalResultSchema,
     boolEvalResultSchema,

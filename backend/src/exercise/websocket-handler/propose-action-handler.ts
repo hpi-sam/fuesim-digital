@@ -27,6 +27,7 @@ export function registerProposeActionHandler(
                 });
                 return;
             }
+            // TODO@Felix
             // 1. validate json
             const errors = validateExerciseAction(action);
             if (errors.length > 0) {

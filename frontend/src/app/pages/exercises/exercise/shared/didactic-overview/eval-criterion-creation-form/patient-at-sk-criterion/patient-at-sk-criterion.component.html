@@ -85,7 +85,11 @@
             />
             <app-didactic-overview-patient-interaction-bar
                 [patient]="selected"
+                [selectedGlobalTargetStatus]="this.selectedTargetStatus()"
                 (targetPatient)="addPatient($event)"
+                (targetStatus)="
+                    updateSelectedPatientStatusMap(selected.id, $event)
+                "
             />
         }
     </div>

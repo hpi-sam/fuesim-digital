@@ -24,6 +24,7 @@ import {
     EvalCriterion,
     getNumFromEvalCriterion,
     getRootCriteriaMap,
+    EvalCriterionCategory,
 } from '../../../../../../../../../shared/dist/models/evaluation-criterion';
 import {
     type TechnicalChallengeId,
@@ -75,18 +76,9 @@ export class DidacticOverviewModalComponent {
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
     public readonly statusNames = statusNames;
     /* this is set on selection of the criterion category to be created. */
-    public readonly criterionCreationCategory = signal<
-        | 'boolEvalCriterion'
-        | 'numberEvalCriterion'
-        | 'combinedEvalCriterion'
-        | null
-    >(null);
-    public setCriterionCreationCategory(
-        category:
-            | 'boolEvalCriterion'
-            | 'numberEvalCriterion'
-            | 'combinedEvalCriterion'
-    ) {
+    public readonly criterionCreationCategory =
+        signal<EvalCriterionCategory | null>(null);
+    public setCriterionCreationCategory(category: EvalCriterionCategory) {
         this.criterionCreationCategory.set(category);
     }
     public getTechnicalChallengeNamebyId(id: TechnicalChallengeId) {

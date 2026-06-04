@@ -40,6 +40,8 @@ export class DidacticOverviewPatientInteractionBarComponent {
     public readonly statusNames = statusNames;
 
     readonly patient = input.required<Patient>();
+    readonly selectedGlobalTargetStatus =
+        input.required<PatientStatus | null>();
     readonly targetPatient = output<Patient>();
     readonly targetStatus = output<PatientStatus>();
     readonly selectedTargetStatus = signal<PatientStatus | null>(null);

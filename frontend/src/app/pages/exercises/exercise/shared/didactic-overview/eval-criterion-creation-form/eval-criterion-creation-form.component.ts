@@ -1,30 +1,27 @@
-import {
-    Component,
-    computed,
-    inject,
-    input,
-    Signal,
-    signal,
-} from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import {
-    Patient,
-    PatientStatus,
+    type Patient,
+    type PatientStatus,
     patientStatusAllowedValues,
     statusNames,
-    TechnicalChallenge,
-    TechnicalChallengeId,
-    TechnicalChallengeStateId,
-    UUID,
+    type TechnicalChallengeId,
+    type TechnicalChallengeStateId,
+    type UUID,
 } from 'fuesim-digital-shared';
 import {
-    EvalCriterion,
+    boolEvalCritrionTypes,
+    combinedEvalCriterionTypes,
+    type EvalCriterion,
+    EvalCriterionCategory,
     type EvalcriterionType,
     evalCriterionTypesNames,
     newPatientAtStatusEvalCriterion,
     newReachTechnicalChallengeStateEvalCriterion,
     newXPatientsAtStatusEvalCriterion,
+    numberEvalCriterionTypes,
+    evalCriterionCategoryNames,
 } from '../../../../../../../../../shared/dist/models/evaluation-criterion';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { FormsModule } from '@angular/forms';
@@ -32,6 +29,13 @@ import { Store } from '@ngrx/store';
 import { AppState } from '../../../../../../state/app.state';
 import { selectTechnicalChallenges } from '../../../../../../state/application/selectors/exercise.selectors';
 import { PatientAtSKCriterionComponent } from './patient-at-sk-criterion/patient-at-sk-criterion.component';
+import {
+    NgbDropdown,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
+} from '@ng-bootstrap/ng-bootstrap';
 
 interface InputData {
     countInput: number;
@@ -50,13 +54,35 @@ interface InputData {
         FormsModule,
         AppSaveOnTypingDirective,
         PatientAtSKCriterionComponent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
     ],
 })
 export class EvalCriterionCreationForm {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
-
-    public readonly criterionCreationType = input.required<EvalcriterionType>();
+    public readonly criterionCreationCategory =
+        input.required<EvalCriterionCategory>();
+    public readonly criterionTypeOptions = computed(() => {
+        switch (this.criterionCreationCategory()) {
+            case 'boolEvalCriterion': {
+                return boolEvalCritrionTypes;
+            }
+            case 'numberEvalCriterion': {
+                return numberEvalCriterionTypes;
+            }
+            case 'combinedEvalCriterion': {
+                return combinedEvalCriterionTypes;
+            }
+        }
+    });
+    public readonly criterionCreationType = signal<EvalcriterionType | null>(
+        null
+    );
+    public readonly evalCriterionCategoryNames = evalCriterionCategoryNames;
 
     private readonly tcs = this.store.selectSignal(selectTechnicalChallenges);
     public readonly technicalChallenges = signal(Object.values(this.tcs()));
@@ -200,7 +226,35 @@ export class EvalCriterionCreationForm {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }
-            case 'combinedEvalCriterion': {
+            case 'constNumEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
+                break;
+            }
+            case 'timeStampEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
+                break;
+            }
+            case 'firstTrueAtEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
+                break;
+            }
+            case 'greaterThanEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
+                break;
+            }
+            case 'notEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
+                break;
+            }
+            case 'andEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
+                break;
+            }
+            case 'countEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
+                break;
+            }
+            case 'orEvalCriterion': {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }

@@ -11,6 +11,9 @@
     <button
         class="btn btn-outline-success ms-1"
         (click)="targetPatient.emit(this.patient()); emitTargetStatus()"
+        [disabled]="
+            !this.selectedGlobalTargetStatus() && !this.selectedTargetStatus()
+        "
     >
         Auswählen
     </button>

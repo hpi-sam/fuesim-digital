@@ -1,10 +1,52 @@
 <div class="container-fluid d-flex flex-column h-100 mt-3 ms-1">
     <div class="card rounded-2" style="min-width: 400px">
         <div class="card-header text-center">
-            <h5 class="mb-0 ms-0 d-flex align-items-center">Neues Kriterium</h5>
+            <h5 class="mb-0 ms-0 d-flex align-items-center">
+                Neues
+                {{
+                    evalCriterionCategoryNames[this.criterionCreationCategory()]
+                }}
+                <div ngbDropdown class="d-inline-block">
+                    <button
+                        type="button"
+                        ngbDropdownToggle
+                        class="btn btn-outline-primary ms-3"
+                        data-cy="didacticOverviewAddEvalCriterionButton"
+                    >
+                        <i class="bi bi-plus"></i>
+                        {{
+                            this.criterionCreationType()
+                                ? this.evalCriterionTypesNames[
+                                      this.criterionCreationType()!
+                                  ]
+                                : 'Art des Kriteriums'
+                        }}
+                    </button>
+                    <div ngbDropdownMenu class="position-absolute">
+                        @for (
+                            option of this.criterionTypeOptions();
+                            track $index
+                        ) {
+                            <button
+                                ngbDropdownItem
+                                (click)="this.criterionCreationType.set(option)"
+                            >
+                                {{ evalCriterionTypesNames[option] }}
+                            </button>
+                        }
+                    </div>
+                </div>
+            </h5>
         </div>
         <div class="card-body" p-4>
             @switch (criterionCreationType()) {
+                @case (null) {
+                    <!-- TODO @JohannesPotzi @Jogius -->
+                    <span class="text-muted"
+                        >Bitte wählen sie eine Art von Kriterium im Drop-Down
+                        oben aus.</span
+                    >
+                }
                 @case ('xPatientsAtStatusEvalCriterion') {
                     <form class="ms-2">
                         <label>
@@ -137,24 +179,94 @@
                                 evalCriterionTypesNames.viewScoutableEvalCriterion
                             }}
                         </label>
+                        <!-- TODO @JohannesPotzi @Jogius -->
                     </form>
                 }
-                @case ('combinedEvalCriterion') {
+                @case ('andEvalCriterion') {
                     <form class="ms-2">
                         <label>
                             Art:
-                            {{ evalCriterionTypesNames.combinedEvalCriterion }}
+                            {{ evalCriterionTypesNames.andEvalCriterion }}
                         </label>
+                        <!-- TODO @JohannesPotzi @Jogius -->
+                    </form>
+                }
+                @case ('orEvalCriterion') {
+                    <form class="ms-2">
+                        <label>
+                            Art:
+                            {{ evalCriterionTypesNames.orEvalCriterion }}
+                        </label>
+                        <!-- TODO @JohannesPotzi @Jogius -->
+                    </form>
+                }
+                @case ('constNumEvalCriterion') {
+                    <form class="ms-2">
+                        <label>
+                            Art:
+                            {{ evalCriterionTypesNames.constNumEvalCriterion }}
+                        </label>
+                        <!-- TODO @JohannesPotzi @Jogius -->
+                    </form>
+                }
+                @case ('countEvalCriterion') {
+                    <form class="ms-2">
+                        <label>
+                            Art:
+                            {{ evalCriterionTypesNames.countEvalCriterion }}
+                        </label>
+                        <!-- TODO @JohannesPotzi @Jogius -->
+                    </form>
+                }
+                @case ('firstTrueAtEvalCriterion') {
+                    <form class="ms-2">
+                        <label>
+                            Art:
+                            {{
+                                evalCriterionTypesNames.firstTrueAtEvalCriterion
+                            }}
+                        </label>
+                        <!-- TODO @JohannesPotzi @Jogius -->
+                    </form>
+                }
+                @case ('greaterThanEvalCriterion') {
+                    <form class="ms-2">
+                        <label>
+                            Art:
+                            {{
+                                evalCriterionTypesNames.greaterThanEvalCriterion
+                            }}
+                        </label>
+                        <!-- TODO @JohannesPotzi @Jogius -->
+                    </form>
+                }
+                @case ('notEvalCriterion') {
+                    <form class="ms-2">
+                        <label>
+                            Art:
+                            {{ evalCriterionTypesNames.notEvalCriterion }}
+                        </label>
+                        <!-- TODO @JohannesPotzi @Jogius -->
+                    </form>
+                }
+                @case ('timeStampEvalCriterion') {
+                    <form class="ms-2">
+                        <label>
+                            Art:
+                            {{ evalCriterionTypesNames.timeStampEvalCriterion }}
+                        </label>
+                        <!-- TODO @JohannesPotzi @Jogius -->
                     </form>
                 }
             }
         </div>
-
-        <button
-            class="btn btn-outline-success mt-1 ms-2 me-2 mb-1"
-            (click)="submitCriterion(criterionCreationType())"
-        >
-            Bestätigen
-        </button>
+        @if (criterionCreationType()) {
+            <button
+                class="btn btn-outline-success mt-1 ms-2 me-2 mb-1"
+                (click)="submitCriterion(criterionCreationType()!)"
+            >
+                Bestätigen
+            </button>
+        }
     </div>
 </div>

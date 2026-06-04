@@ -193,6 +193,17 @@ export const evalCriterionSchema = z.discriminatedUnion('criterionType', [
 ]);
 export type EvalCriterion = z.infer<typeof evalCriterionSchema>;
 
+export type EvalCriterionCategory =
+    | 'boolEvalCriterion'
+    | 'numberEvalCriterion'
+    | 'combinedEvalCriterion';
+
+export const evalCriterionCategoryNames = {
+    boolEvalCriterion: 'Erfüllbares Kriterium',
+    numberEvalCriterion: 'Zahl-/Zähl Kriterium',
+    combinedEvalCriterion: 'Kombiniertes Kriterium',
+} as const satisfies { [Key in EvalCriterionCategory]: string };
+
 export type BoolEvalCriterionType = BoolEvalCriterion['criterionType'];
 export const boolEvalCritrionTypes = [
     'andEvalCriterion',

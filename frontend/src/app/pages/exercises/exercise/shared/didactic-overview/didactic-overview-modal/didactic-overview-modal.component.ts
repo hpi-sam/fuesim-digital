@@ -1,12 +1,4 @@
-import {
-    Component,
-    computed,
-    effect,
-    inject,
-    Signal,
-    signal,
-    WritableSignal,
-} from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
     NgbActiveModal,
     NgbDropdown,
@@ -17,7 +9,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
-    createSelectEvalCriterion,
+    selectEvalCriteria,
     selectEvalResults,
     selectTechnicalChallenges,
 } from '../../../../../../state/application/selectors/exercise.selectors';
@@ -25,17 +17,18 @@ import { AppState } from '../../../../../../state/app.state';
 import { EvalCriterionCreationForm } from '../eval-criterion-creation-form/eval-criterion-creation-form.component';
 import {
     type EvalcriterionType,
-    evalCritrionTypes,
+    boolEvalCritrionTypes,
+    numberEvalCriterionTypes,
+    combinedEvalCriterionTypes,
     evalCriterionTypesNames,
-    XPatientsAtStatusEvalCriterion,
+    EvalCriterion,
+    getNumFromEvalCriterion,
+    getRootCriteriaMap,
 } from '../../../../../../../../../shared/dist/models/evaluation-criterion';
 import {
-    type EvalResult,
-    Patient,
-    TechnicalChallenge,
-    TechnicalChallengeId,
-    TechnicalChallengeStateId,
-    type UUID,
+    type TechnicalChallengeId,
+    type TechnicalChallengeStateId,
+    getNumFromEvalResult,
     statusNames,
 } from 'fuesim-digital-shared';
 @Component({
@@ -54,28 +47,47 @@ import {
 export class DidacticOverviewModalComponent {
     private readonly activeModal = inject(NgbActiveModal);
     private readonly store = inject<Store<AppState>>(Store);
+    public readonly rootCriteriaMap = computed(() =>
+        this.getRootCriteriaMap(this.store.selectSignal(selectEvalCriteria)())
+    );
     public readonly results = computed(() =>
         Object.values(this.store.selectSignal(selectEvalResults)())
+    );
+    public readonly rootResults = computed(() =>
+        this.results().filter((res) => this.rootCriteriaMap()[res.criterionId])
     );
     public readonly completedCriteriaCount = computed(() => {
         let count = 0;
         for (let i = 0; i < this.results().length; i += 1) {
-            if (this.results().at(i)?.isCompleted) count += 1;
+            const res = this.results().at(i);
+            if (res?.type === 'boolEvalResult' && res?.isCompleted) {
+                count += 1;
+            }
         }
         return count;
     });
     private readonly tcs = this.store.selectSignal(selectTechnicalChallenges);
     public readonly technicalChallenges = signal(Object.values(this.tcs()));
     creatingcriterion = false;
-    public readonly evalCriterionTypes = evalCritrionTypes;
+    public readonly boolEvalCriterionTypes = boolEvalCritrionTypes;
+    public readonly numberEvalCriterionTypes = numberEvalCriterionTypes;
+    public readonly combinedEvalCriterionTypes = combinedEvalCriterionTypes;
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
     public readonly statusNames = statusNames;
-    /* this is set on selection of the criterion type to be created. */
-    criterionCreationType!: EvalcriterionType;
-    getTypedCriterion(id: UUID) {
-        return this.store.selectSignal(
-            createSelectEvalCriterion(id)
-        )() as XPatientsAtStatusEvalCriterion;
+    /* this is set on selection of the criterion category to be created. */
+    public readonly criterionCreationCategory = signal<
+        | 'boolEvalCriterion'
+        | 'numberEvalCriterion'
+        | 'combinedEvalCriterion'
+        | null
+    >(null);
+    public setCriterionCreationCategory(
+        category:
+            | 'boolEvalCriterion'
+            | 'numberEvalCriterion'
+            | 'combinedEvalCriterion'
+    ) {
+        this.criterionCreationCategory.set(category);
     }
     public getTechnicalChallengeNamebyId(id: TechnicalChallengeId) {
         return this.technicalChallenges()
@@ -91,6 +103,9 @@ export class DidacticOverviewModalComponent {
             .at(0);
         return tc?.states[stateId]?.title;
     }
+    public getNumFromEvalResult = getNumFromEvalResult;
+    public getNumFromEvalCriterion = getNumFromEvalCriterion;
+    public getRootCriteriaMap = getRootCriteriaMap;
     public close() {
         this.activeModal.close();
     }

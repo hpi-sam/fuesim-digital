@@ -14,23 +14,41 @@
                 <i class="bi bi-plus"></i> Auswertungskriterium Hinzufügen
             </button>
             <div ngbDropdownMenu class="position-absolute">
-                @for (type of evalCriterionTypes; track type) {
-                    <button
-                        ngbDropdownItem
-                        (click)="
-                            criterionCreationType = type;
-                            creatingcriterion = true
-                        "
-                    >
-                        {{ evalCriterionTypesNames[type] }}
-                    </button>
-                }
+                <button
+                    ngbDropdownItem
+                    (click)="
+                        creatingcriterion = true;
+                        this.setCriterionCreationCategory('boolEvalCriterion')
+                    "
+                >
+                    Erfüllbares Kriterium
+                </button>
+                <button
+                    ngbDropdownItem
+                    (click)="
+                        creatingcriterion = true;
+                        this.setCriterionCreationCategory('numberEvalCriterion')
+                    "
+                >
+                    Zahl Kriterium
+                </button>
+                <button
+                    ngbDropdownItem
+                    (click)="
+                        creatingcriterion = true;
+                        this.setCriterionCreationCategory(
+                            'combinedEvalCriterion'
+                        )
+                    "
+                >
+                    Kombiniertes Kriterium
+                </button>
             </div>
         </div>
     </div>
-    @if (creatingcriterion) {
+    @if (creatingcriterion && this.criterionCreationCategory()) {
         <app-eval-criterion-creation-form
-            [criterionCreationType]="criterionCreationType"
+            [criterionCreationCategory]="this.criterionCreationCategory()!"
         />
     }
     <div class="card col-3 p-0 rounded-2 ms-3 mt-3" style="min-width: 600px">
@@ -51,53 +69,61 @@
                 Es sind aktuell keine Auswertungskriterien festgelegt.
             </p>
         } @else {
-            @for (result of this.results(); track result.criterionId) {
+            @for (result of this.rootResults(); track result.criterionId) {
                 <div class="card col-3 p-0 rounded-0" style="min-width: 600px">
                     <div class="d-flex mx-2">
-                        <span class="ms-1"
-                            >{{ result.criterion.name }}
+                        <span class="ms-1">
                             @if (
-                                result.criterion.criterionType ===
-                                'xPatientsAtStatusEvalCriterion'
+                                this.rootCriteriaMap()[result.criterionId];
+                                as criterion
                             ) {
-                                {{ statusNames[result.criterion.targetStatus] }}
-                            }
-                            @if (
-                                result.criterion.criterionType ===
-                                'reachTechnicalChallengeStateEvalCriterion'
-                            ) {
-                                {{
-                                    ' - ' +
-                                        getTechnicalChallengeNamebyId(
-                                            result.criterion
-                                                .targetTechnicalChallengeId
-                                        ) +
-                                        ' - ' +
-                                        getTechnicalChallengeStateTitlebyId(
-                                            result.criterion
-                                                .targetTechnicalChallengeId,
-                                            result.criterion
-                                                .targetTechnicalChallengeStateId
-                                        )
-                                }}
-                            }
-                            @if (
-                                result.criterion.criterionType ===
-                                    'doMeasureXTimesEvalCriterion' ||
-                                result.criterion.criterionType ===
+                                {{ criterion.name }}
+                                @if (
+                                    criterion.criterionType ===
                                     'xPatientsAtStatusEvalCriterion'
-                            ) {
-                                {{
-                                    ': (' +
-                                        result.count +
-                                        '/' +
-                                        result.criterion.count +
-                                        ')'
-                                }}
+                                ) {
+                                    {{ statusNames[criterion.targetStatus] }}
+                                }
+                                @if (
+                                    criterion.criterionType ===
+                                    'reachTechnicalChallengeStateEvalCriterion'
+                                ) {
+                                    {{
+                                        ' - ' +
+                                            getTechnicalChallengeNamebyId(
+                                                criterion.targetTechnicalChallengeId
+                                            ) +
+                                            ' - ' +
+                                            getTechnicalChallengeStateTitlebyId(
+                                                criterion.targetTechnicalChallengeId,
+                                                criterion.targetTechnicalChallengeStateId
+                                            )
+                                    }}
+                                }
+                                @if (
+                                    criterion.criterionType ===
+                                        'doMeasureXTimesEvalCriterion' ||
+                                    criterion.criterionType ===
+                                        'xPatientsAtStatusEvalCriterion'
+                                ) {
+                                    {{
+                                        ': (' +
+                                            (getNumFromEvalResult(result) ??
+                                                '') +
+                                            '/' +
+                                            (getNumFromEvalCriterion(
+                                                criterion
+                                            ) ?? '') +
+                                            ')'
+                                    }}
+                                }
                             }
                         </span>
                         <div class="flex-grow-1"></div>
-                        @if (result.isCompleted) {
+                        @if (
+                            result.type === 'boolEvalResult' &&
+                            result.isCompleted
+                        ) {
                             <button class="btn btn-success mt-1 mb-1" disabled>
                                 <i class="bi bi-check"></i>
                             </button>

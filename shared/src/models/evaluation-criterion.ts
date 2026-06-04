@@ -58,8 +58,8 @@ export type NotEvalCriterion = z.infer<typeof notEvalCriterionSchema>;
 export const greaterThanEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('greaterThanEvalCriterion'),
-    left: numberEvalCriterionIdSchema,
-    right: numberEvalCriterionIdSchema,
+    leftChild: numberEvalCriterionIdSchema,
+    rightChild: numberEvalCriterionIdSchema,
 });
 export type GreaterThanEvalCriterion = z.infer<
     typeof greaterThanEvalCriterionSchema
@@ -187,7 +187,7 @@ export const numberEvalCriterionSchema = z.discriminatedUnion('criterionType', [
 ]);
 export type NumberEvalCriterion = z.infer<typeof numberEvalCriterionSchema>;
 
-export const evalCriterionSchema = z.union([
+export const evalCriterionSchema = z.discriminatedUnion('criterionType', [
     boolEvalCriterionSchema,
     numberEvalCriterionSchema,
 ]);
@@ -213,6 +213,16 @@ export const numberEvalCriterionTypes = [
     'firstTrueAtEvalCriterion',
     'timeStampEvalCriterion',
 ] satisfies NumberEvalCriterionType[];
+
+export type EvalCriterionType = EvalCriterion['criterionType'];
+export const combinedEvalCriterionTypes = [
+    'andEvalCriterion',
+    'orEvalCriterion',
+    'countEvalCriterion',
+    'notEvalCriterion',
+    'firstTrueAtEvalCriterion',
+    'greaterThanEvalCriterion',
+] satisfies EvalCriterionType[];
 
 export type EvalcriterionType = BoolEvalCriterionType | NumberEvalCriterionType;
 
@@ -308,10 +318,83 @@ export function newViewScoutableEvalCriterion(
         targetScoutableId,
     };
 }
-export function isNumberEvalCriterion(evalCriterion: EvalCriterion): boolean {
+export function isNumberEvalCriterion(criterion: EvalCriterion): boolean {
     return numberEvalCriterionTypes.find(
-        (type) => type === evalCriterion.criterionType
+        (type) => type === criterion.criterionType
     )
         ? true
         : false;
+}
+/* TypeScript and Angular don't understand, that isNumberEvalCriterion(criterion)===true also means that criterion.num exists.*/
+export function getNumFromEvalCriterion(
+    criterion: EvalCriterion
+): number | null {
+    const type = criterion.criterionType;
+    if (
+        type === 'constNumEvalCriterion' ||
+        type === 'countEvalCriterion' ||
+        type === 'firstTrueAtEvalCriterion' ||
+        type === 'timeStampEvalCriterion'
+    ) {
+        return criterion.num;
+    }
+    return null;
+}
+
+export function removeChildren(
+    criteriaMap: { [key: string]: EvalCriterion },
+    currentCriterion?: EvalCriterion
+): { [key: string]: EvalCriterion } {
+    if (!currentCriterion) {
+        return criteriaMap;
+    }
+    if (!criteriaMap[currentCriterion.id]) {
+        console.log(
+            '[logic Error] When filtering root criteria, the current criterion was not in the criteria.'
+        );
+        return criteriaMap;
+    }
+    const type = currentCriterion.criterionType;
+    if (
+        type === 'andEvalCriterion' ||
+        type === 'orEvalCriterion' ||
+        type === 'countEvalCriterion'
+    ) {
+        for (let i = 0; i < currentCriterion.children.length; i += 1) {
+            removeChildren(
+                criteriaMap,
+                criteriaMap[currentCriterion.children.at(i)!]
+            );
+            delete criteriaMap[currentCriterion.children.at(i)!];
+        }
+    }
+    if (type === 'firstTrueAtEvalCriterion' || type === 'notEvalCriterion') {
+        removeChildren(criteriaMap, criteriaMap[currentCriterion.child]);
+        delete criteriaMap[currentCriterion.child];
+    }
+    if (type === 'greaterThanEvalCriterion') {
+        removeChildren(criteriaMap, criteriaMap[currentCriterion.leftChild]);
+        delete criteriaMap[currentCriterion.leftChild];
+        removeChildren(criteriaMap, criteriaMap[currentCriterion.rightChild]);
+        delete criteriaMap[currentCriterion.rightChild];
+    }
+    return criteriaMap;
+}
+export function getRootCriteriaMap(criteriaMap: {
+    [key: string]: EvalCriterion;
+}): {
+    [key: string]: EvalCriterion;
+} {
+    const criteria = Object.values(criteriaMap);
+    for (let i = 0; i < criteria.length; i += 1) {
+        const criterion = criteria[i]!;
+        if (
+            combinedEvalCriterionTypes.find(
+                (type) => type === criterion.criterionType
+            )
+        ) {
+            criteriaMap = removeChildren(criteriaMap, criterion);
+        }
+    }
+    return criteriaMap;
 }

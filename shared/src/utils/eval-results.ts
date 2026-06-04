@@ -149,14 +149,14 @@ export function getEvalResultFromCriterion(
         }
         case 'greaterThanEvalCriterion': {
             const criterion = evalCriterion as GreaterThanEvalCriterion;
-            const leftCrit = evalCriteria[criterion.left];
-            const rightCrit = evalCriteria[criterion.right];
+            const leftCrit = evalCriteria[criterion.leftChild];
+            const rightCrit = evalCriteria[criterion.rightChild];
             if (!leftCrit || !rightCrit) {
                 console.log(
                     '[logic Error] comparing criteria but some are missing with ids: ' +
-                        (leftCrit ? '' : criterion.left) +
+                        (leftCrit ? '' : criterion.leftChild) +
                         (!leftCrit && !rightCrit ? ', ' : '') +
-                        (rightCrit ? '' : criterion.right)
+                        (rightCrit ? '' : criterion.rightChild)
                 );
                 break;
             }
@@ -169,9 +169,9 @@ export function getEvalResultFromCriterion(
             if (!isLeftNum || !isRightNum) {
                 console.log(
                     '[logic Error] comparing criteria but some are not numberCriteria with ids: ' +
-                        (isLeftNum ? '' : criterion.left) +
+                        (isLeftNum ? '' : criterion.leftChild) +
                         (!isLeftNum && !isRightNum ? ', ' : '') +
-                        (isRightNum ? '' : criterion.right)
+                        (isRightNum ? '' : criterion.rightChild)
                 );
             }
             /* boolean are converted to numbers appropiately */
@@ -287,4 +287,7 @@ export function getEvalResultsFromCriteria(
             },
             {}
         );
+}
+export function getNumFromEvalResult(result: EvalResult): number | null {
+    return result.type === 'numberEvalResult' ? result.num : null;
 }

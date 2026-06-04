@@ -1,4 +1,4 @@
-import { z, ZodType } from 'zod';
+import { z } from 'zod';
 import type { UUID } from '../utils/uuid.js';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import type { TechnicalChallengeStateId } from './technical-challenge/state-machine.js';
@@ -9,8 +9,6 @@ import type { PatientStatus } from './utils/patient-status.js';
 import { patientStatusSchema } from './utils/patient-status.js';
 import {
     boolEvalResultSchema,
-    EvalResult,
-    evalResultSchema,
     numberEvalResultSchema,
 } from '../utils/eval-results.js';
 
@@ -24,6 +22,7 @@ export const numberEvalCriterionIdSchema = uuidSchema.brand(
 );
 export type NumberEvalCriterionId = z.infer<typeof numberEvalCriterionIdSchema>;
 
+/* TODO @JohannesPotzi @Jogius : add showInTable attribute. Also, update addCriterion action accordingly. */
 export const evalCriterionBaseSchema = z.strictObject({
     id: uuidSchema,
     name: z.string(),
@@ -37,14 +36,14 @@ export const boolEvalCriterionBaseSchema = z.strictObject({
 export const andEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('andEvalCriterion'),
-    children: z.array(boolEvalCriterionIdSchema),
+    children: z.array(boolEvalCriterionIdSchema).min(1),
 });
 export type AndEvalCriterion = z.infer<typeof andEvalCriterionSchema>;
 
 export const orEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('orEvalCriterion'),
-    children: z.array(boolEvalCriterionIdSchema),
+    children: z.array(boolEvalCriterionIdSchema).min(1),
 });
 export type OrEvalCriterion = z.infer<typeof orEvalCriterionSchema>;
 
@@ -80,7 +79,7 @@ export type ConstNumEvalCriterion = z.infer<typeof constNumEvalCriterionSchema>;
 export const countEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
     criterionType: z.literal('countEvalCriterion'),
-    children: z.array(boolEvalCriterionIdSchema),
+    children: z.array(boolEvalCriterionIdSchema).min(1),
 });
 export type CountEvalCriterion = z.infer<typeof countEvalCriterionSchema>;
 

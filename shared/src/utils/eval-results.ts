@@ -1,15 +1,16 @@
 import { z } from 'zod';
 import {
     AndEvalCriterion,
-    BoolEvalCriterion,
+    CountEvalCriterion,
     EvalCriterion,
-    evalCriterionSchema,
     FirstTrueAtEvalCriterion,
+    GreaterThanEvalCriterion,
     isNumberEvalCriterion,
     NotEvalCriterion,
     OrEvalCriterion,
     PatientAtStatusEvalCriterion,
     ReachTechnicalChallengeStateEvalCriterion,
+    TimeStampEvalCriterion,
     ViewScoutableEvalCriterion,
     XPatientsAtStatusEvalCriterion,
 } from '../models/evaluation-criterion.js';
@@ -71,6 +72,7 @@ export function getEvalResultFromCriterion(
     let isCompleted = false;
     let num = null;
     switch (evalCriterion.criterionType) {
+        /* ------------------------BOOL CRITERIA------------------------ */
         case 'doMeasureXTimesEvalCriterion': {
             /* TODO @JohannesPotzi @Jogius */
             console.log(
@@ -127,7 +129,7 @@ export function getEvalResultFromCriterion(
             isCompleted = false;
             for (let i = 0; i < Criterion.children.length; i += 1) {
                 const res = shortCritToRes(
-                    evalCriteria[Criterion.children[i]!]!
+                    evalCriteria[Criterion.children.at(i)!]!
                 );
                 if (res.type !== 'boolEvalResult') {
                     break;
@@ -143,6 +145,94 @@ export function getEvalResultFromCriterion(
             const res = shortCritToRes(criterion);
             isCompleted =
                 res.type === 'boolEvalResult' ? res.isCompleted : true;
+            break;
+        }
+        case 'greaterThanEvalCriterion': {
+            const criterion = evalCriterion as GreaterThanEvalCriterion;
+            const leftCrit = evalCriteria[criterion.left];
+            const rightCrit = evalCriteria[criterion.right];
+            if (!leftCrit || !rightCrit) {
+                console.log(
+                    '[logic Error] comparing criteria but some are missing with ids: ' +
+                        (leftCrit ? '' : criterion.left) +
+                        (!leftCrit && !rightCrit ? ', ' : '') +
+                        (rightCrit ? '' : criterion.right)
+                );
+                break;
+            }
+            let leftVal = 0;
+            let rightVal = 0;
+            const leftRes = shortCritToRes(leftCrit);
+            const rightRes = shortCritToRes(rightCrit);
+            const isLeftNum = leftRes.type === 'numberEvalResult';
+            const isRightNum = rightRes.type === 'numberEvalResult';
+            if (!isLeftNum || !isRightNum) {
+                console.log(
+                    '[logic Error] comparing criteria but some are not numberCriteria with ids: ' +
+                        (isLeftNum ? '' : criterion.left) +
+                        (!isLeftNum && !isRightNum ? ', ' : '') +
+                        (isRightNum ? '' : criterion.right)
+                );
+            }
+            /* boolean are converted to numbers appropiately */
+            if (!isLeftNum) {
+                leftVal = leftRes.isCompleted ? 1 : 0;
+            } else {
+                leftVal = leftRes.num;
+            }
+            if (!isRightNum) {
+                rightVal = rightRes.isCompleted ? 1 : 0;
+            } else {
+                rightVal = rightRes.num;
+            }
+            isCompleted = leftVal > rightVal;
+            break;
+        }
+        /* ------------------------NUMBER CRITERIA------------------------ */
+        case 'constNumEvalCriterion': {
+            num = evalCriterion.num;
+            break;
+        }
+        case 'timeStampEvalCriterion': {
+            num = evalCriterion.num;
+            break;
+        }
+        case 'countEvalCriterion': {
+            const criterion = evalCriterion as CountEvalCriterion;
+            num = 0;
+            for (let i = 0; i < criterion.children.length; i += 1) {
+                const res = shortCritToRes(
+                    evalCriteria[criterion.children.at(i)!]!
+                );
+                if (res.type === 'numberEvalResult') {
+                    console.log(
+                        '[logic Error] countEvalCriterion ' +
+                            criterion.id +
+                            ' contains numberEvalCriterion ' +
+                            res.criterionId
+                    );
+                } else if (res.isCompleted) {
+                    num += 1;
+                }
+            }
+            break;
+        }
+        case 'firstTrueAtEvalCriterion': {
+            const criterion = evalCriterion as FirstTrueAtEvalCriterion;
+            const resCount = criterion.results.length;
+            if (resCount > 0) {
+                const latestTimeStamp = criterion.results[resCount - 1]!.num;
+                if (latestTimeStamp > 0) {
+                    num = latestTimeStamp;
+                } else {
+                    const childCrit = evalCriteria[criterion.child];
+                    if (childCrit) {
+                        num = shortCritToRes(childCrit);
+                        break;
+                    }
+                    num = -1;
+                }
+            }
             break;
         }
         default:

@@ -14,6 +14,7 @@ import { ReducerError } from '../reducer-error.js';
 import {
     currentStateOf,
     technicalChallengeStateIdSchema,
+    updateEventQueue,
 } from '../../models/technical-challenge/state-machine.js';
 import { taskSchema } from '../../models/task.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
@@ -84,6 +85,12 @@ export namespace TechnicalChallengeActionReducers {
             reducer: (draftState, action) => {
                 draftState.technicalChallenges[action.technicalChallenge.id] =
                     cloneDeepMutable(action.technicalChallenge);
+                updateEventQueue(
+                    draftState.technicalChallenges[
+                        action.technicalChallenge.id
+                    ]!,
+                    draftState
+                );
                 return draftState;
             },
             rights: 'trainer',

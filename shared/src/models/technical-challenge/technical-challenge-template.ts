@@ -5,6 +5,7 @@ import { uuid, uuidSchema } from '../../utils/uuid.js';
 import { imagePropertiesSchema } from '../utils/image-properties.js';
 import { newNoPosition } from '../utils/position/no-position.js';
 import { newSize } from '../utils/size.js';
+import { newTaskProgress } from '../task.js';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,
@@ -40,7 +41,7 @@ export function newTechnicalChallengeFromTemplate(
         position: newNoPosition(),
         size: newSize(40, 40),
         taskProgress: Object.fromEntries(
-            Object.values(relevantTasks).map((task) => [task.id, 0])
+            Object.values(relevantTasks).map((task) => [task.id, newTaskProgress()])
         ),
         currentStateId: template.initialStateId,
         assignedPersonnel: {},

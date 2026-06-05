@@ -3,18 +3,19 @@ import type { Immutable } from 'immer';
 import { uuidSchema } from '../../utils/uuid.js';
 import { imagePropertiesSchema } from '../utils/image-properties.js';
 import { positionSchema } from '../utils/position/position.js';
-import { taskSchema } from '../task.js';
+import { taskProgressSchema, taskSchema } from '../task.js';
 import { personnelSchema } from '../personnel.js';
 import { sizeSchema } from '../utils/size.js';
 import {
     stateMachineSchema,
     technicalChallengeStateIdSchema,
 } from './state-machine.js';
+import {
+    technicalChallengeIdSchema,
+    type TechnicalChallengeId,
+} from './technical-challenge-id.js';
 
-export const technicalChallengeIdSchema = uuidSchema.brand(
-    'TechnicalChallengeId'
-);
-export type TechnicalChallengeId = z.infer<typeof technicalChallengeIdSchema>;
+export { technicalChallengeIdSchema, type TechnicalChallengeId };
 
 export const technicalChallengeSchema = z.strictObject({
     id: technicalChallengeIdSchema,
@@ -24,7 +25,7 @@ export const technicalChallengeSchema = z.strictObject({
     image: imagePropertiesSchema,
     position: positionSchema,
     size: sizeSchema,
-    taskProgress: z.record(taskSchema.shape.id, z.number()),
+    taskProgress: z.record(taskSchema.shape.id, taskProgressSchema),
     currentStateId: technicalChallengeStateIdSchema,
     assignedPersonnel: z.record(personnelSchema.shape.id, taskSchema.shape.id),
     ...stateMachineSchema.shape,

@@ -96,7 +96,7 @@ export class TechnicalChallengeDetailsComponent implements OnChanges {
         Object.values(this.technicalChallenge().relevantTasks).map((task) => ({
             ...task,
             ...this.calculateProgress(
-                this.technicalChallenge().taskProgress[task.id] ?? 0,
+                this.technicalChallenge().taskProgress[task.id]?.progress ?? 0,
                 this.progressGuardsByTaskId().get(task.id)?.minProgress ?? 0
             ),
         }))
@@ -111,11 +111,11 @@ export class TechnicalChallengeDetailsComponent implements OnChanges {
     });
 
     public readonly guards = computed<Guard[]>(() =>
-        this.technicalChallenge().transitions.map(({ guard }) => guard)
+        Object.values(this.technicalChallenge().transitions).map(({ guard }) => guard)
     );
     public readonly visibleGuards = computed<Guard[]>(() =>
-        this.technicalChallenge()
-            .transitions.filter((t) => t.from === this.currentState().id)
+        Object.values(this.technicalChallenge()
+            .transitions).filter((t) => t.from === this.currentState().id)
             .map(({ guard }) => guard)
     );
     public readonly progressGuards = computed(() =>

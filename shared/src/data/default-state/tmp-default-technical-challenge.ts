@@ -184,17 +184,25 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     const transitions: Transition[] = [
         // From initial state
         {
+            id: 'ffcf3b26-d18b-44c3-b3c4-ff9b6a8b9d19',
             from: initialState.id,
             to: onlyExtinguished.id,
             guard: isFireExtinguished,
         },
-        { from: initialState.id, to: onlyDead.id, guard: isPatientDead },
         {
+            id: 'e572cef1-c0d9-4855-a395-7a435bef1f76',
+            from: initialState.id,
+            to: onlyDead.id,
+            guard: isPatientDead,
+        },
+        {
+            id: '359d2925-bf59-4618-8801-477e027074fd',
             from: initialState.id,
             to: onlyTreated.id,
             guard: isPatientRescued,
         },
         {
+            id: 'b0ea2ca8-85a8-4169-9e05-ccf63cf68cc4',
             from: initialState.id,
             to: onlyBurnedOut.id,
             guard: isVehicleBurnedOut,
@@ -202,11 +210,13 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
 
         // From onlyExtinguished
         {
+            id: '9328e285-9dee-4b2f-8b15-5c10db861c0b',
             from: onlyExtinguished.id,
             to: patientDeadButExtinguished.id,
             guard: isPatientDead,
         },
         {
+            id: '2ad70e61-9455-4389-b3be-d684fb30aa48',
             from: onlyExtinguished.id,
             to: treatedAndExtinguished.id,
             guard: isPatientRescued,
@@ -214,11 +224,13 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
 
         // From onlyDead
         {
+            id: '97adb6fc-2c77-4f44-bfdb-d4f8706d2253',
             from: onlyDead.id,
             to: patientDeadButExtinguished.id,
             guard: isFireExtinguished,
         },
         {
+            id: 'd68c4c2d-1ced-4a47-ac6e-785a8adbaa8b',
             from: onlyDead.id,
             to: burnedOutAndPatientDead.id,
             guard: isVehicleBurnedOut,
@@ -226,11 +238,13 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
 
         // From onlyTreated
         {
+            id: '86bfb83e-1eda-45a5-8ad1-ad2e662acccc',
             from: onlyTreated.id,
             to: treatedAndExtinguished.id,
             guard: isFireExtinguished,
         },
         {
+            id: 'efa85b02-4dbc-4c50-9719-1e52a6e35a69',
             from: onlyTreated.id,
             to: burnedOutAndPatientDead.id,
             guard: isVehicleBurnedOut,
@@ -238,11 +252,13 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
 
         // From onlyBurnedOut
         {
+            id: 'e29dd599-b8f5-411a-ba47-dc32aaf49fea',
             from: onlyBurnedOut.id,
             to: burnedOutAndPatientDead.id,
             guard: isPatientDead,
         },
         {
+            id: '3a846832-2306-4a32-817d-466dadabc486',
             from: onlyBurnedOut.id,
             to: burnedOutButRescued.id,
             guard: isPatientRescued,
@@ -260,7 +276,9 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
         name: 'Brennendes Fahrzeug mit eingeklemmter Person',
         states,
         relevantTasks,
-        transitions,
+        transitions: Object.fromEntries(
+            transitions.map((transition) => [transition.id, transition])
+        ),
         simulationStartTime: 0,
     };
 }

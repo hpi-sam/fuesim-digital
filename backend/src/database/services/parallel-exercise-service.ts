@@ -10,6 +10,7 @@ import {
     actionProcessorDictionary,
     applyAction,
     cloneDeepMutable,
+    miningServiceResponseSchema,
     parallelExerciseInstanceSummarySchema,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
@@ -247,7 +248,10 @@ export class ParallelExerciseService {
             let exerciseRunning = false;
             let onlyStartAndStop = true;
             let previousEvent: ProcessEvent | null = null;
+            let previousEventName: string | null = null;
+            const occurrenceMap: { [Key in string]: number } = {};
             processEvents[parallelExerciseInstance.participantKey] = [];
+
             for (const [i, actionEntry] of actions.entries()) {
                 const action = actionEntry.actionString;
                 applyAction(currentState, action);
@@ -270,34 +274,45 @@ export class ParallelExerciseService {
                     );
                     if (
                         actionProcessor.mergeSubsequent &&
-                        previousEvent?.name === processEvent.name
+                        previousEvent &&
+                        previousEventName === processEvent.name
                     ) {
+                        console.log('MERGE HERE', previousEvent.name);
                         previousEvent.endTime = currentState.currentTime;
                         continue;
                     }
 
-                    console.log(
-                        `[EVENT] ${processEvent.timestamp} ${processEvent.name} ${processEvent.verboseName}`
-                    );
+                    previousEventName = processEvent.name;
                     previousEvent = processEvent;
+
+                    const occurrence =
+                        (occurrenceMap[processEvent.name] ?? 0) + 1;
+                    occurrenceMap[processEvent.name] = occurrence;
+                    processEvent.name = `${occurrence}. ${processEvent.name}`;
+
+                    // console.log(
+                    //     `[EVENT] ${processEvent.timestamp} ${processEvent.name} ${processEvent.verboseName}`
+                    // );
                     processEvents[
                         parallelExerciseInstance.participantKey
                     ]!.push(processEvent);
+
+                    if (
+                        !['[Exercise] Start', '[Exercise] Pause'].includes(
+                            action.type
+                        )
+                    ) {
+                        onlyStartAndStop = false;
+                    }
                 }
                 if (action.type === '[Exercise] Pause') {
                     exerciseRunning = false;
-                }
-                if (
-                    !['[Exercise] Start', '[Exercise] Pause'].includes(
-                        action.type
-                    )
-                ) {
-                    onlyStartAndStop = false;
                 }
             }
 
             // If the participant didn't do anything, empty it
             if (onlyStartAndStop) {
+                console.log('only start and stop');
                 processEvents[parallelExerciseInstance.participantKey] = [];
             }
         }
@@ -314,9 +329,12 @@ export class ParallelExerciseService {
             },
             body: JSON.stringify(Object.values(processEvents).flat()),
         });
+        const data = miningServiceResponseSchema.parse(await result.json());
+
         return {
             events: processEvents,
-            dfg: await result.json(),
+            dfg: data.dfg,
+            clusters: data.clusters,
         };
     }
 }

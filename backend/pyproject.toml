@@ -9,7 +9,8 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pm4py (>=2.7.22.3,<3.0.0.0)",
-    "flask (>=3.1.3,<4.0.0)"
+    "flask (>=3.1.3,<4.0.0)",
+    "scikit-learn (>=1.8.0,<2.0.0)"
 ]
 package-mode = false
 

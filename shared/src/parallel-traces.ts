@@ -8,7 +8,7 @@ import { z } from 'zod';
 import type { WritableDraft } from 'immer';
 import { participantKeySchema } from './exercise-keys.js';
 
-export const processEventSchema = z.strictObject({
+export const processEventSchema = z.object({
     participantKey: participantKeySchema,
     verboseName: z.string(),
     timestamp: z.string(),
@@ -98,29 +98,66 @@ export const actionProcessors = [
                 action.scoutableId
             );
             return {
-                name: `[Scoutable] Viewed ${scoutable.name || scoutable.id}`,
+                // name: `[Scoutable] Viewed ${scoutable.name || scoutable.id}`,
+                name: action.type,
                 verboseName: `${scoutable.name || 'Etwas'} erkunden`,
             };
         },
         true
     ),
-    new ActionProcessor(
-        '[Patient] Set Visible Status',
-        (currentState, action) => ({
-            name: action.type,
-            verboseName: `Patienten vorsichten`,
-        }),
-        true
-    ),
+    // new ActionProcessor(
+    //     '[Patient] Set Visible Status',
+    //     (currentState, action) => ({
+    //         name: action.type,
+    //         verboseName: `Patienten vorsichten`,
+    //     }),
+    //     true
+    // ),
 ];
 
 export const actionProcessorDictionary = Object.fromEntries(
     actionProcessors.map((p) => [p.type, p])
 );
 
-export const parallelTracesOverviewSchema = z.strictObject({
+export const activitySummarySchema = z.object({
+    id: z.string().nonempty(),
+    name: z.string().nonempty(),
+    minTime: z.number().nonnegative(),
+    maxTime: z.number().nonnegative(),
+    occurrences: z.array(participantKeySchema),
+});
+
+export const parallelTraceGatewaySchema = z.object({
+    id: z.string().nonempty(),
+    type: z.string().nonempty(),
+});
+
+export const parallelTraceArcSchema = z.object({
+    source: z.string().nonempty(),
+    target: z.string().nonempty(),
+});
+
+export const clusterSchema = z.object({
+    participantKeys: z.array(participantKeySchema),
+    traces: z.record(participantKeySchema, z.array(processEventSchema)),
+    activities: z.record(z.string().nonempty(), activitySummarySchema),
+    gateways: z.record(z.string().nonempty(), parallelTraceGatewaySchema),
+    arcs: z.array(parallelTraceArcSchema),
+    minTime: z.number().nonnegative(),
+    maxTime: z.number().nonnegative(),
+});
+
+export type ParallelTracesCluster = z.infer<typeof clusterSchema>;
+
+export const miningServiceResponseSchema = z.object({
+    dfg: z.json(),
+    clusters: z.array(clusterSchema),
+});
+
+export const parallelTracesOverviewSchema = z.object({
     events: z.record(participantKeySchema, z.array(processEventSchema)),
     dfg: z.json(),
+    clusters: z.array(clusterSchema),
 });
 export type ParallelTracesOverview = z.infer<
     typeof parallelTracesOverviewSchema

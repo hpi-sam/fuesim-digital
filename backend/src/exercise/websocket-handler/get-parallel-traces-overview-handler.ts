@@ -29,6 +29,7 @@ export function registerGetParallelTracesOverviewHandler(
                 });
             })
             .catch((e) => {
+                console.error(e);
                 callback({
                     success: false,
                     message: 'Fetching data failed',

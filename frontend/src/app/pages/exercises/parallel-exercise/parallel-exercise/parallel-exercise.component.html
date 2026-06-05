@@ -157,7 +157,7 @@
                 <a ngbNavLink>Übungsverläufe</a>
                 <ng-template ngbNavContent>
                     <button
-                        class="btn btn-outline-primary"
+                        class="btn btn-outline-primary mb-2"
                         (click)="fetchParallelTracesOverview()"
                     >
                         Aktualisieren
@@ -166,12 +166,41 @@
                         parallelExerciseService.parallelTracesOverview();
                         as parallelTracesOverview
                     ) {
-                        @for (
-                            entry of parallelTracesOverview.events | keyvalue;
-                            track entry.key
-                        ) {
-                            {{ entry.key }}
-                        }
+                        <div ngbAccordion #visWrapper>
+                            @for (
+                                cluster of parallelTracesOverview.clusters;
+                                track $index
+                            ) {
+                                <div ngbAccordionItem>
+                                    <h2 ngbAccordionHeader>
+                                        <button ngbAccordionButton>
+                                            Variante {{ $index + 1 }}
+                                            @for (
+                                                participantKey of cluster.participantKeys;
+                                                track participantKey
+                                            ) {
+                                                <span
+                                                    class="badge bg-secondary mx-1"
+                                                    >{{ participantKey }}</span
+                                                >
+                                            }
+                                        </button>
+                                    </h2>
+                                    <div ngbAccordionCollapse>
+                                        <div ngbAccordionBody>
+                                            <ng-template>
+                                                <app-traces-overview
+                                                    [cluster]="cluster"
+                                                    [baseDimensions]="
+                                                        baseDimensions()
+                                                    "
+                                                />
+                                            </ng-template>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     }
                 </ng-template>
             </ng-container>

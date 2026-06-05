@@ -1,6 +1,19 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    effect,
+    type ElementRef,
+    inject,
+    viewChild,
+} from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
 import {
+    NgbAccordionBody,
+    NgbAccordionButton,
+    NgbAccordionCollapse,
+    NgbAccordionDirective,
+    NgbAccordionHeader,
+    NgbAccordionItem,
     NgbModal,
     NgbNav,
     NgbNavContent,
@@ -27,6 +40,7 @@ import { ExerciseStateBadgeInnerComponent } from '../../../../shared/components/
 import { ParallelExerciseInstanceRowComponent } from '../instance-row/parallel-exercise-instance-row.component';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { InlineTextEditorComponent } from '../../../../shared/components/inline-text-editor/inline-text-editor.component';
+import { TracesOverviewComponent } from '../traces-overview/traces-overview.component.js';
 
 @Component({
     selector: 'app-parallel-exercise',
@@ -47,6 +61,13 @@ import { InlineTextEditorComponent } from '../../../../shared/components/inline-
         NgbNavContent,
         NgbNavOutlet,
         KeyValuePipe,
+        NgbAccordionDirective,
+        NgbAccordionItem,
+        NgbAccordionHeader,
+        NgbAccordionButton,
+        NgbAccordionCollapse,
+        NgbAccordionBody,
+        TracesOverviewComponent,
     ],
 })
 export class ParallelExerciseComponent {
@@ -55,6 +76,13 @@ export class ParallelExerciseComponent {
     private readonly route = inject(ActivatedRoute);
     public readonly parallelExerciseService = inject(ParallelExerciseService);
     private readonly messageService = inject(MessageService);
+
+    readonly baseDimensions = computed(() => ({
+        width: this.divEl().nativeElement.offsetWidth,
+        height: this.divEl().nativeElement.offsetHeight,
+    }));
+    readonly divEl =
+        viewChild.required<ElementRef<HTMLDivElement>>('visWrapper');
 
     parallelExercise: HttpResourceRef<
         GetParallelExerciseResponseData | undefined

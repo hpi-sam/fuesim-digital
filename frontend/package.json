@@ -48,6 +48,7 @@
         "@ngneat/hotkeys": "^4.1.0",
         "@ngrx/store": "^21.0.1",
         "@popperjs/core": "^2.11.8",
+        "@visuallyjs/browser-ui-angular": "^1.0.3",
         "bootstrap": "^5.3.3",
         "bootstrap-icons": "^1.11.3",
         "chart.js": "^4.4.8",

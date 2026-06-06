@@ -67,13 +67,12 @@ export class TechnicalChallengeDetailsComponent implements OnChanges {
 
     readonly technicalChallenge = input.required<TechnicalChallenge>();
 
+    private readonly currentTime = this.store.selectSignal(selectCurrentTime);
+
     public readonly challengeAge = computed(() => {
         const technicalChallengeStartTime =
             this.technicalChallenge().simulationStartTime;
-        return (
-            this.store.selectSignal(selectCurrentTime)() -
-            technicalChallengeStartTime
-        );
+        return this.currentTime() - technicalChallengeStartTime;
     });
 
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
@@ -92,15 +91,37 @@ export class TechnicalChallengeDetailsComponent implements OnChanges {
         };
     }
 
-    public readonly tasksProgress = computed(() =>
-        Object.values(this.technicalChallenge().relevantTasks).map((task) => ({
-            ...task,
-            ...this.calculateProgress(
-                this.technicalChallenge().taskProgress[task.id]?.progress ?? 0,
-                this.progressGuardsByTaskId().get(task.id)?.minProgress ?? 0
-            ),
-        }))
-    );
+    public readonly tasksProgress = computed(() => {
+        const challenge = this.technicalChallenge();
+        const currentTime = this.currentTime();
+        const currentState = this.currentState();
+
+        const personnelPerTask = new Map<string, number>();
+        for (const taskId of Object.values(challenge.assignedPersonnel)) {
+            personnelPerTask.set(
+                taskId,
+                (personnelPerTask.get(taskId) ?? 0) + 1
+            );
+        }
+
+        return Object.values(challenge.relevantTasks).map((task) => {
+            const taskProgress = challenge.taskProgress[task.id];
+            const storedProgress = taskProgress?.progress ?? 0;
+            const lastUpdatedAt = taskProgress?.lastUpdatedAt ?? currentTime;
+            const nPersonnel = personnelPerTask.get(task.id) ?? 0;
+            const speedMultiplier = currentState.possibleTasks[task.id] ?? 0;
+            const liveProgress =
+                storedProgress +
+                (currentTime - lastUpdatedAt) * nPersonnel * speedMultiplier;
+            const maxProgress =
+                this.progressGuardsByTaskId().get(task.id)?.minProgress ?? 0;
+
+            return {
+                ...task,
+                ...this.calculateProgress(liveProgress, maxProgress),
+            };
+        });
+    });
 
     public readonly assignedPersonnel = computed<[Personnel, Task][]>(() => {
         const assignments = this.technicalChallenge().assignedPersonnel;
@@ -111,11 +132,13 @@ export class TechnicalChallengeDetailsComponent implements OnChanges {
     });
 
     public readonly guards = computed<Guard[]>(() =>
-        Object.values(this.technicalChallenge().transitions).map(({ guard }) => guard)
+        Object.values(this.technicalChallenge().transitions).map(
+            ({ guard }) => guard
+        )
     );
     public readonly visibleGuards = computed<Guard[]>(() =>
-        Object.values(this.technicalChallenge()
-            .transitions).filter((t) => t.from === this.currentState().id)
+        Object.values(this.technicalChallenge().transitions)
+            .filter((t) => t.from === this.currentState().id)
             .map(({ guard }) => guard)
     );
     public readonly progressGuards = computed(() =>

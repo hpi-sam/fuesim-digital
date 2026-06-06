@@ -15,6 +15,8 @@ import {
     currentStateOf,
     technicalChallengeStateIdSchema,
     updateEventQueue,
+    updateEventQueueAfterAssignment,
+    updateTaskProgress,
 } from '../../models/technical-challenge/state-machine.js';
 import { taskSchema } from '../../models/task.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
@@ -85,11 +87,14 @@ export namespace TechnicalChallengeActionReducers {
             reducer: (draftState, action) => {
                 draftState.technicalChallenges[action.technicalChallenge.id] =
                     cloneDeepMutable(action.technicalChallenge);
+                draftState.technicalChallenges[
+                    action.technicalChallenge.id
+                ]!.simulationStartTime = draftState.currentTime;
                 updateEventQueue(
+                    draftState,
                     draftState.technicalChallenges[
                         action.technicalChallenge.id
-                    ]!,
-                    draftState
+                    ]!
                 );
                 return draftState;
             },
@@ -131,6 +136,9 @@ export namespace TechnicalChallengeActionReducers {
                     `Task ${taskId} is not possible in current state ${technicalChallenge.currentStateId}`
                 );
             }
+
+            updateTaskProgress(draftState, technicalChallenge, taskId);
+
             technicalChallenge.assignedPersonnel[personnelId] = taskId;
 
             logTechnicalChallengePersonnelAssigned(
@@ -145,6 +153,12 @@ export namespace TechnicalChallengeActionReducers {
                 personnelId,
                 targetPosition,
             });
+
+            updateEventQueueAfterAssignment(
+                draftState,
+                technicalChallenge,
+                taskId
+            );
 
             return draftState;
         },

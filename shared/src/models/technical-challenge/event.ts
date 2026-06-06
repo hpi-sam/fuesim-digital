@@ -1,12 +1,14 @@
 import { z } from 'zod';
 import { exerciseTimeSchema } from '../time.js';
-import type { UUID} from '../../utils/uuid.js';
-import { uuid, uuidSchema } from '../../utils/uuid.js';
-import { type TechnicalChallengeId, technicalChallengeIdSchema } from './technical-challenge-id.js';
+import type { UUID } from '../../utils/uuid.js';
+import { uuidSchema } from '../../utils/uuid.js';
+import {
+    type TechnicalChallengeId,
+    technicalChallengeIdSchema,
+} from './technical-challenge-id.js';
 
 export const technicalChallengeEventSchema = z.strictObject({
     type: z.literal('technicalChallengeEvent'),
-    id: uuidSchema,
     timestamp: exerciseTimeSchema,
     technicalChallengeId: technicalChallengeIdSchema,
     transitionId: uuidSchema,
@@ -23,7 +25,6 @@ export function newTechnicalChallengeEvent(
 ): TechnicalChallengeEvent {
     return {
         type: 'technicalChallengeEvent',
-        id: uuid(),
         timestamp,
         technicalChallengeId,
         transitionId,
@@ -32,7 +33,7 @@ export function newTechnicalChallengeEvent(
 
 export const technicalChallengeEventQueueSchema = z.strictObject({
     events: z.array(technicalChallengeEventSchema),
-    indices: z.record(uuidSchema, z.int().nonnegative()),
+    indices: z.record(technicalChallengeIdSchema, z.int().nonnegative()),
 });
 
 export type TechnicalChallengeEventQueue = z.infer<

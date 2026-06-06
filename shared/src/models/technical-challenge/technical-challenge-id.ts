@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import type { z } from 'zod';
 import { uuidSchema } from '../../utils/uuid.js';
 
 export const technicalChallengeIdSchema = uuidSchema.brand(

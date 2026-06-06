@@ -96,7 +96,11 @@ import {
 } from './models/technical-challenge/technical-challenge.js';
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
-import { newTechnicalChallengeEventQueue, type TechnicalChallengeEventQueue, technicalChallengeEventQueueSchema } from './models/technical-challenge/event.js';
+import {
+    newTechnicalChallengeEventQueue,
+    type TechnicalChallengeEventQueue,
+    technicalChallengeEventQueueSchema,
+} from './models/technical-challenge/event.js';
 import { type ExerciseTime, exerciseTimeSchema } from './models/time.js';
 
 export class ExerciseState {
@@ -268,7 +272,8 @@ export class ExerciseState {
     public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
 
     @IsZodSchema(technicalChallengeEventQueueSchema)
-    public readonly technicalChallengeEventQueue: TechnicalChallengeEventQueue = newTechnicalChallengeEventQueue();
+    public readonly technicalChallengeEventQueue: TechnicalChallengeEventQueue =
+        newTechnicalChallengeEventQueue();
 
     /**
      * @deprecated Use {@link create} instead.

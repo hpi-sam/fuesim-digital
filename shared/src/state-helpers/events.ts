@@ -2,14 +2,14 @@ import type {
     TechnicalChallengeEvent,
     TechnicalChallengeEventQueue,
 } from '../models/technical-challenge/event.js';
-import type { UUID } from '../utils/uuid.js';
+import type { TechnicalChallengeId } from '../models/technical-challenge/technical-challenge-id.js';
 
 export function insert(
     queue: TechnicalChallengeEventQueue,
     event: TechnicalChallengeEvent
 ) {
     queue.events.push(event);
-    queue.indices[event.id] = queue.events.length - 1;
+    queue.indices[event.technicalChallengeId] = queue.events.length - 1;
     bubbleUp(queue, queue.events.length - 1);
 }
 
@@ -24,21 +24,24 @@ export function pop(
 ): TechnicalChallengeEvent | null {
     if (queue.events.length === 0) return null;
     if (queue.events.length === 1) {
-        delete queue.indices[queue.events[0]!.id];
+        delete queue.indices[queue.events[0]!.technicalChallengeId];
         return queue.events.pop()!;
     }
 
     const min = queue.events[0]!;
-    delete queue.indices[min.id];
+    delete queue.indices[min.technicalChallengeId];
 
     queue.events[0] = queue.events.pop()!;
-    queue.indices[queue.events[0].id] = 0;
+    queue.indices[queue.events[0].technicalChallengeId] = 0;
     bubbleDown(queue, 0);
 
     return min;
 }
 
-export function remove(queue: TechnicalChallengeEventQueue, id: UUID): boolean {
+export function remove(
+    queue: TechnicalChallengeEventQueue,
+    id: TechnicalChallengeId
+): boolean {
     const index = queue.indices[id];
     if (index === undefined) return false;
 
@@ -62,16 +65,29 @@ export function remove(queue: TechnicalChallengeEventQueue, id: UUID): boolean {
 
 export function modify(
     queue: TechnicalChallengeEventQueue,
-    id: UUID,
+    id: TechnicalChallengeId,
     updates: Partial<TechnicalChallengeEvent>
-) {
+): boolean {
     const index = queue.indices[id];
     if (index === undefined) return false;
 
+    const smaller: boolean | null =
+        updates.timestamp === undefined
+            ? null
+            : updates.timestamp < queue.events[index]!.timestamp;
+
     queue.events[index] = { ...queue.events[index]!, ...updates };
 
-    bubbleUp(queue, index);
-    bubbleDown(queue, index);
+    switch (smaller) {
+        case null:
+            break;
+        case true:
+            bubbleUp(queue, index);
+            break;
+        case false:
+            bubbleDown(queue, index);
+            break;
+    }
 
     return true;
 }
@@ -81,8 +97,8 @@ function swap(queue: TechnicalChallengeEventQueue, i: number, j: number) {
     queue.events[i] = queue.events[j]!;
     queue.events[j] = tmp;
 
-    queue.indices[queue.events[i].id] = i;
-    queue.indices[queue.events[j].id] = j;
+    queue.indices[queue.events[i].technicalChallengeId] = i;
+    queue.indices[queue.events[j].technicalChallengeId] = j;
 }
 
 function bubbleUp(queue: TechnicalChallengeEventQueue, index: number) {

@@ -7,6 +7,7 @@ import { TimeActivityNodeComponent } from '../time-activity-node/time-activity-n
 import { SingleTimeActivityNodeComponent } from '../single-time-activity-node/single-time-activity-node.component.js';
 import { rgbColorPalette } from '../../../../shared/functions/colors.js';
 import { LogicalActivityNodeComponent } from '../logical-activity-node/logical-activity-node.component.js';
+import { SingleLogicalActivityNodeComponent } from '../single-logical-activity-node/single-logical-activity-node.component.js';
 
 @Component({
     selector: 'app-traces-overview',
@@ -17,6 +18,9 @@ import { LogicalActivityNodeComponent } from '../logical-activity-node/logical-a
 export class TracesOverviewComponent {
     timeActivityNodeHeight = 30;
     timeActivityNodeSpacing = 10;
+    logicalActivityNodeHeight = 50;
+    logicalActivityNodeWidth = 150;
+    logicalSingleActivitySize = 13;
 
     viewOptionsTime = {
         nodes: {
@@ -41,6 +45,11 @@ export class TracesOverviewComponent {
 
     viewOptionsLogical = {
         nodes: {
+            singleLogicalActivity: {
+                component: SingleLogicalActivityNodeComponent,
+            },
+        },
+        groups: {
             logicalActivity: {
                 component: LogicalActivityNodeComponent,
             },
@@ -134,13 +143,42 @@ export class TracesOverviewComponent {
             type: 'logicalActivity',
             id: activity.id,
             label: activity.verboseName,
-            width: 150,
-            height: 50,
+            width: this.logicalActivityNodeWidth,
+            height: this.logicalActivityNodeHeight,
         }))
+    );
+    readonly singleLogicalActivityNodes = computed(() =>
+        Object.values(this.cluster().activities)
+            .sort((a, b) => a.minTime - b.minTime)
+            .flatMap((activity, idx) => {
+                const leftOffset =
+                    (this.logicalActivityNodeWidth -
+                        (activity.occurrences.length *
+                            this.logicalSingleActivitySize *
+                            2 -
+                            this.logicalSingleActivitySize)) /
+                    2;
+
+                return activity.occurrences.map((occurrence, occrIdx) => ({
+                    type: 'singleLogicalActivity',
+                    id: `${activity.id}-${occurrence.participantKey}-${occurrence.actionIndex}`,
+                    group: activity.id,
+                    label: occurrence.participantKey,
+                    left:
+                        leftOffset +
+                        occrIdx * this.logicalSingleActivitySize * 2,
+                    top: (this.logicalActivityNodeHeight / 3) * 2,
+                    width: this.logicalSingleActivitySize,
+                    height: this.logicalSingleActivitySize,
+                    color: this.colorByParticipantKey()[
+                        occurrence.participantKey
+                    ]!,
+                }));
+            })
     );
     readonly dataLogical = computed(() => ({
         nodes: [
-            ...this.logicalActivityNodes(),
+            ...this.singleLogicalActivityNodes(),
             ...Object.values(this.cluster().gateways).map((gateway) => ({
                 id: gateway.id,
                 label: gateway.type.slice(0, 1),
@@ -148,7 +186,7 @@ export class TracesOverviewComponent {
                 height: 20,
             })),
         ],
-        groups: [],
+        groups: this.logicalActivityNodes(),
         edges: this.cluster().arcs.map((arc) => ({
             source: arc.source,
             target: arc.target,

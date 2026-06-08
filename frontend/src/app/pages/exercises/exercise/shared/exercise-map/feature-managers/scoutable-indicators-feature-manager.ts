@@ -10,7 +10,7 @@ import type {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     Element,
     ScoutableElement,
-    ScoutableElementType,
+    TechnicalChallenge,
 } from 'fuesim-digital-shared';
 import { newImageProperties } from 'fuesim-digital-shared';
 import type { TranslateEvent } from 'ol/interaction/Translate';
@@ -112,15 +112,15 @@ export class ScoutableIndicatorsFeatureManager
         });
     }
 
-    getScoutableElementFromIndicator<T extends ScoutableElementType>(
-        indicator: ScoutableIndicator & { scoutableElementType: T }
-    ): ScoutableElement & { type: T } {
+    getScoutableElementFromIndicator(
+        indicator: ScoutableIndicator
+    ): ScoutableElement {
         return selectStateSnapshot(
             scoutableElementTypeSelectorMap[indicator.scoutableElementType](
                 indicator.scoutableElementId
             ),
             this.store
-        ) as ScoutableElement & { type: T };
+        ) as ScoutableElement;
     }
 
     onFeatureClicked(
@@ -134,7 +134,7 @@ export class ScoutableIndicatorsFeatureManager
         const popupFeatureManager =
             this.olMapManager.featureNameFeatureManagerDictionary.get(
                 type
-            ) as MoveableFeatureManager<ScoutableElement>;
+            ) as MoveableFeatureManager<ScoutableElement | TechnicalChallenge>;
 
         const scoutableElement =
             this.getScoutableElementFromIndicator(indicatorElement);

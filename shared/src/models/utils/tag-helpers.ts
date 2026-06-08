@@ -320,16 +320,15 @@ export function createMeasureTemplateTag(
 }
 
 export function createScoutableTag(
-    draftState: WritableDraft<ExerciseState>,
+    scoutableName: string,
     scoutableId: UUID
 ): Tag {
-    const scoutable = getElement(draftState, 'scoutable', scoutableId);
     return newTag(
         'Erkundungselement',
         'orange',
         'black',
-        scoutable.name,
-        scoutable.id
+        scoutableName,
+        scoutableId
     );
 }
 

@@ -1,4 +1,14 @@
-<div style="width: 100%; height: 500px" class="vis-wrapper" #visWrapper>
-    <vjs-surface [data]="data()" [renderOptions]="renderOptions()">
+<div style="width: 100%; height: 500px" class="vis-wrapper">
+    @for (
+        participantKey of cluster().participantKeys;
+        track participantKey
+        ) {
+        <span
+            class="badge mx-1"
+            [style.background-color]="colorByParticipantKey()[participantKey]"
+        >{{ participantKey }}</span
+        >
+    }
+    <vjs-surface [data]="data()" [renderOptions]="renderOptions()" [viewOptions]="viewOptions">
     </vjs-surface>
 </div>

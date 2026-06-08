@@ -74,19 +74,25 @@ def do_process_mining():
 
         for trace in clust_log:
             for event in trace:
+
                 name = event["name"]
-                time = event["timestamp"].timestamp()
+                start_time = event["startTime"]
+                end_time = event["endTime"]
+
                 activity_id = activity_name_to_id_map[name]
-                if activities[activity_id]["minTime"] == -1 or time < activities[activity_id]["minTime"] :
-                    activities[activity_id]["minTime"] = time
-                if min_time == -1 or time < min_time:
-                    min_time = time
-                if time > activities[activity_id]["maxTime"]:
-                    activities[activity_id]["maxTime"] = time
-                if time > max_time:
-                    max_time = time
+
+                activities[activity_id]["verboseName"] = event["verboseName"]
+
+                if activities[activity_id]["minTime"] == -1 or start_time < activities[activity_id]["minTime"] :
+                    activities[activity_id]["minTime"] = start_time
+                if min_time == -1 or start_time < min_time:
+                    min_time = start_time
+                if end_time > activities[activity_id]["maxTime"]:
+                    activities[activity_id]["maxTime"] = end_time
+                if end_time > max_time:
+                    max_time = end_time
                 if event["participantKey"] not in activities[activity_id]["occurrences"]:
-                    activities[activity_id]["occurrences"].append(event["participantKey"])
+                    activities[activity_id]["occurrences"].append({"participantKey": event["participantKey"], "startTime": start_time, "endTime": end_time, "actionIndex": event["actionIndex"]})
         print(activities)
 
         clusters.append({

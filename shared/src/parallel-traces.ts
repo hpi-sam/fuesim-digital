@@ -122,9 +122,17 @@ export const actionProcessorDictionary = Object.fromEntries(
 export const activitySummarySchema = z.object({
     id: z.string().nonempty(),
     name: z.string().nonempty(),
+    verboseName: z.string().nonempty(),
     minTime: z.number().nonnegative(),
     maxTime: z.number().nonnegative(),
-    occurrences: z.array(participantKeySchema),
+    occurrences: z.array(
+        z.object({
+            participantKey: participantKeySchema,
+            startTime: z.number().nonnegative(),
+            endTime: z.number().nonnegative(),
+            actionIndex: z.int().nonnegative(),
+        })
+    ),
 });
 
 export const parallelTraceGatewaySchema = z.object({

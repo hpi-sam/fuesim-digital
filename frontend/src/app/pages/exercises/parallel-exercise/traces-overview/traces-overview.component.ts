@@ -3,6 +3,9 @@ import '@visuallyjs/browser-ui/css/visuallyjs.css';
 import { ParallelTracesCluster } from 'fuesim-digital-shared';
 import { VisuallyJsModule } from '@visuallyjs/browser-ui-angular';
 import { ForceDirectedLayout } from '@visuallyjs/browser-ui';
+import { TimeActivityNodeComponent } from '../time-activity-node/time-activity-node.component.js';
+import { SingleTimeActivityNodeComponent } from '../single-time-activity-node/single-time-activity-node.component.js';
+import { rgbColorPalette } from '../../../../shared/functions/colors.js';
 
 interface OurNode {
     id: string;
@@ -20,6 +23,16 @@ interface OurNode {
     styleUrl: './traces-overview.component.scss',
 })
 export class TracesOverviewComponent {
+    viewOptions = {
+        nodes: {
+            timeActivity: {
+                component: TimeActivityNodeComponent,
+            },
+            singleTimeActivity: {
+                component: SingleTimeActivityNodeComponent,
+            },
+        },
+    };
     readonly baseDimensions = input.required<{
         width: number;
         height: number;
@@ -43,17 +56,49 @@ export class TracesOverviewComponent {
         },
     }));
     readonly cluster = input.required<ParallelTracesCluster>();
+    readonly colorByParticipantKey = computed(() =>
+        Object.fromEntries(
+            this.cluster().participantKeys.map((key, idx) => [
+                key,
+                Object.values(rgbColorPalette)[idx] ?? '#da1f3d',
+            ])
+        )
+    );
     readonly activityNodes = computed(() =>
         Object.values(this.cluster().activities)
             .sort((a, b) => a.minTime - b.minTime)
             .map((activity, idx) => ({
+                type: 'timeActivity',
                 id: activity.id,
-                label: activity.name,
+                label: activity.verboseName,
                 left: this.mapWidth(activity.minTime),
-                top: idx * 80,
+                top: idx * 40,
                 width: this.mapWidth(activity.maxTime - activity.minTime),
                 height: 30,
             }))
+    );
+    readonly singleActivityNodes = computed(() =>
+        Object.values(this.cluster().activities)
+            .sort((a, b) => a.minTime - b.minTime)
+            .flatMap((activity, idx) =>
+                activity.occurrences.map((occurrence) => ({
+                    type: 'singleTimeActivity',
+                    id: `${activity.id}-${occurrence.participantKey}-${occurrence.actionIndex}`,
+                    label: occurrence.participantKey,
+                    left: this.mapWidth(occurrence.startTime),
+                    top: idx * 40 + 10,
+                    width: Math.max(
+                        this.mapWidth(
+                            occurrence.endTime - occurrence.startTime
+                        ),
+                        10
+                    ),
+                    height: 10,
+                    color: this.colorByParticipantKey()[
+                        occurrence.participantKey
+                    ]!,
+                }))
+            )
     );
     readonly nodes = computed(() => [
         ...this.activityNodes(),
@@ -70,7 +115,7 @@ export class TracesOverviewComponent {
         ),
     ]);
     readonly data = computed(() => ({
-        nodes: this.nodes(),
+        nodes: [...this.activityNodes(), ...this.singleActivityNodes()],
         groups: [],
         // edges: this.cluster().arcs.map((arc) => ({
         //     source: arc.source,

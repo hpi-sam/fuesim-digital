@@ -22,6 +22,8 @@ export const numberEvalCriterionIdSchema = uuidSchema.brand(
 );
 export type NumberEvalCriterionId = z.infer<typeof numberEvalCriterionIdSchema>;
 
+export type EvalCriterionId = BoolEvalCriterionId | NumberEvalCriterionId;
+
 /* TODO @JohannesPotzi @Jogius : add showInTable attribute. Also, update addCriterion action accordingly. */
 export const evalCriterionBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -256,6 +258,114 @@ export const evalCriterionTypesNames: {
     timeStampEvalCriterion: 'Zeitpunkt',
     firstTrueAtEvalCriterion: 'Frist',
 } as const;
+export function newAndEvalCriterion(
+    name: string,
+    children?: BoolEvalCriterionId[]
+): AndEvalCriterion {
+    return {
+        id: uuid(),
+        name,
+        type: 'evalCriterion',
+        results: [],
+        criterionType: 'andEvalCriterion',
+        children: children ?? [],
+    };
+}
+export function newOrEvalCriterion(
+    name: string,
+    children?: BoolEvalCriterionId[]
+): OrEvalCriterion {
+    return {
+        id: uuid(),
+        name,
+        type: 'evalCriterion',
+        results: [],
+        criterionType: 'orEvalCriterion',
+        children: children ?? [],
+    };
+}
+export function newNotEvalCriterion(
+    name: string,
+    child: BoolEvalCriterionId
+): NotEvalCriterion {
+    return {
+        id: uuid(),
+        name,
+        type: 'evalCriterion',
+        results: [],
+        criterionType: 'notEvalCriterion',
+        child: child,
+    };
+}
+export function newGreaterThanEvalCriterion(
+    name: string,
+    leftChild: NumberEvalCriterionId,
+    rightChild: NumberEvalCriterionId
+): GreaterThanEvalCriterion {
+    return {
+        id: uuid(),
+        name,
+        type: 'evalCriterion',
+        results: [],
+        criterionType: 'greaterThanEvalCriterion',
+        leftChild: leftChild,
+        rightChild: rightChild,
+    };
+}
+export function newConstNumEvalCriterion(
+    name: string,
+    num: number
+): ConstNumEvalCriterion {
+    return {
+        id: uuid(),
+        name,
+        type: 'evalCriterion',
+        results: [],
+        criterionType: 'constNumEvalCriterion',
+        num: num,
+    };
+}
+export function newCountEvalCriterion(
+    name: string,
+    children: BoolEvalCriterionId[]
+): CountEvalCriterion {
+    return {
+        id: uuid(),
+        name,
+        type: 'evalCriterion',
+        results: [],
+        criterionType: 'countEvalCriterion',
+        num: -1,
+        children: children,
+    };
+}
+export function newFirstTrueAtEvalCriterion(
+    name: string,
+    child: BoolEvalCriterionId
+): FirstTrueAtEvalCriterion {
+    return {
+        id: uuid(),
+        name,
+        type: 'evalCriterion',
+        results: [],
+        criterionType: 'firstTrueAtEvalCriterion',
+        num: -1,
+        child: child,
+    };
+}
+export function newTimeStampEvalCriterion(
+    name: string,
+    num: number
+): TimeStampEvalCriterion {
+    return {
+        id: uuid(),
+        name,
+        type: 'evalCriterion',
+        results: [],
+        criterionType: 'timeStampEvalCriterion',
+        num: num,
+    };
+}
 export function newDoMeasureXTimesEvalCriterion(
     name: string,
     targetCount: number,

@@ -8,6 +8,7 @@ import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { uuidSchema } from '../../utils/uuid.js';
 import { ReducerError } from '../reducer-error.js';
 import { getElement } from './utils/get-element.js';
+import { evalResultSchema } from '../../utils/eval-results.js';
 
 /* The EvalCriteria at criterionType are:
 doMeasureXTimesEvalCriterion
@@ -30,6 +31,12 @@ const updateCriterionActionSchema = z.strictObject({
 });
 export type UpdateCriterionAction = z.infer<typeof updateCriterionActionSchema>;
 
+const updateResultActionSchema = z.strictObject({
+    type: z.literal('[EvalCriterion] Update Result'),
+    criterionId: uuidSchema,
+    newResult: evalResultSchema,
+});
+export type UpdateResultAction = z.infer<typeof updateResultActionSchema>;
 export namespace EvalCriterionActionReducers {
     export const createNewCriterions: ActionReducer<NewCriterionAction> = {
         type: createNewCriterionsActionSchema.shape.type.value,
@@ -59,5 +66,13 @@ export namespace EvalCriterionActionReducers {
             return draftState;
         },
         rights: 'trainer',
+    };
+    export const updateResult: ActionReducer<UpdateResultAction> = {
+        type: updateResultActionSchema.shape.type.value,
+        actionSchema: updateResultActionSchema,
+        reducer: (draftState, {}) => {
+            return draftState;
+        },
+        rights: 'participant',
     };
 }

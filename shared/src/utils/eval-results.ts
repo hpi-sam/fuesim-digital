@@ -250,6 +250,7 @@ export function getEvalResultFromCriterion(
         }
         return {
             id: id,
+            type: 'numberEvalResult',
             criterionId: evalCriterion.id,
             num: num,
             timestamp: currentTime,
@@ -258,6 +259,7 @@ export function getEvalResultFromCriterion(
         return {
             id: uuid(),
             criterionId: evalCriterion.id,
+            type: 'boolEvalResult',
             isCompleted: isCompleted,
             timestamp: currentTime,
         } as BoolEvalResult;

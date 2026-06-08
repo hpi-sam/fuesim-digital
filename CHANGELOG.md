@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Added
+
+- Trainers can now drag elements from the sidebar onto the map on touch devices as well.
+
 ### Changed
 
 - Trainers now have access to the 'Einsatzübersicht' in Exercises and Exercise Templates.

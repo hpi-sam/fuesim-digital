@@ -1,8 +1,11 @@
 import { z } from 'zod';
 import type { ActionReducer } from '../action-reducer.js';
 import {
+    BoolEvalCriterion,
     EvalCriterion,
     evalCriterionSchema,
+    isNumberEvalCriterion,
+    NumberEvalCriterion,
 } from '../../models/evaluation-criterion.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { uuidSchema } from '../../utils/uuid.js';
@@ -70,7 +73,34 @@ export namespace EvalCriterionActionReducers {
     export const updateResult: ActionReducer<UpdateResultAction> = {
         type: updateResultActionSchema.shape.type.value,
         actionSchema: updateResultActionSchema,
-        reducer: (draftState, {}) => {
+        reducer: (draftState, { criterionId, newResult }) => {
+            const criterion = getElement(
+                draftState,
+                'evalCriterion',
+                criterionId
+            );
+            const resultType = newResult.type;
+            if (isNumberEvalCriterion(criterion)) {
+                const typedCriterion = criterion as NumberEvalCriterion;
+                if (resultType !== 'numberEvalResult') {
+                    throw new ReducerError(
+                        '[logic Error] trying to assign a non number evalResult to a NumberEvalCriterion.'
+                    );
+                } else {
+                    typedCriterion.results.push(newResult);
+                    draftState.evalCriteria[criterionId] = typedCriterion;
+                }
+            } else {
+                const typedCriterion = criterion as BoolEvalCriterion;
+                if (resultType !== 'boolEvalResult') {
+                    throw new ReducerError(
+                        '[logic Error] trying to assign a non boolean evalResult to a BoolEvalCriterion.'
+                    );
+                } else {
+                    typedCriterion.results.push(newResult);
+                    draftState.evalCriteria[criterionId] = typedCriterion;
+                }
+            }
             return draftState;
         },
         rights: 'participant',

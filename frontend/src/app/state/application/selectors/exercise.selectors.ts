@@ -8,7 +8,6 @@ import type {
     ExerciseSimulationBehaviorType,
     ExerciseState,
     MeasureTemplate,
-    ScoutableElementType,
     TechnicalChallengeId,
     UUID,
     Vehicle,
@@ -25,6 +24,7 @@ import {
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
 import { elementTypePluralMap } from '../../../../../../shared/dist/utils/element-type-plural-map';
+import type { ScoutableIndicator } from '../../../shared/types/scoutable-indicator.js';
 
 // Properties
 
@@ -169,12 +169,13 @@ export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
 }
 
 export const scoutableElementTypeSelectorMap: {
-    [key in ScoutableElementType]: (
+    [key in ScoutableIndicator['scoutableElementType']]: (
         id: string
     ) => MemoizedSelector<AppState, any, any>;
 } = {
     patient: createSelectPatient,
     mapImage: createSelectMapImage,
+    technicalChallenge: createSelectTechnicalChallenge,
 };
 
 // Misc selectors

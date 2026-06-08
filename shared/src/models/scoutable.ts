@@ -31,12 +31,11 @@ export const scoutableElementSchema = z.discriminatedUnion('type', [
     patientSchema,
 ]);
 export type ScoutableElement = z.infer<typeof scoutableElementSchema>;
-export type ScoutableElementType = ScoutableElement['type'];
 
 export const scoutableElementTypes = [
     'patient',
     'mapImage',
-] satisfies ScoutableElementType[];
+] satisfies ScoutableElement['type'][];
 export const scoutableElementTypeSchema = z.literal(scoutableElementTypes);
 
 export function newScoutable(): Scoutable {

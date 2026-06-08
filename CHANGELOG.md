@@ -16,6 +16,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - The server no longer crashes on startup when using `DFM_USE_DB=false`
 - The server no longer freezes when creating a new exercise from a template with `DFM_USE_DB=false`
+- Add missing entries in release notes
+- Fix some links in documentation
 
 ## [0.13.1] - 2026-06-01
 

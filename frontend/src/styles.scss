@@ -5,6 +5,13 @@
 
 @use 'maplibre-gl/dist/maplibre-gl.css';
 
+@use '@visuallyjs/browser-ui/css/visuallyjs.css';
+
+.vjs-surface {
+    display: block;
+    height: 100%;
+}
+
 .dropdown-menu {
     overflow: auto;
     max-height: 250px;

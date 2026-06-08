@@ -2,7 +2,11 @@ import { Component, computed, input } from '@angular/core';
 import '@visuallyjs/browser-ui/css/visuallyjs.css';
 import { ParallelTracesCluster } from 'fuesim-digital-shared';
 import { VisuallyJsModule } from '@visuallyjs/browser-ui-angular';
-import { HierarchyLayout, PanButtonsPlugin } from '@visuallyjs/browser-ui';
+import {
+    EdgeRoutingPlugin,
+    HierarchyLayout,
+    PanButtonsPlugin,
+} from '@visuallyjs/browser-ui';
 import { TimeActivityNodeComponent } from '../time-activity-node/time-activity-node.component.js';
 import { SingleTimeActivityNodeComponent } from '../single-time-activity-node/single-time-activity-node.component.js';
 import { rgbColorPalette } from '../../../../shared/functions/colors.js';
@@ -62,9 +66,18 @@ export class TracesOverviewComponent {
             type: HierarchyLayout.type,
             options: {
                 axis: 'vertical',
+                generateRouting: true,
             },
         },
-        plugins: [PanButtonsPlugin.type],
+        plugins: [
+            PanButtonsPlugin.type,
+            {
+                type: EdgeRoutingPlugin.type,
+                options: {
+                    mode: 'orthogonal',
+                },
+            },
+        ],
         edges: {
             targetMarker: 'PlainArrow',
             connector: 'Orthogonal',

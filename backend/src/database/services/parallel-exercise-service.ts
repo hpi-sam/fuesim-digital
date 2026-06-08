@@ -1,4 +1,7 @@
 import type {
+    EvalCriterionId,
+    EvalResult,
+    ExerciseState,
     GroupParticipantKey,
     ParallelExerciseId,
     SetAutojoinViewportAction,
@@ -7,7 +10,7 @@ import {
     getEvalResultsFromCriteria,
     parallelExerciseInstanceSummarySchema,
 } from 'fuesim-digital-shared';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ParallelExerciseInsert } from '../schema.js';
 import {
@@ -27,12 +30,39 @@ export interface ParallelExerciseJoin {
 }
 export class ParallelExerciseService {
     public newJoin = new Subject<ParallelExerciseJoin>();
+    private readonly subscriptions: Subscription[] = [];
+    public evalResultsMap: {
+        [exerciseId: ParallelExerciseId]: {
+            [criterionId: EvalCriterionId]: EvalResult[];
+        };
+    } = {};
     public constructor(
         private readonly parallelExerciseRepository: ParallelExerciseRepository,
         private readonly accessKeyService: AccessKeyService,
         private readonly exerciseManagerService: ExerciseManagerService,
         private readonly exerciseService: ExerciseService
-    ) {}
+    ) {
+        this.newJoin.subscribe((join) => {
+            const sub = join.activeExercise.tickApplied.subscribe(async () =>
+                this.onTickApplied(
+                    join.parallelExerciseId,
+                    join.activeExercise.getStateSnapshot()
+                )
+            );
+            this.subscriptions.push(sub);
+        });
+    }
+    public async onTickApplied(id: ParallelExerciseId, state: ExerciseState) {
+        /* TODO @JohannesPotzi @Jogius : update evalResultsMap */
+        const previousResults = this.evalResultsMap[id];
+        const results = getEvalResultsFromCriteria(
+            state.evalCriteria,
+            state.technicalChallenges,
+            state.patients,
+            state.scoutables,
+            state.currentTime
+        );
+    }
 
     public async generateParticipantKey() {
         return (await this.accessKeyService.generateKey(
@@ -194,6 +224,7 @@ export class ParallelExerciseService {
         );
         return activeExercises;
     }
+    public async updateEvalResults() {}
 
     public async getParallelExerciseInstanceSummariesById(
         id: ParallelExerciseId,
@@ -212,13 +243,7 @@ export class ParallelExerciseService {
                 currentTime: state.currentTime,
                 currentStatus: state.currentStatus,
                 lastLogEntry: state.lastLogEntry,
-                evalResults: getEvalResultsFromCriteria(
-                    state.evalCriteria,
-                    state.technicalChallenges,
-                    state.patients,
-                    state.scoutables,
-                    state.currentTime
-                ),
+                evalResults: this.evalResultsMap[id],
                 isActive: Object.values(state.clients).some(
                     (client) => client.role.mainRole === 'participant'
                 ),

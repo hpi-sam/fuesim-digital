@@ -30,6 +30,7 @@ import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.j
 
 export class ActiveExercise {
     public readonly actionApplied = new Subject<boolean>();
+    public readonly tickApplied = new Subject<boolean>();
     public template: ExerciseTemplateEntry | null = null;
 
     public get exercise() {
@@ -242,6 +243,9 @@ export class ActiveExercise {
         intermediateAction?.();
         this.emitAction(action);
         this.actionApplied.next(true);
+        if (action.type === '[Exercise] Tick') {
+            this.tickApplied.next(true);
+        }
     }
 
     /**

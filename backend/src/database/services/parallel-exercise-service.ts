@@ -5,6 +5,8 @@ import type {
     GroupParticipantKey,
     ParallelExerciseId,
     SetAutojoinViewportAction,
+    ParallelExerciseKey,
+    ExerciseId,
 } from 'fuesim-digital-shared';
 import {
     getEvalResultsFromCriteria,
@@ -12,7 +14,7 @@ import {
 } from 'fuesim-digital-shared';
 import { Subject, Subscription } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import type { ParallelExerciseInsert } from '../schema.js';
+import type { ParallelExercise, ParallelExerciseInsert } from '../schema.js';
 import {
     ApiError,
     NotFoundError,
@@ -20,7 +22,7 @@ import {
 } from '../../utils/http.js';
 import type { ParallelExerciseRepository } from '../repositories/parallel-exercise-repository.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
-import type { AccessKeyService } from './access-key-service.js';
+import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 import type { ExerciseManagerService } from './exercise-manager-service.js';
 import type { ExerciseService } from './exercise-service.js';
 
@@ -32,27 +34,26 @@ export class ParallelExerciseService {
     public newJoin = new Subject<ParallelExerciseJoin>();
     private readonly subscriptions: Subscription[] = [];
     public evalResultsMap: {
-        [exerciseId: ParallelExerciseId]: {
+        [exerciseId: ExerciseId]: {
             [criterionId: EvalCriterionId]: EvalResult[];
         };
     } = {};
     public constructor(
         private readonly parallelExerciseRepository: ParallelExerciseRepository,
-        private readonly accessKeyService: AccessKeyService,
         private readonly exerciseManagerService: ExerciseManagerService,
         private readonly exerciseService: ExerciseService
     ) {
         this.newJoin.subscribe((join) => {
             const sub = join.activeExercise.tickApplied.subscribe(async () =>
                 this.onTickApplied(
-                    join.parallelExerciseId,
+                    join.activeExercise.exercise.id,
                     join.activeExercise.getStateSnapshot()
                 )
             );
             this.subscriptions.push(sub);
         });
     }
-    public async onTickApplied(id: ParallelExerciseId, state: ExerciseState) {
+    public async onTickApplied(id: ExerciseId, state: ExerciseState) {
         const previousResults = this.evalResultsMap[id];
         if (!previousResults) {
             return;
@@ -80,12 +81,6 @@ export class ParallelExerciseService {
         }
     }
 
-    public async generateParticipantKey() {
-        return (await this.accessKeyService.generateKey(
-            7
-        )) as GroupParticipantKey;
-    }
-
     public async getParallelExercisesOfOwner(session: SessionInformation) {
         return this.parallelExerciseRepository.getParallelExercisesOfOwner(
             session.user.id
@@ -107,7 +102,7 @@ export class ParallelExerciseService {
         return parallelExercise;
     }
 
-    public async getParallelExerciseByParticipantKey(key: GroupParticipantKey) {
+    public async getParallelExerciseByParticipantKey(key: ParallelExerciseKey) {
         const parallelExercise =
             await this.parallelExerciseRepository.getParallelExerciseByParticipantKey(
                 key
@@ -119,7 +114,7 @@ export class ParallelExerciseService {
     }
 
     public async joinParallelExerciseByParticipantKey(
-        key: GroupParticipantKey
+        key: ParallelExerciseKey
     ) {
         const parallelExercise =
             await this.getParallelExerciseByParticipantKey(key);
@@ -151,21 +146,23 @@ export class ParallelExerciseService {
             'joinViewportId' | 'name' | 'templateId'
         >,
         session: SessionInformation
-    ) {
-        const created =
-            await this.parallelExerciseRepository.createParallelExercise({
+    ): Promise<ParallelExercise> {
+        return this.parallelExerciseRepository.transaction(async (tx) => {
+            const created = await tx.createParallelExercise({
                 ...data,
-                participantKey: await this.generateParticipantKey(),
+                participantKey: await new AccessKeyRepository(tx).generateKey(
+                    7
+                ),
                 user: session.user.id,
             });
-        if (!created) {
-            throw new ApiError();
-        }
-        const parallelExercise =
-            await this.parallelExerciseRepository.getParallelExerciseById(
+            if (!created) {
+                throw new ApiError();
+            }
+            const parallelExercise = await tx.getParallelExerciseById(
                 created.id
             );
-        return parallelExercise!;
+            return parallelExercise!;
+        });
     }
 
     public async updateParallelExercise(
@@ -220,7 +217,6 @@ export class ParallelExerciseService {
         );
 
         await this.parallelExerciseRepository.deleteParallelExerciseById(id);
-        await this.accessKeyService.free(parallelExercise.participantKey);
     }
 
     public async getParallelExerciseInstancesById(
@@ -250,7 +246,11 @@ export class ParallelExerciseService {
             id,
             session
         );
-        return activeExercises.map((exercise) => {
+        return this.getParallelExerciseInstanceSummaries(activeExercises);
+    }
+
+    public getParallelExerciseInstanceSummaries(exercises: ActiveExercise[]) {
+        return exercises.map((exercise) => {
             const state = exercise.exercise.currentStateString;
             return parallelExerciseInstanceSummarySchema.parse({
                 participantKey: exercise.participantKey,
@@ -259,9 +259,11 @@ export class ParallelExerciseService {
                 currentTime: state.currentTime,
                 currentStatus: state.currentStatus,
                 lastLogEntry: state.lastLogEntry,
-                evalResults: this.evalResultsMap[id],
+                evalResults: this.evalResultsMap[exercise.exercise.id],
                 isActive: Object.values(state.clients).some(
-                    (client) => client.role.mainRole === 'participant'
+                    (client) =>
+                        client.role.mainRole === 'participant' &&
+                        client.isActive
                 ),
             });
         });

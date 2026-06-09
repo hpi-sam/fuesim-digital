@@ -2,16 +2,20 @@
     <thead>
         <tr>
             <th scope="col">Name</th>
-            <th scope="col">Rolle</th>
-            <th scope="col">Ansicht</th>
+            <th scope="col">Modus</th>
+            <th scope="col">Kartenansicht</th>
             <th scope="col">In der Übung</th>
+            <th scope="col"></th>
         </tr>
     </thead>
     <tbody>
         @for (client of clients$ | async | values; track client.id) {
-            <tr>
+            <tr [class.text-muted]="!client.isActive">
                 <td class="align-middle">
                     {{ client.name }}
+                    @if (!client.isActive) {
+                        <span class="badge bg-secondary ms-1">Getrennt</span>
+                    }
                 </td>
                 @if (client.role.mainRole === 'trainer') {
                     <td class="align-middle">
@@ -27,6 +31,7 @@
                         <button
                             class="btn btn-outline-primary btn-sm"
                             ngbDropdownToggle
+                            [disabled]="!client.isActive"
                             data-cy="clientPopupSetRoleButton"
                         >
                             {{
@@ -69,9 +74,10 @@
                 <!-- Choose the viewport -->
                 <td ngbDropdown>
                     <button
-                        [disabled]="
-                            client.role.specificRole !== 'mapOperator' &&
-                            client.role.mainRole !== 'trainer'
+                        [class.d-none]="
+                            !client.isActive ||
+                            (client.role.specificRole !== 'mapOperator' &&
+                                client.role.mainRole !== 'trainer')
                         "
                         class="btn btn-outline-primary btn-sm"
                         ngbDropdownToggle
@@ -84,7 +90,7 @@
                                 ]?.name
                             }}
                         } @else {
-                            <i> Nicht zugewiesen </i>
+                            <em> Gesamte Karte </em>
                         }
                     </button>
                     <div ngbDropdownMenu>
@@ -107,20 +113,35 @@
                             (click)="restrictToViewport(client.id, undefined)"
                             data-cy="clientPopupUnsetViewportDropdownButton"
                         >
-                            <i> Nicht zugewiesen </i>
+                            <em> Gesamte Karte </em>
                         </button>
                     </div>
                 </td>
                 <td class="align-middle">
-                    <div class="form-switch">
-                        <input
-                            [ngModel]="!client.isInWaitingRoom"
-                            (ngModelChange)="setWaitingRoom(client.id, !$event)"
-                            class="form-check-input"
-                            type="checkbox"
-                            data-cy="clientPopupSetWaitingRoomCheckbox"
-                        />
-                    </div>
+                    @if (client.isActive) {
+                        <div class="form-switch">
+                            <input
+                                [ngModel]="!client.isInWaitingRoom"
+                                (ngModelChange)="
+                                    setWaitingRoom(client.id, !$event)
+                                "
+                                class="form-check-input"
+                                type="checkbox"
+                                data-cy="clientPopupSetWaitingRoomCheckbox"
+                            />
+                        </div>
+                    }
+                </td>
+                <td class="align-middle">
+                    @if (!client.isActive) {
+                        <button
+                            class="btn btn-outline-danger btn-sm"
+                            (click)="removeClient(client.id)"
+                            ngbTooltip="Entfernen"
+                        >
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    }
                 </td>
             </tr>
         }

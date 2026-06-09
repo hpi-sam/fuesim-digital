@@ -8,4 +8,5 @@ export const environment: Environment = {
     websocketPort:
         Number.parseInt(window.location.port) ||
         (window.location.protocol === 'https:' ? 443 : 80),
+    docsUrl: '/about/help',
 };

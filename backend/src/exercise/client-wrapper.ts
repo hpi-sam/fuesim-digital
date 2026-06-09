@@ -8,7 +8,7 @@ import type {
     Client,
 } from 'fuesim-digital-shared';
 import { ReducerError, newClient, newClientRole } from 'fuesim-digital-shared';
-import { filter, type Subscription } from 'rxjs';
+import { Subject, filter, throttleTime, type Subscription } from 'rxjs';
 import cookie from 'cookie';
 import type { ExerciseSocket } from '../exercise-server.js';
 import { Config, isDevelopment } from '../config.js';
@@ -91,6 +91,31 @@ export class ExerciseClientWrapper extends ClientWrapper {
     }
 
     /**
+     * Reconnect to an existing inactive client in an exercise.
+     * @param exerciseKey The exercise key to use.
+     * @param clientId The id of the existing (inactive) client to set active.
+     * @returns The client's id on success, or null if the client could not be reconnected.
+     */
+    public reconnectToExercise(
+        exerciseKey: ExerciseKey,
+        clientId: UUID
+    ): UUID | null {
+        this.chosenExercise = this.services.exerciseService.getExerciseByKey(
+            exerciseKey,
+            this.session
+        );
+        const existingClient =
+            this.chosenExercise.getStateSnapshot().clients[clientId];
+        if (existingClient?.isActive) {
+            this.chosenExercise = undefined;
+            return null;
+        }
+        this.relatedExerciseClient = existingClient;
+        this.chosenExercise.setClientActive(this);
+        return existingClient?.id ?? null;
+    }
+
+    /**
      * Note that this method simply returns when the client did not join an exercise.
      */
     public leaveExercise() {
@@ -116,7 +141,13 @@ export class ExerciseClientWrapper extends ClientWrapper {
     }
 
     public override disconnect() {
-        this.leaveExercise();
+        if (
+            this.chosenExercise !== undefined &&
+            this.relatedExerciseClient !== undefined
+        ) {
+            this.chosenExercise.setClientInactive(this);
+            this.chosenExercise = undefined;
+        }
         super.disconnect();
     }
 }
@@ -124,6 +155,8 @@ export class ExerciseClientWrapper extends ClientWrapper {
 export class ParallelExerciseClientWrapper extends ClientWrapper {
     private chosenExercise: ParallelExercise | null = null;
     private readonly subscriptions: Subscription[] = [];
+    private readonly cachedActiveExercises: ActiveExercise[] = [];
+    private readonly aggregatedActions = new Subject<void>();
 
     public async joinParallelExercise(id: ParallelExerciseId) {
         if (!this.session) {
@@ -140,57 +173,58 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
                 this.session
             );
 
+        // One throttled subscription drives all client updates
+        const throttledSub = this.aggregatedActions
+            .pipe(
+                throttleTime(200, undefined, {
+                    leading: true,
+                    trailing: true, // Ensures the last value is emitted when enough time has passed. This prevents latest changes not being propagated due to throttling.
+                })
+            )
+            .subscribe(() => this.emitUpdateExerciseInstances());
+        this.subscriptions.push(throttledSub);
+
         // We watch for new exercise instances to join the parallel exercise
         // to register watchers for them
         const joinSub = this.services.parallelExerciseService.newJoin
             .pipe(filter((join) => id === join.parallelExerciseId))
             .subscribe((join) => {
-                const sub = join.activeExercise.actionApplied.subscribe(
-                    async () => this.onActionApplied()
+                this.cachedActiveExercises.push(join.activeExercise);
+                const sub = join.activeExercise.actionApplied.subscribe(() =>
+                    this.aggregatedActions.next()
                 );
                 this.subscriptions.push(sub);
-                this.onActionApplied();
+                this.emitUpdateExerciseInstances();
             });
         this.subscriptions.push(joinSub);
 
         // Watch for changes in the exercise instances to send updates
         for (const activeExercise of activeExercises) {
-            const sub = activeExercise.actionApplied.subscribe(async () =>
-                this.onActionApplied()
+            this.cachedActiveExercises.push(activeExercise);
+            const sub = activeExercise.actionApplied.subscribe(() =>
+                this.aggregatedActions.next()
             );
             this.subscriptions.push(sub);
         }
     }
 
-    public async onActionApplied() {
+    public emitUpdateExerciseInstances() {
         this.socket.emit('updateExerciseInstances', {
-            exerciseInstances: await this.getInstanceSummaries(),
+            exerciseInstances: this.getInstanceSummaries(),
         });
     }
 
     /**
      * Get summaries of all exercise instances
      */
-    public async getInstanceSummaries() {
-        if (!this.session) {
-            throw new PermissionDeniedError();
-        }
-        return this.services.parallelExerciseService.getParallelExerciseInstanceSummariesById(
-            this.chosenExercise!.id,
-            this.session
+    public getInstanceSummaries() {
+        return this.services.parallelExerciseService.getParallelExerciseInstanceSummaries(
+            this.cachedActiveExercises
         );
     }
 
-    public async applyActionToAll(action: ExerciseAction) {
-        if (!this.session) {
-            throw new PermissionDeniedError();
-        }
-        const activeExercises =
-            await this.services.parallelExerciseService.getParallelExerciseInstancesById(
-                this.chosenExercise!.id,
-                this.session
-            );
-        for (const activeExercise of activeExercises) {
+    public applyActionToAll(action: ExerciseAction) {
+        for (const activeExercise of this.cachedActiveExercises) {
             try {
                 activeExercise.applyAction(action, null);
             } catch (e: unknown) {
@@ -202,14 +236,14 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
         }
     }
 
-    public async start() {
-        await this.applyActionToAll({
+    public start() {
+        this.applyActionToAll({
             type: '[Exercise] Start',
         } satisfies StartExerciseAction);
     }
 
-    public async pause() {
-        await this.applyActionToAll({
+    public pause() {
+        this.applyActionToAll({
             type: '[Exercise] Pause',
         } satisfies PauseExerciseAction);
     }

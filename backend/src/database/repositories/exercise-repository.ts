@@ -136,20 +136,29 @@ export class ExerciseRepository extends BaseRepository {
             );
     }
 
-    public async saveExerciseState(exercise: ExerciseInsert) {
+    public async saveExerciseState(
+        exercise: ExerciseInsert & { id: ExerciseId }
+    ) {
+        const {
+            currentStateString,
+            initialStateString,
+            stateVersion,
+            id,
+            tickCounter,
+        } = exercise;
         const exercisePatch = {
-            ...exercise,
+            currentStateString,
+            initialStateString,
+            stateVersion,
+            tickCounter,
             lastUsedAt: new Date(),
         };
 
         return this.onlySingle(
             await this.databaseConnection
-                .insert(exerciseTable)
-                .values(exercisePatch)
-                .onConflictDoUpdate({
-                    target: exerciseTable.id,
-                    set: exercisePatch,
-                })
+                .update(exerciseTable)
+                .set(exercisePatch)
+                .where(eq(exerciseTable.id, id))
                 .returning()
         );
     }

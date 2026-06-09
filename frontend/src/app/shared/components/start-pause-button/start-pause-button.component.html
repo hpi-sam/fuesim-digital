@@ -1,4 +1,11 @@
-@if ((exerciseStatus$ | async) === 'running') {
+@if (exerciseType() === 'template') {
+    <button
+        (click)="tryToCreateNewExercise()"
+        class="btn btn-outline-secondary"
+    >
+        Neue Übung erstellen
+    </button>
+} @else if (exerciseStatus() === 'running') {
     <button
         (click)="pauseExercise()"
         class="btn btn-primary"
@@ -6,8 +13,7 @@
     >
         Pause
     </button>
-}
-@if ((exerciseStatus$ | async) !== 'running') {
+} @else {
     <button
         (click)="startExercise()"
         class="btn btn-primary"

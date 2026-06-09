@@ -36,6 +36,7 @@ import { SimulatedRegionNameComponent } from '../../../../../../shared/component
 import { StackedBarChartComponent } from '../stacked-bar-chart/stacked-bar-chart.component';
 import { HospitalPatientsTableComponent } from '../hospital-patients-table/hospital-patients-table.component';
 import { LogTableComponent } from '../log-table/log-table.component';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-exercise-statistics-modal',
@@ -60,6 +61,7 @@ import { LogTableComponent } from '../log-table/log-table.component';
         NgbNavOutlet,
         LogTableComponent,
         AsyncPipe,
+        HelpButtonComponent,
     ],
 })
 export class ExerciseStatisticsModalComponent implements OnInit {

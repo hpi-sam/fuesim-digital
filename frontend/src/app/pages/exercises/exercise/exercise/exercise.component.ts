@@ -51,6 +51,7 @@ import {
     openParticipantsModal,
     openTrainersModal,
 } from '../shared/clients-modal/open-clients-modal';
+import { environment } from '../../../../../environments/environment.js';
 import { MapOperatorMapComponent } from '../shared/map-operator-map/map-operator-map.component';
 import { openDidacticOverviewModal } from '../shared/didactic-overview/tag/open-didacti-overview-modal';
 
@@ -108,6 +109,7 @@ export class ExerciseComponent implements OnDestroy {
     );
 
     readonly version: string = Package.version;
+    readonly docsUrl = environment.docsUrl;
 
     public openInviteModal() {
         openInviteModal(this.modalService);

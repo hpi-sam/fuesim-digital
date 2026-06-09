@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { exerciseTemplateIdSchema, parallelExerciseIdSchema } from './ids.js';
 import {
-    groupParticipantKeySchema,
+    parallelExerciseKey,
     participantKeySchema,
     trainerKeySchema,
 } from './exercise-keys.js';
@@ -137,7 +137,7 @@ export type JoinExerciseResponseDataInput = z.input<
 
 export const getParallelExerciseResponseDataSchema = z.object({
     id: parallelExerciseIdSchema,
-    participantKey: groupParticipantKeySchema,
+    participantKey: parallelExerciseKey,
     createdAt: stringToDate,
     name: z.string(),
     joinViewportId: z.uuidv4(),

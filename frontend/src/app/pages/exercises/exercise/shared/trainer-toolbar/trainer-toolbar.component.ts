@@ -10,6 +10,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { TrainerKey } from 'fuesim-digital-shared';
+import { exerciseTypeGermanNameDictionary } from 'fuesim-digital-shared';
 import { openAlarmGroupOverviewModal } from '../alarm-group-overview/open-alarm-group-overview-modal';
 import { openClientsModal } from '../clients-modal/open-clients-modal';
 import { openEmergencyOperationsCenterModal } from '../emergency-operations-center/open-emergency-operations-center-modal';
@@ -17,9 +18,10 @@ import { openExerciseSettingsModal } from '../exercise-settings/open-exercise-se
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
 import { openDidacticOverviewModal } from '../didactic-overview/tag/open-didacti-overview-modal';
 import { openHospitalEditorModal } from '../hospital-editor/hospital-editor-modal';
+import { openTrainerOperationsTabletModal } from '../operations-tablet-view/trainer-operations-tablet-modal/open-trainer-operations-tablet-modal';
 import { openSimulationTrainerModal } from '../simulation/trainer-modal/open-simulation-trainer-modal';
-import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
 import { openSimulationSignallerModal } from '../simulation/signaller-modal/open-simulation-signaller-modal';
+import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
 import { ApiService } from '../../../../../core/api.service';
 import { ApplicationService } from '../../../../../core/application.service';
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
@@ -27,7 +29,7 @@ import { ExerciseService } from '../../../../../core/exercise.service';
 import { MessageService } from '../../../../../core/messages/message.service';
 import type { AppState } from '../../../../../state/app.state';
 import { selectExerciseKey } from '../../../../../state/application/selectors/application.selectors';
-import { selectExerciseStatus } from '../../../../../state/application/selectors/exercise.selectors';
+import { selectExerciseType } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { StartPauseButtonComponent } from '../../../../../shared/components/start-pause-button/start-pause-button.component';
 import { openMeasuresOverviewModal } from '../measures-overview/open-measures-overview-modal';
@@ -57,10 +59,19 @@ export class TrainerToolbarComponent {
     );
     private readonly messageService = inject(MessageService);
 
-    public exerciseStatus$ = this.store.select(selectExerciseStatus);
+    public readonly isExerciseTemplate = computed<boolean>(
+        () => this.store.selectSignal(selectExerciseType)() === 'template'
+    );
+    public readonly exerciseTemplateId = computed(
+        () =>
+            this.exerciseService.additionalExerciseMeta()?.exerciseTemplate?.id
+    );
 
-    public readonly isTemplate = computed<boolean>(
-        () => !!this.exerciseService.additionalExerciseMeta()?.exerciseTemplate
+    public readonly exerciseTypeName = computed(
+        () =>
+            exerciseTypeGermanNameDictionary[
+                this.store.selectSignal(selectExerciseType)()
+            ]
     );
 
     public openClientsModal() {
@@ -107,24 +118,32 @@ export class TrainerToolbarComponent {
         openSimulationSignallerModal(this.modalService);
     }
 
+    public openOperationsTabletModal() {
+        openTrainerOperationsTabletModal(this.modalService);
+    }
+
     public async deleteExercise() {
         const exerciseKey = selectStateSnapshot(selectExerciseKey, this.store)!;
         const deletionConfirmed = await this.confirmationModalService.confirm({
-            title: 'Übung löschen',
-            description:
-                'Möchten Sie die Übung wirklich unwiederbringlich löschen?',
+            title: `${this.exerciseTypeName()} löschen`,
+            description: `Möchten Sie die ${this.exerciseTypeName()} wirklich unwiederbringlich löschen?`,
             confirmationString: exerciseKey,
         });
         if (!deletionConfirmed) {
             return;
         }
         // If we get disconnected by the server during the deletion a disconnect error would be displayed
-        this.applicationService.leaveExercise();
-        this.apiService
-            .deleteExercise(exerciseKey as TrainerKey)
+        await this.applicationService.leaveExercise();
+
+        const templateId = this.exerciseTemplateId();
+        await (
+            templateId
+                ? this.apiService.deleteExerciseTemplate(templateId)
+                : this.apiService.deleteExercise(exerciseKey as TrainerKey)
+        )
             .then((response) => {
                 this.messageService.postMessage({
-                    title: 'Übung erfolgreich gelöscht',
+                    title: `${this.exerciseTypeName()} erfolgreich gelöscht`,
                     color: 'success',
                 });
             })

@@ -97,8 +97,8 @@
                 >
                     Auswertung
                 </div>
-                <div>
-                    <div ngbDropdown class="d-inline-block">
+                <div class="d-flex gap-2 align-items-center">
+                    <div ngbDropdown>
                         <button
                             type="button"
                             class="btn btn-outline-primary"
@@ -150,35 +150,36 @@
                             </button>
                         </div>
                     </div>
-                    <div class="btn-group ms-3" role="group">
-                        <a
-                            class="btn btn-outline-secondary"
-                            href="/about/privacy"
-                            target="_blank"
-                        >
-                            Datenschutz
-                        </a>
-                        <a
-                            class="btn btn-outline-secondary"
-                            href="/about/imprint"
-                            target="_blank"
-                        >
-                            Impressum
-                        </a>
-                    </div>
-                    <div ngbDropdown class="d-inline-block ms-3">
+                    <a
+                        class="btn btn-sm btn-outline-secondary"
+                        [href]="docsUrl"
+                        target="_blank"
+                    >
+                        <i class="bi bi-question-circle me-1"></i>
+                        Hilfe
+                    </a>
+                    <div ngbDropdown>
                         <button
                             type="button"
-                            class="btn btn-outline-secondary"
+                            class="btn btn-sm btn-outline-secondary"
                             ngbDropdownToggle
                         >
-                            Infos
+                            Infos & Kontakt
                         </button>
                         <!-- "position: absolute" is only set with a delay by "ngbDropdownMenu", therefore the map canvas has the wrong height when it is initialized -->
                         <div ngbDropdownMenu class="position-absolute">
                             <a
                                 ngbDropdownItem
-                                class="btn btn-outline-secondary"
+                                class="btn btn-sm btn-outline-secondary"
+                                href="mailto:kontakt@manv-simulation.de?subject=Anfrage zur FüSim Digital Version {{
+                                    version
+                                }}"
+                            >
+                                Kontakt & Feedback
+                            </a>
+                            <a
+                                ngbDropdownItem
+                                class="btn btn-sm btn-outline-secondary"
                                 href="/about/terms"
                                 target="_blank"
                             >
@@ -186,7 +187,7 @@
                             </a>
                             <a
                                 ngbDropdownItem
-                                class="btn btn-outline-secondary"
+                                class="btn btn-sm btn-outline-secondary"
                                 href="/about/license"
                                 target="_blank"
                             >
@@ -194,12 +195,19 @@
                             </a>
                             <a
                                 ngbDropdownItem
-                                class="btn btn-outline-secondary"
-                                href="mailto:kontakt@manv-simulation.de?subject=Anfrage zur FüSim Digital Version {{
-                                    version
-                                }}"
+                                class="btn btn-sm btn-outline-secondary"
+                                href="/about/privacy"
+                                target="_blank"
                             >
-                                Kontakt & Feedback
+                                Datenschutz
+                            </a>
+                            <a
+                                ngbDropdownItem
+                                class="btn btn-sm btn-outline-secondary"
+                                href="/about/imprint"
+                                target="_blank"
+                            >
+                                Impressum
                             </a>
                         </div>
                     </div>

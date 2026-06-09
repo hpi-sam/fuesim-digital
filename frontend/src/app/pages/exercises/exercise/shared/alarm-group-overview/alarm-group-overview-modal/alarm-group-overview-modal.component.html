@@ -1,13 +1,9 @@
 <div class="modal-header">
     <h4 class="modal-title">
         Alarmierungsgruppen
-        <button
-            class="ms-3 btn btn-outline-primary"
-            (click)="addAlarmGroup()"
-            data-cy="alarmGroupAddButton"
-        >
-            <i class="bi bi-plus"></i> Hinzufügen
-        </button>
+        <app-help-button
+            url="2_exercises/3_exercise_elements.html#alarmierungsgruppen"
+        />
     </h4>
     <button
         type="button"
@@ -18,6 +14,13 @@
 </div>
 @if (alarmGroups$ | async | values; as alarmGroups) {
     <div class="modal-body" style="min-height: 60vh">
+        <button
+            class="btn btn-sm btn-outline-primary"
+            (click)="addAlarmGroup()"
+            data-cy="alarmGroupAddButton"
+        >
+            <i class="bi bi-plus"></i> Hinzufügen
+        </button>
         @if (alarmGroups.length > 0) {
             <ul class="list-group list-group-flush">
                 @for (alarmGroup of alarmGroups; track alarmGroup.id) {

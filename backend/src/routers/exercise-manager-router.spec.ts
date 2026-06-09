@@ -95,7 +95,8 @@ describe('exercise manager router', () => {
         it('works with deleted base templates', async () => {
             const exerciseTemplate = await createExerciseTemplate(
                 environment,
-                session
+                session,
+                personalOrganisation.id
             );
             await environment
                 .httpRequest(

@@ -110,11 +110,10 @@ describe('join exercise', () => {
                 organisation.id
             );
             await environment.withWebsocket(async (socket) => {
-                const join = await socket.emit(
-                    'joinExercise',
-                    exerciseTemplate.trainerKey,
-                    'Test Client'
-                );
+                const join = await socket.emit('joinExercise', {
+                    exerciseKey: exerciseTemplate.trainerKey,
+                    clientName: 'Test Client',
+                });
 
                 expect(join.success).toBe(false);
             }, session);
@@ -154,11 +153,10 @@ describe('join exercise', () => {
                 );
 
                 await environment.withWebsocket(async (socket) => {
-                    const join = await socket.emit(
-                        'joinExercise',
-                        exerciseTemplate.trainerKey,
-                        'Test Client'
-                    );
+                    const join = await socket.emit('joinExercise', {
+                        exerciseKey: exerciseTemplate.trainerKey,
+                        clientName: 'Test Client',
+                    });
 
                     expect(join.success).toBe(true);
                 }, session);

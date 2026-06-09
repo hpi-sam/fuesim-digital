@@ -147,7 +147,7 @@ export class ExerciseManagerService {
             }
 
             const isNotMember =
-                !session ||
+                session &&
                 !(await this.organisationRepository.isMemberOfOrganisationById(
                     exerciseTemplate.organisationId,
                     session.user.id
@@ -168,7 +168,7 @@ export class ExerciseManagerService {
             };
             const exerciseInsert = {
                 ...optionalData,
-                user: session.user.id,
+                user: session ? session.user.id : null,
                 trainerKey,
                 participantKey,
                 stateVersion: exerciseTemplate.exercise.stateVersion,

@@ -39,15 +39,16 @@ export class ExerciseManagerService {
         data: ExerciseTemplateInsert,
         session: SessionInformation
     ) {
-        if (
-            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+        const isEditorOrAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                 data.organisationId,
                 session.user.id,
                 ['editor', 'admin']
-            ))
-        ) {
+            );
+        if (!isEditorOrAdmin) {
             throw new PermissionDeniedError();
         }
+
         const exerciseTemplate =
             await this.exerciseRepository.createExerciseTemplate(data);
         if (!exerciseTemplate) {
@@ -68,15 +69,16 @@ export class ExerciseManagerService {
         importObject: StateExport,
         session: SessionInformation
     ) {
-        if (
-            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+        const isEditorOrAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                 data.organisationId,
                 session.user.id,
                 ['editor', 'admin']
-            ))
-        ) {
+            );
+        if (!isEditorOrAdmin) {
             throw new PermissionDeniedError();
         }
+
         const exerciseTemplate =
             await this.exerciseRepository.createExerciseTemplate(data);
         if (!exerciseTemplate) {
@@ -105,15 +107,17 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (
-            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+
+        const isEditorOrAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                 exerciseTemplate.organisationId,
                 session.user.id,
                 ['editor', 'admin']
-            ))
-        ) {
+            );
+        if (!isEditorOrAdmin) {
             throw new PermissionDeniedError();
         }
+
         const updatedTemplate =
             await this.exerciseRepository.updateExerciseTemplate(
                 exerciseTemplate.id,
@@ -141,13 +145,14 @@ export class ExerciseManagerService {
             if (!exerciseTemplate) {
                 throw new NotFoundError();
             }
-            if (
-                session &&
+
+            const isNotMember =
+                !session ||
                 !(await this.organisationRepository.isMemberOfOrganisationById(
                     exerciseTemplate.organisationId,
                     session.user.id
-                ))
-            ) {
+                ));
+            if (isNotMember) {
                 throw new PermissionDeniedError();
             }
 
@@ -163,7 +168,7 @@ export class ExerciseManagerService {
             };
             const exerciseInsert = {
                 ...optionalData,
-                user: session ? session.user.id : null,
+                user: session.user.id,
                 trainerKey,
                 participantKey,
                 stateVersion: exerciseTemplate.exercise.stateVersion,
@@ -194,15 +199,17 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (
-            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+
+        const isEditorOrAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                 exerciseTemplate.organisationId,
                 session.user.id,
                 ['editor', 'admin']
-            ))
-        ) {
+            );
+        if (!isEditorOrAdmin) {
             throw new PermissionDeniedError();
         }
+
         const activeExercise = await this.exerciseService.getExerciseByKey(
             exerciseTemplate.trainerKey,
             session
@@ -223,14 +230,16 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (
-            !(await this.organisationRepository.isMemberOfOrganisationById(
+
+        const isMember =
+            await this.organisationRepository.isMemberOfOrganisationById(
                 exerciseTemplate.organisationId,
                 session.user.id
-            ))
-        ) {
+            );
+        if (!isMember) {
             throw new PermissionDeniedError();
         }
+
         return this.exerciseService.getExercisesViewportsById(
             exerciseTemplate.exercise.id
         );

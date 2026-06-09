@@ -109,16 +109,16 @@ describe('organisation router', () => {
         );
     });
 
-    describe('GET /api/organisations/editor', () => {
+    describe('GET /api/organisations/?role=editor', () => {
         it('fails with 403 if not authenticated', async () => {
             await environment
-                .httpRequest('get', '/api/organisations/editor')
+                .httpRequest('get', '/api/organisations/?role=editor')
                 .expect(403);
         });
 
         it('returns an empty list for no organisations', async () => {
             const response = await environment
-                .httpRequest('get', '/api/organisations/editor', session)
+                .httpRequest('get', '/api/organisations/?role=editor', session)
                 .expect(200);
 
             const parsed = getOrganisationsResponseDataSchema.parse(
@@ -134,7 +134,7 @@ describe('organisation router', () => {
                 );
 
             const response = await environment
-                .httpRequest('get', '/api/organisations/editor', session)
+                .httpRequest('get', '/api/organisations/?role=editor', session)
                 .expect(200);
             const parsed = getOrganisationsResponseDataSchema.parse(
                 response.body
@@ -172,7 +172,7 @@ describe('organisation router', () => {
             );
 
             const response = await environment
-                .httpRequest('get', '/api/organisations/editor', session)
+                .httpRequest('get', '/api/organisations/?role=editor', session)
                 .expect(200);
             const parsed = getOrganisationsResponseDataSchema.parse(
                 response.body

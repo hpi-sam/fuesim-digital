@@ -150,9 +150,12 @@ export class ApiService {
         });
     }
     public getOrganisationsAsEditorResource() {
-        return httpResource(() => `${httpOrigin}/api/organisations/editor/`, {
-            parse: getOrganisationsResponseDataSchema.parse,
-        });
+        return httpResource(
+            () => `${httpOrigin}/api/organisations/?role=editor`,
+            {
+                parse: getOrganisationsResponseDataSchema.parse,
+            }
+        );
     }
     public getOrganisationResource(id: OrganisationId) {
         return httpResource(() => `${httpOrigin}/api/organisations/${id}`, {

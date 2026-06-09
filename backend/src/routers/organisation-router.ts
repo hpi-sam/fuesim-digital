@@ -23,7 +23,14 @@ export function createOrganisationRouter(
         .all(isAuthenticatedMiddleware)
         .get(async (req, res) => {
             const organisations =
-                await organisationService.getOrganisationsForUser(req.session!);
+                req.query['role'] === 'editor'
+                    ? await organisationService.getOrganisationsForUser(
+                          req.session!,
+                          ['editor', 'admin']
+                      )
+                    : await organisationService.getOrganisationsForUser(
+                          req.session!
+                      );
             res.send(getOrganisationsResponseDataSchema.encode(organisations));
         })
         .post(async (req, res) => {
@@ -38,18 +45,6 @@ export function createOrganisationRouter(
             res.status(201).send(
                 getOrganisationResponseDataSchema.encode(organisation)
             );
-        });
-
-    router
-        .route('/editor')
-        .all(isAuthenticatedMiddleware)
-        .get(async (req, res) => {
-            const organisations =
-                await organisationService.getOrganisationsForUser(
-                    req.session!,
-                    ['editor', 'admin']
-                );
-            res.send(getOrganisationsResponseDataSchema.encode(organisations));
         });
 
     router

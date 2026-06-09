@@ -1,0 +1,76 @@
+@if (organisation().userRole === 'admin') {
+    <button class="btn btn-primary mt-2" (click)="invite()">
+        <i class="bi bi-person-plus me-1"></i>
+        Mitglied einladen
+    </button>
+}
+<ul class="list-group mt-2">
+    @for (member of organisation().members; track member) {
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col d-flex align-items-center">
+                    {{ member.user.displayName }}
+                </div>
+                <div class="col d-flex align-items-center">
+                    <span class="me-2">Rolle:</span>
+                    @if (organisation().userRole === 'admin') {
+                        <select
+                            class="form-select form-select-sm"
+                            [ngModel]="member.role"
+                            (ngModelChange)="
+                                updateMembershipRole(member.id, $event)
+                            "
+                        >
+                            @for (
+                                role of organisationMembershipRoleAllowedValues;
+                                track role
+                            ) {
+                                <option
+                                    [value]="role"
+                                    [selected]="member.role === role"
+                                >
+                                    {{
+                                        organisationMembershipRoleToGermanNameDictionary[
+                                            role
+                                        ]
+                                    }}
+                                </option>
+                            }
+                        </select>
+                    } @else {
+                        <span class="badge badge-pill text-bg-secondary">
+                            {{
+                                organisationMembershipRoleToGermanNameDictionary[
+                                    member.role
+                                ]
+                            }}
+                        </span>
+                    }
+                </div>
+
+                <div class="col">
+                    @if (
+                        organisation().userRole === 'admin' &&
+                        member.user.id !== authService.authData().user!.id
+                    ) {
+                        <button
+                            class="btn btn-sm btn-danger float-end"
+                            (click)="deleteMembership(member)"
+                        >
+                            Entfernen
+                        </button>
+                    } @else if (
+                        member.user.id === authService.authData().user!.id
+                    ) {
+                        <button
+                            class="btn btn-sm btn-danger float-end"
+                            (click)="leave()"
+                        >
+                            Verlassen
+                        </button>
+                    }
+                </div>
+            </div>
+        </li>
+    }
+</ul>

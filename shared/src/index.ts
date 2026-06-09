@@ -12,7 +12,7 @@ export * from './state.js';
 export * from './store/index.js';
 export * from './socket-api/index.js';
 export * from './exercise-keys.js';
-export * from './http-interfaces.js';
+export * from './interfaces/index.js';
 export * from './state-helpers/index.js';
 export * from './data/index.js';
 export * from './store/action-reducers/utils/index.js';

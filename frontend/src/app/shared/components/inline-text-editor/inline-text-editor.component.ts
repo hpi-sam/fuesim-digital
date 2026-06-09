@@ -13,6 +13,8 @@ export class InlineTextEditorComponent {
     readonly required = input<boolean>(false);
     readonly singleLine = input<boolean>(false);
     readonly name = input.required<string>();
+    readonly noValueText = input<string>('–');
+
     readonly value = model<string>('');
     newValue = '';
     readonly update = output<string>();

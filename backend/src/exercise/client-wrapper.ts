@@ -100,14 +100,15 @@ export class ExerciseClientWrapper extends ClientWrapper {
      * @param clientId The id of the existing (inactive) client to set active.
      * @returns The client's id on success, or null if the client could not be reconnected.
      */
-    public reconnectToExercise(
+    public async reconnectToExercise(
         exerciseKey: ExerciseKey,
         clientId: UUID
-    ): UUID | null {
-        this.chosenExercise = this.services.exerciseService.getExerciseByKey(
-            exerciseKey,
-            this.session
-        );
+    ): Promise<UUID | null> {
+        this.chosenExercise =
+            await this.services.exerciseService.getExerciseByKey(
+                exerciseKey,
+                this.session
+            );
         const existingClient =
             this.chosenExercise.getStateSnapshot().clients[clientId];
         if (existingClient?.isActive) {

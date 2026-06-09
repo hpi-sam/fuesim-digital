@@ -76,10 +76,11 @@ export function registerJoinExerciseHandler(
                 let joinedClientId: UUID | null = null;
                 try {
                     if (clientId !== undefined) {
-                        joinedClientId = clientWrapper.reconnectToExercise(
-                            exerciseKey,
-                            clientId
-                        );
+                        joinedClientId =
+                            await clientWrapper.reconnectToExercise(
+                                exerciseKey,
+                                clientId
+                            );
                         if (joinedClientId === null) {
                             callback({
                                 success: false,

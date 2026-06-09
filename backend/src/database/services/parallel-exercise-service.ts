@@ -53,15 +53,31 @@ export class ParallelExerciseService {
         });
     }
     public async onTickApplied(id: ParallelExerciseId, state: ExerciseState) {
-        /* TODO @JohannesPotzi @Jogius : update evalResultsMap */
         const previousResults = this.evalResultsMap[id];
-        const results = getEvalResultsFromCriteria(
-            state.evalCriteria,
-            state.technicalChallenges,
-            state.patients,
-            state.scoutables,
-            state.currentTime
+        if (!previousResults) {
+            return;
+        }
+        const results = Object.values(
+            getEvalResultsFromCriteria(
+                state.evalCriteria,
+                state.technicalChallenges,
+                state.patients,
+                state.scoutables,
+                state.currentTime
+            )
         );
+        for (let i = 0; i < results.length; i += 1) {
+            const res = results[i]!;
+            const critId = res.criterionId as EvalCriterionId;
+            const previousRes = previousResults[critId];
+
+            // When the result has changed or there was no previous result, we push the calculated result to the map.
+            if (!previousRes || previousRes[previousRes.length - 1] !== res) {
+                this.evalResultsMap[id]![critId]
+                    ? this.evalResultsMap[id]![critId].push(res)
+                    : (this.evalResultsMap[id]![critId] = [res]);
+            }
+        }
     }
 
     public async generateParticipantKey() {

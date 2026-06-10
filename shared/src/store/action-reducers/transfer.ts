@@ -6,7 +6,7 @@ import {
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
+import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import type { Vehicle } from '../../models/vehicle.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
@@ -46,6 +46,7 @@ import {
     logVehicle,
 } from './utils/log.js';
 import { getElement } from './utils/get-element.js';
+import { isVehicleLoading } from './vehicle.js';
 
 export type TransferableElementType = 'personnel' | 'vehicle';
 const transferableElementTypeAllowedValues: AllowedValues<TransferableElementType> =
@@ -195,6 +196,18 @@ export namespace TransferActionReducers {
                     `Element with id ${element.id} is already in transfer`
                 );
             }
+
+            if (
+                elementType === 'vehicle' &&
+                isVehicleLoading(
+                    element as Vehicle,
+                    draftState.currentTime,
+                    draftState.configuration
+                )
+            )
+                throw new ExpectedReducerError(
+                    'Das Fahrzeug wird gerade beladen und kann daher nicht bewegt werden'
+                );
 
             // Get the duration
             let duration: number;

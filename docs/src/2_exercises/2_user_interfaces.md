@@ -122,7 +122,7 @@ Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-
 
 - **Einstellungen**: Hier können die allgemeinen [Übungseinstellungen](1_general.md#übungseinstellungen) vorgenommen werden.
 - **Erstellung**
-    - **Alarmierungsgruppen**: In diesem Fenster können [Alarmierungsgruppen](3_exercise_elements.md#alarmierungsgruppen) erstellt, bearbeitet und wieder gelöscht werden.
+    - **Alarmgruppen**: In diesem Fenster können [Alarmgruppen](3_exercise_elements.md#alarmgruppen) erstellt, bearbeitet und wieder gelöscht werden.
     - **Krankenhäuser**: In diesem Fenster können [Krankenhäuser](3_exercise_elements.md#krankenhäuser) erstellt, bearbeitet und wieder gelöscht werden.
 - **Durchführung**
     - **Teilnehmende**: Fenster zur [Verwaltung der Übungsteilnehmenden](4_conduction.md#teilnehmende-verwalten).

@@ -78,4 +78,8 @@ export type ReducerRights<A extends Action> =
     | SpecificRole
     | boolean
     | 'server'
-    | ((client: Client, action: A) => Role | SpecificRole | boolean | 'server');
+    | ((
+          state: ExerciseState,
+          client: Client,
+          action: A
+      ) => Role | SpecificRole | boolean | 'server');

@@ -10,6 +10,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Added
 
 - Trainers can now drag elements from the sidebar onto the map on touch devices as well.
+- Trainers can configure whether participants can use the button to completely load a vehicle. To ensure backwards compatibility, loading a patient into a vehicle will for now still automatically load all personnel and material, independent from whether the button is active.
+- Trainers can configure whether related elements such as the personnel of a vehicle should be highlighted when one of the elements is selected. Highlighting can be turned off, activated for trainers only (default, matches previous behavior), or activated for both trainers and participants.
 
 ### Changed
 

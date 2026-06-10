@@ -154,14 +154,34 @@
                 </ng-template>
             </ng-container>
             <ng-container ngbNavItem="traces">
-                <a ngbNavLink>Übungsverläufe</a>
+                <a ngbNavLink (click)="fetchParallelTracesOverview()"
+                    >Übungsverläufe</a
+                >
                 <ng-template ngbNavContent>
                     <button
-                        class="btn btn-outline-primary mb-2"
+                        class="btn btn-sm btn-outline-primary mb-2"
                         (click)="fetchParallelTracesOverview()"
+                        [disabled]="
+                            parallelExerciseService.parallelTracesOverviewLoading()
+                        "
                     >
+                        <i class="bi bi-arrow-clockwise me-1"></i>
                         Aktualisieren
                     </button>
+                    @if (
+                        parallelExerciseService.parallelTracesOverviewLoading()
+                    ) {
+                        <div class="d-flex justify-content-center my-4">
+                            <div
+                                class="spinner-border text-primary"
+                                role="status"
+                            >
+                                <span class="visually-hidden"
+                                    >Wird geladen...</span
+                                >
+                            </div>
+                        </div>
+                    }
                     @if (
                         parallelExerciseService.parallelTracesOverview();
                         as parallelTracesOverview
@@ -174,15 +194,25 @@
                                 <div ngbAccordionItem>
                                     <h2 ngbAccordionHeader>
                                         <button ngbAccordionButton>
-                                            Variante {{ $index + 1 }}
+                                            <span class="me-2"
+                                                >Variante
+                                                <strong>{{
+                                                    $index + 1
+                                                }}</strong></span
+                                            >
                                             @for (
                                                 participantKey of cluster.participantKeys;
                                                 track participantKey
                                             ) {
                                                 <span
                                                     class="badge bg-secondary mx-1"
-                                                    >{{ participantKey }}</span
                                                 >
+                                                    {{
+                                                        getParticipantLabel(
+                                                            participantKey
+                                                        )
+                                                    }}
+                                                </span>
                                             }
                                         </button>
                                     </h2>

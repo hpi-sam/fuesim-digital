@@ -2,6 +2,7 @@ import {
     Component,
     computed,
     effect,
+    inject,
     input,
     signal,
     viewChild,
@@ -22,6 +23,7 @@ import { SingleTimeActivityNodeComponent } from '../single-time-activity-node/si
 import { rgbColorPalette } from '../../../../shared/functions/colors.js';
 import { LogicalActivityNodeComponent } from '../logical-activity-node/logical-activity-node.component.js';
 import { SingleLogicalActivityNodeComponent } from '../single-logical-activity-node/single-logical-activity-node.component.js';
+import { ParallelExerciseService } from '../../../../core/parallel-exercise.service.js';
 
 interface BaseNode {
     id: string;
@@ -39,6 +41,8 @@ export class TracesOverviewComponent {
     logicalActivityNodeHeight = 50;
     logicalActivityNodeWidth = 150;
     logicalSingleActivitySize = 13;
+
+    public readonly parallelExerciseService = inject(ParallelExerciseService);
 
     viewOptionsTime = {
         nodes: {
@@ -142,7 +146,7 @@ export class TracesOverviewComponent {
                 activity.occurrences.map((occurrence) => ({
                     type: 'singleTimeActivity',
                     id: `${activity.id}-${occurrence.participantKey}-${occurrence.actionIndex}`,
-                    label: occurrence.participantKey,
+                    label: this.getParticipantLabel(occurrence.participantKey),
                     left: this.mapWidth(occurrence.startTime),
                     top:
                         idx *
@@ -194,7 +198,7 @@ export class TracesOverviewComponent {
                     type: 'singleLogicalActivity',
                     id: `${activity.id}-${occurrence.participantKey}-${occurrence.actionIndex}`,
                     group: activity.id,
-                    label: occurrence.participantKey,
+                    label: this.getParticipantLabel(occurrence.participantKey),
                     left:
                         leftOffset +
                         occrIdx * this.logicalSingleActivitySize * 2,
@@ -280,5 +284,11 @@ export class TracesOverviewComponent {
 
     getParticipantKeyColor(key: ParticipantKey) {
         return this.colorByParticipantKey()[key]!;
+    }
+
+    getParticipantLabel(key: ParticipantKey) {
+        const name = this.parallelExerciseService.participantNames()[key];
+        if (name) return name;
+        return key;
     }
 }

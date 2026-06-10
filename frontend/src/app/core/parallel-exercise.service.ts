@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     ClientToServerEvents,
@@ -47,6 +47,15 @@ export class ParallelExerciseService {
         signal<ParallelExerciseId | null>(null);
     public readonly parallelTracesOverview =
         signal<ParallelTracesOverview | null>(null);
+    public readonly parallelTracesOverviewLoading = signal<boolean>(false);
+    public readonly participantNames = computed(() =>
+        Object.fromEntries(
+            this.exerciseInstances().map((instance) => [
+                instance.participantKey,
+                instance.clientNames.join(', '),
+            ])
+        )
+    );
 
     constructor() {
         this.socket.on(
@@ -137,22 +146,29 @@ export class ParallelExerciseService {
 
     public async getParallelTracesOverview() {
         console.log('GET');
-        const response = await new Promise<SocketResponse<object>>(
-            (resolve) => {
-                this.socket.emit('getParallelTracesOverview', resolve);
+        this.parallelTracesOverviewLoading.set(true);
+        try {
+            const response = await new Promise<SocketResponse<object>>(
+                (resolve) => {
+                    this.socket.emit('getParallelTracesOverview', resolve);
+                }
+            );
+            if (!response.success) {
+                this.messageService.postError({
+                    title: 'Fehler beim Abrufen der Parallelübungsverläufe',
+                    error: response.message,
+                });
+                return;
             }
-        );
-        if (!response.success) {
-            this.messageService.postError({
-                title: 'Fehler beim Abrufen der Parallelübungsverläufe',
-                error: response.message,
-            });
-            return;
+            const parsedResponse = parallelTracesOverviewSchema.parse(
+                response.payload
+            );
+            this.parallelTracesOverview.set(parsedResponse);
+            this.parallelTracesOverviewLoading.set(false);
+        } catch (error) {
+            this.parallelTracesOverviewLoading.set(false);
+            throw error;
         }
-        const parsedResponse = parallelTracesOverviewSchema.parse(
-            response.payload
-        );
-        this.parallelTracesOverview.set(parsedResponse);
     }
 
     public leaveParallelExercise() {

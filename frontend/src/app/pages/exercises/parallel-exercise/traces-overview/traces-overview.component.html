@@ -1,5 +1,6 @@
 <div style="width: 100%" class="vis-wrapper">
     <div class="mb-4">
+        Teilnehmende:
         @for (
             participantKey of cluster().participantKeys;
             track participantKey
@@ -15,7 +16,7 @@
                 (mouseover)="highlightedParticipantKey.set(participantKey)"
                 (mouseout)="highlightedParticipantKey.set(null)"
             >
-                {{ participantKey }}
+                {{ getParticipantLabel(participantKey) }}
             </span>
         }
     </div>

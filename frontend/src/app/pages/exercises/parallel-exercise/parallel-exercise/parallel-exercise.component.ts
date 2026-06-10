@@ -25,6 +25,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import {
     GetParallelExerciseResponseData,
+    ParticipantKey,
     PatchParallelExerciseRequestData,
 } from 'fuesim-digital-shared';
 import { ActivatedRoute } from '@angular/router';
@@ -105,6 +106,12 @@ export class ParallelExerciseComponent {
 
     async fetchParallelTracesOverview() {
         await this.parallelExerciseService.getParallelTracesOverview();
+    }
+
+    getParticipantLabel(key: ParticipantKey) {
+        const name = this.parallelExerciseService.participantNames()[key];
+        if (name) return name;
+        return key;
     }
 
     constructor() {

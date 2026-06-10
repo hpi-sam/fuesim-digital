@@ -147,7 +147,11 @@ export class TracesOverviewComponent {
                     type: 'singleTimeActivity',
                     id: `${activity.id}-${occurrence.participantKey}-${occurrence.actionIndex}`,
                     label: this.getParticipantLabel(occurrence.participantKey),
-                    left: this.mapWidth(occurrence.startTime),
+                    left:
+                        occurrence.startTime === occurrence.endTime
+                            ? this.mapWidth(occurrence.startTime) -
+                              this.timeActivityNodeHeight / 3 / 2
+                            : this.mapWidth(occurrence.startTime),
                     top:
                         idx *
                             (this.timeActivityNodeSpacing +
@@ -165,6 +169,7 @@ export class TracesOverviewComponent {
                     ),
                     participantKey: occurrence.participantKey,
                     highlighted: true,
+                    dot: occurrence.startTime === occurrence.endTime,
                 }))
             )
     );

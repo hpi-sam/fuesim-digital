@@ -27,7 +27,7 @@ CREATE TABLE "organisation" (
 --> statement-breakpoint
 ALTER TABLE "exercise_template" DROP CONSTRAINT "exercise_template_user_users_id_fk";
 --> statement-breakpoint
-ALTER TABLE "exercise_template" ADD COLUMN "organisationId" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "exercise_template" ADD COLUMN "organisationId" uuid;--> statement-breakpoint
 ALTER TABLE "organisation_invite_link" ADD CONSTRAINT "organisation_invite_link_organisationId_organisation_id_fk" FOREIGN KEY ("organisationId") REFERENCES "public"."organisation"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "organisation_membership" ADD CONSTRAINT "organisation_membership_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "organisation_membership" ADD CONSTRAINT "organisation_membership_organisationId_organisation_id_fk" FOREIGN KEY ("organisationId") REFERENCES "public"."organisation"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -39,5 +39,7 @@ select 'Private Inhalte', "id"
 from users on conflict do nothing;
 --> statement-breakpoint
 UPDATE "exercise_template" SET "organisationId" = (select "id" from "organisation" where "personalOrganisationOf" = "exercise_template"."user" limit 1);
+--> statement-breakpoint
+ALTER TABLE "exercise_template" ALTER COLUMN "organisationId" SET NOT NULL;
 --> statement-breakpoint
 ALTER TABLE "exercise_template" DROP COLUMN "user";

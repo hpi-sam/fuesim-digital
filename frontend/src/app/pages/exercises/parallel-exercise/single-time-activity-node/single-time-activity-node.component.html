@@ -1,5 +1,6 @@
 <div
     class="single-time-activity-node"
     [ngbTooltip]="data['label']"
-    [style.background-color]="data['color']"
+    [style.background-color]="$data()['color']"
+    [class.d-none]="!$data()['highlighted']"
 ></div>

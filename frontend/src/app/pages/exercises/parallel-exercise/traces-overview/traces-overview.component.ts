@@ -1,7 +1,17 @@
-import { Component, computed, input } from '@angular/core';
+import {
+    Component,
+    computed,
+    effect,
+    input,
+    signal,
+    viewChild,
+} from '@angular/core';
 import '@visuallyjs/browser-ui/css/visuallyjs.css';
-import { ParallelTracesCluster } from 'fuesim-digital-shared';
-import { VisuallyJsModule } from '@visuallyjs/browser-ui-angular';
+import { ParallelTracesCluster, ParticipantKey } from 'fuesim-digital-shared';
+import {
+    SurfaceComponent,
+    VisuallyJsModule,
+} from '@visuallyjs/browser-ui-angular';
 import {
     EdgeRoutingPlugin,
     HierarchyLayout,
@@ -13,6 +23,10 @@ import { rgbColorPalette } from '../../../../shared/functions/colors.js';
 import { LogicalActivityNodeComponent } from '../logical-activity-node/logical-activity-node.component.js';
 import { SingleLogicalActivityNodeComponent } from '../single-logical-activity-node/single-logical-activity-node.component.js';
 
+interface BaseNode {
+    id: string;
+    type: '';
+}
 @Component({
     selector: 'app-traces-overview',
     imports: [VisuallyJsModule],
@@ -91,6 +105,8 @@ export class TracesOverviewComponent {
     }>();
     readonly cluster = input.required<ParallelTracesCluster>();
 
+    readonly highlightedParticipantKey = signal<ParticipantKey | null>(null);
+
     readonly colorByParticipantKey = computed(() =>
         Object.fromEntries(
             this.cluster().participantKeys.map((key, idx) => [
@@ -140,9 +156,11 @@ export class TracesOverviewComponent {
                         this.timeActivityNodeHeight / 3
                     ),
                     height: this.timeActivityNodeHeight / 3,
-                    color: this.colorByParticipantKey()[
+                    color: this.getParticipantKeyColor(
                         occurrence.participantKey
-                    ]!,
+                    ),
+                    participantKey: occurrence.participantKey,
+                    highlighted: true,
                 }))
             )
     );
@@ -183,9 +201,11 @@ export class TracesOverviewComponent {
                     top: (this.logicalActivityNodeHeight / 3) * 2,
                     width: this.logicalSingleActivitySize,
                     height: this.logicalSingleActivitySize,
-                    color: this.colorByParticipantKey()[
+                    color: this.getParticipantKeyColor(
                         occurrence.participantKey
-                    ]!,
+                    ),
+                    participantKey: occurrence.participantKey,
+                    highlighted: true,
                 }));
             })
     );
@@ -210,9 +230,55 @@ export class TracesOverviewComponent {
         })),
     }));
 
+    constructor() {
+        effect(() => {
+            this.highlightedParticipantKey();
+            const timeModel = this.timeModel;
+            const logicalModel = this.logicalModel;
+            if (!timeModel || !logicalModel) return;
+
+            for (const node of timeModel.getNodes()) {
+                if (node.type !== 'singleTimeActivity') continue;
+                timeModel.updateNode(node.id, {
+                    highlighted:
+                        this.highlightedParticipantKey() === null ||
+                        this.highlightedParticipantKey() ===
+                            (node.data['participantKey'] as ParticipantKey),
+                });
+            }
+            for (const node of logicalModel.getNodes()) {
+                if (node.type !== 'singleLogicalActivity') continue;
+                logicalModel.updateNode(node.id, {
+                    highlighted:
+                        this.highlightedParticipantKey() === null ||
+                        this.highlightedParticipantKey() ===
+                            (node.data['participantKey'] as ParticipantKey),
+                });
+            }
+        });
+    }
+
+    readonly timeSurface = viewChild<SurfaceComponent>('timeSurface');
+    readonly logicalSurface = viewChild<SurfaceComponent>('logicalSurface');
+
+    get timeModel() {
+        const surface = this.timeSurface();
+        if (!surface?.surface) return undefined;
+        return surface.surface.model;
+    }
+    get logicalModel() {
+        const surface = this.logicalSurface();
+        if (!surface?.surface) return undefined;
+        return surface.surface.model;
+    }
+
     mapWidth(width: number) {
         const factor =
             (this.baseDimensions().width - 80) / this.cluster().maxTime;
         return factor * width;
+    }
+
+    getParticipantKeyColor(key: ParticipantKey) {
+        return this.colorByParticipantKey()[key]!;
     }
 }

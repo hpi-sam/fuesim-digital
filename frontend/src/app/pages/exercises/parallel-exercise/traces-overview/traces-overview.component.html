@@ -7,8 +7,13 @@
             <span
                 class="badge me-1"
                 [style.background-color]="
-                    colorByParticipantKey()[participantKey]
+                    highlightedParticipantKey() === null ||
+                    highlightedParticipantKey() === participantKey
+                        ? getParticipantKeyColor(participantKey)
+                        : 'lightgrey'
                 "
+                (mouseover)="highlightedParticipantKey.set(participantKey)"
+                (mouseout)="highlightedParticipantKey.set(null)"
             >
                 {{ participantKey }}
             </span>
@@ -17,6 +22,7 @@
     <h3 class="h6">Zeitlicher Verlauf</h3>
     <div [style.height]="`${timeVisHeight()}px`">
         <vjs-surface
+            #timeSurface
             [data]="dataTime()"
             [renderOptions]="renderOptionsTime()"
             [viewOptions]="viewOptionsTime"
@@ -26,6 +32,7 @@
     <h3 class="h6">Logischer Verlauf</h3>
     <div [style.height]="`500px`">
         <vjs-surface
+            #logicalSurface
             [data]="dataLogical()"
             [renderOptions]="renderOptionsLogical()"
             [viewOptions]="viewOptionsLogical"

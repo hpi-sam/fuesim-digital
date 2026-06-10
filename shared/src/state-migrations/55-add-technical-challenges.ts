@@ -1,6 +1,7 @@
 import type { Migration } from './migration-functions.js';
 
 export const addTechnicalChallenges55: Migration = {
+// TODO@Felix: Update Migration, as well as migration tests
     action: (intermediateState, action) => true,
     state: (state: any) => {
         const typedState = state as {

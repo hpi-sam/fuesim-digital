@@ -23,6 +23,7 @@ import {
     varchar,
     timestamp,
     text,
+    unique,
 } from 'drizzle-orm/pg-core';
 
 function typedUUID<T>() {
@@ -150,6 +151,7 @@ export const actionTable = pgTable(
         })
             .onUpdate('cascade')
             .onDelete('cascade'),
+        unique().on(table.index, table.exerciseId),
     ]
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;

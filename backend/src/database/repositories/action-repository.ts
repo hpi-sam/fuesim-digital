@@ -14,6 +14,13 @@ export class ActionRepository extends BaseRepository {
             .orderBy(asc(actionTable.index));
     }
 
+    public async getActionsCountForExerciseId(exerciseId: ExerciseId) {
+        return this.databaseConnection.$count(
+            actionTable,
+            eq(actionTable.exerciseId, exerciseId)
+        );
+    }
+
     public async deleteAllForExercise(exerciseId: ExerciseId) {
         await this.databaseConnection
             .delete(actionTable)

@@ -1,7 +1,8 @@
 <div
     class="card text-center me-1 mb-1"
-    (mousedown)="elementMousedown.emit($event)"
     [attr.data-cy]="dataCy()"
+    (touchstart)="$event.preventDefault()"
+    (pointerdown)="elementPointerdown.emit($event)"
 >
     <ng-content>
         <div
@@ -13,7 +14,7 @@
         <div style="top: 0; right: 0" class="position-absolute">
             @if (enableEditButton()) {
                 <button
-                    (mousedown)="elementEdit.emit(); $event.stopPropagation()"
+                    (pointerdown)="elementEdit.emit(); $event.stopPropagation()"
                     class="btn btn-outline-warning btn-sm"
                 >
                     <i class="bi bi-pencil-fill"></i>
@@ -21,7 +22,9 @@
             }
             @if (enableDeleteButton()) {
                 <button
-                    (mousedown)="elementDelete.emit(); $event.stopPropagation()"
+                    (pointerdown)="
+                        elementDelete.emit(); $event.stopPropagation()
+                    "
                     class="btn btn-outline-danger btn-sm"
                 >
                     <i class="bi bi-trash"></i>

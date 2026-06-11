@@ -17,9 +17,10 @@ import { openEmergencyOperationsCenterModal } from '../emergency-operations-cent
 import { openExerciseSettingsModal } from '../exercise-settings/open-exercise-settings-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
 import { openHospitalEditorModal } from '../hospital-editor/hospital-editor-modal';
+import { openTrainerOperationsTabletModal } from '../operations-tablet-view/trainer-operations-tablet-modal/open-trainer-operations-tablet-modal';
 import { openSimulationTrainerModal } from '../simulation/trainer-modal/open-simulation-trainer-modal';
-import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
 import { openSimulationSignallerModal } from '../simulation/signaller-modal/open-simulation-signaller-modal';
+import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
 import { ApiService } from '../../../../../core/api.service';
 import { ApplicationService } from '../../../../../core/application.service';
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
@@ -105,6 +106,10 @@ export class TrainerToolbarComponent {
 
     public openSimulationSignallerModal() {
         openSimulationSignallerModal(this.modalService);
+    }
+
+    public openOperationsTabletModal() {
+        openTrainerOperationsTabletModal(this.modalService);
     }
 
     public async deleteExercise() {

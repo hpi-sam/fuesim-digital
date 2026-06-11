@@ -56,7 +56,7 @@ export function dragToMap(
 ) {
     const mapSelector = '[data-cy=openLayersContainer]';
 
-    cy.get(elementSelector).first().trigger('mousedown');
+    cy.get(elementSelector).first().trigger('pointerdown');
 
     return (
         cy
@@ -65,7 +65,7 @@ export function dragToMap(
              * We have to force the click here, as the img
              * of the element being dragged is in front of the map
              **/
-            .trigger('mousemove', { force: true, ...offset })
+            .trigger('pointermove', { force: true, ...offset })
             .click({ force: true })
     );
 }
@@ -153,8 +153,7 @@ export function initializeParticipantSocket() {
                         (resolve) => {
                             participantSocket.emit(
                                 'joinExercise',
-                                participantKey,
-                                '',
+                                { exerciseKey: participantKey, clientName: '' },
                                 (
                                     response: SocketResponse<JoinExerciseResponseDataInput>
                                 ) => resolve(response)
@@ -204,8 +203,7 @@ export function initializeTrainerSocket() {
                     (resolve) => {
                         trainerSocket.emit(
                             'joinExercise',
-                            trainerKey,
-                            '',
+                            { exerciseKey: trainerKey, clientName: '' },
                             (
                                 response: SocketResponse<JoinExerciseResponseDataInput>
                             ) => resolve(response)

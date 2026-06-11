@@ -50,6 +50,8 @@ import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
 import { addScoutables50 } from './50-add-scoutables.js';
 import { addUUIDtoAddEocLogEntryAction51 } from './51-add-uuid-to-add-eoc-log-action.js';
 import { fixInfinity52 } from './52-fix-infinity.js';
+import { addIsActiveToClient53 } from './53-add-is-active-to-client.js';
+import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loading-and-highlighting.js';
 
 /**
  * Migrate a single action
@@ -128,4 +130,6 @@ export const migrations: {
     50: addScoutables50,
     51: addUUIDtoAddEocLogEntryAction51,
     52: fixInfinity52,
+    53: addIsActiveToClient53,
+    54: configVehicleLoadingAndHighlighting54,
 };

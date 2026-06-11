@@ -4,7 +4,7 @@ import { createTestEnvironment, createExercise } from '../../test/utils.js';
 describe('disconnect socket', () => {
     const environment = createTestEnvironment();
 
-    it('removes client from state on disconnect', async () => {
+    it('marks client as inactive on disconnect', async () => {
         const participantKey = (await createExercise(environment))
             .participantKey;
 
@@ -12,7 +12,10 @@ describe('disconnect socket', () => {
         const innerName = 'My Name';
 
         await environment.withWebsocket(async (outerSocket) => {
-            await outerSocket.emit('joinExercise', participantKey, outerName);
+            await outerSocket.emit('joinExercise', {
+                exerciseKey: participantKey,
+                clientName: outerName,
+            });
 
             let state = await outerSocket.emit('getState');
             expect(state.success).toBe(true);
@@ -20,14 +23,18 @@ describe('disconnect socket', () => {
             const previousClientIds = Object.keys(state.payload.clients);
 
             await environment.withWebsocket(async (innerSocket) =>
-                innerSocket.emit('joinExercise', participantKey, innerName)
+                innerSocket.emit('joinExercise', {
+                    exerciseKey: participantKey,
+                    clientName: innerName,
+                })
             );
 
             state = await outerSocket.emit('getState');
             expect(state.success).toBe(true);
             assert(state.success);
             const afterClientIds = Object.keys(state.payload.clients);
-            expect(afterClientIds).toStrictEqual(previousClientIds);
+            // After disconnect, the client is marked inactive (not removed), so both clients remain
+            expect(afterClientIds.length).toBe(previousClientIds.length + 1);
         });
     });
 });

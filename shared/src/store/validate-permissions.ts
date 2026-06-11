@@ -26,7 +26,7 @@ export function validatePermissions(
     >;
 
     if (typeof rights === 'function') {
-        rights = rights(client, action);
+        rights = rights(state, client, action);
     }
 
     if (typeof rights === 'boolean') {

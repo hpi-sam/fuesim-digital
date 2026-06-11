@@ -54,6 +54,20 @@ export class ChangeSpecificClientRoleAction implements Action {
     public readonly newRole!: SpecificRole;
 }
 
+export class SetClientInactiveAction implements Action {
+    @IsValue('[Client] Set client inactive' as const)
+    public readonly type = '[Client] Set client inactive';
+    @IsUUID(4, uuidValidationOptions)
+    public readonly clientId!: UUID;
+}
+
+export class SetClientActiveAction implements Action {
+    @IsValue('[Client] Set client active' as const)
+    public readonly type = '[Client] Set client active';
+    @IsUUID(4, uuidValidationOptions)
+    public readonly clientId!: UUID;
+}
+
 export namespace ClientActionReducers {
     export const addClient: ActionReducer<AddClientAction> = {
         action: AddClientAction,
@@ -87,7 +101,7 @@ export namespace ClientActionReducers {
             delete draftState.clients[clientId];
             return draftState;
         },
-        rights: 'server',
+        rights: 'trainer',
     };
 
     export const restrictViewToViewport: ActionReducer<RestrictViewToViewportAction> =
@@ -126,4 +140,24 @@ export namespace ClientActionReducers {
             },
             rights: 'trainer',
         };
+
+    export const setClientInactive: ActionReducer<SetClientInactiveAction> = {
+        action: SetClientInactiveAction,
+        reducer: (draftState, { clientId }) => {
+            const client = getElement(draftState, 'client', clientId);
+            client.isActive = false;
+            return draftState;
+        },
+        rights: 'server',
+    };
+
+    export const setClientActive: ActionReducer<SetClientActiveAction> = {
+        action: SetClientActiveAction,
+        reducer: (draftState, { clientId }) => {
+            const client = getElement(draftState, 'client', clientId);
+            client.isActive = true;
+            return draftState;
+        },
+        rights: 'server',
+    };
 }

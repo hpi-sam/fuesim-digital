@@ -7,6 +7,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-06-11
+
 ### Added
 
 - Trainers can configure whether participants can use the button to completely load a vehicle. To ensure backwards compatibility, loading a patient into a vehicle will for now still automatically load all personnel and material, independent from whether the button is active.
@@ -453,7 +455,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.1...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.1...v0.14.0
 [0.13.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.0...v0.12.1

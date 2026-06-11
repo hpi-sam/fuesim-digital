@@ -1,4 +1,4 @@
-import { computed, Component, inject, input } from '@angular/core';
+import { computed, Component, inject, input, type OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TechnicalChallenge, StateMachine } from 'fuesim-digital-shared';
 import {
@@ -12,6 +12,7 @@ import {
 import { currentStateOf } from 'fuesim-digital-shared';
 import type { AppState } from '../../../state/app.state';
 import {
+    createSelectTechnicalChallenge,
     selectCurrentTime,
     selectExerciseStatus,
 } from '../../../state/application/selectors/exercise.selectors';
@@ -19,6 +20,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
 import { UserGeneratedContentEditorComponent } from '../user-generated-content-editor/user-generated-content-editor.component.js';
 import { StateMachineDetailsComponent } from '../state-machine-details/state-machine-details.component.js';
 import { ExerciseService } from '../../../core/exercise.service.js';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot.js';
 
 @Component({
     selector: 'app-technical-challenge-details',
@@ -35,7 +37,7 @@ import { ExerciseService } from '../../../core/exercise.service.js';
         UserGeneratedContentEditorComponent,
     ],
 })
-export class TechnicalChallengeDetailsComponent {
+export class TechnicalChallengeDetailsComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
@@ -50,6 +52,7 @@ export class TechnicalChallengeDetailsComponent {
     public readonly currentTime = this.store.selectSignal(selectCurrentTime);
 
     scoutStateMachine(stateMachine: StateMachine) {
+        console.log('test');
         if (this.currentRole() === 'participant') {
             const state = currentStateOf(stateMachine);
             this.exerciseService.proposeAction({
@@ -59,6 +62,16 @@ export class TechnicalChallengeDetailsComponent {
                 stateId: state.id,
             });
         }
+    }
+
+    ngOnInit(): void {
+        console.log(
+            selectStateSnapshot(
+                createSelectTechnicalChallenge(this.technicalChallenge().id),
+                this.store
+            )
+        );
+        this.scoutStateMachine(this.stateMachines()[0]!);
     }
     protected readonly currentStateOf = currentStateOf;
 }

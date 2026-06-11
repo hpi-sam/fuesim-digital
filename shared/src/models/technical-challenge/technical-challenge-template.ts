@@ -41,6 +41,8 @@ export function newTechnicalChallengeFromTemplate(
         size: newSize(40, 40),
         name,
         image,
-        stateMachines,
+        stateMachines: Object.fromEntries(
+            Object.values(stateMachines).map((s) => [s.id, s])
+        ),
     };
 }

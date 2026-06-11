@@ -3,6 +3,26 @@
 Auf dieser Seite informieren wir über aktuelle Änderungen in der FüSim Digital. Zudem gibt es einen [Mailverteiler](https://lists.myhpi.de/8NGBl7FhFMPbVxPK7Pa0cRMfCezUkjHksbD9HxOM),
 der auch über die Änderungen informiert.
 
+## Version 0.14.0 -- 11.06.2026
+
+[Release 0.14.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.14.0)
+
+### Neue Features
+
+- Übungsleitende können festlegen, ob die Teilnehmenden den Button „Alle einsteigen“ für Fahrzeuge nutzen können. Um die Abwärtskompatibilität zu gewährleisten, werden beim Einladen eines Patienten in ein Fahrzeug vorerst weiterhin automatisch das gesamte Personal und Material eingeladen, unabhängig davon, ob der Button aktiv ist.
+- Übungsleitende können festlegen, ob zugehörige Elemente wie das Personal eines Fahrzeugs hervorgehoben werden sollen, wenn eines der Elemente ausgewählt wird. Die Hervorhebung kann deaktiviert, nur für Übungsleitende aktiviert (Standard, entspricht dem bisherigen Verhalten) oder sowohl für Übungsleitende als auch für Teilnehmende aktiviert werden.
+
+### Verbesserungen
+
+- Übungsleitende haben nun auch Zugriff auf die „Einsatzübersicht“ (in Übungen und Übungsvorlagen).
+- Wenn die Verbindung aufgrund von Netzwerkproblemen oder beim Neuladen unterbrochen wurde, treten Teilnehmende nun automatisch im gleichen Modus und ggf. der gleichen Kartenansicht wieder der Übung bei.
+
+### Fehlerbehebungen
+
+- Übungsleitende können nun auch auf Touch-Geräten Elemente aus der Seitenleiste auf die Karte ziehen.
+- \[Anleitung\] Es wurden fehlende Einträge in der Änderungshistorie hinzugefügt.
+- \[Anleitung\] Einige Links wurden korrigiert.
+
 ## Version 0.13.1 -- 01.06.2026
 
 [Release 0.13.1 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.13.1)

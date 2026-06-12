@@ -112,7 +112,7 @@ def do_process_mining():
         "dfg": [{"activities": activities, "count": count} for activities, count in dfg.items()],
         "startActivities": sa,
         "endActivities": ea,
-        "clusters": clusters
+        "clusters": sorted(clusters, key=lambda cluster: len(cluster["participantKeys"]), reverse=True)
     }
     # print(data)
     return jsonify(data), 200

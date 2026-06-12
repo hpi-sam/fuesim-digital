@@ -293,6 +293,7 @@ export class ParallelExerciseService {
                         (occurrenceMap[processEvent.name] ?? 0) + 1;
                     occurrenceMap[processEvent.name] = occurrence;
                     processEvent.name = `${occurrence}. ${processEvent.name}`;
+                    processEvent.verboseName = `${occurrence}. ${processEvent.verboseName}`;
 
                     // console.log(
                     //     `[EVENT] ${processEvent.timestamp} ${processEvent.name} ${processEvent.verboseName}`

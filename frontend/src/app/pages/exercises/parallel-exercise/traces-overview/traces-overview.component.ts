@@ -24,6 +24,9 @@ import { rgbColorPalette } from '../../../../shared/functions/colors.js';
 import { LogicalActivityNodeComponent } from '../logical-activity-node/logical-activity-node.component.js';
 import { SingleLogicalActivityNodeComponent } from '../single-logical-activity-node/single-logical-activity-node.component.js';
 import { ParallelExerciseService } from '../../../../core/parallel-exercise.service.js';
+import { ParallelGatewayComponent } from '../parallel-gateway/parallel-gateway.component.js';
+import { ExclusiveGatewayComponent } from '../exclusive-gateway/exclusive-gateway.component.js';
+import { TimelineNodeComponent } from '../timeline-node/timeline-node.component.js';
 
 interface BaseNode {
     id: string;
@@ -37,7 +40,7 @@ interface BaseNode {
 })
 export class TracesOverviewComponent {
     timeActivityNodeHeight = 30;
-    timeActivityNodeSpacing = 10;
+    timeActivityNodeSpacing = 5;
     logicalActivityNodeHeight = 50;
     logicalActivityNodeWidth = 150;
     logicalSingleActivitySize = 13;
@@ -51,6 +54,9 @@ export class TracesOverviewComponent {
             },
             singleTimeActivity: {
                 component: SingleTimeActivityNodeComponent,
+            },
+            timeline: {
+                component: TimelineNodeComponent,
             },
         },
     };
@@ -69,6 +75,12 @@ export class TracesOverviewComponent {
         nodes: {
             singleLogicalActivity: {
                 component: SingleLogicalActivityNodeComponent,
+            },
+            parallelGateway: {
+                component: ParallelGatewayComponent,
+            },
+            exclusiveGateway: {
+                component: ExclusiveGatewayComponent,
             },
         },
         groups: {
@@ -129,9 +141,10 @@ export class TracesOverviewComponent {
                 label: activity.verboseName,
                 left: this.mapWidth(activity.minTime),
                 top:
+                    30 +
                     idx *
-                    (this.timeActivityNodeHeight +
-                        this.timeActivityNodeSpacing),
+                        (this.timeActivityNodeHeight +
+                            this.timeActivityNodeSpacing),
                 width: this.mapWidth(activity.maxTime - activity.minTime),
                 height: this.timeActivityNodeHeight,
             }))
@@ -153,6 +166,7 @@ export class TracesOverviewComponent {
                               this.timeActivityNodeHeight / 3 / 2
                             : this.mapWidth(occurrence.startTime),
                     top:
+                        30 +
                         idx *
                             (this.timeActivityNodeSpacing +
                                 this.timeActivityNodeHeight) +
@@ -173,8 +187,32 @@ export class TracesOverviewComponent {
                 }))
             )
     );
+    readonly timelineNodes = computed(() => {
+        const nodes = [];
+        for (
+            let i = this.cluster().minTime;
+            i <= this.cluster().maxTime;
+            i += 10000
+        ) {
+            const isMinute = i % 60000 === 0;
+            nodes.push({
+                id: `time-${i}`,
+                type: 'timeline',
+                label: isMinute ? `${i / 60000}:00` : undefined,
+                width: isMinute ? 3 : 1,
+                height: isMinute ? 15 : 10,
+                left: this.mapWidth(i),
+                top: 0,
+            });
+        }
+        return nodes;
+    });
     readonly dataTime = computed(() => ({
-        nodes: [...this.timeActivityNodes(), ...this.singleTimeActivityNodes()],
+        nodes: [
+            ...this.timeActivityNodes(),
+            ...this.singleTimeActivityNodes(),
+            ...this.timelineNodes(),
+        ],
         groups: [],
     }));
 
@@ -221,12 +259,21 @@ export class TracesOverviewComponent {
     readonly dataLogical = computed(() => ({
         nodes: [
             ...this.singleLogicalActivityNodes(),
-            ...Object.values(this.cluster().gateways).map((gateway) => ({
-                id: gateway.id,
-                label: gateway.type.slice(0, 1),
-                width: 20,
-                height: 20,
-            })),
+            ...Object.values(this.cluster().gateways).map((gateway) =>
+                gateway.type === 'ParallelGateway'
+                    ? {
+                          id: gateway.id,
+                          type: 'parallelGateway',
+                          width: 10,
+                          height: 60,
+                      }
+                    : {
+                          id: gateway.id,
+                          type: 'exclusiveGateway',
+                          width: 25,
+                          height: 25,
+                      }
+            ),
         ],
         groups: this.logicalActivityNodes(),
         edges: this.cluster().arcs.map((arc) => ({

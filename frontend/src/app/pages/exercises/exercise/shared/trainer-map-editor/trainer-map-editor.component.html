@@ -53,7 +53,7 @@
                                     [imageUrl]="viewportTemplate.image.url"
                                     [darkBackground]="true"
                                     dataCy="draggableViewportDiv"
-                                    (elementMousedown)="
+                                    (elementPointerdown)="
                                         dragElementService.onMouseDown($event, {
                                             type: 'viewport',
                                             template: viewportTemplate,
@@ -66,7 +66,7 @@
                                     title="Transferpunkt"
                                     [imageUrl]="transferPointTemplate.image.url"
                                     dataCy="draggableTransferPointDiv"
-                                    (elementMousedown)="
+                                    (elementPointerdown)="
                                         dragElementService.onMouseDown($event, {
                                             type: 'transferPoint',
                                             template: transferPointTemplate,
@@ -115,7 +115,7 @@
                                         track simulatedRegionDragTemplate
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -160,7 +160,7 @@
                                         track restrictedZoneDragTemplate
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -256,7 +256,7 @@
                                                 track patientCategory
                                             ) {
                                                 <app-map-editor-card
-                                                    (elementMousedown)="
+                                                    (elementPointerdown)="
                                                         dragElementService.onMouseDown(
                                                             $event,
                                                             {
@@ -366,7 +366,7 @@
                                         track vehicleTemplate.id
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -469,7 +469,7 @@
                                         track mapImageTemplate.id
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -528,7 +528,7 @@
                                         track category
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -550,7 +550,7 @@
                                         </app-map-editor-card>
                                     }
                                     <app-map-editor-card
-                                        (elementMousedown)="
+                                        (elementPointerdown)="
                                             dragElementService.onMouseDown(
                                                 $event,
                                                 {

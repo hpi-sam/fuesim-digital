@@ -11,6 +11,13 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - There are now notifications when viewing an exercise replay whenever a measure is taken or a scoutable element is viewed.
 
+## [0.14.0] - 2026-06-11
+
+### Added
+
+- Trainers can configure whether participants can use the button to completely load a vehicle. To ensure backwards compatibility, loading a patient into a vehicle will for now still automatically load all personnel and material, independent from whether the button is active.
+- Trainers can configure whether related elements such as the personnel of a vehicle should be highlighted when one of the elements is selected. Highlighting can be turned off, activated for trainers only (default, matches previous behavior), or activated for both trainers and participants.
+
 ### Changed
 
 - Trainers now have access to the 'Einsatzübersicht' in Exercises and Exercise Templates.
@@ -20,6 +27,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - The server no longer crashes on startup when using `DFM_USE_DB=false`
 - The server no longer freezes when creating a new exercise from a template with `DFM_USE_DB=false`
+- Add missing entries in release notes
+- Fix some links in documentation
+- Trainers can now drag elements from the sidebar onto the map on touch devices as well.
+- Stored exercises that changed are no longer corrupted on server restart.
 
 ## [0.13.1] - 2026-06-01
 
@@ -448,7 +459,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.1...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.1...v0.14.0
 [0.13.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.0...v0.12.1

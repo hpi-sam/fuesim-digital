@@ -72,14 +72,15 @@ export function registerJoinExerciseHandler(
                 return;
             }
 
-            clientWrapper.getSessionInformation().then(() => {
+            clientWrapper.getSessionInformation().then(async () => {
                 let joinedClientId: UUID | null = null;
                 try {
                     if (clientId !== undefined) {
-                        joinedClientId = clientWrapper.reconnectToExercise(
-                            exerciseKey,
-                            clientId
-                        );
+                        joinedClientId =
+                            await clientWrapper.reconnectToExercise(
+                                exerciseKey,
+                                clientId
+                            );
                         if (joinedClientId === null) {
                             callback({
                                 success: false,
@@ -90,7 +91,7 @@ export function registerJoinExerciseHandler(
                             return;
                         }
                     } else {
-                        joinedClientId = clientWrapper.joinExercise(
+                        joinedClientId = await clientWrapper.joinExercise(
                             exerciseKey,
                             clientName!
                         );

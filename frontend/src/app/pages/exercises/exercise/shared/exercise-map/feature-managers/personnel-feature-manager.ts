@@ -22,6 +22,7 @@ import { selectVisiblePersonnel } from '../../../../../../state/application/sele
 import type { Positions } from '../utility/geometry-helper';
 import { selectWorkingPersonnel } from '../../../../../../state/application/selectors/exercise.selectors';
 import { MoveableFeatureManager } from './moveable-feature-manager';
+import { determineMarkedElements } from './utils';
 
 export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
     public register(
@@ -137,17 +138,19 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
     ): void {
         super.onFeatureClicked(event, feature);
 
+        const markedElements = determineMarkedElements(
+            this.store,
+            feature.getId() as UUID,
+            [(this.getElementFromFeature(feature) as Personnel).vehicleId]
+        );
+
         this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 PersonnelPopupComponent,
                 feature,
                 [feature.getId() as UUID],
-                [
-                    feature.getId() as UUID,
-                    (this.getElementFromFeature(feature) as Personnel)
-                        .vehicleId,
-                ],
-                [feature.getId() as UUID],
+                markedElements.trainer,
+                markedElements.participant,
                 ['personnel', 'vehicle'],
                 {
                     personnelId: feature.getId() as UUID,

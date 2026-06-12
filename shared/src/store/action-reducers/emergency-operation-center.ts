@@ -83,7 +83,7 @@ export namespace EmergencyOperationCenterActionReducers {
             draftState.eocLog.push(logEntry);
             return draftState;
         },
-        rights: (client, action) => {
+        rights: (state, client, action) => {
             if (action.isPrivate && client.role.mainRole === 'participant') {
                 return false;
             }

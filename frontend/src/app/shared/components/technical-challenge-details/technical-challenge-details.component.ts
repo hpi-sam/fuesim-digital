@@ -1,4 +1,11 @@
-import { computed, Signal, Component, inject, input } from '@angular/core';
+import {
+    computed,
+    Signal,
+    Component,
+    inject,
+    input,
+    type OnChanges,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     Personnel,
@@ -44,7 +51,17 @@ import { ProgressBarComponent } from '../progress-bar/progress-bar.component.js'
         ProgressBarComponent,
     ],
 })
-export class TechnicalChallengeDetailsComponent {
+export class TechnicalChallengeDetailsComponent implements OnChanges {
+    ngOnChanges(_changes: any): void {
+        const state = this.currentState();
+        if (this.currentRole() === 'participant') {
+            this.exerciseService.proposeAction({
+                type: '[TechnicalChallenge] Mark state as viewed',
+                technicalChallengeId: this.technicalChallenge().id,
+                stateId: state.id,
+            });
+        }
+    }
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 

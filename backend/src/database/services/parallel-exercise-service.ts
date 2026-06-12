@@ -191,8 +191,12 @@ export class ParallelExerciseService {
             await this.parallelExerciseRepository.getParallelExerciseInstancesById(
                 parallelExercise.id
             );
-        const activeExercises = exerciseInstances.map((exerciseEntry) =>
-            this.exerciseService.getExerciseByKey(exerciseEntry.participantKey)
+        const activeExercises = await Promise.all(
+            exerciseInstances.map(async (exerciseEntry) =>
+                this.exerciseService.getExerciseByKey(
+                    exerciseEntry.participantKey
+                )
+            )
         );
         return activeExercises;
     }

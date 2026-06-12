@@ -16,19 +16,26 @@ import {
     createTestUserSession,
     createTestEnvironment,
     createExerciseTemplate,
+    defaultTestUserSessionData,
 } from '../test/utils.js';
 import {
     createParallelExercise,
     createViewport,
     joinParallelExercise,
 } from '../test/parallel-exercise-utils.js';
+import type { OrganisationEntry } from '../database/schema.js';
 
 describe('parallel exercise router', () => {
     const environment = createTestEnvironment();
     let session: string;
+    let personalOrganisation: OrganisationEntry;
     beforeEach(async () => {
         environment.services.exerciseService.TESTING_getExerciseMap().clear();
         session = await createTestUserSession(environment);
+        personalOrganisation =
+            await environment.services.organisationService.ensurePersonalOrganisation(
+                defaultTestUserSessionData
+            );
     });
     describe('GET /api/parallel_exercises', () => {
         it('fails with 403 if not authenticated', async () => {
@@ -150,12 +157,21 @@ describe('parallel exercise router', () => {
 
         it('succeeds creating a parallel exercise', async () => {
             const beforeCreation = new Date();
-            const template = await createExerciseTemplate(environment, session);
+            const template = await createExerciseTemplate(
+                environment,
+                session,
+                personalOrganisation.id
+            );
+
+            const exerciseId =
+                (await environment.repositories.exerciseRepository.getExerciseTemplateById(
+                    template.id
+                ))!.exercise.id;
 
             const viewport = createViewport(
                 environment.services.exerciseService
                     .TESTING_getExerciseMap()
-                    .get(template.trainerKey)!
+                    .get(exerciseId)!
             );
             const testData = {
                 name: 'Test Parallel Exercise',

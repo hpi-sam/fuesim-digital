@@ -937,7 +937,7 @@ export function logScoutableViewed(
         ? `Es wurde ${scoutable.name} erkundet.`
         : `Es wurde etwas erkundet.`;
 
-    log(state, [createScoutableTag(state, scoutable.id)], description);
+    log(state, [createScoutableTag(scoutable.name, scoutable.id)], description);
 }
 
 export function logTechnicalChallenge(

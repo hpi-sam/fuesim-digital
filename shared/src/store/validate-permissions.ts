@@ -21,7 +21,7 @@ export function validatePermissions(
     let rights = reducer.rights;
 
     if (typeof rights === 'function') {
-        rights = rights(client, action);
+        rights = rights(state, client, action);
     }
 
     if (typeof rights === 'boolean') {

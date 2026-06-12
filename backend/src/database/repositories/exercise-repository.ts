@@ -13,11 +13,7 @@ import {
     type OrganisationEntry,
     organisationMembershipTable,
     organisationTable,
-} from '../schema.js';
-import {
     actionTable,
-    type ExerciseInsert,
-    type ExerciseTemplateInsert,
 } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import { BaseRepository } from './base-repository.js';

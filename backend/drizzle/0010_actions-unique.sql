@@ -1,0 +1,1 @@
+ALTER TABLE "action_entity" ADD CONSTRAINT "action_entity_index_exerciseId_unique" UNIQUE("index","exerciseId");

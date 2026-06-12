@@ -251,15 +251,18 @@ export class ExerciseService {
                 );
 
                 const exercises = await Promise.all(
-                    (await exerciseRepoTransaction.getAllExercises()).map(
-                        async (exerciseEntity) => {
-                            const exercise = new ActiveExercise(exerciseEntity);
-                            exercise.template = exerciseEntity.template ?? null;
-                            exercise.resetStopped();
-                            this.loadExercise(exercise);
-                            return exercise;
-                        }
-                    )
+                    (
+                        await exerciseRepoTransaction.getAllExercisesWithActionsCount()
+                    ).map(async (exerciseEntity) => {
+                        const exercise = new ActiveExercise(exerciseEntity);
+                        exercise.template = exerciseEntity.template ?? null;
+                        exercise.incrementIdGenerator.setCurrent(
+                            exerciseEntity.actionsCount!
+                        );
+                        exercise.resetStopped();
+                        this.loadExercise(exercise);
+                        return exercise;
+                    })
                 );
                 return exercises;
             }

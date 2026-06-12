@@ -3,6 +3,55 @@
 Auf dieser Seite informieren wir über aktuelle Änderungen in der FüSim Digital. Zudem gibt es einen [Mailverteiler](https://lists.myhpi.de/8NGBl7FhFMPbVxPK7Pa0cRMfCezUkjHksbD9HxOM),
 der auch über die Änderungen informiert.
 
+## Version 0.14.0 -- 11.06.2026
+
+[Release 0.14.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.14.0)
+
+### Neue Features
+
+- Übungsleitende können festlegen, ob die Teilnehmenden den Button „Alle einsteigen“ für Fahrzeuge nutzen können. Um die Abwärtskompatibilität zu gewährleisten, werden beim Einladen eines Patienten in ein Fahrzeug vorerst weiterhin automatisch das gesamte Personal und Material eingeladen, unabhängig davon, ob der Button aktiv ist.
+- Übungsleitende können festlegen, ob zugehörige Elemente wie das Personal eines Fahrzeugs hervorgehoben werden sollen, wenn eines der Elemente ausgewählt wird. Die Hervorhebung kann deaktiviert, nur für Übungsleitende aktiviert (Standard, entspricht dem bisherigen Verhalten) oder sowohl für Übungsleitende als auch für Teilnehmende aktiviert werden.
+
+### Verbesserungen
+
+- Übungsleitende haben nun auch Zugriff auf die „Einsatzübersicht“ (in Übungen und Übungsvorlagen).
+- Wenn die Verbindung aufgrund von Netzwerkproblemen oder beim Neuladen unterbrochen wurde, treten Teilnehmende nun automatisch im gleichen Modus und ggf. der gleichen Kartenansicht wieder der Übung bei.
+
+### Fehlerbehebungen
+
+- Übungsleitende können nun auch auf Touch-Geräten Elemente aus der Seitenleiste auf die Karte ziehen.
+- \[Anleitung\] Es wurden fehlende Einträge in der Änderungshistorie hinzugefügt.
+- \[Anleitung\] Einige Links wurden korrigiert.
+
+## Version 0.13.1 -- 01.06.2026
+
+[Release 0.13.1 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.13.1)
+
+Diese Version enthielt nur eine kleine Fehlerbehebung für Version 0.13.0.
+
+## Version 0.13.0 -- 01.06.2026
+
+[Release 0.13.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.13.0)
+
+### Anleitung/Hilfe
+
+Bislang gab es für die FüSim Digital keine offizielle Anleitung: Dies hat sich nun geändert. Unter [fuesim-manv.de/about/help](https://fuesim-manv.de/about/help) findet sich die offizielle Anleitung mit Informationen zu allen wichtigen Features. In der Zukunft wird diese auch noch um ein Tutorial ergänzt, welches das Erstellen und Durchführen von Übungen erklären wird. Auch in der Software findet ihr nun an zahlreichen Stellen den Button „Hilfe“, welcher euch direkt zur richtigen Stelle in der Anleitung führt.
+
+### Neue Features
+
+- Das Zoomen der Karte per Touch-Eingabe kann sowohl von Übungsleitenden als auch von Teilnehmenden pro Gerät deaktiviert werden. Dies hilft, versehentliches Zoomen zu verhindern, wenn mehrere Teilnehmer gleichzeitig an einem einzigen Gerät arbeiten.
+
+### Verbesserungen
+
+- In der Teilnehmenden-Übersichtstabelle wurden folgende Bezeichnungen aus Gründen der Konsistenz umbenannt: „Rolle“ in „Modus“, „Ansicht“ in „Kartenansicht“ und bei Kartenansicht „nicht zugewiesen“ in „Gesamte Karte“.
+- Übungen können nun direkt beim Bearbeiten von Übungsvorlagen erstellt werden.
+- Übungsvorlagen können direkt beim Bearbeiten gelöscht werden.
+
+### Fehlerbehebungen
+
+- Sehr alte Übungsexporte können nun wieder erfolgreich importiert werden.
+- Übungsvorlagen können nicht mehr versehentlich aus der Simulationsübersicht gestartet werden.
+
 ## Version 0.12.0 -- 17.05.2026
 
 [Release 0.12.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.12.0)

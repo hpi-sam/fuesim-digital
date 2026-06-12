@@ -51,9 +51,10 @@ import { addScoutables50 } from './50-add-scoutables.js';
 import { addUUIDtoAddEocLogEntryAction51 } from './51-add-uuid-to-add-eoc-log-action.js';
 import { fixInfinity52 } from './52-fix-infinity.js';
 import { addIsActiveToClient53 } from './53-add-is-active-to-client.js';
-import { addTechnicalChallenges54 } from './54-add-technical-challenges.js';
-import { extendScoutables55 } from './55-extend-scoutables.js';
-import { addMeasures56 } from './56-add-measures.js';
+import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loading-and-highlighting.js';
+import { addTechnicalChallenges55 } from './55-add-technical-challenges.js';
+import { extendScoutables56 } from './56-extend-scoutables.js';
+import { addMeasures57 } from './57-add-measures.js';
 
 /**
  * Migrate a single action
@@ -133,7 +134,8 @@ export const migrations: {
     51: addUUIDtoAddEocLogEntryAction51,
     52: fixInfinity52,
     53: addIsActiveToClient53,
-    54: addTechnicalChallenges54,
-    55: extendScoutables55,
-    56: addMeasures56,
+    54: configVehicleLoadingAndHighlighting54,
+    55: addTechnicalChallenges55,
+    56: extendScoutables56,
+    57: addMeasures57,
 };

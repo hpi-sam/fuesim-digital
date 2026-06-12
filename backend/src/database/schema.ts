@@ -236,6 +236,7 @@ export const actionTable = pgTable(
         })
             .onUpdate('cascade')
             .onDelete('cascade'),
+        unique().on(table.index, table.exerciseId),
     ]
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;

@@ -335,15 +335,15 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
         const remainingLoadSeconds =
             remainingLoadFullSeconds - remainingLoadMinutes * 60;
 
-        const textSegments = [];
-        if (config.vehicleStatusHighlight)
-            textSegments.push(`${patientCount}/${vehicle.patientCapacity}`);
-        if (isLoading)
-            textSegments.push(
-                `(${remainingLoadMinutes.toString().padStart(2, '0')}:${remainingLoadSeconds.toString().padStart(2, '0')})`
-            );
+        const capacityText = `${patientCount}/${vehicle.patientCapacity}`;
+        const timeText = `${remainingLoadMinutes.toString().padStart(2, '0')}:${remainingLoadSeconds.toString().padStart(2, '0')}`;
 
-        const text = textSegments.join(' ');
+        let label = '';
+
+        if (config.vehicleStatusHighlight && !isLoading) label = capacityText;
+        else if (config.vehicleStatusHighlight && isLoading)
+            label = `${capacityText} (${timeText})`;
+        else if (!config.vehicleStatusHighlight && isLoading) label = timeText;
 
         let statusbarColor: StatusbarColor = {
             backgroundColor: 'rgba(255, 255, 255, 0.85)',
@@ -388,7 +388,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
 
         const textStyle = new Style({
             text: new OlText({
-                text,
+                text: label,
                 font: `${fontPx}px sans-serif`,
                 fill: new Fill({ color: statusbarColor.color }),
                 backgroundFill: new Fill({

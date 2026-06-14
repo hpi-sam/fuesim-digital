@@ -174,15 +174,24 @@ export class RestrictedZoneFeatureManager
                     offsetY: (extent[3] - extent[1]) / 2,
                 };
 
-            const nameSegments = [];
-            if (restrictedZone.nameVisible)
-                nameSegments.push(restrictedZone.name);
-            if (restrictedZone.capacityVisible)
-                nameSegments.push(
-                    `(${vehicleCount}/${restrictedZone.capacity})`
-                );
+            const capacityText = `${vehicleCount}/${restrictedZone.capacity}`;
+            let label = '';
+
+            if (restrictedZone.nameVisible && !restrictedZone.capacityVisible)
+                label = restrictedZone.name;
+            else if (
+                restrictedZone.nameVisible &&
+                restrictedZone.capacityVisible
+            )
+                label = `${restrictedZone.name} (${capacityText})`;
+            else if (
+                !restrictedZone.nameVisible &&
+                restrictedZone.capacityVisible
+            )
+                label = capacityText;
+
             return {
-                name: nameSegments.join(' '),
+                name: label,
                 offsetY: (extent[3] - extent[1]) / 2,
             };
         },

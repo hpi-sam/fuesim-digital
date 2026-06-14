@@ -62,4 +62,11 @@ bootstrapApplication(AppComponent, {
             async (): Promise<void> => inject(AuthService).initialize()
         ),
     ],
-}).catch((err) => console.error(err));
+})
+    .then(() => {
+        const fallback =
+            document.querySelector<HTMLElement>('#fallback-banner');
+        fallback?.style.setProperty('display', 'none');
+        fallback?.setAttribute('aria-hidden', 'true');
+    })
+    .catch((err) => console.error(err));

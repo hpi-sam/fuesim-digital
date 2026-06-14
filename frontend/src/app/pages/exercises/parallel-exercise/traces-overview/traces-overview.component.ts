@@ -14,8 +14,12 @@ import {
     VisuallyJsModule,
 } from '@visuallyjs/browser-ui-angular';
 import {
+    BrowserElement,
     EdgeRoutingPlugin,
+    EVENT_MOUSEOUT,
+    EVENT_MOUSEOVER,
     HierarchyLayout,
+    NodeEventCallbackPayload,
     PanButtonsPlugin,
 } from '@visuallyjs/browser-ui';
 import { TimeActivityNodeComponent } from '../time-activity-node/time-activity-node.component.js';
@@ -54,6 +58,20 @@ export class TracesOverviewComponent {
             },
             singleTimeActivity: {
                 component: SingleTimeActivityNodeComponent,
+                events: {
+                    [EVENT_MOUSEOVER]: (
+                        p: NodeEventCallbackPayload<BrowserElement>
+                    ) => {
+                        this.highlightedParticipantKey.set(
+                            p.obj.data['participantKey']
+                        );
+                    },
+                    [EVENT_MOUSEOUT]: (
+                        p: NodeEventCallbackPayload<BrowserElement>
+                    ) => {
+                        this.highlightedParticipantKey.set(null);
+                    },
+                },
             },
             timeline: {
                 component: TimelineNodeComponent,
@@ -75,6 +93,20 @@ export class TracesOverviewComponent {
         nodes: {
             singleLogicalActivity: {
                 component: SingleLogicalActivityNodeComponent,
+                events: {
+                    [EVENT_MOUSEOVER]: (
+                        p: NodeEventCallbackPayload<BrowserElement>
+                    ) => {
+                        this.highlightedParticipantKey.set(
+                            p.obj.data['participantKey']
+                        );
+                    },
+                    [EVENT_MOUSEOUT]: (
+                        p: NodeEventCallbackPayload<BrowserElement>
+                    ) => {
+                        this.highlightedParticipantKey.set(null);
+                    },
+                },
             },
             parallelGateway: {
                 component: ParallelGatewayComponent,

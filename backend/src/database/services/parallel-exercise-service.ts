@@ -314,6 +314,7 @@ export class ParallelExerciseService {
                     exerciseRunning = false;
                 }
             }
+            console.log(occurrenceMap);
 
             // If the participant didn't do anything, empty it
             if (onlyStartAndStop) {

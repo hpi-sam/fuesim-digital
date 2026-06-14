@@ -100,7 +100,7 @@ export const actionProcessors = [
             return {
                 // name: `[Scoutable] Viewed ${scoutable.name || scoutable.id}`,
                 name: action.type,
-                verboseName: `${scoutable.name || 'Etwas'} erkunden`,
+                verboseName: `Erkunden`,
             };
         },
         true

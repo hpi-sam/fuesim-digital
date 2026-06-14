@@ -1,43 +1,67 @@
 <div style="width: 100%" class="vis-wrapper">
-    <div class="mb-4">
-        Teilnehmende:
-        @for (
-            participantKey of cluster().participantKeys;
-            track participantKey
-        ) {
-            <span
-                class="badge me-1"
-                [style.background-color]="
-                    highlightedParticipantKey() === null ||
-                    highlightedParticipantKey() === participantKey
-                        ? getParticipantKeyColor(participantKey)
-                        : 'lightgrey'
-                "
-                (mouseover)="highlightedParticipantKey.set(participantKey)"
-                (mouseout)="highlightedParticipantKey.set(null)"
-            >
-                {{ getParticipantLabel(participantKey) }}
-            </span>
-        }
+    <div class="alert alert-info small px-3 py-2 mb-2">
+        Der <strong>zeitliche Verlauf</strong> zeigt alle wichtigen Aktionen der
+        Teilnehmenden in zeitlicher Abfolge. Der
+        <strong>logische Verlauf</strong> zeigt, in welcher Reihenfolge
+        Teilnehmende Aktionen ausführen bzw. welche z. B. nur von einzelnen
+        Teilnehmenden ausgeführt werden. Die Raute steht dabei für eine
+        Aufteilung – es wird nur einer der Pfeile weiter verfolgt, während der
+        schwarze Balken bedeutet, dass etwas parallel passiert – die
+        nachfolgenden Aktionen können also in beliebiger Reihenfolge passieren.
+        Lassen Sie Ihren <strong>Mauszeiger</strong> über den Elementen in der
+        Darstellung <strong>schweben</strong>, um weitere Informationen über
+        diese zu erhalten bzw. einzelne Teilnehmende hervorzuheben.
     </div>
-    <h3 class="h6">Zeitlicher Verlauf</h3>
-    <div [style.height]="`${timeVisHeight()}px`">
-        <vjs-surface
-            #timeSurface
-            [data]="dataTime()"
-            [renderOptions]="renderOptionsTime()"
-            [viewOptions]="viewOptionsTime"
-        >
-        </vjs-surface>
+    <div class="card mb-2">
+        <div class="card-body p-3">
+            <h3 class="h6 d-inline-block me-2 mb-0">Teilnehmende:</h3>
+            @for (
+                participantKey of cluster().participantKeys;
+                track participantKey
+            ) {
+                <span
+                    class="badge me-1"
+                    [style.background-color]="
+                        highlightedParticipantKey() === null ||
+                        highlightedParticipantKey() === participantKey
+                            ? getParticipantKeyColor(participantKey)
+                            : 'lightgrey'
+                    "
+                    (mouseover)="highlightedParticipantKey.set(participantKey)"
+                    (mouseout)="highlightedParticipantKey.set(null)"
+                >
+                    {{ getParticipantLabel(participantKey) }}
+                </span>
+            }
+        </div>
     </div>
-    <h3 class="h6">Logischer Verlauf</h3>
-    <div [style.height]="`500px`">
-        <vjs-surface
-            #logicalSurface
-            [data]="dataLogical()"
-            [renderOptions]="renderOptionsLogical()"
-            [viewOptions]="viewOptionsLogical"
-        >
-        </vjs-surface>
+    <div class="card mb-2">
+        <div class="card-body p-3">
+            <h3 class="card-title h6 mb-3">Zeitlicher Verlauf</h3>
+            <div [style.height]="`${timeVisHeight()}px`" class="mb-0">
+                <vjs-surface
+                    #timeSurface
+                    [data]="dataTime()"
+                    [renderOptions]="renderOptionsTime()"
+                    [viewOptions]="viewOptionsTime"
+                >
+                </vjs-surface>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-3">
+            <h3 class="card-title h6 mb-3">Logischer Verlauf</h3>
+            <div [style.height]="`500px`">
+                <vjs-surface
+                    #logicalSurface
+                    [data]="dataLogical()"
+                    [renderOptions]="renderOptionsLogical()"
+                    [viewOptions]="viewOptionsLogical"
+                >
+                </vjs-surface>
+            </div>
+        </div>
     </div>
 </div>

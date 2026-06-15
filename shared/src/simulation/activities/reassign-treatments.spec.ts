@@ -1289,7 +1289,7 @@ describe('reassign treatment', () => {
 
     describe('in triaged state', () => {
         function setupPatientsAndPersonnel(
-            draftState: ExerciseState,
+            draftState: WritableDraft<ExerciseState>,
             simulatedRegion: SimulatedRegion,
             patients: readonly {
                 readonly state: PatientStatus;

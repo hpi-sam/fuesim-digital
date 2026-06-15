@@ -1,0 +1,22 @@
+<span
+    class="badge rounded-pill"
+    [ngStyle]="{
+        'background-color': this.color(),
+    }"
+>
+    @if (this.boolEvalResult(); as res) {
+        @if (res.isCompleted) {
+            <i class="bi bi-check"></i>
+        } @else {
+            <i class="bi bi-x-lg"></i>
+        }
+    }
+    @if (this.leftNumResult(); as leftNum) {
+        @if (this.rightNumResult(); as rightNum) {
+            {{ leftNum + '/' + rightNum }}
+        }
+    }
+    @if (this.singleNumResult(); as res) {
+        {{ res.num }}
+    }
+</span>

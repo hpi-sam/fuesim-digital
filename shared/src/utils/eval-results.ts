@@ -1,16 +1,17 @@
 import { z } from 'zod';
 import {
     AndEvalCriterion,
+    boolEvalCriterionSchema,
     CountEvalCriterion,
     EvalCriterion,
     FirstTrueAtEvalCriterion,
     GreaterThanEvalCriterion,
     isNumberEvalCriterion,
     NotEvalCriterion,
+    numberEvalCriterionSchema,
     OrEvalCriterion,
     PatientAtStatusEvalCriterion,
     ReachTechnicalChallengeStateEvalCriterion,
-    TimeStampEvalCriterion,
     ViewScoutableEvalCriterion,
     XPatientsAtStatusEvalCriterion,
 } from '../models/evaluation-criterion.js';
@@ -25,6 +26,7 @@ export const evalResultBaseSchema = z.strictObject({
 export const numberEvalResultSchema = z.strictObject({
     ...evalResultBaseSchema.shape,
     type: z.literal('numberEvalResult'),
+    criterion: numberEvalCriterionSchema,
     num: z.number(),
 });
 export type NumberEvalResult = z.infer<typeof numberEvalResultSchema>;
@@ -32,6 +34,7 @@ export type NumberEvalResult = z.infer<typeof numberEvalResultSchema>;
 export const boolEvalResultSchema = z.strictObject({
     ...evalResultBaseSchema.shape,
     type: z.literal('boolEvalResult'),
+    criterion: boolEvalCriterionSchema,
     isCompleted: z.boolean(),
 });
 export type BoolEvalResult = z.infer<typeof boolEvalResultSchema>;
@@ -48,7 +51,8 @@ export function getEvalResultFromCriterion(
     technicalChallenges: { [key: string]: TechnicalChallenge },
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
-    currentTime: number
+    currentTime: number,
+    cache: { [key: string]: EvalResult }
 ): EvalResult {
     function shortCritToRes(evalCriterion: EvalCriterion): EvalResult {
         return getEvalResultFromCriterion(
@@ -57,18 +61,15 @@ export function getEvalResultFromCriterion(
             technicalChallenges,
             patients,
             scoutables,
-            currentTime
+            currentTime,
+            cache
         );
     }
     /* TODO @JohannesPotzi @Jogius : This reduces redundant visits to criteria in the tree. Can we do Better? */
-    if (evalCriterion.results.length >= 1) {
-        const latestResult = evalCriterion.results.at(
-            evalCriterion.results.length - 1
-        )!;
-        if (latestResult.timestamp === currentTime) {
-            return latestResult;
-        }
+    if (cache[evalCriterion.id] !== undefined) {
+        return cache[evalCriterion.id] as EvalResult;
     }
+
     let isCompleted = false;
     let num = null;
     switch (evalCriterion.criterionType) {
@@ -219,7 +220,8 @@ export function getEvalResultFromCriterion(
         }
         case 'firstTrueAtEvalCriterion': {
             const criterion = evalCriterion as FirstTrueAtEvalCriterion;
-            const resCount = criterion.results.length;
+            /* TODO @JohannesPotzi @Jogius : implementation */
+            /* const resCount = criterion.results.length;
             if (resCount > 0) {
                 const latestTimeStamp = criterion.results[resCount - 1]!.num;
                 if (latestTimeStamp > 0) {
@@ -232,7 +234,7 @@ export function getEvalResultFromCriterion(
                     }
                     num = -1;
                 }
-            }
+            } */
             break;
         }
         default:
@@ -248,21 +250,26 @@ export function getEvalResultFromCriterion(
             );
             num = 0;
         }
-        return {
+        const res = {
             id: id,
             type: 'numberEvalResult',
             criterionId: evalCriterion.id,
             num: num,
             timestamp: currentTime,
         } as NumberEvalResult;
-    } else
-        return {
+        cache[evalCriterion.id] = res;
+        return res;
+    } else {
+        const res = {
             id: uuid(),
             criterionId: evalCriterion.id,
             type: 'boolEvalResult',
             isCompleted: isCompleted,
             timestamp: currentTime,
         } as BoolEvalResult;
+        cache[evalCriterion.id] = res;
+        return res;
+    }
 }
 export function getEvalResultsFromCriteria(
     evalCriteria: { [key: string]: EvalCriterion },
@@ -271,16 +278,20 @@ export function getEvalResultsFromCriteria(
     scoutables: { [key: string]: Scoutable },
     currentTime: number
 ): { [evalCriterionId: UUID]: EvalResult } {
-    return Object.values(evalCriteria)
-        .flatMap((evalCriterion: EvalCriterion): EvalResult => {
-            return getEvalResultFromCriterion(
-                evalCriterion,
+    const criteria = Object.values(evalCriteria);
+    let cache = {} as { [key: string]: EvalResult };
+    return criteria
+        .flatMap((criterion: EvalCriterion): EvalResult => {
+            const res = getEvalResultFromCriterion(
+                criterion,
                 evalCriteria,
                 technicalChallenges,
                 patients,
                 scoutables,
-                currentTime
+                currentTime,
+                cache
             );
+            return res;
         })
         .reduce<{ [evalCriterionId: UUID]: EvalResult }>(
             (evalResultObject, evalResult) => {
@@ -292,4 +303,9 @@ export function getEvalResultsFromCriteria(
 }
 export function getNumFromEvalResult(result: EvalResult): number | null {
     return result.type === 'numberEvalResult' ? result.num : null;
+}
+export function getIsCompletedFromEvalResult(
+    result: EvalResult
+): boolean | null {
+    return result.type === 'boolEvalResult' ? result.isCompleted : null;
 }

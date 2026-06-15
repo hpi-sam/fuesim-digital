@@ -54,6 +54,7 @@ import { addIsActiveToClient53 } from './53-add-is-active-to-client.js';
 import { addTechnicalChallenges54 } from './54-add-technical-challenges.js';
 import { extendScoutables55 } from './55-extend-scoutables.js';
 import { addMeasures56 } from './56-add-measures.js';
+import { addEvalCriteria57 } from './57-add-eval-criteria.js';
 
 /**
  * Migrate a single action
@@ -136,4 +137,5 @@ export const migrations: {
     54: addTechnicalChallenges54,
     55: extendScoutables55,
     56: addMeasures56,
+    57: addEvalCriteria57,
 };

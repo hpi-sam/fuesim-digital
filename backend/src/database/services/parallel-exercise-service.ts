@@ -2,7 +2,6 @@ import type {
     EvalCriterionId,
     EvalResult,
     ExerciseState,
-    GroupParticipantKey,
     ParallelExerciseId,
     SetAutojoinViewportAction,
     ParallelExerciseKey,
@@ -44,6 +43,7 @@ export class ParallelExerciseService {
         private readonly exerciseService: ExerciseService
     ) {
         this.newJoin.subscribe((join) => {
+            this.evalResultsMap[join.activeExercise.exercise.id] = {};
             const sub = join.activeExercise.tickApplied.subscribe(async () =>
                 this.onTickApplied(
                     join.activeExercise.exercise.id,
@@ -55,6 +55,7 @@ export class ParallelExerciseService {
     }
     public async onTickApplied(id: ExerciseId, state: ExerciseState) {
         const previousResults = this.evalResultsMap[id];
+        /* TODO */
         if (!previousResults) {
             return;
         }
@@ -74,9 +75,9 @@ export class ParallelExerciseService {
 
             // When the result has changed or there was no previous result, we push the calculated result to the map.
             if (!previousRes || previousRes[previousRes.length - 1] !== res) {
-                this.evalResultsMap[id]![critId]
-                    ? this.evalResultsMap[id]![critId].push(res)
-                    : (this.evalResultsMap[id]![critId] = [res]);
+                previousRes
+                    ? previousRes.push(res)
+                    : (previousResults[critId] = [res]);
             }
         }
     }

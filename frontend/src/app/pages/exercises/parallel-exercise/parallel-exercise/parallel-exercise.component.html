@@ -98,47 +98,78 @@
 
         <div class="row">
             <div class="col">
-                <div class="card">
-                    <div class="card-header h4">
-                        Teilnehmende
-                        <span class="badge bg-secondary float-end">
-                            <i class="bi bi-people me-1"></i>
-                            {{
-                                parallelExerciseService.exerciseInstances()
-                                    .length
-                            }}
-                        </span>
-                    </div>
-                    <table class="table table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Teilnehmenden-PIN</th>
-                                <th>Name(n)</th>
-                                <th>Letzte Aktion</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (
-                                exerciseInstance of parallelExerciseService.exerciseInstances();
-                                track exerciseInstance.participantKey
-                            ) {
-                                <tr
-                                    app-parallel-exercise-instance-row
-                                    [exerciseInstance]="exerciseInstance"
-                                ></tr>
-                            } @empty {
-                                <tr>
-                                    <td colspan="3" class="text-muted">
-                                        Es sind noch keine Teilnehmenden der
-                                        Übung beigetreten.
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                <nav
+                    #nav="ngbNav"
+                    ngbNav
+                    [activeId]="activeNavId()"
+                    class="nav-tabs"
+                >
+                    <ng-container ngbNavItem [ngbNavItem]="'participants'">
+                        <a ngbNavLink data-cy="paralellExerciseParticipantsNav"
+                            >Teilnehmenden Übersicht</a
+                        >
+                        <ng-template ngbNavContent>
+                            <div class="card">
+                                <div class="card-header h4">
+                                    Teilnehmende
+                                    <span class="badge bg-secondary float-end">
+                                        <i class="bi bi-people me-1"></i>
+                                        {{
+                                            parallelExerciseService.exerciseInstances()
+                                                .length
+                                        }}
+                                    </span>
+                                </div>
+                                <table class="table table-striped mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Teilnehmenden-PIN</th>
+                                            <th>Name(n)</th>
+                                            <th>Letzte Aktion</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (
+                                            exerciseInstance of parallelExerciseService.exerciseInstances();
+                                            track exerciseInstance.participantKey
+                                        ) {
+                                            <tr
+                                                app-parallel-exercise-instance-row
+                                                [exerciseInstance]="
+                                                    exerciseInstance
+                                                "
+                                            ></tr>
+                                        } @empty {
+                                            <tr>
+                                                <td
+                                                    colspan="3"
+                                                    class="text-muted"
+                                                >
+                                                    Es sind noch keine
+                                                    Teilnehmenden der Übung
+                                                    beigetreten.
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </ng-template>
+                    </ng-container>
+                    <ng-container ngbNavItem [ngbNavItem]="'didactic overview'">
+                        <a
+                            ngbNavLink
+                            data-cy="paralellExerciseDidacticOverviewNav"
+                            >Auswertung</a
+                        >
+                        <ng-template ngbNavContent
+                            ><app-parallel-exercise-evaluation />
+                        </ng-template>
+                    </ng-container>
+                </nav>
+                <div [ngbNavOutlet]="nav" class="mt-2"></div>
             </div>
         </div>
     } @else if (parallelExercise.isLoading()) {

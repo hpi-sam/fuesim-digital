@@ -1,0 +1,103 @@
+<div class="card">
+    <div class="card-header h4">Auswertung</div>
+    <table class="table-striped mb-0">
+        <thead>
+            <!-- TODO @JohannesPotzi @Jogius : Add a button to toggle participant names.-->
+            <tr>
+                <th>Kriterium</th>
+                <!-- participants -->
+                @for (
+                    exerciseInstance of exerciseInstances();
+                    track exerciseInstance.participantKey
+                ) {
+                    <th>
+                        <code class="me-2">{{
+                            exerciseInstance.participantKey
+                        }}</code>
+                        <button
+                            app-copy-button
+                            class="btn btn-light btn-sm"
+                            [value]="getParticipantUrl(exerciseInstance)"
+                        ></button>
+                    </th>
+                }
+                <th></th>
+                <!-- open exerciseInstance -->
+            </tr>
+        </thead>
+        <tbody>
+            <td>Ist Aktiv:</td>
+            @for (
+                exerciseInstance of exerciseInstances();
+                track exerciseInstance.participantKey
+            ) {
+                <td>
+                    @if (exerciseInstance.isActive) {
+                        <span class="badge bg-primary">aktiv</span>
+                    }
+                </td>
+            }
+            <td></td>
+            @for (
+                exerciseInstance of exerciseInstances();
+                track exerciseInstance.participantKey
+            ) {
+                <td>
+                    <a
+                        [routerLink]="`/exercises/${exerciseInstance.trainerKey}`"
+                        class="btn btn-sm btn-outline-primary float-end"
+                    >
+                        Öffnen
+                    </a>
+                </td>
+            }
+
+            @for (criterion of this.rootCriteria(); track criterion.id) {
+                <td>{{ criterion.name }}</td>
+                <!-- Results -->
+                @for (
+                    exerciseInstance of exerciseInstances();
+                    track exerciseInstance.participantKey
+                ) {
+                    @let res =
+                        getLatestResFromCriterionOfInstace(
+                            criterion,
+                            exerciseInstance
+                        );
+                    @if (res) {
+                        <!-- TODO @JohannesPotzi @Jogius : implement and use the result badge -->
+                        @let isCompleted = getIsCompletedFromEvalResult(res);
+                        @if (isCompleted !== null) {
+                            <span
+                                class="badge rounded-pill"
+                                [ngStyle]="{
+                                    'background-color': isCompleted
+                                        ? 'green'
+                                        : 'red',
+                                }"
+                            >
+                                @if (isCompleted) {
+                                    <i class="bi bi-check"></i>
+                                } @else {
+                                    <i class="bi bi-x-lg"></i>
+                                }
+                            </span>
+                        }
+                        @if (getNumFromEvalResult(res); as resNum) {
+                            <span class="badge rounded-pill">
+                                {{ resNum }}
+                            </span>
+                        }
+                    }
+                }
+            }
+            @if (this.exerciseInstances().length === 0) {
+                <tr>
+                    <td colspan="3" class="text-muted">
+                        Es sind noch keine Teilnehmenden der Übung beigetreten.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

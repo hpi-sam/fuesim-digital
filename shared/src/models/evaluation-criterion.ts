@@ -7,10 +7,6 @@ import type { TechnicalChallengeId } from './technical-challenge/technical-chall
 import { technicalChallengeIdSchema } from './technical-challenge/technical-challenge.js';
 import type { PatientStatus } from './utils/patient-status.js';
 import { patientStatusSchema } from './utils/patient-status.js';
-import {
-    boolEvalResultSchema,
-    numberEvalResultSchema,
-} from '../utils/eval-results.js';
 
 export const boolEvalCriterionIdSchema = uuidSchema.brand(
     'BoolEvalCriterionId'
@@ -32,7 +28,6 @@ export const evalCriterionBaseSchema = z.strictObject({
 });
 export const boolEvalCriterionBaseSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
-    results: z.array(boolEvalResultSchema),
 });
 
 export const andEvalCriterionSchema = z.strictObject({
@@ -69,7 +64,6 @@ export type GreaterThanEvalCriterion = z.infer<
 
 export const numberEvalCriterionBaseSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
-    results: z.array(numberEvalResultSchema),
     num: z.number(),
 });
 export const constNumEvalCriterionSchema = z.strictObject({
@@ -103,7 +97,7 @@ export type FirstTrueAtEvalCriterion = z.infer<
 
 export const countPatientsAtStatusEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
-    criterionType: z.literal('constNumEvalCriterion'),
+    criterionType: z.literal('countPatientsAtStatusEvalCriterion'),
 });
 export type CountPatientsAtStatusEvalCriterion = z.infer<
     typeof countPatientsAtStatusEvalCriterionSchema
@@ -173,6 +167,14 @@ export const boolEvalCriterionLeafSchema = z.discriminatedUnion(
 );
 export type BoolEvalCriterionLeaf = z.infer<typeof boolEvalCriterionLeafSchema>;
 
+export const targetCountCriterionSchema = z.discriminatedUnion(
+    'criterionType',
+    [doMeasureXTimesEvalCriterionSchema, xPatientsAtStatusEvalCriterionSchema]
+);
+export type TargetCountEvalCriterion = z.infer<
+    typeof targetCountCriterionSchema
+>;
+
 export const boolEvalCriterionSchema = z.discriminatedUnion('criterionType', [
     boolEvalCriterionLeafSchema,
     andEvalCriterionSchema,
@@ -182,6 +184,7 @@ export const boolEvalCriterionSchema = z.discriminatedUnion('criterionType', [
 export type BoolEvalCriterion = z.infer<typeof boolEvalCriterionSchema>;
 
 export const numberEvalCriterionSchema = z.discriminatedUnion('criterionType', [
+    constNumEvalCriterionSchema,
     countPatientsAtStatusEvalCriterionSchema,
     countEvalCriterionSchema,
     timeStampEvalCriterionSchema,
@@ -222,6 +225,7 @@ export const boolEvalCritrionTypes = [
 export type NumberEvalCriterionType = NumberEvalCriterion['criterionType'];
 export const numberEvalCriterionTypes = [
     'constNumEvalCriterion',
+    'countPatientsAtStatusEvalCriterion',
     'countEvalCriterion',
     'firstTrueAtEvalCriterion',
     'timeStampEvalCriterion',
@@ -257,6 +261,7 @@ export const evalCriterionTypesNames: {
     notEvalCriterion: 'Negierung',
     timeStampEvalCriterion: 'Zeitpunkt',
     firstTrueAtEvalCriterion: 'Frist',
+    countPatientsAtStatusEvalCriterion: 'Anzahl von Patienten mit Status',
 } as const;
 export function newAndEvalCriterion(
     name: string,
@@ -266,7 +271,6 @@ export function newAndEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'andEvalCriterion',
         children: children ?? [],
     };
@@ -279,7 +283,6 @@ export function newOrEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'orEvalCriterion',
         children: children ?? [],
     };
@@ -292,7 +295,6 @@ export function newNotEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'notEvalCriterion',
         child: child,
     };
@@ -306,7 +308,6 @@ export function newGreaterThanEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'greaterThanEvalCriterion',
         leftChild: leftChild,
         rightChild: rightChild,
@@ -320,7 +321,6 @@ export function newConstNumEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'constNumEvalCriterion',
         num: num,
     };
@@ -333,7 +333,6 @@ export function newCountEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'countEvalCriterion',
         num: -1,
         children: children,
@@ -347,7 +346,6 @@ export function newFirstTrueAtEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'firstTrueAtEvalCriterion',
         num: -1,
         child: child,
@@ -361,7 +359,6 @@ export function newTimeStampEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'timeStampEvalCriterion',
         num: num,
     };
@@ -375,7 +372,6 @@ export function newDoMeasureXTimesEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'doMeasureXTimesEvalCriterion',
         targetCount,
         targetMeasureId,
@@ -390,7 +386,6 @@ export function newReachTechnicalChallengeStateEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'reachTechnicalChallengeStateEvalCriterion',
         targetTechnicalChallengeId,
         targetTechnicalChallengeStateId,
@@ -405,7 +400,6 @@ export function newPatientAtStatusEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'patientAtStatusEvalCriterion',
         targetPatientId,
         targetStatus,
@@ -420,7 +414,6 @@ export function newXPatientsAtStatusEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'xPatientsAtStatusEvalCriterion',
         targetCount,
         targetStatus,
@@ -434,7 +427,6 @@ export function newViewScoutableEvalCriterion(
         id: uuid(),
         name,
         type: 'evalCriterion',
-        results: [],
         criterionType: 'viewScoutableEvalCriterion',
         targetScoutableId,
     };

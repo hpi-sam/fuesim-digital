@@ -7,6 +7,17 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-06-15
+
+### Added
+
+- Vehicles can have load times per patient. While a patient is being loaded into the vehicle, it cannot be moved or transferred and no second patient can be loaded at the same time. Load times can be configured per vehicle template and can be disabled globally. While the load time is running, a countdown is shown above the vehicle.
+
+### Changed
+
+- Replace `fuesim-manv.de` links with `fuesim.digital`
+- Help pages are linked in landing page footer
+
 ## [0.14.0] - 2026-06-11
 
 ### Added
@@ -455,7 +466,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.14.0...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.1...v0.14.0
 [0.13.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.1...v0.13.0

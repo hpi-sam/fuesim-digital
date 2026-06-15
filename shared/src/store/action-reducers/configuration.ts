@@ -73,6 +73,14 @@ export class SetVehicleStatusInPatientStatusColorEnabled implements Action {
     public readonly vehicleStatusInPatientStatusColor!: boolean;
 }
 
+export class SetVehicleLoadTimesEnabled implements Action {
+    @IsValue('[Configuration] Set vehicleLoadTimesEnabled' as const)
+    public readonly type = '[Configuration] Set vehicleLoadTimesEnabled';
+
+    @IsBoolean()
+    public readonly vehicleLoadTimesEnabled!: boolean;
+}
+
 export class SetHighlightRelatedElements implements Action {
     @IsValue('[Configuration] Set highlightRelatedElements' as const)
     public readonly type = '[Configuration] Set highlightRelatedElements';
@@ -160,6 +168,17 @@ export namespace ConfigurationActionReducers {
             reducer(draftState, { vehicleStatusInPatientStatusColor }) {
                 draftState.configuration.vehicleStatusInPatientStatusColor =
                     vehicleStatusInPatientStatusColor;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setVehicleLoadTimesEnabled: ActionReducer<SetVehicleLoadTimesEnabled> =
+        {
+            action: SetVehicleLoadTimesEnabled,
+            reducer(draftState, { vehicleLoadTimesEnabled }) {
+                draftState.configuration.vehicleLoadTimesEnabled =
+                    vehicleLoadTimesEnabled;
                 return draftState;
             },
             rights: 'trainer',

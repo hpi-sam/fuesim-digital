@@ -78,6 +78,24 @@
         ></app-display-validation>
     </div>
     <div class="form-group mb-3">
+        <label class="form-label">Ladezeit pro Patient:</label>
+        <div class="input-group">
+            <input
+                #patientLoadMinutesInput="ngModel"
+                [(ngModel)]="values.patientLoadMinutes"
+                required
+                min="0"
+                type="number"
+                class="form-control"
+                placeholder="2"
+            />
+            <span class="input-group-text">Minuten</span>
+        </div>
+        <app-display-validation
+            [ngModelInput]="patientLoadMinutesInput"
+        ></app-display-validation>
+    </div>
+    <div class="form-group mb-3">
         <label class="form-label"
             >Materialien
             <div ngbDropdown autoClose="outside" class="d-inline-block">

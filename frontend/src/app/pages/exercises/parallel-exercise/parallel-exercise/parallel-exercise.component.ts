@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
-import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import {
     GetParallelExerciseResponseData,
     PatchParallelExerciseRequestData,
@@ -9,8 +9,6 @@ import { ActivatedRoute } from '@angular/router';
 import { QrCodeComponent } from 'ng-qrcode';
 import { ApiService } from '../../../../core/api.service';
 import { ParallelExerciseService } from '../../../../core/parallel-exercise.service';
-import { shareLink } from '../../../../shared/functions/share';
-import { MessageService } from '../../../../core/messages/message.service';
 import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { ExerciseStateBadgeInnerComponent } from '../../../../shared/components/exercise-state-badge-inner/exercise-state-badge-inner.component';
 import { ParallelExerciseInstanceRowComponent } from '../instance-row/parallel-exercise-instance-row.component';
@@ -35,10 +33,8 @@ import { CopyButtonComponent } from '../../../../shared/components/copy-button/c
 })
 export class ParallelExerciseComponent {
     private readonly apiService = inject(ApiService);
-    private readonly ngbModalService = inject(NgbModal);
     private readonly route = inject(ActivatedRoute);
     public readonly parallelExerciseService = inject(ParallelExerciseService);
-    private readonly messageService = inject(MessageService);
 
     parallelExercise: HttpResourceRef<
         GetParallelExerciseResponseData | undefined
@@ -47,10 +43,6 @@ export class ParallelExerciseComponent {
         () =>
             `${location.origin}/exercises/parallel/join/${this.parallelExercise.value()?.participantKey}`
     );
-
-    shareParticipantLink() {
-        shareLink(this.participantUrl(), this.messageService);
-    }
 
     async patchParallelExercise(data: PatchParallelExerciseRequestData) {
         const parallelExercise = this.parallelExercise.value();

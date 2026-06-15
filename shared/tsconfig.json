@@ -7,8 +7,7 @@
         // These are needed for using it as a library
         "declaration": true,
         "declarationMap": true,
-        "sourceMap": true,
-        "noErrorTruncation": true
+        "sourceMap": true
     },
     "references": [],
     "include": ["src/**/*", "tests/**/*"],

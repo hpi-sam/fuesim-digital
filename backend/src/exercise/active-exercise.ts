@@ -261,6 +261,8 @@ export class ActiveExercise {
 
     /**
      * Applies and broadcasts the action on the current state.
+     * @param action action to apply
+     * @param emitterId the clientId, or `null` for server actions
      * @param intermediateAction When set is run between reducing the state and broadcasting the action
      * @throws Error if the action is not applicable on the current state
      */
@@ -318,18 +320,17 @@ export class ActiveExercise {
         const currentState = cloneDeepMutable(this.exercise.initialStateString);
 
         this.temporaryActionHistory.forEach((actionWrapper) => {
-            validateExerciseAction(actionWrapper.getAction().actionString);
+            const action = validateExerciseAction(
+                actionWrapper.getAction().actionString
+            );
             try {
-                applyAction(
-                    currentState,
-                    actionWrapper.getAction().actionString
-                );
+                applyAction(currentState, action);
             } catch (e: unknown) {
                 if (e instanceof ReducerError) {
                     throw new RestoreError(
                         `A reducer error occurred while restoring (Action ${
                             actionWrapper.getAction().index
-                        }: \`${JSON.stringify(actionWrapper.getAction().actionString)}\`)`,
+                        }: \`${JSON.stringify(action)}\`)`,
                         this.exercise.id,
                         e
                     );

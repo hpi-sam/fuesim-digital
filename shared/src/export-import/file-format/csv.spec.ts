@@ -1,4 +1,4 @@
-import { produce, type WritableDraft } from 'immer';
+import { castDraft, produce, type WritableDraft } from 'immer';
 import { toLonLat } from 'ol/proj.js';
 import type { ExerciseState } from '../../state.js';
 import { newExerciseState } from '../../state.js';
@@ -111,12 +111,14 @@ describe('csv export', () => {
             [
                 (draftState: WritableDraft<ExerciseState>) => {
                     // patient is in both viewports, select smaller
-                    const largerViewport = newViewport(
-                        {
-                            x: mapPosition.coordinates.x - 1,
-                            y: mapPosition.coordinates.y + 1,
-                        },
-                        'large'
+                    const largerViewport = castDraft(
+                        newViewport(
+                            {
+                                x: mapPosition.coordinates.x - 1,
+                                y: mapPosition.coordinates.y + 1,
+                            },
+                            'large'
+                        )
                     );
                     largerViewport.size = {
                         width: defaultViewportSize.width * 2,
@@ -247,8 +249,8 @@ describe('csv export', () => {
         expect(csvContent).toBe(patientsCsvExportColumns.join(';'));
     });
     it('at least one correct patient in CSV', () => {
-        let patient: Patient;
-        const state = setupState((draftState: WritableDraft<ExerciseState>) => {
+        let patient: WritableDraft<Patient>;
+        const state = setupState((draftState) => {
             patient = addPatient(draftState, 'red', 'red');
             patient.identifier = 'xyz';
         });
@@ -258,7 +260,7 @@ describe('csv export', () => {
     });
     it('multiple patients', () => {
         let patients: Patient[] = [];
-        const state = setupState((draftState: ExerciseState) => {
+        const state = setupState((draftState) => {
             patients = [
                 addPatient(draftState, 'red', 'red'),
                 addPatient(draftState, 'yellow', 'yellow'),

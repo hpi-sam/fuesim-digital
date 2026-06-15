@@ -1,9 +1,9 @@
-import { isUUID } from 'class-validator';
 import {
     type UUID,
     type ExerciseKey,
     joinExerciseResponseDataSchema,
     isExerciseKey,
+    uuidSchema,
 } from 'fuesim-digital-shared';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
@@ -63,7 +63,10 @@ export function registerJoinExerciseHandler(
                 });
                 return;
             }
-            if (clientId !== undefined && !isUUID(clientId, 4)) {
+            if (
+                clientId !== undefined &&
+                !uuidSchema.safeParse(clientId).success
+            ) {
                 callback({
                     success: false,
                     message: 'Invalid clientId format',

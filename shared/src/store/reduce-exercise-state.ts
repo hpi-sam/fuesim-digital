@@ -25,11 +25,10 @@ export function reduceExerciseState(
  * @param draftState The current state (mutable)
  * @param action The action to apply on the current state
  * @throws {ReducerError} if the action is not applicable on the current state
- * @returns the new state
  */
 export function applyAction(
     draftState: WritableDraft<ExerciseState>,
     action: ExerciseAction
-) {
-    return lookupReducerFor(action.type).reducer(draftState, action);
+): void {
+    lookupReducerFor(action.type).reducer(draftState, action);
 }

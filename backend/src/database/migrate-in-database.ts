@@ -26,12 +26,12 @@ export async function migrateInDatabase(
         currentState: loadedCurrentState,
         history: {
             initialState: loadedInitialState,
-            actions: loadedActions.map((action) => action.actionString),
+            actionHistory: loadedActions.map((action) => action.actionString),
         },
     });
 
     const initialState: ExerciseState = history?.initialState ?? currentState;
-    const actions = history?.actions ?? [];
+    const actions = history?.actionHistory ?? [];
 
     exercise.stateVersion = currentStateVersion;
     exercise.initialStateString = initialState;
@@ -46,9 +46,6 @@ export async function migrateInDatabase(
     let patchedActionsIndex = 0;
     const actionsToUpdate: ActionEntry[] = [];
     actions.forEach((action, i) => {
-        if (action === null) {
-            return;
-        }
         const previousAction = loadedActions[i]!;
         actionsToUpdate.push({
             ...previousAction,

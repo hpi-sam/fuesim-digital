@@ -125,8 +125,8 @@ export class LandingPageComponent {
                 // The file dialog has been aborted.
                 return;
             }
-            const importPlain = JSON.parse(importString);
-            const importObject = validateExerciseExport(importPlain);
+            const importJSON = JSON.parse(importString);
+            const importObject = validateExerciseExport(importJSON);
 
             switch (importObject.type) {
                 case 'complete': {

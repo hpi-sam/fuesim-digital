@@ -99,6 +99,7 @@ export class EditVehicleTemplateModalComponent implements OnInit {
         name,
         aspectRatio,
         patientCapacity,
+        patientLoadMinutes,
         type,
         materialTemplateIds,
         personnelTemplateIds,
@@ -120,6 +121,7 @@ export class EditVehicleTemplateModalComponent implements OnInit {
                 materialTemplateIds,
                 personnelTemplateIds,
                 patientCapacity,
+                patientLoadMinutes,
                 vehicleType: type,
             })
             .then((response) => {

@@ -188,6 +188,8 @@ In diesem Bereich werden die fahrzeugbezogenen Aspekte der Übung konfiguriert (
 > [!TIP]
 > Diese Option kann gut mit der [Karten-Einstellung](#karte) <kbd>Markiere zusammengehörende Elemente auf der Karte</kbd> kombiniert werden, sodass Teilnehmende das zugehörige Personal und Material einfacher oder weniger einfach finden können.
 
+<kbd>**Mit Ladezeiten für Fahrzeuge üben?**</kbd> erlaubt es, die Funktion Ladezeiten für die gesamte Übung auszuschalten, sodass nicht bei allen Fahrzeugvorlagen die Ladezeit auf 0 gestellt werden muss. Die Funktion Ladezeiten ist bei den [Fahrzeugen](3_exercise_elements.html#einstellungsmöglichkeiten-3) genauer beschrieben
+
 Zudem kann in diesem Bereich eine optionale Statusanzeige für [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) aktiviert werden.
 
 Sofern aktiviert, zeigt die Statusanzeige über jedem Fahrzeug an, wie viele Patienten sich aktuell im Fahrzeug befinden und wie viele Plätze es insgesamt bietet. Sie kann optional in der Farbe der Sichtungskategorie des Patienten angezeigt werden, bei mehreren Patienten wird die Kategorie mit der höchsten Priorität gewählt.

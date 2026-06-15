@@ -52,6 +52,7 @@ import { addUUIDtoAddEocLogEntryAction51 } from './51-add-uuid-to-add-eoc-log-ac
 import { fixInfinity52 } from './52-fix-infinity.js';
 import { addIsActiveToClient53 } from './53-add-is-active-to-client.js';
 import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loading-and-highlighting.js';
+import { vehicleLoadTimes55 } from './55-vehicle-load-times.js';
 
 /**
  * Migrate a single action
@@ -132,4 +133,5 @@ export const migrations: {
     52: fixInfinity52,
     53: addIsActiveToClient53,
     54: configVehicleLoadingAndHighlighting54,
+    55: vehicleLoadTimes55,
 };

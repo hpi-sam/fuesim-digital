@@ -25,6 +25,7 @@ export class CreateVehicleTemplateModalComponent {
             height: 100,
             name: null,
             patientCapacity: 1,
+            patientLoadMinutes: 2,
             type: null,
             materialTemplates: [],
             personnelTemplates: [],
@@ -36,6 +37,7 @@ export class CreateVehicleTemplateModalComponent {
         name,
         aspectRatio,
         patientCapacity,
+        patientLoadMinutes,
         type,
         materialTemplateIds,
         personnelTemplateIds,
@@ -55,6 +57,7 @@ export class CreateVehicleTemplateModalComponent {
                     materialTemplateIds,
                     personnelTemplateIds,
                     patientCapacity,
+                    patientLoadMinutes,
                     vehicleType: type,
                 },
             })

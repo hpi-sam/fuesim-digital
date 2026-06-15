@@ -96,6 +96,26 @@ export function isVehicleLoading(
 }
 
 /**
+ * Increments {@link draftState.vehicleCounter} and replaces the first `#` in the vehicle name by the current counter for the vehicle template
+ * @param draftState The state to operate on
+ * @param vehicle The vehicle to apply the number on
+ * @returns The mutated vehicle
+ */
+function applyVehicleNumber(
+    draftState: WritableDraft<ExerciseState>,
+    vehicle: WritableDraft<Vehicle>
+) {
+    if (!Object.hasOwn(draftState.vehicleCounters, vehicle.templateId))
+        draftState.vehicleCounters[vehicle.templateId] = 0;
+
+    const vehicleNumber = ++draftState.vehicleCounters[vehicle.templateId]!;
+
+    vehicle.name = vehicle.name.replace('#', String(vehicleNumber));
+
+    return vehicle;
+}
+
+/**
  * Performs all necessary actions to remove a vehicle from the state.
  * This includes removing the material, personnel and (if there are some) patients and sending removed events for those elements if the vehicle is in a simulated region.
  * @param vehicleId The ID of the vehicle to be deleted
@@ -298,7 +318,10 @@ export namespace VehicleActionReducers {
                 vehicle.position
             );
 
-            draftState.vehicles[vehicle.id] = cloneDeepMutable(vehicle);
+            draftState.vehicles[vehicle.id] = applyVehicleNumber(
+                draftState,
+                cloneDeepMutable(vehicle)
+            );
             for (const material of cloneDeepMutable(materials)) {
                 changePosition(
                     material,

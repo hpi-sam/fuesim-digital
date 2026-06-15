@@ -81,6 +81,10 @@ import {
     exerciseRadiogramSchema,
 } from './models/radiogram/exercise-radiogram.js';
 import { type Scoutable, scoutableSchema } from './models/scoutable.js';
+import {
+    type ResourceDescription,
+    resourceDescriptionSchema,
+} from './models/utils/resource-description.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -211,6 +215,9 @@ export class ExerciseState {
 
     @IsZodSchema(z.int().nonnegative())
     public readonly patientCounter: number = 0;
+
+    @IsZodSchema(resourceDescriptionSchema)
+    public readonly vehicleCounters: ResourceDescription = {};
 
     /**
      * The log entries generated for the statistics.

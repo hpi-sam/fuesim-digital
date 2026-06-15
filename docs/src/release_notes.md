@@ -3,6 +3,19 @@
 Auf dieser Seite informieren wir über aktuelle Änderungen in der FüSim Digital. Zudem gibt es einen [Mailverteiler](https://lists.myhpi.de/8NGBl7FhFMPbVxPK7Pa0cRMfCezUkjHksbD9HxOM),
 der auch über die Änderungen informiert.
 
+## Version 0.15.0 -- 15.06.2026
+
+[Release 0.15.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.15.0)
+
+### Neue Features
+
+- Es können Ladezeiten für Patienten für Fahrzeuge festgelegt werden. Wenn ein Patient in das Fahrzeug eingeladen wird, kann er nicht bewegt oder transportiert werden und es kann kein zweiter Patient gleichzeitig eingeladen werden. Ladezeiten können pro Fahrzeugvorlage konfiguriert werden und können pro Übung deaktiviert werden. Wenn die Ladezeit läuft, wird ein Countdown über dem Fahrzeug angezeigt.
+
+### Änderungen
+
+- `fuesim-manv.de` wurde in `fuesim.digital` umbenannt.
+- Es wurde ein Hilfelink in der Fußleiste hinzugefügt.
+
 ## Version 0.14.0 -- 11.06.2026
 
 [Release 0.14.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.14.0)

@@ -9,7 +9,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Added
 
-- Vehicles can have load times per patient. While a patient is being loaded into the vehicle, it cannot be moved or transferred and no second patient can be loaded at the same time. Move times can be configured per vehicle template and can be disabled globally. While the load time is running, a countdown is shown above the vehicle.
+- Vehicles can have load times per patient. While a patient is being loaded into the vehicle, it cannot be moved or transferred and no second patient can be loaded at the same time. Load times can be configured per vehicle template and can be disabled globally. While the load time is running, a countdown is shown above the vehicle.
 
 ### Changed
 

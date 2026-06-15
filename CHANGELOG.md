@@ -14,6 +14,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Changed
 
 - Replace `fuesim-manv.de` links with `fuesim.digital`
+- Help pages are linked in landing page footer
 
 ## [0.14.0] - 2026-06-11
 

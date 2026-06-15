@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Added
+
+- Names of new vehicle are automatically numbered using a counter per vehicle template. This can be en-/disabled using the '#' placeholder in the default name.
+
 ## [0.16.0] - 2026-06-23
 
 ### Changed

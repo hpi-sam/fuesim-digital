@@ -16,6 +16,7 @@ import { ExerciseStateBadgeInnerComponent } from '../../../../shared/components/
 import { ParallelExerciseInstanceRowComponent } from '../instance-row/parallel-exercise-instance-row.component';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { InlineTextEditorComponent } from '../../../../shared/components/inline-text-editor/inline-text-editor.component';
+import { CopyButtonComponent } from '../../../../shared/components/copy-button/copy-button.component';
 
 @Component({
     selector: 'app-parallel-exercise',
@@ -29,6 +30,7 @@ import { InlineTextEditorComponent } from '../../../../shared/components/inline-
         FooterComponent,
         NgbTooltip,
         InlineTextEditorComponent,
+        CopyButtonComponent,
     ],
 })
 export class ParallelExerciseComponent {

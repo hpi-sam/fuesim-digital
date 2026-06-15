@@ -5,11 +5,11 @@ import type { ExerciseAction } from '../../store/action-reducers/action-reducers
 import { exportImportFileSchema } from './export-import-file.js';
 
 export const stateHistoryCompoundSchema = z.object({
-    actionHistory: z.array(z.object()),
+    actionHistory: z.array(z.looseObject({})),
     /*
  This can be some arbitrary object because we can get an invalid or not migrated state
   */
-    initialState: z.object(),
+    initialState: z.looseObject({}),
 });
 export type StateHistoryCompound = Immutable<
     z.infer<typeof stateHistoryCompoundSchema>
@@ -29,7 +29,7 @@ export const stateExportSchema = z.object({
     /*
         This can be some arbitrary object because we can get an invalid or not migrated state
      */
-    currentState: z.any(),
+    currentState: z.looseObject({}),
     history: stateHistoryCompoundSchema.optional(),
 });
 

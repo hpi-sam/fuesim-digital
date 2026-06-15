@@ -6,7 +6,7 @@ import {
 
 /**
  *
- * @param maybeAction A json object that should be checked for validity.
+ * @param maybeAction A JSON object that should be checked for validity.
  * @returns An array of errors validating {@link maybeAction}. An empty array indicates a valid action object.
  */
 export function validateExerciseAction(maybeAction: object): ExerciseAction {

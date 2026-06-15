@@ -28,11 +28,7 @@
                             "browser": ""
                         },
                         "index": "src/index.html",
-                        "polyfills": [
-                            "zone.js",
-                            "@angular/localize/init",
-                            "reflect-metadata"
-                        ],
+                        "polyfills": ["zone.js", "@angular/localize/init"],
                         "tsConfig": "tsconfig.app.json",
                         "inlineStyleLanguage": "scss",
                         "assets": ["src/assets"],

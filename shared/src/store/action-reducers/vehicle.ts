@@ -36,7 +36,6 @@ import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-av
 import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { vehicleSchema } from '../../models/vehicle.js';
-import { simulatedRegionSchema } from '../../models/simulated-region.js';
 import { getElement } from './utils/get-element.js';
 import { deletePatient } from './patient.js';
 import { completelyLoadVehicle as completelyLoadVehicleHelper } from './utils/completely-load-vehicle.js';
@@ -181,7 +180,7 @@ export type CompletelyLoadVehicleAction = Immutable<
 const removeVehicleFromSimulatedRegionActionSchema = z.strictObject({
     type: z.literal('[Vehicle] Remove from simulated region'),
     vehicleId: vehicleSchema.shape.id,
-    simulatedRegionId: simulatedRegionSchema.shape.id,
+    simulatedRegionId: uuidSchema,
 });
 export type RemoveVehicleFromSimulatedRegionAction = Immutable<
     z.infer<typeof removeVehicleFromSimulatedRegionActionSchema>

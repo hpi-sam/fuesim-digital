@@ -30,6 +30,7 @@ import {
     OrganisationMembershipId,
     OrganisationMembershipRole,
     getExerciseTemplateResponseDataSchema,
+    StateExport,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -56,7 +57,7 @@ export class ApiService {
         );
     }
 
-    public async importExercise(exportedState: object) {
+    public async importExercise(exportedState: StateExport) {
         return lastValueFrom(
             this.httpClient
                 .post(`${httpOrigin}/api/exercise`, exportedState)

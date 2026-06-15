@@ -30,7 +30,9 @@ export const scoutableElementSchema = z.discriminatedUnion('type', [
     mapImageSchema,
     patientSchema,
 ]);
-export type ScoutableElement = z.infer<typeof scoutableElementSchema>;
+export type ScoutableElement = Immutable<
+    z.infer<typeof scoutableElementSchema>
+>;
 
 export const scoutableElementTypes = [
     'patient',

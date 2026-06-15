@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import {
+    actionTypeSchema,
     type ExerciseAction,
-    isActionType,
     lookupReducerFor,
 } from './action-reducers/action-reducers.js';
 
@@ -10,14 +11,10 @@ import {
  * @returns An array of errors validating {@link maybeAction}. An empty array indicates a valid action object.
  */
 export function validateExerciseAction(maybeAction: object): ExerciseAction {
-    const actionType = 'type' in maybeAction ? maybeAction.type : null;
-    if (typeof actionType !== 'string') {
-        throw new TypeError('Action type is not a string.');
-    }
-    if (!isActionType(actionType)) {
-        throw new Error(`Unknown action type: ${actionType}`);
-    }
+    const maybeActionWithType = z
+        .object({ type: actionTypeSchema })
+        .parse(maybeAction);
 
-    const reducer = lookupReducerFor(actionType);
+    const reducer = lookupReducerFor(maybeActionWithType.type);
     return reducer.actionSchema.parse(maybeAction);
 }

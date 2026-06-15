@@ -4,6 +4,7 @@ import {
     isAccessKey,
     isExerciseKey,
     isParallelExerciseKey,
+    validateExerciseExport,
 } from 'fuesim-digital-shared';
 import { escapeRegExp } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +14,7 @@ import {
     validate,
     validateAsync,
 } from '@angular/forms/signals';
+import { ZodError } from 'zod';
 import { AuthService } from '../../../core/auth.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
@@ -124,14 +126,12 @@ export class LandingPageComponent {
                 return;
             }
             const importPlain = JSON.parse(importString);
-            const type = importPlain.type;
-            if (!['complete', 'partial'].includes(type)) {
-                throw new Error(`Ungültiger Dateityp: \`type === ${type}\``);
-            }
-            switch (importPlain.type) {
+            const importObject = validateExerciseExport(importPlain);
+
+            switch (importObject.type) {
                 case 'complete': {
                     const exerciseKeys =
-                        await this.apiService.importExercise(importPlain);
+                        await this.apiService.importExercise(importObject);
                     this.trainerKey = exerciseKeys.trainerKey;
                     this.model.set({ joinKey: this.trainerKey });
                     this.participantKey = exerciseKeys.participantKey;
@@ -154,10 +154,18 @@ export class LandingPageComponent {
                 }
             }
         } catch (error: unknown) {
-            this.messageService.postError({
-                title: 'Fehler beim Importieren der Übung',
-                error,
-            });
+            if (error instanceof ZodError) {
+                this.messageService.postMessage({
+                    color: 'danger',
+                    title: 'Fehlerhafte Datei',
+                    body: 'Die Datei hat das falsche Format.',
+                });
+            } else {
+                this.messageService.postError({
+                    title: 'Fehler beim Importieren der Übung',
+                    error,
+                });
+            }
         } finally {
             this.importingExercise = false;
         }

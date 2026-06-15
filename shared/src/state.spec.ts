@@ -7,6 +7,6 @@ describe('ExerciseState', () => {
     it('creates a valid state', () => {
         const exercise = newExerciseState('123456' as ParticipantKey);
         const validation = validateExerciseState(exercise);
-        expect(validation).toBeTrue();
+        expect(validation).toBeDefined();
     });
 });

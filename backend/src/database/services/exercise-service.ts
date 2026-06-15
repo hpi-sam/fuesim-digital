@@ -5,6 +5,7 @@ import type {
     ExerciseTimeline,
     ParticipantKey,
     TrainerKey,
+    ExerciseState,
 } from 'fuesim-digital-shared';
 import {
     isTrainerKey,
@@ -14,6 +15,7 @@ import {
     newExerciseState,
     currentStateVersion,
 } from 'fuesim-digital-shared';
+import { ZodError } from 'zod';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { ActiveExercise } from '../../exercise/active-exercise.js';
 import { pushAll } from '../../utils/array.js';
@@ -201,7 +203,7 @@ export class ExerciseService {
                 } catch (err) {
                     if (err instanceof ZodError) {
                         throw new ApiError(
-                            `The validation of the import failed: ${err.error}`
+                            `The validation of the import failed: ${err.message}`
                         );
                     }
                     if (err instanceof ReducerError) {

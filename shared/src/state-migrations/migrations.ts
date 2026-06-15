@@ -148,13 +148,13 @@ export function applyMigrations<H extends StateHistoryCompound | undefined>(
         );
         try {
             const migratedActionHistory: ExerciseAction[] = [];
-            const currentState = produce(
+            const migratedCurrentState = produce(
                 migratedInitialState,
                 (intermediaryState) => {
                     history.actionHistory.forEach((action, index) => {
                         const migratedAction = migrateAction(
                             migrationsToApply,
-                            castImmutable(migratedInitialState),
+                            castImmutable(intermediaryState),
                             action
                         );
                         if (migratedAction === null) return;
@@ -176,7 +176,7 @@ export function applyMigrations<H extends StateHistoryCompound | undefined>(
                 }
             );
             return {
-                currentState,
+                currentState: migratedCurrentState,
                 history: {
                     actionHistory: migratedActionHistory,
                     initialState: migratedInitialState,

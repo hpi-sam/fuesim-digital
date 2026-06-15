@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { ActionReducer } from '../action-reducer.js';
 import { AlarmGroupActionReducers } from './alarm-group.js';
 import { ClientActionReducers } from './client.js';
@@ -86,6 +87,10 @@ export function isActionType(
 ): actionType is ExerciseAction['type'] {
     return actionType in exerciseActionTypeDictionary;
 }
+export const actionTypeSchema = z.custom<ExerciseAction['type']>(
+    (val) => typeof val === 'string' && isActionType(val),
+    'Not a valid action type'
+);
 
 export function lookupReducerFor(
     actionType: ExerciseAction['type']

@@ -8,12 +8,10 @@ import type {
     ExerciseState,
 } from 'fuesim-digital-shared';
 import {
-    validateExerciseState,
     applyAction,
     reduceExerciseState,
     ReducerError,
     validateExerciseAction,
-    currentStateVersion,
     cloneDeepMutable,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
@@ -317,7 +315,7 @@ export class ActiveExercise {
      * as well as adding actions to the end to gracefully mark the end of the previous exercise session.
      */
     public restoreState() {
-        let currentState = cloneDeepMutable(this.exercise.initialStateString);
+        const currentState = cloneDeepMutable(this.exercise.initialStateString);
 
         this.temporaryActionHistory.forEach((actionWrapper) => {
             validateExerciseAction(actionWrapper.getAction().actionString);

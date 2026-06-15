@@ -11,6 +11,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Vehicles can have load times per patient. While a patient is being loaded into the vehicle, it cannot be moved or transferred and no second patient can be loaded at the same time. Move times can be configured per vehicle template and can be disabled globally. While the load time is running, a countdown is shown above the vehicle.
 
+### Changed
+
+- Replace `fuesim-manv.de` links with `fuesim.digital`
+
 ## [0.14.0] - 2026-06-11
 
 ### Added

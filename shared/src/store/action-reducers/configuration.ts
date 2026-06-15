@@ -6,10 +6,7 @@ import {
     operationsMapPropertiesSchema,
 } from '../../models/utils/map-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import {
-    ExerciseConfiguration,
-    exerciseConfigurationSchema,
-} from '../../models/exercise-configuration.js';
+import { exerciseConfigurationSchema } from '../../models/exercise-configuration.js';
 
 export const setTileMapPropertiesActionSchema = z.strictObject({
     type: z.literal('[Configuration] Set tileMapProperties'),
@@ -71,21 +68,23 @@ export type SetVehicleStatusInPatientStatusColorEnabled = Immutable<
     z.infer<typeof setVehicleStatusInPatientStatusColorEnabledSchema>
 >;
 
-export class SetHighlightRelatedElements implements Action {
-    @IsValue('[Configuration] Set highlightRelatedElements' as const)
-    public readonly type = '[Configuration] Set highlightRelatedElements';
+export const setHighlightRelatedElementsActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set highlightRelatedElements'),
+    highlightRelatedElements:
+        exerciseConfigurationSchema.shape.highlightRelatedElements,
+});
+export type SetHighlightRelatedElements = Immutable<
+    z.infer<typeof setHighlightRelatedElementsActionSchema>
+>;
 
-    @IsZodSchema(exerciseConfigurationSchema.shape.highlightRelatedElements)
-    public readonly highlightRelatedElements!: ExerciseConfiguration['highlightRelatedElements'];
-}
-
-export class SetParticipantLoadAllEnabled implements Action {
-    @IsValue('[Configuration] Set participantLoadAllEnabled' as const)
-    public readonly type = '[Configuration] Set participantLoadAllEnabled';
-
-    @IsBoolean()
-    public readonly participantLoadAllEnabled!: boolean;
-}
+export const setParticipantLoadAllEnabledActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set participantLoadAllEnabled'),
+    participantLoadAllEnabled:
+        exerciseConfigurationSchema.shape.participantLoadAllEnabled,
+});
+export type SetParticipantLoadAllEnabled = Immutable<
+    z.infer<typeof setParticipantLoadAllEnabledActionSchema>
+>;
 
 export namespace ConfigurationActionReducers {
     export const setTileMapProperties: ActionReducer<SetTileMapPropertiesAction> =
@@ -172,7 +171,8 @@ export namespace ConfigurationActionReducers {
 
     export const setHighlightRelatedElements: ActionReducer<SetHighlightRelatedElements> =
         {
-            action: SetHighlightRelatedElements,
+            type: '[Configuration] Set highlightRelatedElements',
+            actionSchema: setHighlightRelatedElementsActionSchema,
             reducer(draftState, { highlightRelatedElements }) {
                 draftState.configuration.highlightRelatedElements =
                     highlightRelatedElements;
@@ -183,7 +183,8 @@ export namespace ConfigurationActionReducers {
 
     export const setParticipantLoadAllEnabled: ActionReducer<SetParticipantLoadAllEnabled> =
         {
-            action: SetParticipantLoadAllEnabled,
+            type: '[Configuration] Set participantLoadAllEnabled',
+            actionSchema: setParticipantLoadAllEnabledActionSchema,
             reducer(draftState, { participantLoadAllEnabled }) {
                 draftState.configuration.participantLoadAllEnabled =
                     participantLoadAllEnabled;

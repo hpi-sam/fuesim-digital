@@ -24,7 +24,7 @@ import {
 import { type UUID, uuid } from '../../utils/uuid.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import { ParticipantKey } from '../../exercise-keys.js';
+import type { ParticipantKey } from '../../exercise-keys.js';
 import { simulateAllTechnicalChallenges } from '../../models/technical-challenge/state-machine.js';
 import { viewportSchema } from '../../models/viewport.js';
 import { patientUpdateSchema } from './utils/patient-updates.js';
@@ -95,12 +95,14 @@ export type ImportTemplatesAction = Immutable<
  *
  * @deprecated
  */
-export class SetParticipantIdAction implements Action {
-    @IsString()
-    public readonly type = `[Exercise] Set Participant Id`;
-    @IsString()
-    public readonly participantId!: string;
-}
+export const setParticipantIdActionSchema = z.strictObject({
+    type: z.literal('[Exercise] Set Participant Id'),
+    participantId: z.string(),
+});
+/* @deprecated */
+export type SetParticipantIdAction = Immutable<
+    z.infer<typeof setParticipantIdActionSchema>
+>;
 
 export namespace ExerciseActionReducers {
     export const pauseExercise: ActionReducer<PauseExerciseAction> = {
@@ -258,7 +260,8 @@ export namespace ExerciseActionReducers {
      * @deprecated
      */
     export const setParticipantId: ActionReducer<SetParticipantIdAction> = {
-        action: SetParticipantIdAction,
+        type: '[Exercise] Set Participant Id',
+        actionSchema: setParticipantIdActionSchema,
         reducer: (draftState, { participantId }) => {
             draftState.participantKey = participantId as ParticipantKey;
             return draftState;

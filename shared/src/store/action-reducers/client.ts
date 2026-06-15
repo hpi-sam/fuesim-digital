@@ -48,19 +48,21 @@ export type ChangeSpecificClientRoleAction = Immutable<
     z.infer<typeof changeSpecificClientRoleActionSchema>
 >;
 
-export class SetClientInactiveAction implements Action {
-    @IsValue('[Client] Set client inactive' as const)
-    public readonly type = '[Client] Set client inactive';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly clientId!: UUID;
-}
+export const setClientInactiveActionSchema = z.strictObject({
+    type: z.literal('[Client] Set client inactive'),
+    clientId: clientSchema.shape.id,
+});
+export type SetClientInactiveAction = Immutable<
+    z.infer<typeof setClientInactiveActionSchema>
+>;
 
-export class SetClientActiveAction implements Action {
-    @IsValue('[Client] Set client active' as const)
-    public readonly type = '[Client] Set client active';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly clientId!: UUID;
-}
+export const setClientActiveActionSchema = z.strictObject({
+    type: z.literal('[Client] Set client active'),
+    clientId: clientSchema.shape.id,
+});
+export type SetClientActiveAction = Immutable<
+    z.infer<typeof setClientActiveActionSchema>
+>;
 
 export namespace ClientActionReducers {
     export const addClient: ActionReducer<AddClientAction> = {
@@ -141,7 +143,8 @@ export namespace ClientActionReducers {
         };
 
     export const setClientInactive: ActionReducer<SetClientInactiveAction> = {
-        action: SetClientInactiveAction,
+        type: '[Client] Set client inactive',
+        actionSchema: setClientInactiveActionSchema,
         reducer: (draftState, { clientId }) => {
             const client = getElement(draftState, 'client', clientId);
             client.isActive = false;
@@ -151,7 +154,8 @@ export namespace ClientActionReducers {
     };
 
     export const setClientActive: ActionReducer<SetClientActiveAction> = {
-        action: SetClientActiveAction,
+        type: '[Client] Set client active',
+        actionSchema: setClientActiveActionSchema,
         reducer: (draftState, { clientId }) => {
             const client = getElement(draftState, 'client', clientId);
             client.isActive = true;

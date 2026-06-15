@@ -1,6 +1,7 @@
 @if (viewport$ | async; as viewport) {
     <h5 class="popover-header">
         Ansicht {{ viewport.name }}
+        <app-help-button url="2_exercises/3_exercise_elements.html#ansichten" />
         <button
             (click)="closePopup()"
             type="button"

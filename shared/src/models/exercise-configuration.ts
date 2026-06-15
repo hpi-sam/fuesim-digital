@@ -16,6 +16,8 @@ export const exerciseConfigurationSchema = z.strictObject({
     patientIdentifierPrefix: z.string(),
     vehicleStatusHighlight: z.boolean(),
     vehicleStatusInPatientStatusColor: z.boolean(),
+    highlightRelatedElements: z.literal(['off', 'trainersOnly', 'all']),
+    participantLoadAllEnabled: z.boolean(),
     tileMapProperties: tileMapPropertiesSchema,
     operationsMapProperties: operationsMapPropertiesSchema,
 });
@@ -30,6 +32,8 @@ export function newExerciseConfiguration(): ExerciseConfiguration {
         patientIdentifierPrefix: '',
         vehicleStatusHighlight: false,
         vehicleStatusInPatientStatusColor: false,
+        highlightRelatedElements: 'trainersOnly',
+        participantLoadAllEnabled: true,
         tileMapProperties: defaultTileMapProperties,
         operationsMapProperties: defaultOperationsMapProperties,
     };

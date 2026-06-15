@@ -8,6 +8,7 @@ import type {
     JoinExerciseResponseData,
     ServerToClientEvents,
     SocketResponse,
+    UUID,
 } from 'fuesim-digital-shared';
 import {
     joinExerciseResponseDataSchema,
@@ -33,9 +34,12 @@ import {
     createLeaveExerciseAction,
     createSetExerciseStateAction,
 } from '../state/application/application.actions';
-import { selectExerciseStateMode } from '../state/application/selectors/application.selectors';
 import {
-    selectClients,
+    selectExerciseStateMode,
+    selectExerciseKey,
+} from '../state/application/selectors/application.selectors';
+import {
+    selectActiveClients,
     selectExerciseState,
 } from '../state/application/selectors/exercise.selectors';
 import {
@@ -45,6 +49,11 @@ import {
 } from '../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
 import { websocketOrigin } from './api-origins';
+import {
+    saveReconnectToken,
+    clearReconnectToken,
+    clearExpiredTokens,
+} from './reconnect-token';
 import { MessageService } from './messages/message.service';
 import { OptimisticActionHandler } from './optimistic-action-handler';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
@@ -81,6 +90,7 @@ export class ExerciseService {
         signal<JoinExerciseResponseData | null>(null);
 
     constructor() {
+        clearExpiredTokens();
         this.socket.on('performAction', (action: ExerciseAction) => {
             freeze(action, true);
             this.optimisticActionHandler?.performAction(action);
@@ -103,7 +113,8 @@ export class ExerciseService {
      */
     public async joinExercise(
         exerciseKey: ExerciseKey,
-        clientName: string
+        clientName: string,
+        clientId?: UUID
     ): Promise<boolean> {
         this.socket.connect().on('connect_error', (error) => {
             this.messageService.postError({
@@ -115,17 +126,22 @@ export class ExerciseService {
             (resolve) => {
                 this.socket.emit(
                     'joinExercise',
-                    exerciseKey,
-                    clientName,
+                    {
+                        exerciseKey,
+                        clientName: clientId ? undefined : clientName,
+                        clientId,
+                    },
                     resolve
                 );
             }
         );
         if (!joinResponse.success) {
-            this.messageService.postError({
-                title: 'Fehler beim Beitreten der Übung',
-                error: joinResponse.message,
-            });
+            if (!joinResponse.expected) {
+                this.messageService.postError({
+                    title: 'Fehler beim Beitreten der Übung',
+                    error: joinResponse.message,
+                });
+            }
             return false;
         }
         const joinResponsePayload = joinExerciseResponseDataSchema.parse(
@@ -146,14 +162,20 @@ export class ExerciseService {
             });
             return false;
         }
+        // Use the actual client name from state when reconnecting
+        const resolvedClientName = clientId
+            ? (getStateResponse.payload.clients[joinResponsePayload.clientId]
+                  ?.name ?? clientName)
+            : clientName;
         this.store.dispatch(
             createJoinExerciseAction(
                 joinResponsePayload.clientId,
                 getStateResponse.payload,
                 exerciseKey,
-                clientName
+                resolvedClientName
             )
         );
+        saveReconnectToken(exerciseKey, joinResponsePayload.clientId);
         // Only do this after the correct state is in the store
         this.optimisticActionHandler = new OptimisticActionHandler<
             ExerciseAction,
@@ -213,6 +235,8 @@ export class ExerciseService {
      * Use the function in ApplicationService instead
      */
     public leaveExercise() {
+        const exerciseKey = selectStateSnapshot(selectExerciseKey, this.store);
+        if (exerciseKey) clearReconnectToken(exerciseKey);
         this.socket.disconnect();
         this.stopNotifications();
         this.optimisticActionHandler = undefined;
@@ -250,7 +274,7 @@ export class ExerciseService {
             .select(selectCurrentMainRole)
             .pipe(
                 filter((role) => role === 'trainer'),
-                switchMap(() => this.store.select(selectClients)),
+                switchMap(() => this.store.select(selectActiveClients)),
                 pairwise(),
                 takeUntil(this.stopNotifications$)
             )

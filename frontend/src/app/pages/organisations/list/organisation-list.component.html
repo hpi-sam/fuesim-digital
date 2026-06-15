@@ -1,0 +1,47 @@
+<app-header />
+<main class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between">
+        <h1>Organisationen</h1>
+        <button class="btn btn-primary my-2" (click)="create()">
+            Neue Organisation erstellen
+        </button>
+    </div>
+    @if (organisations.hasValue()) {
+        <div class="row">
+            @for (
+                organisation of organisations.value();
+                track organisation.id
+            ) {
+                <div class="col col-md-12 col-lg-6 col-xl-4 mb-4">
+                    <app-organisation-card
+                        [organisation]="organisation"
+                        (updated)="organisations.reload()"
+                    />
+                </div>
+            }
+        </div>
+    } @else if (organisations.isLoading()) {
+        <div class="row">
+            @for (_ of [1, 2, 3]; track $index) {
+                <div class="col col-md-12 col-lg-6 col-xl-4 mb-4">
+                    <div class="card" aria-hidden="true">
+                        <div class="card-body">
+                            <h2 class="card-title h4 placeholder-glow">
+                                <span class="placeholder col-6"></span>
+                            </h2>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-4"></span>
+                                <span class="placeholder col-4"></span>
+                            </p>
+                            <a
+                                class="btn btn-primary disabled placeholder col-6"
+                                aria-disabled="true"
+                            ></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</main>
+<app-footer />

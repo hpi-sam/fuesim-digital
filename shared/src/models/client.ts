@@ -11,6 +11,7 @@ export const clientSchema = z.strictObject({
     role: clientRoleSchema,
     viewRestrictedToViewportId: uuidSchema.optional(),
     isInWaitingRoom: z.boolean(),
+    isActive: z.boolean(),
 });
 export type Client = Immutable<z.infer<typeof clientSchema>>;
 
@@ -26,5 +27,6 @@ export function newClient(
         role,
         viewRestrictedToViewportId: undefined,
         isInWaitingRoom,
+        isActive: true,
     };
 }

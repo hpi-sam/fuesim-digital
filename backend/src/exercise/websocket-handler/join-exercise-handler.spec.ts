@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import { jest } from '@jest/globals';
 import type {
-    GetExerciseTemplateResponseData,
+    OrganisationMembershipRole,
     ParticipantKey,
 } from 'fuesim-digital-shared';
 import { generateDummyPatient, sleep } from 'fuesim-digital-shared';
@@ -12,7 +12,11 @@ import {
     createExerciseTemplate,
     createTestEnvironment,
     createTestUserSession,
+    defaultTestUserSessionData,
 } from '../../test/utils.js';
+import { createOrganisation } from '../../test/organisation-utils.js';
+import type { ExerciseTemplateDetailsEntry } from '../../database/repositories/exercise-repository.js';
+import type { OrganisationEntry } from '../../database/schema.js';
 
 describe('join exercise', () => {
     const environment = createTestEnvironment();
@@ -23,11 +27,10 @@ describe('join exercise', () => {
         await environment.withWebsocket(async (clientSocket) => {
             const clientName = 'someRandomName';
 
-            const joinExercise = await clientSocket.emit(
-                'joinExercise',
+            const joinExercise = await clientSocket.emit('joinExercise', {
                 exerciseKey,
-                clientName
-            );
+                clientName,
+            });
 
             expect(joinExercise.success).toBe(true);
             assert(joinExercise.success);
@@ -51,56 +54,124 @@ describe('join exercise', () => {
         const id = '123456' as ParticipantKey;
 
         await environment.withWebsocket(async (socket) => {
-            const join = await socket.emit('joinExercise', id, 'Test Client');
+            const join = await socket.emit('joinExercise', {
+                exerciseKey: id,
+                clientName: 'Test Client',
+            });
 
             expect(join.success).toBe(false);
         });
     });
 
     describe('exercise template', () => {
-        let exerciseTemplate: GetExerciseTemplateResponseData;
+        let exerciseTemplate: ExerciseTemplateDetailsEntry;
         let session: string;
+        let personalOrganisation: OrganisationEntry;
         beforeEach(async () => {
             session = await createTestUserSession(environment);
+            personalOrganisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
             exerciseTemplate = await createExerciseTemplate(
                 environment,
-                session
+                session,
+                personalOrganisation.id
             );
         });
         it('fails joining with trainer key if not logged in', async () => {
             await environment.withWebsocket(async (socket) => {
-                const join = await socket.emit(
-                    'joinExercise',
-                    exerciseTemplate.trainerKey,
-                    'Test Client'
-                );
+                const join = await socket.emit('joinExercise', {
+                    exerciseKey: exerciseTemplate.trainerKey,
+                    clientName: 'Test Client',
+                });
 
                 expect(join.success).toBe(false);
             });
         });
 
+        it('fails joining with trainer key if viewer', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            await environment.repositories.organisationRepository.addMemberToOrganisation(
+                organisation.id,
+                defaultTestUserSessionData.id,
+                'viewer'
+            );
+
+            exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+            await environment.withWebsocket(async (socket) => {
+                const join = await socket.emit('joinExercise', {
+                    exerciseKey: exerciseTemplate.trainerKey,
+                    clientName: 'Test Client',
+                });
+
+                expect(join.success).toBe(false);
+            }, session);
+        });
+
         it('succeeds joining with trainer key if logged in', async () => {
             await environment.withWebsocket(async (socket) => {
-                const join = await socket.emit(
-                    'joinExercise',
-                    exerciseTemplate.trainerKey,
-                    'Test Client'
-                );
+                const join = await socket.emit('joinExercise', {
+                    exerciseKey: exerciseTemplate.trainerKey,
+                    clientName: 'Test Client',
+                });
 
                 expect(join.success).toBe(true);
             }, session);
         });
+
+        it.each(['editor', 'admin'] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+
+                exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+
+                await environment.withWebsocket(async (socket) => {
+                    const join = await socket.emit('joinExercise', {
+                        exerciseKey: exerciseTemplate.trainerKey,
+                        clientName: 'Test Client',
+                    });
+
+                    expect(join.success).toBe(true);
+                }, session);
+            }
+        );
 
         it('fails joining with trainer key if logged in with wrong user', async () => {
             const session2 = await createTestUserSession(environment, {
                 user: alternativeTestUserSessionData,
             });
             await environment.withWebsocket(async (socket) => {
-                const join = await socket.emit(
-                    'joinExercise',
-                    exerciseTemplate.trainerKey,
-                    'Test Client'
-                );
+                const join = await socket.emit('joinExercise', {
+                    exerciseKey: exerciseTemplate.trainerKey,
+                    clientName: 'Test Client',
+                });
 
                 expect(join.success).toBe(false);
             }, session2);
@@ -111,11 +182,10 @@ describe('join exercise', () => {
                 .TESTING_getExerciseMap()
                 .get(exerciseTemplate.trainerKey)!;
             await environment.withWebsocket(async (socket) => {
-                const join = await socket.emit(
-                    'joinExercise',
-                    exercise.participantKey,
-                    'Test Client'
-                );
+                const join = await socket.emit('joinExercise', {
+                    exerciseKey: exercise.participantKey,
+                    clientName: 'Test Client',
+                });
 
                 expect(join.success).toBe(false);
             });
@@ -125,11 +195,10 @@ describe('join exercise', () => {
                 .TESTING_getExerciseMap()
                 .get(exerciseTemplate.trainerKey)!;
             await environment.withWebsocket(async (socket) => {
-                const join = await socket.emit(
-                    'joinExercise',
-                    exercise.participantKey,
-                    'Test Client'
-                );
+                const join = await socket.emit('joinExercise', {
+                    exerciseKey: exercise.participantKey,
+                    clientName: 'Test Client',
+                });
 
                 expect(join.success).toBe(false);
             }, session);
@@ -144,20 +213,18 @@ describe('join exercise', () => {
         await environment.withWebsocket(async (firstClientSocket) => {
             const firstClientName = 'someRandomName';
 
-            await firstClientSocket.emit(
-                'joinExercise',
-                firstExerciseKey,
-                firstClientName
-            );
+            await firstClientSocket.emit('joinExercise', {
+                exerciseKey: firstExerciseKey,
+                clientName: firstClientName,
+            });
 
             await environment.withWebsocket(async (secondClientSocket) => {
                 const secondClientName = 'anotherRandomName';
 
-                await secondClientSocket.emit(
-                    'joinExercise',
-                    secondExerciseKey,
-                    secondClientName
-                );
+                await secondClientSocket.emit('joinExercise', {
+                    exerciseKey: secondExerciseKey,
+                    clientName: secondClientName,
+                });
 
                 const state = await firstClientSocket.emit('getState');
 
@@ -179,20 +246,18 @@ describe('join exercise', () => {
 
             firstClientSocket.spyOn('performAction');
 
-            await firstClientSocket.emit(
-                'joinExercise',
+            await firstClientSocket.emit('joinExercise', {
                 exerciseKey,
-                firstClientName
-            );
+                clientName: firstClientName,
+            });
 
             await environment.withWebsocket(async (secondClientSocket) => {
                 const secondClientName = 'anotherRandomName';
 
-                await secondClientSocket.emit(
-                    'joinExercise',
+                await secondClientSocket.emit('joinExercise', {
                     exerciseKey,
-                    secondClientName
-                );
+                    clientName: secondClientName,
+                });
 
                 expect(firstClientSocket.getTimesCalled('performAction')).toBe(
                     1
@@ -205,19 +270,20 @@ describe('join exercise', () => {
         const exerciseKeys = await createExercise(environment);
 
         await environment.withWebsocket(async (trainerSocket) => {
-            const joinTrainer = await trainerSocket.emit(
-                'joinExercise',
-                exerciseKeys.trainerKey,
-                'trainer'
-            );
+            const joinTrainer = await trainerSocket.emit('joinExercise', {
+                exerciseKey: exerciseKeys.trainerKey,
+                clientName: 'trainer',
+            });
 
             expect(joinTrainer.success).toBe(true);
 
             await environment.withWebsocket(async (participantSocket) => {
                 const joinParticipant = await participantSocket.emit(
                     'joinExercise',
-                    exerciseKeys.participantKey,
-                    'participant'
+                    {
+                        exerciseKey: exerciseKeys.participantKey,
+                        clientName: 'participant',
+                    }
                 );
 
                 expect(joinParticipant.success).toBe(true);
@@ -275,11 +341,10 @@ describe('join exercise', () => {
 
         const pauseSpy = jest.spyOn(ActiveExercise.prototype, 'pause');
         await environment.withWebsocket(async (socket) => {
-            const joinResponse = await socket.emit(
-                'joinExercise',
-                exerciseKeys.trainerKey,
-                'Test'
-            );
+            const joinResponse = await socket.emit('joinExercise', {
+                exerciseKey: exerciseKeys.trainerKey,
+                clientName: 'Test',
+            });
             expect(joinResponse.success).toBe(true);
 
             const startResponse = await socket.emit('proposeAction', {
@@ -290,5 +355,13 @@ describe('join exercise', () => {
         // Let the socket disconnect.
         await sleep(1000);
         expect(pauseSpy).toHaveBeenCalledTimes(1);
+
+        const activeExercise = environment.services.exerciseService
+            .TESTING_getExerciseMap()
+            .get(exerciseKeys.trainerKey)!;
+        const state = activeExercise.getStateSnapshot();
+        const clients = Object.values(state.clients);
+        expect(clients.length).toBeGreaterThan(0);
+        expect(clients.every((c) => !c.isActive)).toBe(true);
     });
 });

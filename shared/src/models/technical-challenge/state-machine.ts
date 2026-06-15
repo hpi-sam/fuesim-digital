@@ -34,6 +34,7 @@ export const technicalChallengeStateSchema = z.object({
     title: z.string(),
     image: imagePropertiesSchema,
     userGeneratedContent: userGeneratedContentSchema,
+    viewedByParticipants: z.boolean().optional(),
     /**
      * maps taskId to the task-specific progress multiplier (default 1)
      * */

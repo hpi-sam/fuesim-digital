@@ -16,6 +16,8 @@ import type { Repositories } from './database/repositories/index.js';
 import { ParallelExerciseRepository } from './database/repositories/parallel-exercise-repository.js';
 import type { Services } from './database/services/index.js';
 import { ParallelExerciseService } from './database/services/parallel-exercise-service.js';
+import { OrganisationService } from './database/services/organisation-service.js';
+import { OrganisationRepository } from './database/repositories/organisation-repository.js';
 
 async function main() {
     Config.initialize();
@@ -52,27 +54,37 @@ async function main() {
         parallelExerciseRepository: new ParallelExerciseRepository(
             databaseService.databaseConnection
         ),
+        organisationRepository: new OrganisationRepository(
+            databaseService.databaseConnection
+        ),
     };
 
     const exerciseService = new ExerciseService(
         repositories.exerciseRepository,
-        repositories.actionRepository
+        repositories.actionRepository,
+        repositories.organisationRepository
     );
     const exerciseManagerService = new ExerciseManagerService(
         repositories.exerciseRepository,
-        exerciseService
+        exerciseService,
+        repositories.organisationRepository
     );
     const parallelExerciseService = new ParallelExerciseService(
         repositories.parallelExerciseRepository,
         exerciseManagerService,
         exerciseService
     );
+    const organisationService = new OrganisationService(
+        repositories.organisationRepository,
+        repositories.userRepository
+    );
 
     let authService: AuthService;
     try {
         authService = await new AuthService(
             repositories.userRepository,
-            repositories.sessionRepository
+            repositories.sessionRepository,
+            organisationService
         ).initialize();
     } catch (e: unknown) {
         console.error('Error initializing AuthService:');
@@ -85,6 +97,7 @@ async function main() {
         exerciseService,
         parallelExerciseService,
         databaseService,
+        organisationService,
     };
 
     if (Config.useDb) {
@@ -120,6 +133,8 @@ async function main() {
             }
             throw e;
         }
+
+        await organisationService.ensurePersonalOrganisationsForAllUsers();
     }
 
     // eslint-disable-next-line no-new

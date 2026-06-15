@@ -60,7 +60,7 @@ import { defaultPatientCategories } from './data/default-state/patient-templates
  *
  * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
  */
-export const currentStateVersion = 55 as const;
+export const currentStateVersion = 57 as const;
 
 export const exerciseStateSchema = z.strictObject({
     id: uuidSchema,

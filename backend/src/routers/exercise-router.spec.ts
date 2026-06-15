@@ -12,7 +12,9 @@ import {
     createTestUserSession,
     createExercise,
     createTestEnvironment,
+    defaultTestUserSessionData,
 } from '../test/utils.js';
+import type { OrganisationEntry } from '../database/schema.js';
 
 describe('exercise router', () => {
     const environment = createTestEnvironment();
@@ -130,11 +132,17 @@ describe('exercise router', () => {
         describe('exercise template', () => {
             let session: string;
             let exerciseTemplate: GetExerciseTemplateResponseData;
+            let personalOrganisation: OrganisationEntry;
             beforeEach(async () => {
                 session = await createTestUserSession(environment);
+                personalOrganisation =
+                    await environment.services.organisationService.ensurePersonalOrganisation(
+                        defaultTestUserSessionData
+                    );
                 exerciseTemplate = await createExerciseTemplate(
                     environment,
-                    session
+                    session,
+                    personalOrganisation.id
                 );
             });
 
@@ -309,11 +317,17 @@ describe('exercise router', () => {
         describe('exercise template', () => {
             let session: string;
             let exerciseTemplate: GetExerciseTemplateResponseData;
+            let personalOrganisation: OrganisationEntry;
             beforeEach(async () => {
                 session = await createTestUserSession(environment);
+                personalOrganisation =
+                    await environment.services.organisationService.ensurePersonalOrganisation(
+                        defaultTestUserSessionData
+                    );
                 exerciseTemplate = await createExerciseTemplate(
                     environment,
-                    session
+                    session,
+                    personalOrganisation.id
                 );
             });
 
@@ -355,11 +369,10 @@ describe('exercise router', () => {
         it('disconnects clients of the removed exercise', async () => {
             const exerciseKey = (await createExercise(environment)).trainerKey;
             await environment.withWebsocket(async (socket) => {
-                const joinExercise = await socket.emit(
-                    'joinExercise',
+                const joinExercise = await socket.emit('joinExercise', {
                     exerciseKey,
-                    ''
-                );
+                    clientName: '',
+                });
 
                 expect(joinExercise.success).toBe(true);
 

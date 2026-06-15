@@ -6,6 +6,7 @@ import {
     NgbDropdownItem,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../../core/auth.service';
+import { environment } from '../../../../environments/environment.js';
 
 @Component({
     selector: 'app-user-account-navbar-item',
@@ -20,4 +21,5 @@ export class UserAccountNavbarItemComponent {
     public logoutUrl = this.auth.logoutUrl;
     public userSelfServiceUrl = this.auth.userSelfServiceUrl;
     public userRegistrationsUrl = this.auth.userRegistrationsUrl;
+    readonly docsUrl = environment.docsUrl;
 }

@@ -122,6 +122,18 @@ export namespace AlarmGroupActionReducers {
         reducer: (draftState, { alarmGroupId }) => {
             getElement(draftState, 'alarmGroup', alarmGroupId);
             delete draftState.alarmGroups[alarmGroupId];
+            // Remove this alarm group from every measure template's alarm properties
+            for (const category of Object.values(draftState.measureTemplates)) {
+                for (const template of Object.values(category.templates)) {
+                    for (const property of template.properties) {
+                        if (property.type === 'alarm') {
+                            property.alarmGroups = property.alarmGroups.filter(
+                                (id) => id !== alarmGroupId
+                            );
+                        }
+                    }
+                }
+            }
             return draftState;
         },
         rights: 'trainer',

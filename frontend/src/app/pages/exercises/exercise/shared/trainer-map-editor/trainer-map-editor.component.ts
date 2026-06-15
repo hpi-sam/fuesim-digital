@@ -52,6 +52,7 @@ import { PatientStatusBadgeComponent } from '../../../../../shared/components/pa
 import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
+import { HelpBannerComponent } from '../../../../../help-banner/help-banner.component.js';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -85,6 +86,7 @@ type FilterCategory =
         AsyncPipe,
         KeyValuePipe,
         ValuesPipe,
+        HelpBannerComponent,
     ],
 })
 /**

@@ -141,6 +141,10 @@ jobs:
             - name: Run Prettier
               if: always()
               run: npm run prettier:check
+            - name: Download mdbook-lint
+              run: cd docs && wget https://github.com/joshrotenberg/mdbook-lint/releases/download/v0.14.4/mdbook-lint-x86_64-unknown-linux-gnu.tar.xz && tar -xf mdbook-lint-x86_64-unknown-linux-gnu.tar.xz
+            - name: Lint mdBook
+              run: cd docs && ./mdbook-lint-x86_64-unknown-linux-gnu/mdbook-lint lint src/
 
     test:
         timeout-minutes: 4
@@ -345,6 +349,11 @@ jobs:
 
         steps:
             - uses: actions/checkout@v6
+            # We need the correct node/npm version for add-commit-hash-to-version to work properly
+            - uses: ./.github/actions/setup-install
+              with:
+                  download-shared: false
+                  install-command: ''
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Add commit hash to version
               uses: ./.github/actions/add-commit-hash-to-version
@@ -377,6 +386,11 @@ jobs:
 
         steps:
             - uses: actions/checkout@v6
+            # We need the correct node/npm version for add-commit-hash-to-version to work properly
+            - uses: ./.github/actions/setup-install
+              with:
+                  download-shared: false
+                  install-command: ''
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Add commit hash to version
               uses: ./.github/actions/add-commit-hash-to-version

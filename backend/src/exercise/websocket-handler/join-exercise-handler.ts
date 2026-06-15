@@ -1,3 +1,4 @@
+import { isUUID } from 'class-validator';
 import {
     type UUID,
     type ExerciseKey,
@@ -18,7 +19,18 @@ export function registerJoinExerciseHandler(
     secureOn(
         socket,
         'joinExercise',
-        (exerciseKey: ExerciseKey, clientName: string, callback) => {
+        (
+            {
+                exerciseKey,
+                clientName,
+                clientId,
+            }: {
+                exerciseKey: ExerciseKey;
+                clientName?: string;
+                clientId?: UUID;
+            },
+            callback
+        ) => {
             const clientWrapper = ClientWrapper.init(
                 ExerciseClientWrapper,
                 socket,
@@ -43,14 +55,47 @@ export function registerJoinExerciseHandler(
                 });
                 return;
             }
+            if (clientId === undefined && clientName === undefined) {
+                callback({
+                    success: false,
+                    message: 'Either clientId or clientName must be provided',
+                    expected: false,
+                });
+                return;
+            }
+            if (clientId !== undefined && !isUUID(clientId, 4)) {
+                callback({
+                    success: false,
+                    message: 'Invalid clientId format',
+                    expected: false,
+                });
+                return;
+            }
 
-            clientWrapper.getSessionInformation().then(() => {
-                let clientId: UUID | undefined;
+            clientWrapper.getSessionInformation().then(async () => {
+                let joinedClientId: UUID | null = null;
                 try {
-                    clientId = clientWrapper.joinExercise(
-                        exerciseKey,
-                        clientName
-                    );
+                    if (clientId !== undefined) {
+                        joinedClientId =
+                            await clientWrapper.reconnectToExercise(
+                                exerciseKey,
+                                clientId
+                            );
+                        if (joinedClientId === null) {
+                            callback({
+                                success: false,
+                                message:
+                                    'The client could not be reconnected (not found or not inactive)',
+                                expected: true,
+                            });
+                            return;
+                        }
+                    } else {
+                        joinedClientId = await clientWrapper.joinExercise(
+                            exerciseKey,
+                            clientName!
+                        );
+                    }
                 } catch (e: unknown) {
                     if (e instanceof NotFoundError) {
                         callback({
@@ -73,7 +118,7 @@ export function registerJoinExerciseHandler(
                 callback({
                     success: true,
                     payload: joinExerciseResponseDataSchema.encode({
-                        clientId,
+                        clientId: joinedClientId,
                         exerciseTemplate: clientWrapper.exercise!.template
                             ? {
                                   ...clientWrapper.exercise!.template,

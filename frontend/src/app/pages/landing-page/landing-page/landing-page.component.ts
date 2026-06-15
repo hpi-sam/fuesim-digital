@@ -21,6 +21,7 @@ import { AutofocusDirective } from '../../../shared/directives/autofocus.directi
 import { FileInputDirective } from '../../../shared/directives/file-input.directive';
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { DisplayModelValidationComponent } from '../../../shared/validation/display-model-validation/display-model-validation.component';
+import { HelpButtonComponent } from '../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-landing-page',
@@ -35,6 +36,7 @@ import { DisplayModelValidationComponent } from '../../../shared/validation/disp
         FooterComponent,
         FormField,
         DisplayModelValidationComponent,
+        HelpButtonComponent,
     ],
 })
 export class LandingPageComponent {

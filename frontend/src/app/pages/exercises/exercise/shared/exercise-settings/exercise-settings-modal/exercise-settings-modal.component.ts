@@ -1,9 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { cloneDeepMutable } from 'fuesim-digital-shared';
+import { cloneDeepMutable, ExerciseConfiguration } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
-import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
@@ -16,6 +15,7 @@ import { UrlValidatorDirective } from '../../../../../../shared/validation/url-v
 import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { TileServerSelectorComponent } from '../tile-server-selector/tile-server-selector.component';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-exercise-settings-modal',
@@ -27,8 +27,8 @@ import { TileServerSelectorComponent } from '../tile-server-selector/tile-server
         DisplayValidationComponent,
         NgbTooltip,
         AppSaveOnTypingDirective,
-        AsyncPipe,
         TileServerSelectorComponent,
+        HelpButtonComponent,
     ],
 })
 export class ExerciseSettingsModalComponent {
@@ -46,7 +46,7 @@ export class ExerciseSettingsModalComponent {
 
     public readonly tileUrlRegex = /^(?=.*\{x\})(?=.*\{-?y\})(?=.*\{z\}).*$/u;
 
-    public configuration$ = this.store.select(selectConfiguration);
+    public configuration = this.store.selectSignal(selectConfiguration);
 
     public updateTileMapProperties() {
         this.exerciseService.proposeAction({
@@ -99,6 +99,22 @@ export class ExerciseSettingsModalComponent {
             type: '[Configuration] Set vehicleStatusInPatientStatusColorEnabled',
             vehicleStatusInPatientStatusColor:
                 vehicleStatusInPatientStatusColorEnabled,
+        });
+    }
+
+    public setHighlightRelatedElements(
+        highlightRelatedElements: ExerciseConfiguration['highlightRelatedElements']
+    ) {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set highlightRelatedElements',
+            highlightRelatedElements,
+        });
+    }
+
+    public setParticipantLoadAllEnabled(participantLoadAllEnabled: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set participantLoadAllEnabled',
+            participantLoadAllEnabled,
         });
     }
 

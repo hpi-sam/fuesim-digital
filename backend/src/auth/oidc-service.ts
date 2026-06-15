@@ -190,6 +190,8 @@ export class OidcService {
             accessToken: tokens.access_token,
         });
 
+        await this.authService.onLoginSuccess(userInfo);
+
         const returnTo =
             state.length > this.OIDC_RANDOM_STATE_LENGTH
                 ? state.slice(this.OIDC_RANDOM_STATE_LENGTH)

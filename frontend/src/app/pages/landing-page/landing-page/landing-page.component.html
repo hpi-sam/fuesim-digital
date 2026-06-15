@@ -4,7 +4,13 @@
     <div class="row mb-4 d-flex">
         <div class="col">
             <div class="p-4 bg-light rounded-3 h-100">
-                <h2>Übung beitreten</h2>
+                <div class="d-flex flex-row justify-content-start">
+                    <h2>Übung beitreten</h2>
+                    <div class="flex-grow-1"></div>
+                    <app-help-button
+                        url="2_exercises/1_general.html#übungsbeitritt"
+                    />
+                </div>
                 <p class="lead">
                     Bitte geben Sie hier die Übungs-PIN ein, die sie von der
                     Übungsleitung erhalten haben:
@@ -40,7 +46,13 @@
 
         <div class="col">
             <div class="p-4 bg-light rounded-3 h-100">
-                <h2>Neue Übung erstellen</h2>
+                <div class="d-flex flex-row justify-content-start">
+                    <h2>Neue Übung erstellen</h2>
+                    <div class="flex-grow-1"></div>
+                    <app-help-button
+                        url="2_exercises/1_general.html#übungen-anlegen"
+                    />
+                </div>
                 @if (auth.authData().user) {
                     <div class="mb-3">
                         <p class="lead">
@@ -187,6 +199,7 @@
         <p>
             <strong>Projektteam 2025/26: </strong>
             <a href="https://github.com/fekoch">Felix Koch</a>,
+            <a href="https://github.com/jogius">Julius Makowski</a>,
             <a href="https://github.com/JohannesPotzi">Johannes Potzi</a>,
             <a href="https://github.com/Quixelation">Robert Stündl</a> und
             <a href="https://github.com/hansegucker">Jonathan Weth</a>

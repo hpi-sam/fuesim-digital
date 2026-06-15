@@ -53,7 +53,7 @@
                                     [imageUrl]="viewportTemplate.image.url"
                                     [darkBackground]="true"
                                     dataCy="draggableViewportDiv"
-                                    (elementMousedown)="
+                                    (elementPointerdown)="
                                         dragElementService.onMouseDown($event, {
                                             type: 'viewport',
                                             template: viewportTemplate,
@@ -66,7 +66,7 @@
                                     title="Transferpunkt"
                                     [imageUrl]="transferPointTemplate.image.url"
                                     dataCy="draggableTransferPointDiv"
-                                    (elementMousedown)="
+                                    (elementPointerdown)="
                                         dragElementService.onMouseDown($event, {
                                             type: 'transferPoint',
                                             template: transferPointTemplate,
@@ -90,6 +90,10 @@
                                     Verbindungen anzeigen
                                 </label>
                             </div>
+                            <app-help-banner
+                                url="2_exercises/3_exercise_elements.html#ansichten"
+                                label="Mehr Informationen zu Ansichten und Transferpunkten"
+                            />
                         </div>
                     </div>
                 </div>
@@ -111,7 +115,7 @@
                                         track simulatedRegionDragTemplate
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -156,7 +160,7 @@
                                         track restrictedZoneDragTemplate
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -178,6 +182,10 @@
                                         />
                                     }
                                 </div>
+                                <app-help-banner
+                                    url="2_exercises/3_exercise_elements.html#ansichten"
+                                    label="Mehr Informationen zu eingeschränkten Zonen"
+                                />
                             </ng-template>
                         </div>
                     </div>
@@ -248,7 +256,7 @@
                                                 track patientCategory
                                             ) {
                                                 <app-map-editor-card
-                                                    (elementMousedown)="
+                                                    (elementPointerdown)="
                                                         dragElementService.onMouseDown(
                                                             $event,
                                                             {
@@ -318,6 +326,10 @@
                                         }
                                     }
                                 }
+                                <app-help-banner
+                                    url="2_exercises/3_exercise_elements.html#ansichten"
+                                    label="Mehr Informationen zu Patienten"
+                                />
                             </ng-template>
                         </div>
                     </div>
@@ -354,7 +366,7 @@
                                         track vehicleTemplate.id
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -381,6 +393,10 @@
                                         </app-map-editor-card>
                                     }
                                 </div>
+                                <app-help-banner
+                                    url="2_exercises/3_exercise_elements.html#ansichten"
+                                    label="Mehr Informationen zu Fahrzeugen"
+                                />
                             </ng-template>
                         </div>
                     </div>
@@ -403,7 +419,7 @@
                                         track template.id
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -453,7 +469,7 @@
                                         track mapImageTemplate.id
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -486,6 +502,10 @@
                                         Keine Bilder vorhanden
                                     </span>
                                 }
+                                <app-help-banner
+                                    url="2_exercises/3_exercise_elements.html#ansichten"
+                                    label="Mehr Informationen zu Bildern"
+                                />
                             </ng-template>
                         </div>
                     </div>
@@ -508,7 +528,7 @@
                                         track category
                                     ) {
                                         <app-map-editor-card
-                                            (elementMousedown)="
+                                            (elementPointerdown)="
                                                 dragElementService.onMouseDown(
                                                     $event,
                                                     {
@@ -530,7 +550,7 @@
                                         </app-map-editor-card>
                                     }
                                     <app-map-editor-card
-                                        (elementMousedown)="
+                                        (elementPointerdown)="
                                             dragElementService.onMouseDown(
                                                 $event,
                                                 {

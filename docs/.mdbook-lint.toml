@@ -1,0 +1,5 @@
+fail-on-warnings = true
+disabled-rules = ["CONTENT001", "CONTENT003", "CONTENT004", "CONTENT005", "MD013", "MD024", "MD028", "MD033", "MDBOOK004", "MDBOOK023" ]
+
+[MD007]
+indent = 4

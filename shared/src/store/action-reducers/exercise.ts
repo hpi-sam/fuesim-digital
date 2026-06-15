@@ -24,6 +24,7 @@ import {
 import { type UUID, uuid } from '../../utils/uuid.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { ParticipantKey } from '../../exercise-keys.js';
 import { simulateAllTechnicalChallenges } from '../../models/technical-challenge/state-machine.js';
 import { viewportSchema } from '../../models/viewport.js';
 import { patientUpdateSchema } from './utils/patient-updates.js';
@@ -85,6 +86,21 @@ export const importTemplatesActionSchema = z.strictObject({
 export type ImportTemplatesAction = Immutable<
     z.infer<typeof importTemplatesActionSchema>
 >;
+
+/**
+ * WARNING: THIS IS ABSOLUTELY LEGACY
+ * --- DO NOT USE ---
+ * This is used only for legacy purposes for exercises created with an empty intitialState participantId (stateVersion <4)
+ * We cannot migrate them properly without this action
+ *
+ * @deprecated
+ */
+export class SetParticipantIdAction implements Action {
+    @IsString()
+    public readonly type = `[Exercise] Set Participant Id`;
+    @IsString()
+    public readonly participantId!: string;
+}
 
 export namespace ExerciseActionReducers {
     export const pauseExercise: ActionReducer<PauseExerciseAction> = {
@@ -232,6 +248,22 @@ export namespace ExerciseActionReducers {
             return draftState;
         },
         rights: 'trainer',
+    };
+    /**
+     * WARNING: THIS IS ABSOLUTELY LEGACY
+     * --- DO NOT USE ---
+     * This is used only for legacy purposes for exercises created with an empty intitialState participantId (stateVersion <4)
+     * We cannot migrate them properly without this action
+     *
+     * @deprecated
+     */
+    export const setParticipantId: ActionReducer<SetParticipantIdAction> = {
+        action: SetParticipantIdAction,
+        reducer: (draftState, { participantId }) => {
+            draftState.participantKey = participantId as ParticipantKey;
+            return draftState;
+        },
+        rights: 'server',
     };
 }
 

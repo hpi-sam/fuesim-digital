@@ -1,10 +1,10 @@
 import type { ExerciseState } from '../state.js';
 import type {
-    JoinExerciseResponseDataInput,
     JoinParallelExerciseResponseData,
     UpdateParallelExerciseResponseData,
-} from '../http-interfaces.js';
+} from '../interfaces/parallel-exercise.js';
 import type { ExerciseKey } from '../exercise-keys.js';
+import type { JoinExerciseResponseDataInput } from '../interfaces/exercise.js';
 import type { ExerciseAction } from '../store/action-reducers/action-reducers.js';
 import type { UUID } from '../utils/uuid.js';
 
@@ -16,8 +16,13 @@ export interface ServerToClientEvents {
 // The last argument is always expected to be the callback function. (To be able to use it in advanced typings)
 export interface ClientToServerEvents {
     joinExercise: (
-        exerciseKey: ExerciseKey,
-        clientName: string,
+        payload: {
+            exerciseKey: ExerciseKey;
+            /** Present on fresh join; absent on reconnect. */
+            clientName?: string;
+            /** Present on reconnect attempt; absent on fresh join. */
+            clientId?: UUID;
+        },
         callback: (
             response: SocketResponse<JoinExerciseResponseDataInput>
         ) => void

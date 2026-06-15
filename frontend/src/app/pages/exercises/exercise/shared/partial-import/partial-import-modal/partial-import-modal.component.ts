@@ -5,12 +5,13 @@ import { preparePartialExportForImport } from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-partial-import-modal',
     templateUrl: './partial-import-modal.component.html',
     styleUrls: ['./partial-import-modal.component.scss'],
-    imports: [AutofocusDirective],
+    imports: [AutofocusDirective, HelpButtonComponent],
 })
 export class PartialImportModalComponent {
     private readonly activeModal = inject(NgbActiveModal);

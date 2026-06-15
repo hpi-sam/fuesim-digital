@@ -1,11 +1,11 @@
 import {
     getExercisesResponseDataSchema,
-    getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     postExerciseTemplateRequestDataSchema,
     getExerciseTemplateViewportsResponseDataSchema,
     patchExerciseTemplateRequestDataSchema,
     exerciseTemplateIdSchema,
+    getExerciseTemplateResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
@@ -29,34 +29,30 @@ export function createExerciseManagerRouter(
         .all(isAuthenticatedMiddleware)
         .get(async (req, res) => {
             const templates =
-                await exerciseManagerService.getAllExerciseTemplatesOfOwner(
+                await exerciseManagerService.getAllExerciseTemplatesForUser(
                     req.session!
                 );
             res.send(getExerciseTemplatesResponseDataSchema.encode(templates));
         })
         .post(async (req, res) => {
-            const parsedData = postExerciseTemplateRequestDataSchema.parse(
-                req.body
-            );
-            const exerciseTemplate =
-                await exerciseManagerService.createExerciseTemplateFromBlank(
-                    parsedData,
-                    req.session!
-                );
+            const { importObject, ...parsedData } =
+                postExerciseTemplateRequestDataSchema.parse(req.body);
+            let exerciseTemplate;
+            if (!importObject) {
+                exerciseTemplate =
+                    await exerciseManagerService.createExerciseTemplateFromBlank(
+                        parsedData,
+                        req.session!
+                    );
+            } else {
+                exerciseTemplate =
+                    await exerciseManagerService.createExerciseTemplateFromFile(
+                        parsedData,
+                        importObject,
+                        req.session!
+                    );
+            }
 
-            res.status(201).send(
-                getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
-            );
-        });
-    router
-        .route('/exercise_templates/import')
-        .all(isAuthenticatedMiddleware)
-        .post(async (req, res) => {
-            const exerciseTemplate =
-                await exerciseManagerService.createExerciseTemplateFromFile(
-                    req.body,
-                    req.session!
-                );
             res.status(201).send(
                 getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
             );

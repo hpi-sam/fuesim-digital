@@ -22,7 +22,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Trainers now have access to the 'Einsatzübersicht' in Exercises and Exercise Templates.
 - Clients now automatically rejoin the exercise with the same view and role when disconnecting due to network issues/reloads.
-- Participants no longer see a button to export the current exericse
+- Participants no longer see a button to export the current exercise.
 
 ### Fixed
 

@@ -10,6 +10,11 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Added
 
 - There are now notifications when viewing an exercise replay whenever a measure is taken or a scoutable element is viewed.
+- There is now a banner that is displayed when the application is unable to start properly, informing the user about potential causes.
+
+### Fixed
+
+- The deletion of alarm groups no longer breaks breaks measure templates that use them.
 
 ## [0.14.0] - 2026-06-11
 

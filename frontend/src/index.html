@@ -12,6 +12,27 @@
         <link rel="author" href="mailto:kontakt@manv-simulation.de" />
     </head>
     <body>
+        <!--
+            Shown if the app fails to bootstrap within 5s (e.g. old browser
+            can't run the Angular bundle, or the backend is unreachable).
+        -->
+        <div
+            id="fallback-banner"
+            class="position-fixed top-0 end-0 bottom-0 start-0 z-n1 align-items-center justify-content-center text-center bg-white text-body p-4"
+            style="display: none"
+            aria-hidden="true"
+        >
+            <div class="col-11 col-sm-8 col-md-6 col-lg-5">
+                <h1 class="h4 mb-3">
+                    Die Anwendung konnte nicht geladen werden
+                </h1>
+                <p class="m-0">
+                    Bitte überprüfen Sie, ob Sie eine veraltete Browserversion
+                    nutzen. Falls Sie an einem Smartboard arbeiten, versuchen
+                    Sie bitte, stattdessen einen Laptop anzuschließen.
+                </p>
+            </div>
+        </div>
         <app-root></app-root>
         <noscript>
             <div class="container">
@@ -27,5 +48,18 @@
                 </div>
             </div>
         </noscript>
+        <script>
+            (function () {
+                setTimeout(function () {
+                    var appRoot = document.querySelector('app-root');
+                    if (appRoot && appRoot.children.length === 0) {
+                        var fallback =
+                            document.getElementById('fallback-banner');
+                        fallback.style.display = 'flex';
+                        fallback.setAttribute('aria-hidden', 'false');
+                    }
+                }, 5000);
+            })();
+        </script>
     </body>
 </html>

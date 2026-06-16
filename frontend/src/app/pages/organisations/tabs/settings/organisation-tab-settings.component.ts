@@ -46,8 +46,8 @@ export class OrganisationTabSettingsComponent {
         const deletionConfirmed = await this.confirmationModalService.confirm({
             title: 'Organisation löschen',
             description: `Möchten Sie die Organisation ${this.organisation().name} wirklich löschen? Alle in dieser Organisation gespeicherten Daten werden dann ebenfalls unwiderruflich gelöscht.`,
-            confirmationString: this.organisation.name
-                .toLowerCase()
+            confirmationString: this.organisation()
+                .name.toLowerCase()
                 .replace(' ', ''),
         });
         if (!deletionConfirmed) {

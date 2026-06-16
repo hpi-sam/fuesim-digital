@@ -14,7 +14,7 @@ Nach dem Klick öffnet sich ein Fenster, in dem optional ein Name eingegeben wer
 
 ## Übungs-PINs
 
-Für das Beitreten zu einer Übung gibt es verschiedene Arten von PINs für unterschiedliche Berechtigungen bzw. Teilnahmearten. Ein Beitritt ist sowohl über die Eingabe der PIN [auf der Startseite](#übungsbeitritt) als auch direkt über das Öffnen der [teilbaren Links](2_user_interfaces.md#einladungs-buttons) (Format: `fuesim-manv.de/exercises/<PIN>`) möglich.
+Für das Beitreten zu einer Übung gibt es verschiedene Arten von PINs für unterschiedliche Berechtigungen bzw. Teilnahmearten. Ein Beitritt ist sowohl über die Eingabe der PIN [auf der Startseite](#übungsbeitritt) als auch direkt über das Öffnen der [teilbaren Links](2_user_interfaces.md#einladungs-buttons) (Format: `fuesim.digital/exercises/<PIN>`) möglich.
 
 ![Übungs-PINs: Teilnehmenden-PIN (6-stellig) als Identifier ganz oben links in er Übungsansicht und Übungsleitungs-PIN (8-stellig) in der URL. Zusätzlich sind die PIN-Teilen Buttons ("einladen") zu sehen.](./general_pins.png)
 
@@ -137,7 +137,7 @@ Die wichtigste Einstellung ist die <kbd>**Serveradresse**</kbd>, die bestimmt, v
 > Bitte beachten Sie die Lizenzbedingungen der entsprechenden Karten-Server.
 
 > [!WARNING]
-> Der Anbieter des genutzten Kartenservers erhält zwar keinen Zugriff auf die Übungsinhalte, aber er kann verfolgen, welche Orte Übungsleitende und Teilnehmende betrachten sowie deren IP-Addressen sammeln und auswerten. Letztes ist ein personenbezogenes Datum im Sinne der DSGVO. Es ist daher erforderlich, die Datenschutzbedingungen des jeweiligen Anbieters zu beachten und die Zustimmung der Nutzenden einzuholen (siehe [Nutzungsbedingungen](https://fuesim-manv.de/about/terms)).
+> Der Anbieter des genutzten Kartenservers erhält zwar keinen Zugriff auf die Übungsinhalte, aber er kann verfolgen, welche Orte Übungsleitende und Teilnehmende betrachten sowie deren IP-Addressen sammeln und auswerten. Letztes ist ein personenbezogenes Datum im Sinne der DSGVO. Es ist daher erforderlich, die Datenschutzbedingungen des jeweiligen Anbieters zu beachten und die Zustimmung der Nutzenden einzuholen (siehe [Nutzungsbedingungen](https://fuesim.digital/about/terms)).
 
 Neben der Serveradresse kann unter <kbd>**Maximaler Zoom**</kbd> die höchste Zoomstufe, für die Kartendaten vom Server geholt werden, eingestellt werden. Wird ein zu höher, nicht unterstützter Wert eingegeben, werden von vielen Servern Fehlerbilder statt Kartenmaterial ausgeliefert, was bei starkem Hereinzoomen eine Übung unbenutzbar macht. Es wird daher empfohlen, die für den jeweiligen Kartenserver maximale Zoomstufe zu recherchieren und hier einzugeben.
 

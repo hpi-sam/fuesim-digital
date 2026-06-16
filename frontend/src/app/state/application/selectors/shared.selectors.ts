@@ -207,7 +207,7 @@ export const selectVisibleScoutableIndicators = createSelector(
                         const scoutable = scoutables[element.scoutableId!]!;
 
                         if (
-                            currentRole !== 'trainer' &&
+                            currentRole === 'participant' &&
                             !scoutable.isVisibleForParticipants
                         ) {
                             return null;
@@ -229,9 +229,14 @@ export const selectVisibleScoutableIndicators = createSelector(
 
                         const imageKey1 =
                             scoutable.viewedByParticipants &&
-                            currentRole === 'trainer'
+                            currentRole !== 'participant'
                                 ? 'viewed'
                                 : 'unviewed';
+                        console.log(
+                            imageKey1,
+                            currentRole,
+                            scoutable.viewedByParticipants
+                        );
                         const imageKey2 =
                             element.type === 'patient' ? 'patient' : 'generic';
                         return {

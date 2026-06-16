@@ -18,6 +18,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Replace `fuesim-manv.de` links with `fuesim.digital`
 - Help pages are linked in landing page footer
 
+### Fixed
+
+- The naming has been unified to use "Alarmgruppe" instead of a mix of "Alarmgruppe" and "Alarmierungsgruppe".
+
 ## [0.14.0] - 2026-06-11
 
 ### Added

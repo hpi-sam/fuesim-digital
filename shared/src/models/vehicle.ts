@@ -21,10 +21,12 @@ export const vehicleSchema = z.strictObject({
     templateId: uuidSchema,
     materialIds: uuidSetSchema,
     patientCapacity: z.int().nonnegative(),
+    patientLoadMinutes: z.number().nonnegative(),
     position: positionSchema,
     image: imagePropertiesSchema,
     personnelIds: uuidSetSchema,
     patientIds: uuidSetSchema,
+    patientLoadTimes: z.record(uuidSchema, z.int().nonnegative()),
     occupation: exerciseOccupationSchema,
     operationalAssignment: operationalAssignmentSchema.nullable(),
 });
@@ -37,6 +39,7 @@ export function newVehicle(
     templateId: UUID,
     materialIds: UUIDSet,
     patientCapacity: number,
+    patientLoadMinutes: number,
     image: ImageProperties,
     position: Position,
     occupation: ExerciseOccupation
@@ -49,10 +52,12 @@ export function newVehicle(
         templateId,
         materialIds,
         patientCapacity,
+        patientLoadMinutes,
         position,
         image,
         personnelIds: {},
         patientIds: {},
+        patientLoadTimes: {},
         occupation,
         operationalAssignment: null,
     };

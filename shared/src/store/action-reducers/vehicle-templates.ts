@@ -1,4 +1,11 @@
-import { IsString, IsUUID, IsInt, IsArray } from 'class-validator';
+import {
+    IsString,
+    IsUUID,
+    IsInt,
+    IsArray,
+    IsNumber,
+    Min,
+} from 'class-validator';
 import { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../state.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
@@ -43,6 +50,10 @@ export class EditVehicleTemplateAction implements Action {
 
     @IsInt()
     public readonly patientCapacity!: number;
+
+    @IsNumber()
+    @Min(0)
+    public readonly patientLoadMinutes!: number;
 
     @IsZodSchema(imagePropertiesSchema)
     public readonly image!: ImageProperties;
@@ -91,6 +102,7 @@ export namespace VehicleTemplateActionReducers {
                     vehicleType,
                     image,
                     patientCapacity,
+                    patientLoadMinutes,
                     materialTemplateIds,
                     personnelTemplateIds,
                 }
@@ -99,6 +111,7 @@ export namespace VehicleTemplateActionReducers {
                 vehicleTemplate.image = cloneDeepMutable(image);
                 vehicleTemplate.name = name;
                 vehicleTemplate.patientCapacity = patientCapacity;
+                vehicleTemplate.patientLoadMinutes = patientLoadMinutes;
                 vehicleTemplate.vehicleType = vehicleType;
                 vehicleTemplate.materialTemplateIds =
                     cloneDeepMutable(materialTemplateIds);

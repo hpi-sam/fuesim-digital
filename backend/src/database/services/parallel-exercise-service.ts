@@ -9,9 +9,14 @@ import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ParallelExercise, ParallelExerciseInsert } from '../schema.js';
 import {
     ApiError,
+    ExerciseAlreadyStartedError,
     NotFoundError,
     PermissionDeniedError,
 } from '../../utils/http.js';
+import {
+    fastForwardExercise,
+    MAX_FAST_FORWARD_DURATION_MS,
+} from '../../exercise/fast-forward-exercise.js';
 import type { ParallelExerciseRepository } from '../repositories/parallel-exercise-repository.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
@@ -68,6 +73,18 @@ export class ParallelExerciseService {
         const parallelExercise =
             await this.getParallelExerciseByParticipantKey(key);
 
+        const referenceInstance = await this.getMostProgressedStartedInstance(
+            parallelExercise.id
+        );
+
+        if (
+            referenceInstance &&
+            referenceInstance.exercise.currentStateString.currentTime >
+                MAX_FAST_FORWARD_DURATION_MS
+        ) {
+            throw new ExerciseAlreadyStartedError();
+        }
+
         const exercise =
             await this.exerciseManagerService.createExerciseFromTemplate(
                 parallelExercise.template.id,
@@ -82,11 +99,54 @@ export class ParallelExerciseService {
         };
         exercise.applyAction(setAutojoinViewportAction, null);
 
+        if (referenceInstance) {
+            fastForwardExercise(
+                exercise,
+                referenceInstance.exercise.currentStateString.currentTime,
+                referenceInstance.exercise.currentStateString.currentStatus
+            );
+        }
+
         this.newJoin.next({
             parallelExerciseId: parallelExercise.id,
             activeExercise: exercise,
         });
         return exercise;
+    }
+
+    /**
+     * Returns the existing instance of {@link parallelExerciseId} with the
+     * highest `currentTime` among those that have been started (i.e.
+     * `currentStatus !== 'notStarted'`), or `null` if none have been started
+     * yet.
+     */
+    private async getMostProgressedStartedInstance(
+        parallelExerciseId: ParallelExerciseId
+    ): Promise<ActiveExercise | null> {
+        const instanceEntries =
+            await this.parallelExerciseRepository.getParallelExerciseInstancesById(
+                parallelExerciseId
+            );
+        const instances = await Promise.all(
+            instanceEntries.map(async (entry) =>
+                this.exerciseService.getExerciseByKey(entry.participantKey)
+            )
+        );
+        return instances
+            .filter(
+                (instance) =>
+                    instance.exercise.currentStateString.currentStatus !==
+                    'notStarted'
+            )
+            .reduce<ActiveExercise | null>(
+                (furthest, instance) =>
+                    !furthest ||
+                    instance.exercise.currentStateString.currentTime >
+                        furthest.exercise.currentStateString.currentTime
+                        ? instance
+                        : furthest,
+                null
+            );
     }
 
     public async createParallelExercise(

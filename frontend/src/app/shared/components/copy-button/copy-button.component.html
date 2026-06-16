@@ -1,1 +1,6 @@
-<i class="bi bi-{{ icon() }}"></i>
+@if (text() !== '') {
+    {{ text() }}
+}
+@if (icon() !== '') {
+    <i class="bi bi-{{ icon() }}"></i>
+}

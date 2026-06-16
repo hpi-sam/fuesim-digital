@@ -1,7 +1,11 @@
 import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
 import { ExerciseState } from 'fuesim-digital-shared';
 import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
-import type { ExerciseInsert, ExerciseTemplateInsert } from '../schema.js';
+import {
+    actionTable,
+    type ExerciseInsert,
+    type ExerciseTemplateInsert,
+} from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import { BaseRepository } from './base-repository.js';
 
@@ -20,13 +24,21 @@ export class ExerciseRepository extends BaseRepository {
             );
     }
 
-    private get exerciseQuery() {
+    private getExerciseQuery(withActionsCount: boolean = false) {
         return this.databaseConnection
             .select({
                 ...getTableColumns(exerciseTable),
                 template: {
                     ...getTableColumns(exerciseTemplateTable),
                 },
+                ...(withActionsCount
+                    ? {
+                          actionsCount: this.databaseConnection.$count(
+                              actionTable,
+                              eq(actionTable.exerciseId, exerciseTable.id)
+                          ),
+                      }
+                    : {}),
             })
             .from(exerciseTable)
             .leftJoin(
@@ -37,12 +49,12 @@ export class ExerciseRepository extends BaseRepository {
 
     public async getExerciseById(id: ExerciseId) {
         return this.onlySingle(
-            await this.exerciseQuery.where(eq(exerciseTable.id, id))
+            await this.getExerciseQuery().where(eq(exerciseTable.id, id))
         );
     }
 
-    public getAllExercises() {
-        return this.exerciseQuery;
+    public getAllExercisesWithActionsCount() {
+        return this.getExerciseQuery(true);
     }
 
     public getAllExercisesOfOwner(userId: string) {

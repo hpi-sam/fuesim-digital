@@ -14,7 +14,7 @@ Nach dem Klick öffnet sich ein Fenster, in dem optional ein Name eingegeben wer
 
 ## Übungs-PINs
 
-Für das Beitreten zu einer Übung gibt es verschiedene Arten von PINs für unterschiedliche Berechtigungen bzw. Teilnahmearten. Ein Beitritt ist sowohl über die Eingabe der PIN [auf der Startseite](#übungsbeitritt) als auch direkt über das Öffnen der [teilbaren Links](2_user_interfaces.md#einladungs-buttons) (Format: `fuesim-manv.de/exercises/<PIN>`) möglich.
+Für das Beitreten zu einer Übung gibt es verschiedene Arten von PINs für unterschiedliche Berechtigungen bzw. Teilnahmearten. Ein Beitritt ist sowohl über die Eingabe der PIN [auf der Startseite](#übungsbeitritt) als auch direkt über das Öffnen der [teilbaren Links](2_user_interfaces.md#einladungs-buttons) (Format: `fuesim.digital/exercises/<PIN>`) möglich.
 
 ![Übungs-PINs: Teilnehmenden-PIN (6-stellig) als Identifier ganz oben links in er Übungsansicht und Übungsleitungs-PIN (8-stellig) in der URL. Zusätzlich sind die PIN-Teilen Buttons ("einladen") zu sehen.](./general_pins.png)
 
@@ -109,7 +109,7 @@ Auf der Startseite gibt es (neben dem Button zum [Anlegen einer neuen Übung](#�
 
 ### Vorlagen importieren
 
-Um bereits erstellte Patienten, Fahrzeuge und Bilder (siehe [Übungselemente](3_exercise_elements.md)) wiederzuverwenden, gibt es am oberen Rand des [Editors](2_user_interfaces.md#editor) den Button <kbd>Vorlagen importieren</kbd>.
+Um bereits erstellte Patienten, Fahrzeuge und Bilder (siehe [Übungselemente](3_exercise_elements.md)) wiederzuverwenden, gibt es am oberen Rand des [Editors](2_user_interfaces.md#editor-nur-in-übungsleitenden-ansicht)) den Button <kbd>Vorlagen importieren</kbd>.
 
 Nach Klick auf diesen Button muss eine Vorlage `.json`-Datei ausgewählt werden. Bevor der Import erfolgt, muss entschieden werden, ob die bestehenden Patienten-, Fahrzeug- und Bildvorlagen ergänzt oder ob sie gelöscht und vollständig durch die neuen überschrieben werden sollen.
 
@@ -121,7 +121,7 @@ Nach Klick auf diesen Button muss eine Vorlage `.json`-Datei ausgewählt werden.
 
 ## Übungseinstellungen
 
-Übungsleitende können in der [unteren Menüleiste](2_user_interfaces.md#untere-menüleiste-nur-in-übungsleitungs-ansicht) den Punkt <kbd>Einstellungen</kbd> wählen. Es öffnet sich ein Fenster, in dem globale Einstellungen für die aktuelle Übung vorgenommen werden können.
+Übungsleitende können in der [unteren Menüleiste](2_user_interfaces.md#untere-menüleiste-nur-in-übungsleitenden-ansicht) den Punkt <kbd>Einstellungen</kbd> wählen. Es öffnet sich ein Fenster, in dem globale Einstellungen für die aktuelle Übung vorgenommen werden können.
 
 Die meisten Einstellungen werden sofort nach Eingabe übernommen, lediglich die Änderungen der Kartenserver-Adressen müssen noch manuell bestätigt werden.
 
@@ -137,11 +137,13 @@ Die wichtigste Einstellung ist die <kbd>**Serveradresse**</kbd>, die bestimmt, v
 > Bitte beachten Sie die Lizenzbedingungen der entsprechenden Karten-Server.
 
 > [!WARNING]
-> Der Anbieter des genutzten Kartenservers erhält zwar keinen Zugriff auf die Übungsinhalte, aber er kann verfolgen, welche Orte Übungsleitende und Teilnehmende betrachten sowie deren IP-Addressen sammeln und auswerten. Letztes ist ein personenbezogenes Datum im Sinne der DSGVO. Es ist daher erforderlich, die Datenschutzbedingungen des jeweiligen Anbieters zu beachten und die Zustimmung der Nutzenden einzuholen (siehe [Nutzungsbedingungen](https://fuesim-manv.de/about/terms)).
+> Der Anbieter des genutzten Kartenservers erhält zwar keinen Zugriff auf die Übungsinhalte, aber er kann verfolgen, welche Orte Übungsleitende und Teilnehmende betrachten sowie deren IP-Addressen sammeln und auswerten. Letztes ist ein personenbezogenes Datum im Sinne der DSGVO. Es ist daher erforderlich, die Datenschutzbedingungen des jeweiligen Anbieters zu beachten und die Zustimmung der Nutzenden einzuholen (siehe [Nutzungsbedingungen](https://fuesim.digital/about/terms)).
 
 Neben der Serveradresse kann unter <kbd>**Maximaler Zoom**</kbd> die höchste Zoomstufe, für die Kartendaten vom Server geholt werden, eingestellt werden. Wird ein zu höher, nicht unterstützter Wert eingegeben, werden von vielen Servern Fehlerbilder statt Kartenmaterial ausgeliefert, was bei starkem Hereinzoomen eine Übung unbenutzbar macht. Es wird daher empfohlen, die für den jeweiligen Kartenserver maximale Zoomstufe zu recherchieren und hier einzugeben.
 
-Die beiden Einstellungen müssen nach einer Änderung durch einen Klick auf <kbd>Karteneinstellungen speichern</kbd> manuell bestätigt werden.
+Die Einstellungen <kbd>Serveradresse</kbd> und <kbd>Maximaler Zoom</kbd> müssen nach einer Änderung durch einen Klick auf <kbd>Karteneinstellungen speichern</kbd> manuell bestätigt werden.
+
+Zusätzlich gibt es die Option <kbd>**Markiere zusammengehörende Elemente auf der Karte**</kbd>. Standardmäßig werden Übungsleitenden angezeigt, welche Elemente auf der Karte zusammengehören, wenn sie eines dieser Elemente anklicken, indem alle Elemente einen orangenen Rahmen erhalten. Dies umfasst Fahrzeuge, Personal und Material. Über <kbd>Markiere zusammengehörende Elemente auf der Karte</kbd> kann diese Funktion auch für Teilnehmende aktiviert oder komplett ausgeschaltet werden.
 
 ### Einsatzübersicht
 
@@ -172,10 +174,22 @@ Im Feld <kbd>**Präfix der Patienten-IDs**</kbd> kann ein Präfix eingegeben wer
 > [!WARNING]
 > Wenn bereits Patienten platziert sind, ändern sich deren ID durch das Anpassen dieser Einstellung nicht.
 
-### Statusanzeige für Fahrzeuge
+### Fahrzeuge
 
 ![Einstellungsfenster](./general_settings4.png)
 
-In diesem Bereich kann eine optionale Statusanzeige für [Fahrzeuge](3_exercise_elements.md#fahrzeuge) aktiviert werden.
+In diesem Bereich werden die fahrzeugbezogenen Aspekte der Übung konfiguriert (siehe [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material)).
+
+<kbd>**"Alle einsteigen" für Teilnehmende aktivieren?**</kbd> legt fest, ob Teilnehmende die <kbd>Alle einsteigen</kbd>-Funktion eines Fahrzeugs nutzen können. Ist die Funktion nicht aktiv, müssen Teilnehmende das zum Fahrzeug gehörende Personal und Material selbstständig suchen und auf das Fahrzeug ziehen.
+
+> [!WARNING]
+> Wenn Teilnehmende einen Patienten in ein Fahrzeug verladen, steigen Personal und Material automatisch mit ein, unabhängig vom Wert dieser Einstellung.
+
+> [!TIP]
+> Diese Option kann gut mit der [Karten-Einstellung](#karte) <kbd>Markiere zusammengehörende Elemente auf der Karte</kbd> kombiniert werden, sodass Teilnehmende das zugehörige Personal und Material einfacher oder weniger einfach finden können.
+
+<kbd>**Mit Ladezeiten für Fahrzeuge üben?**</kbd> erlaubt es, die Funktion Ladezeiten für die gesamte Übung auszuschalten, sodass nicht bei allen Fahrzeugvorlagen die Ladezeit auf 0 gestellt werden muss. Die Funktion Ladezeiten ist bei den [Fahrzeugen](3_exercise_elements.html#einstellungsmöglichkeiten-3) genauer beschrieben
+
+Zudem kann in diesem Bereich eine optionale Statusanzeige für [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) aktiviert werden.
 
 Sofern aktiviert, zeigt die Statusanzeige über jedem Fahrzeug an, wie viele Patienten sich aktuell im Fahrzeug befinden und wie viele Plätze es insgesamt bietet. Sie kann optional in der Farbe der Sichtungskategorie des Patienten angezeigt werden, bei mehreren Patienten wird die Kategorie mit der höchsten Priorität gewählt.

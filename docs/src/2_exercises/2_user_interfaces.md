@@ -98,9 +98,6 @@ Im rechten Bereich der unteren Menüleiste befindet sich ein roter Button, mit d
 
 Übungsleitende sehen am rechten Rand der Karte den sogenannten Editor. Dieser besteht aus einem Auswahlmenü mit Vorlagen für alle in der Übung platzierbaren [Übungselemente](3_exercise_elements.md). Wenn diese angeklickt und auf die Übungskarte "gezogen" werden, wird basierend auf der Vorlage ein entsprechendes Übungselement entstellt.
 
-> [!IMPORTANT]
-> Der Editor kann aus technischen Gründen nicht auf Touch-Geräten benutzt werden. Übungsleitende müssen eine Maus verwenden, um Übungselemente aus dem Editor auf der Karte zu platzieren. Die Interaktion mit allen anderen Teilen der Übung ist für Übungsleitende allerdings auch auf Touch-Geräten möglich.
-
 #### Platzierbare Übungselemente
 
 Der Editor ist in folgende Kategorien unterteilt:
@@ -134,7 +131,7 @@ Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-
     - **Statistik**: Fenster mit den [Statistiken](5_evaluation.md#statistiken) zur aktuellen Übung. Beinhaltet auch ein detailliertes Protokoll.
     - **Aufzeichnung**: Schließt die Übungsansicht und öffnet stattdessen die Replay-Ansicht, in der die [Aufzeichnung](5_evaluation.md#aufzeichnung) der aktuellen Übung betrachtet werden kann.
 
-## Leitellenansicht (für Teilnehmende)
+## Leitstellenansicht (für Teilnehmende)
 
 Teilnehmende, die von den Übungsleitenden der Rolle <kbd>Leitstelle</kbd> zugeordnet wurden, sehen diese Oberfläche.
 

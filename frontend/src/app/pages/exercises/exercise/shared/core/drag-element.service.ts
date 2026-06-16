@@ -78,7 +78,17 @@ export class DragElementService {
      * @param event the mouse event
      * @param transferTemplate the template to be added
      */
-    public onMouseDown(event: MouseEvent, transferTemplate: TransferTemplate) {
+    public onMouseDown(
+        event: PointerEvent,
+        transferTemplate: TransferTemplate
+    ) {
+        if (this.dragElement) {
+            console.warn(
+                'A drag is already in progress, ignoring new drag start',
+                this
+            );
+            return;
+        }
         this.transferringTemplate = transferTemplate;
         // Create the drag image
         const imageProperties = transferTemplate.template.image;
@@ -105,20 +115,21 @@ export class DragElementService {
         // The dragging logic
         event.preventDefault();
         document.body.style.cursor = 'move';
-        document.addEventListener('mousemove', this.onMouseMove);
-        document.addEventListener('mouseup', this.onMouseUp);
+        document.addEventListener('pointermove', this.onMouseMove);
+        document.addEventListener('pointerup', this.onMouseUp);
     }
 
-    private readonly onMouseMove = (event: MouseEvent) => {
+    private readonly onMouseMove = (event: PointerEvent) => {
         event.preventDefault();
         this.updateDragElementPosition(event);
     };
 
-    private updateDragElementPosition(event: MouseEvent) {
+    private updateDragElementPosition(event: PointerEvent) {
         if (!this.dragElement || !this.imageDimensions) {
             console.log('dragElement or imageDimensions are undefined', this);
             return;
         }
+
         // max and min to not move out of the window
         this.dragElement.style.left = `${Math.max(
             Math.min(
@@ -140,9 +151,11 @@ export class DragElementService {
         // Remove the dragging stuff
         event.preventDefault();
         document.body.style.cursor = 'default';
-        document.removeEventListener('mousemove', this.onMouseMove);
-        document.removeEventListener('mouseup', this.onMouseUp);
+        document.removeEventListener('pointermove', this.onMouseMove);
+        document.removeEventListener('pointerup', this.onMouseUp);
+
         this.dragElement?.remove();
+        delete this.dragElement;
 
         if (!this.transferringTemplate || !this.olMap) {
             console.error('No template or map to add the element to', this);

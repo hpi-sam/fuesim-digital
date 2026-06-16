@@ -96,10 +96,7 @@ import {
 } from './models/technical-challenge/technical-challenge.js';
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
-import {
-    EvalCriterion,
-    evalCriterionSchema,
-} from './models/evaluation-criterion.js';
+import { EvalCriterion, evalCriterionSchema } from './models/eval-criterion.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)

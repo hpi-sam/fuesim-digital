@@ -21,7 +21,7 @@ import type { UUID } from '../../../utils/uuid.js';
 import { getElement } from '../../../store/action-reducers/utils/get-element.js';
 import { cloneDeepMutable } from '../../../utils/clone-deep.js';
 import type { Task } from '../../task.js';
-import type { EvalCriterion } from '../../evaluation-criterion.js';
+import type { EvalCriterion } from '../../eval-criterion.js';
 import type { MapCoordinates } from './map-coordinates.js';
 import type { MapPosition } from './map-position.js';
 import { newMapPositionAt } from './map-position.js';

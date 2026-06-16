@@ -16,12 +16,10 @@ import {
 import { AppState } from '../../../../../../state/app.state';
 import { EvalCriterionCreationForm } from '../eval-criterion-creation-form/eval-criterion-creation-form.component';
 import {
-    type EvalcriterionType,
     boolEvalCritrionTypes,
     numberEvalCriterionTypes,
     combinedEvalCriterionTypes,
     evalCriterionTypesNames,
-    EvalCriterion,
     getNumFromEvalCriterion,
     getRootCriteriaMap,
     EvalCriterionCategory,
@@ -30,8 +28,10 @@ import {
     type TechnicalChallengeId,
     type TechnicalChallengeStateId,
     getNumFromEvalResult,
+    isTemporalEvalCriterionType,
     statusNames,
 } from 'fuesim-digital-shared';
+import { ExerciseService } from '../../../../../../core/exercise.service';
 @Component({
     selector: 'app-didactic-overview',
     templateUrl: './didactic-overview-modal.component.html',
@@ -48,11 +48,23 @@ import {
 export class DidacticOverviewModalComponent {
     private readonly activeModal = inject(NgbActiveModal);
     private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
     public readonly rootCriteriaMap = computed(() =>
         this.getRootCriteriaMap(this.store.selectSignal(selectEvalCriteria)())
     );
     public readonly results = computed(() =>
-        Object.values(this.store.selectSignal(selectEvalResults)())
+        Object.values(this.store.selectSignal(selectEvalResults)()).map(
+            (res) => {
+                if (isTemporalEvalCriterionType(res.criterion.criterionType)) {
+                    const cacheHit =
+                        this.exerciseService.evalResultsCache()[
+                            res.criterionId
+                        ];
+                    return cacheHit ?? res;
+                }
+                return res;
+            }
+        )
     );
     public readonly rootResults = computed(() =>
         this.results().filter((res) => this.rootCriteriaMap()[res.criterionId])

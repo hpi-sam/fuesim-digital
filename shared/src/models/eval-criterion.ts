@@ -62,6 +62,7 @@ export type GreaterThanEvalCriterion = z.infer<
     typeof greaterThanEvalCriterionSchema
 >;
 
+/* TODO @JohannesPotzi @Jogius : drop the num attribute.  With this, also add a timestamp attribute to the timeStampEvalCriterionSchema and a num attribute to the constNumEvalCriterionSchema.*/
 export const numberEvalCriterionBaseSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
     num: z.number(),
@@ -242,6 +243,26 @@ export const combinedEvalCriterionTypes = [
 ] satisfies EvalCriterionType[];
 
 export type EvalcriterionType = BoolEvalCriterionType | NumberEvalCriterionType;
+
+/* Results of criteria with one of these criteriaTypes can not be calculated from the ExerciseState alone. Previous results with this type need to be cached in the respective exercise services. */
+export const temporalEvalCriterionTypes = [
+    'firstTrueAtEvalCriterion',
+] satisfies EvalCriterionType[];
+export const temporalEvalCriterionSchema = z.discriminatedUnion(
+    'criterionType',
+    [firstTrueAtEvalCriterionSchema]
+);
+export function isTemporalEvalCriterionType(
+    evalCriterionType: EvalCriterionType
+): boolean {
+    for (let i = 0; i < temporalEvalCriterionTypes.length; i += 1) {
+        if (evalCriterionType === temporalEvalCriterionTypes[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+export type TemporalEvalCriterion = z.infer<typeof temporalEvalCriterionSchema>;
 
 /* TODO @JohannesPotzi @Jogius : Zu überarbeiten. */
 export const evalCriterionTypesNames: {

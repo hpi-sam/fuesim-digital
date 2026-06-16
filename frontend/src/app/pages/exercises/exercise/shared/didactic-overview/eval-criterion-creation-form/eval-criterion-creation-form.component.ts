@@ -15,14 +15,14 @@ import {
     combinedEvalCriterionTypes,
     type EvalCriterion,
     EvalCriterionCategory,
-    type EvalcriterionType,
+    type EvalCriterionType,
     evalCriterionTypesNames,
     newPatientAtStatusEvalCriterion,
     newReachTechnicalChallengeStateEvalCriterion,
     newXPatientsAtStatusEvalCriterion,
     numberEvalCriterionTypes,
     evalCriterionCategoryNames,
-} from '../../../../../../../../../shared/dist/models/evaluation-criterion';
+} from '../../../../../../../../../shared/dist/models/eval-criterion';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -79,7 +79,7 @@ export class EvalCriterionCreationForm {
             }
         }
     });
-    public readonly criterionCreationType = signal<EvalcriterionType | null>(
+    public readonly criterionCreationType = signal<EvalCriterionType | null>(
         null
     );
     public readonly evalCriterionCategoryNames = evalCriterionCategoryNames;
@@ -167,7 +167,7 @@ export class EvalCriterionCreationForm {
             criterions: criteria,
         });
     }
-    public submitCriterion(criterionType: EvalcriterionType) {
+    public submitCriterion(criterionType: EvalCriterionType) {
         switch (criterionType) {
             case 'xPatientsAtStatusEvalCriterion': {
                 const criterion = newXPatientsAtStatusEvalCriterion(

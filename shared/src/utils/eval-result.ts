@@ -4,19 +4,23 @@ import {
     boolEvalCriterionSchema,
     CountEvalCriterion,
     EvalCriterion,
+    EvalcriterionType,
     FirstTrueAtEvalCriterion,
     GreaterThanEvalCriterion,
     isNumberEvalCriterion,
+    isTemporalEvalCriterionType,
     NotEvalCriterion,
     numberEvalCriterionSchema,
     OrEvalCriterion,
     PatientAtStatusEvalCriterion,
     ReachTechnicalChallengeStateEvalCriterion,
+    temporalEvalCriterionTypes,
     ViewScoutableEvalCriterion,
     XPatientsAtStatusEvalCriterion,
-} from '../models/evaluation-criterion.js';
+} from '../models/eval-criterion.js';
 import { Patient, Scoutable, TechnicalChallenge } from '../models/index.js';
 import { uuid, UUID, uuidSchema } from './uuid.js';
+import { ExerciseState } from '../state.js';
 
 export const evalResultBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -52,7 +56,8 @@ export function getEvalResultFromCriterion(
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
     currentTime: number,
-    cache: { [key: string]: EvalResult }
+    cache: { [key: string]: EvalResult },
+    previousResult?: EvalResult
 ): EvalResult {
     function shortCritToRes(evalCriterion: EvalCriterion): EvalResult {
         return getEvalResultFromCriterion(
@@ -220,21 +225,22 @@ export function getEvalResultFromCriterion(
         }
         case 'firstTrueAtEvalCriterion': {
             const criterion = evalCriterion as FirstTrueAtEvalCriterion;
-            /* TODO @JohannesPotzi @Jogius : implementation */
-            /* const resCount = criterion.results.length;
-            if (resCount > 0) {
-                const latestTimeStamp = criterion.results[resCount - 1]!.num;
-                if (latestTimeStamp > 0) {
-                    num = latestTimeStamp;
-                } else {
-                    const childCrit = evalCriteria[criterion.child];
-                    if (childCrit) {
-                        num = shortCritToRes(childCrit);
-                        break;
-                    }
-                    num = -1;
-                }
-            } */
+            /* -1 in num means, that the child criterion has not been true yet */
+            num = -1;
+            if (
+                previousResult &&
+                previousResult.criterionId === criterion.id &&
+                previousResult.type === 'numberEvalResult' &&
+                previousResult.num !== -1
+            ) {
+                num = previousResult.num;
+            } else if (evalCriteria[criterion.child]) {
+                const childRes = shortCritToRes(evalCriteria[criterion.child]!);
+                num =
+                    childRes.type === 'boolEvalResult' && childRes.isCompleted
+                        ? currentTime
+                        : -1;
+            }
             break;
         }
         default:
@@ -254,6 +260,7 @@ export function getEvalResultFromCriterion(
             id: id,
             type: 'numberEvalResult',
             criterionId: evalCriterion.id,
+            criterion: evalCriterion,
             num: num,
             timestamp: currentTime,
         } as NumberEvalResult;
@@ -263,6 +270,7 @@ export function getEvalResultFromCriterion(
         const res = {
             id: uuid(),
             criterionId: evalCriterion.id,
+            criterion: evalCriterion,
             type: 'boolEvalResult',
             isCompleted: isCompleted,
             timestamp: currentTime,
@@ -281,18 +289,18 @@ export function getEvalResultsFromCriteria(
     const criteria = Object.values(evalCriteria);
     let cache = {} as { [key: string]: EvalResult };
     return criteria
-        .flatMap((criterion: EvalCriterion): EvalResult => {
-            const res = getEvalResultFromCriterion(
-                criterion,
-                evalCriteria,
-                technicalChallenges,
-                patients,
-                scoutables,
-                currentTime,
-                cache
-            );
-            return res;
-        })
+        .flatMap(
+            (criterion: EvalCriterion): EvalResult =>
+                getEvalResultFromCriterion(
+                    criterion,
+                    evalCriteria,
+                    technicalChallenges,
+                    patients,
+                    scoutables,
+                    currentTime,
+                    cache
+                )
+        )
         .reduce<{ [evalCriterionId: UUID]: EvalResult }>(
             (evalResultObject, evalResult) => {
                 evalResultObject[evalResult.criterionId] = evalResult;
@@ -308,4 +316,43 @@ export function getIsCompletedFromEvalResult(
     result: EvalResult
 ): boolean | null {
     return result.type === 'boolEvalResult' ? result.isCompleted : null;
+}
+export function updateEvalResultsMap(
+    evalResultsMap: { [criterionId: string]: EvalResult },
+    evalCriteria: { [key: string]: EvalCriterion },
+    technicalChallenges: { [key: string]: TechnicalChallenge },
+    patients: { [key: string]: Patient },
+    scoutables: { [key: string]: Scoutable },
+    currentTime: number,
+    temporalOnly: boolean
+): { [criterionId: string]: EvalResult } {
+    let tmpCache = {} as { [criterionId: string]: EvalResult };
+    return Object.values(evalCriteria)
+        .filter((crit) => {
+            if (!temporalOnly) {
+                return true;
+            }
+            /* For non parallel exercises we only care to cache results for temporal criteria, because the rest is selected via the exeercise selector selectEvalResults. */
+            return isTemporalEvalCriterionType(crit.criterionType);
+        })
+        .flatMap((criterion: EvalCriterion): EvalResult => {
+            const previousRes = evalResultsMap[criterion.id];
+            return getEvalResultFromCriterion(
+                criterion,
+                evalCriteria,
+                technicalChallenges,
+                patients,
+                scoutables,
+                currentTime,
+                tmpCache,
+                previousRes
+            );
+        })
+        .reduce<{ [evalCriterionId: UUID]: EvalResult }>(
+            (evalResultObject, evalResult) => {
+                evalResultObject[evalResult.criterionId] = evalResult;
+                return evalResultObject;
+            },
+            {}
+        );
 }

@@ -6,12 +6,12 @@ import {
     evalCriterionSchema,
     isNumberEvalCriterion,
     NumberEvalCriterion,
-} from '../../models/evaluation-criterion.js';
+} from '../../models/eval-criterion.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { uuidSchema } from '../../utils/uuid.js';
 import { ReducerError } from '../reducer-error.js';
 import { getElement } from './utils/get-element.js';
-import { evalResultSchema } from '../../utils/eval-results.js';
+import { evalResultSchema } from '../../utils/eval-result.js';
 
 /* The EvalCriteria at criterionType are:
 doMeasureXTimesEvalCriterion
@@ -34,6 +34,7 @@ const updateCriterionActionSchema = z.strictObject({
 });
 export type UpdateCriterionAction = z.infer<typeof updateCriterionActionSchema>;
 
+/* TODO @JohannesPotzi @Jogius : drop this, below as well */
 /* const updateResultActionSchema = z.strictObject({
     type: z.literal('[EvalCriterion] Update Result'),
     criterionId: uuidSchema,

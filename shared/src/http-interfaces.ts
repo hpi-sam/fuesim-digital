@@ -9,7 +9,7 @@ import { validationMessages } from './validation-messages.js';
 import { exerciseStatusSchema } from './models/utils/exercise-status.js';
 import { logEntrySchema } from './models/log-entry.js';
 import { uuidSchema } from './utils/uuid.js';
-import { evalResultSchema } from './utils/eval-results.js';
+import { evalResultSchema } from './utils/eval-result.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,

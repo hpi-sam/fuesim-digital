@@ -2,6 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ClientToServerEvents,
+    EvalResult,
     ExerciseAction,
     ExerciseKey,
     ExerciseState,
@@ -13,6 +14,7 @@ import type {
 import {
     joinExerciseResponseDataSchema,
     socketIoTransports,
+    updateEvalResultsMap,
 } from 'fuesim-digital-shared';
 import { freeze, WritableDraft } from 'immer';
 import {
@@ -40,7 +42,12 @@ import {
 } from '../state/application/selectors/application.selectors';
 import {
     selectActiveClients,
+    selectCurrentTime,
+    selectEvalCriteria,
     selectExerciseState,
+    selectPatients,
+    selectScoutables,
+    selectTechnicalChallenges,
 } from '../state/application/selectors/exercise.selectors';
 import {
     selectCurrentMainRole,
@@ -80,6 +87,10 @@ export class ExerciseService {
         ...socketIoTransports,
     });
 
+    public readonly evalResultsCache = signal<{
+        [criterionId: string]: EvalResult;
+    }>({});
+
     private optimisticActionHandler?: OptimisticActionHandler<
         ExerciseAction,
         ExerciseState,
@@ -94,6 +105,19 @@ export class ExerciseService {
         this.socket.on('performAction', (action: ExerciseAction) => {
             freeze(action, true);
             this.optimisticActionHandler?.performAction(action);
+            if (action.type === '[Exercise] Tick') {
+                this.evalResultsCache.set(
+                    updateEvalResultsMap(
+                        this.evalResultsCache(),
+                        this.store.selectSignal(selectEvalCriteria)(),
+                        this.store.selectSignal(selectTechnicalChallenges)(),
+                        this.store.selectSignal(selectPatients)(),
+                        this.store.selectSignal(selectScoutables)(),
+                        this.store.selectSignal(selectCurrentTime)(),
+                        true
+                    )
+                );
+            }
         });
         this.socket.on('disconnect', (reason) => {
             if (reason === 'io client disconnect') {

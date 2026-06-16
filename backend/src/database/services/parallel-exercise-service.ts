@@ -10,6 +10,7 @@ import type {
 import {
     getEvalResultsFromCriteria,
     parallelExerciseInstanceSummarySchema,
+    updateEvalResultsMap,
 } from 'fuesim-digital-shared';
 import { Subject, Subscription } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
@@ -34,7 +35,7 @@ export class ParallelExerciseService {
     private readonly subscriptions: Subscription[] = [];
     public evalResultsMap: {
         [exerciseId: ExerciseId]: {
-            [criterionId: EvalCriterionId]: EvalResult[];
+            [criterionId: EvalCriterionId]: EvalResult;
         };
     } = {};
     public constructor(
@@ -59,27 +60,15 @@ export class ParallelExerciseService {
         if (!previousResults) {
             return;
         }
-        const results = Object.values(
-            getEvalResultsFromCriteria(
-                state.evalCriteria,
-                state.technicalChallenges,
-                state.patients,
-                state.scoutables,
-                state.currentTime
-            )
+        this.evalResultsMap[id] = updateEvalResultsMap(
+            previousResults,
+            state.evalCriteria,
+            state.technicalChallenges,
+            state.patients,
+            state.scoutables,
+            state.currentTime,
+            false
         );
-        for (let i = 0; i < results.length; i += 1) {
-            const res = results[i]!;
-            const critId = res.criterionId as EvalCriterionId;
-            const previousRes = previousResults[critId];
-
-            // When the result has changed or there was no previous result, we push the calculated result to the map.
-            if (!previousRes || previousRes[previousRes.length - 1] !== res) {
-                previousRes
-                    ? previousRes.push(res)
-                    : (previousResults[critId] = [res]);
-            }
-        }
     }
 
     public async getParallelExercisesOfOwner(session: SessionInformation) {

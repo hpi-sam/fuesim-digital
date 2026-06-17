@@ -4,10 +4,7 @@ import { personnelSchema } from '../../models/personnel.js';
 import type { ActionReducer } from '../action-reducer.js';
 import { uuidSchema } from '../../utils/uuid.js';
 import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
-import {
-    technicalChallengeIdSchema,
-    technicalChallengeSchema,
-} from '../../models/technical-challenge/technical-challenge.js';
+import { technicalChallengeSchema } from '../../models/technical-challenge/technical-challenge.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { sizeSchema } from '../../models/utils/size.js';
 import { ReducerError } from '../reducer-error.js';
@@ -15,6 +12,7 @@ import {
     currentStateOf,
     stateMachineSchema,
     stateMachineStateSchema,
+    updateEventQueue,
 } from '../../models/technical-challenge/state-machine.js';
 import { taskTypeSchema } from '../../models/task-type.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
@@ -26,6 +24,7 @@ import {
     logTechnicalChallengePersonnelAssigned,
 } from './utils/log.js';
 import { PersonnelActionReducers } from './personnel.js';
+import { technicalChallengeIdSchema } from '../../models/technical-challenge/technical-challenge-id.js';
 
 const createTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Create technical challenge'),
@@ -88,6 +87,12 @@ export namespace TechnicalChallengeActionReducers {
             reducer: (draftState, action) => {
                 draftState.technicalChallenges[action.technicalChallenge.id] =
                     cloneDeepMutable(action.technicalChallenge);
+                for (const stateMachine of Object.values(
+                    draftState.technicalChallenges[
+                        action.technicalChallenge.id
+                    ]!.stateMachines
+                ))
+                    updateEventQueue(stateMachine, draftState);
                 return draftState;
             },
             rights: 'trainer',

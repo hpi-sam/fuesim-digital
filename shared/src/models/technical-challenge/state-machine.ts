@@ -2,7 +2,12 @@ import { z } from 'zod';
 import type { Immutable, WritableDraft } from 'immer';
 import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 import type { ExerciseState } from '../../state.js';
-import { type TaskType, taskTypeSchema } from '../task-type.js';
+import {
+    newTaskTimeSpent,
+    taskTimeSpentSchema,
+    type TaskType,
+    taskTypeSchema,
+} from '../task-type.js';
 import {
     type ImageProperties,
     imagePropertiesSchema,
@@ -19,6 +24,8 @@ import {
     logTechnicalChallengeStateTransition,
 } from '../../store/action-reducers/utils/log.js';
 import type { TechnicalChallenge } from './technical-challenge.js';
+import { insert, peek, pop } from '../../state-helpers/events.js';
+import { newTechnicalChallengeEvent as newStateMachineEvent } from './event.js';
 
 const taskSchema = z.object({
     /**
@@ -97,6 +104,7 @@ export type Guard = Immutable<z.infer<typeof guardSchema>>;
 
 const stateMachineStateIdSchema = uuidSchema.brand<'StateMachineStateId'>();
 export const transitionSchema = z.object({
+    id: uuidSchema,
     targetState: stateMachineStateIdSchema,
     guard: guardSchema,
 });
@@ -111,7 +119,7 @@ export const stateMachineStateSchema = z.object({
      * maps taskId to the task-specific progress multiplier (default 1)
      * */
     possibleTasks: z.record(taskTypeSchema.shape.id, z.number()),
-    outgoingTransitions: z.array(transitionSchema),
+    outgoingTransitions: z.record(transitionSchema.shape.id, transitionSchema),
 
     viewedByParticipant: z.boolean().optional().default(false),
 });
@@ -122,7 +130,7 @@ export type StateMachineState = Immutable<
 export function newTechnicalChallengeState(
     title: string,
     image: ImageProperties,
-    outgoingTransitions: Transition[],
+    outgoingTransitions: { [key: UUID]: Transition },
     possibleTasks: UUID[] | { [key: UUID]: number } = {},
     userGeneratedContent?: UserGeneratedContent
 ): StateMachineState {
@@ -168,7 +176,7 @@ export function getTaskProgress(
         `Task ${taskId} does not exist on stateMachine.`,
         stateMachine
     );
-    const timeSpent = stateMachine.taskTimeSpent[taskId] ?? 0;
+    const timeSpent = stateMachine.taskTimeSpent[taskId]?.timeSpent ?? 0;
     const totalTaskDuration = stateMachine.tasks[taskId]!.totalDuration;
     const progressPercentage = timeSpent / totalTaskDuration;
     return { timeSpent, progressPercentage };
@@ -275,10 +283,7 @@ export const stateMachineSchema = z
         // runtime values:
         simulationStartTime: z.number().default(0),
         currentStateId: stateMachineStateSchema.shape.id,
-        taskTimeSpent: z.record(
-            taskTypeSchema.shape.id,
-            z.number().nonnegative()
-        ),
+        taskTimeSpent: z.record(taskTypeSchema.shape.id, taskTimeSpentSchema),
         assignedPersonnel: z.record(
             personnelSchema.shape.id,
             taskTypeSchema.shape.id
@@ -357,7 +362,8 @@ function isGuardFulfilled(
 
 function simulateStateMachine(
     stateMachine: WritableDraft<StateMachine>,
-    currentTime: number,
+    transitionId: WritableDraft<UUID>,
+    exerciseState: WritableDraft<ExerciseState>,
     tickInterval: number,
     logStateTransition?: (targetStateId: StateMachineState['id']) => void,
     logPersonnelUnassigned?: (
@@ -367,20 +373,23 @@ function simulateStateMachine(
 ): void {
     const state = currentStateOf(stateMachine);
 
-    for (const taskId of Object.values(stateMachine.assignedPersonnel)) {
-        if (state.possibleTasks[taskId]) {
-            stateMachine.taskTimeSpent[taskId] ??= 0;
-            stateMachine.taskTimeSpent[taskId] +=
-                tickInterval * state.possibleTasks[taskId];
-        }
-    }
+    // for (const taskId of Object.values(stateMachine.assignedPersonnel)) {
+    //     if (state.possibleTasks[taskId]) {
+    //         stateMachine.taskTimeSpent[taskId] ??= newTaskTimeSpent();
+    //         stateMachine.taskTimeSpent[taskId].timeSpent = 0;
+    //         stateMachine.taskTimeSpent[taskId].timeSpent +=
+    //             tickInterval * state.possibleTasks[taskId];
+    //     }
+    // }
 
-    const guardFulfilled = (t: Transition) =>
-        isGuardFulfilled(t.guard, stateMachine, currentTime);
+    // const guardFulfilled = (t: Transition) =>
+    //     isGuardFulfilled(t.guard, stateMachine, currentTime);
 
-    // the next transition is not necessarily the first one to have its guard
-    // fulfilled
-    const nextTransition = state.outgoingTransitions.find(guardFulfilled);
+    // // the next transition is not necessarily the first one to have its guard
+    // // fulfilled
+    // const nextTransition = state.outgoingTransitions.find(guardFulfilled);
+
+    const nextTransition = state.outgoingTransitions[transitionId];
 
     if (!nextTransition) return;
 
@@ -395,10 +404,52 @@ function simulateStateMachine(
             logPersonnelUnassigned(personnelId, taskTypeId);
         }
     }
+
+    updateEventQueue(stateMachine, exerciseState);
+}
+
+export function updateEventQueue(
+    stateMachine: WritableDraft<StateMachine>,
+    exerciseState: WritableDraft<ExerciseState>
+) {
+    const state = currentStateOf(stateMachine);
+
+    const potentialTransitions = Object.values(state.outgoingTransitions);
+
+    const queue = exerciseState.technicalChallengeEventQueue;
+    for (const transition of potentialTransitions) {
+        const guard = transition.guard;
+        const event = newStateMachineEvent(0, stateMachine.id, transition.id);
+        switch (guard.type) {
+            case 'taskGuard': {
+                const nAssignedPersonnel = Object.values(
+                    stateMachine.assignedPersonnel
+                ).filter((taskId) => taskId === guard.taskId).length;
+
+                if (nAssignedPersonnel === 0) continue;
+
+                const taskProgress = stateMachine.taskTimeSpent[guard.taskId]!;
+                event.timestamp =
+                    (guard.minProgress - taskProgress.timeSpent) /
+                    (nAssignedPersonnel * state.possibleTasks[guard.taskId]!);
+                break;
+            }
+            case 'timerGuard': {
+                event.timestamp =
+                    stateMachine.simulationStartTime + guard.minProgress;
+                break;
+            }
+            case 'andGuard':
+            case 'notGuard':
+                throw new Error('Not Implemented');
+        }
+        insert(queue, event);
+    }
 }
 
 export function simulateTechnicalChallenge(
     technicalChallenge: WritableDraft<TechnicalChallenge>,
+    transitionId: WritableDraft<UUID>,
     exerciseState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {
@@ -408,7 +459,8 @@ export function simulateTechnicalChallenge(
         const currentStateId = stateMachine.currentStateId;
         simulateStateMachine(
             stateMachine,
-            exerciseState.currentTime,
+            transitionId,
+            exerciseState,
             tickInterval,
             (targetStateId) =>
                 logTechnicalChallengeStateTransition(
@@ -432,8 +484,19 @@ export function simulateAllTechnicalChallenges(
     draftState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {
-    // TODO@Julius: this is a naïve implementation, somebody should improve it
-    for (const challenge of Object.values(draftState.technicalChallenges)) {
-        simulateTechnicalChallenge(challenge, draftState, tickInterval);
+    const queue = draftState.technicalChallengeEventQueue;
+    console.log(JSON.stringify(queue, null, 2));
+    console.log(
+        `Comparing ${peek(queue)?.timestamp} with ${draftState.currentTime}`
+    );
+
+    while ((peek(queue)?.timestamp ?? Infinity) <= draftState.currentTime) {
+        const event = pop(queue);
+        simulateTechnicalChallenge(
+            draftState.technicalChallenges[event.technicalChallengeId],
+            event.transitionId,
+            draftState,
+            tickInterval
+        );
     }
 }

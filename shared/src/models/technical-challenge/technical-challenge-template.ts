@@ -7,9 +7,9 @@ import { newNoPosition } from '../utils/position/no-position.js';
 import { newSize } from '../utils/size.js';
 import type {
     TechnicalChallenge,
-    TechnicalChallengeId,
 } from './technical-challenge.js';
 import { type StateMachine, stateMachineSchema } from './state-machine.js';
+import type { TechnicalChallengeId } from './technical-challenge-id.js';
 
 export const technicalChallengeTemplateSchema = z.strictObject({
     stateMachines: z

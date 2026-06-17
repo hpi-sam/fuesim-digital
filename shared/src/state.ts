@@ -54,13 +54,18 @@ import { getDefaultTasks } from './data/default-state/tmp-default-technical-chal
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
+import {  exerciseTimeSchema } from './models/time.js';
+import {
+    newTechnicalChallengeEventQueue,
+    technicalChallengeEventQueueSchema,
+} from './models/technical-challenge/event.js';
 
 /**
  * **Important**
  *
  * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
  */
-export const currentStateVersion = 56 as const;
+export const currentStateVersion = 57 as const;
 
 export const exerciseStateSchema = z.strictObject({
     id: uuidSchema,
@@ -71,7 +76,7 @@ export const exerciseStateSchema = z.strictObject({
      *
      * It is guaranteed that the `ExerciseTickAction` is the only action that modifies this value.
      */
-    currentTime: z.int().nonnegative(),
+    currentTime: exerciseTimeSchema,
     type: exerciseTypeSchema,
     currentStatus: exerciseStatusSchema,
     randomState: randomStateSchema,
@@ -118,6 +123,8 @@ export const exerciseStateSchema = z.strictObject({
     mapImageTemplates: z.record(uuidSchema, mapImageTemplateSchema),
 
     scoutables: z.record(scoutableSchema.shape.id, scoutableSchema),
+
+    technicalChallengeEventQueue: technicalChallengeEventQueueSchema,
 
     eocLog: z.array(eocLogEntrySchema),
 
@@ -175,6 +182,7 @@ export function newExerciseState(
         measureTemplates: defaultMeasureTemplateCategories,
         mapImageTemplates: defaultMapImagesTemplatesById,
         scoutables: {},
+        technicalChallengeEventQueue: newTechnicalChallengeEventQueue(),
         eocLog: [],
         participantKey,
         spatialTrees: {

@@ -5,10 +5,7 @@ import { imagePropertiesSchema } from '../utils/image-properties.js';
 import { positionSchema } from '../utils/position/position.js';
 import { sizeSchema } from '../utils/size.js';
 import { stateMachineSchema, type StateMachineState } from './state-machine.js';
-
-export const technicalChallengeIdSchema =
-    uuidSchema.brand<'TechnicalChallengeId'>();
-export type TechnicalChallengeId = z.infer<typeof technicalChallengeIdSchema>;
+import { technicalChallengeIdSchema } from './technical-challenge-id.js';
 
 export const technicalChallengeSchema = z.strictObject({
     id: technicalChallengeIdSchema,

@@ -9,3 +9,17 @@ export const taskTypeSchema = z.object({
 });
 
 export type TaskType = Immutable<z.infer<typeof taskTypeSchema>>;
+
+export const taskTimeSpentSchema = z.strictObject({
+    timeSpent: z.int().nonnegative(),
+    lastUpdatedAt: z.int().nonnegative(),
+});
+
+export type TaskTimeSpent = z.infer<typeof taskTimeSpentSchema>;
+
+export function newTaskTimeSpent(): TaskTimeSpent {
+    return {
+        timeSpent: 0,
+        lastUpdatedAt: 0,
+    };
+}

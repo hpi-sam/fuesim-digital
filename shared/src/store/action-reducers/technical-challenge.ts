@@ -4,15 +4,11 @@ import { personnelSchema } from '../../models/personnel.js';
 import type { ActionReducer } from '../action-reducer.js';
 import { uuidSchema } from '../../utils/uuid.js';
 import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
-import {
-    technicalChallengeIdSchema,
-    technicalChallengeSchema,
-} from '../../models/technical-challenge/technical-challenge.js';
+import { technicalChallengeSchema } from '../../models/technical-challenge/technical-challenge.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { sizeSchema } from '../../models/utils/size.js';
 import { ReducerError } from '../reducer-error.js';
 import {
-    currentStateOf,
     stateMachineSchema,
     stateMachineStateSchema,
 } from '../../models/technical-challenge/state-machine.js';
@@ -20,6 +16,12 @@ import { taskTypeSchema } from '../../models/task-type.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { createScoutableTag } from '../../models/utils/tag-helpers.js';
+import { technicalChallengeIdSchema } from '../../models/technical-challenge/ids.js';
+import {
+    currentStateOf,
+    updateEventQueue,
+    updateTaskProgress,
+} from '../../state-helpers/state-machine.js';
 import { getElement } from './utils/get-element.js';
 import {
     logTechnicalChallenge,
@@ -88,6 +90,16 @@ export namespace TechnicalChallengeActionReducers {
             reducer: (draftState, action) => {
                 draftState.technicalChallenges[action.technicalChallenge.id] =
                     cloneDeepMutable(action.technicalChallenge);
+                for (const stateMachine of Object.values(
+                    draftState.technicalChallenges[
+                        action.technicalChallenge.id
+                    ]!.stateMachines
+                ))
+                    updateEventQueue(
+                        draftState,
+                        action.technicalChallenge.id,
+                        stateMachine
+                    );
                 return draftState;
             },
             rights: 'trainer',
@@ -142,7 +154,11 @@ export namespace TechnicalChallengeActionReducers {
                 );
             }
 
+            updateTaskProgress(stateMachine, draftState.currentTime, taskId);
+
             stateMachine.assignedPersonnel[personnelId] = taskId;
+
+            updateEventQueue(draftState, technicalChallengeId, stateMachine);
 
             logTechnicalChallengePersonnelAssigned(
                 draftState,

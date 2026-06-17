@@ -10,7 +10,11 @@ import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
 import type { TaskType } from '../models/task-type.js';
 import { TypeAssertedObject } from '../utils/type-asserted-object.js';
-import type { StateMachine } from '../models/technical-challenge/state-machine.js';
+import { type StateMachine } from '../models/technical-challenge/state-machine.js';
+import {
+    updateEventQueueAfterTaskChange,
+    updateTaskProgress,
+} from './state-machine.js';
 
 // TODO: maybe only remove personnelId
 export function getAssignmentsOnTechnicalChallenge(
@@ -33,8 +37,10 @@ export function getAssignmentsOnTechnicalChallenge(
 }
 
 export function unassignPersonnelFromTechnicalChallenge(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallenge: WritableDraft<TechnicalChallenge>,
     personnelId: Personnel['id'],
-    technicalChallenge: WritableDraft<TechnicalChallenge>
+    currentTime: ExerciseState['currentTime']
 ): void {
     const result = getAssignmentsOnTechnicalChallenge(technicalChallenge).find(
         (assignment) => assignment.personnelId === personnelId
@@ -44,8 +50,21 @@ export function unassignPersonnelFromTechnicalChallenge(
         return;
     }
 
+    updateTaskProgress(
+        technicalChallenge.stateMachines[result.stateMachineId]!,
+        currentTime,
+        result.taskTypeId
+    );
+
     delete technicalChallenge.stateMachines[result.stateMachineId]!
         .assignedPersonnel[personnelId];
+
+    updateEventQueueAfterTaskChange(
+        exerciseState,
+        technicalChallenge.id,
+        technicalChallenge.stateMachines[result.stateMachineId]!,
+        result.taskTypeId
+    );
 }
 
 export function isPersonnelAssigned(
@@ -97,6 +116,11 @@ export function removeInvalidAssignments(
         (c) => !isValidAssignment(personnel, c)
     );
     invalidChallenges.forEach((challenge) => {
-        unassignPersonnelFromTechnicalChallenge(personnelId, challenge);
+        unassignPersonnelFromTechnicalChallenge(
+            draftState,
+            challenge,
+            personnelId,
+            draftState.currentTime
+        );
     });
 }

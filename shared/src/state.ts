@@ -54,6 +54,11 @@ import { getDefaultTasks } from './data/default-state/tmp-default-technical-chal
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
+import { exerciseTimeSchema } from './models/time.js';
+import {
+    newStateMachineEventQueue,
+    stateMachineEventQueueSchema,
+} from './models/technical-challenge/event.js';
 
 /**
  * **Important**
@@ -71,7 +76,7 @@ export const exerciseStateSchema = z.strictObject({
      *
      * It is guaranteed that the `ExerciseTickAction` is the only action that modifies this value.
      */
-    currentTime: z.int().nonnegative(),
+    currentTime: exerciseTimeSchema,
     type: exerciseTypeSchema,
     currentStatus: exerciseStatusSchema,
     randomState: randomStateSchema,
@@ -119,6 +124,8 @@ export const exerciseStateSchema = z.strictObject({
 
     scoutables: z.record(scoutableSchema.shape.id, scoutableSchema),
 
+    stateMachineEventQueue: stateMachineEventQueueSchema,
+
     eocLog: z.array(eocLogEntrySchema),
 
     participantKey: participantKeySchema,
@@ -137,6 +144,7 @@ export const exerciseStateSchema = z.strictObject({
         .optional(),
 });
 
+export type WireExerciseState = Immutable<z.input<typeof exerciseStateSchema>>;
 export type ExerciseState = Immutable<z.infer<typeof exerciseStateSchema>>;
 
 export function newExerciseState(
@@ -176,6 +184,7 @@ export function newExerciseState(
         measureTemplates: defaultMeasureTemplateCategories,
         mapImageTemplates: defaultMapImagesTemplatesById,
         scoutables: {},
+        stateMachineEventQueue: newStateMachineEventQueue(),
         eocLog: [],
         participantKey,
         spatialTrees: {

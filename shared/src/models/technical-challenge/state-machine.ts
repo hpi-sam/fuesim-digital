@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import type { Immutable, WritableDraft } from 'immer';
+import type { Immutable } from 'immer';
 import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
-import type { ExerciseState } from '../../state.js';
-import { type TaskType, taskTypeSchema } from '../task-type.js';
+import { taskTimeSpentSchema, taskTypeSchema } from '../task-type.js';
 import {
     type ImageProperties,
     imagePropertiesSchema,
@@ -12,13 +11,13 @@ import {
     type UserGeneratedContent,
     userGeneratedContentSchema,
 } from '../user-generated-content.js';
-import { type Personnel, personnelSchema } from '../personnel.js';
-import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
+import { personnelSchema } from '../personnel.js';
+import type { GuardId } from './ids.js';
 import {
-    logTechnicalChallengePersonnelUnassigned,
-    logTechnicalChallengeStateTransition,
-} from '../../store/action-reducers/utils/log.js';
-import type { TechnicalChallenge } from './technical-challenge.js';
+    guardIdSchema,
+    stateMachineIdSchema,
+    transitionIdSchema,
+} from './ids.js';
 
 const taskSchema = z.object({
     /**
@@ -29,14 +28,19 @@ const taskSchema = z.object({
     totalDuration: z.number().nonnegative(),
 });
 
-const timerSchema = z.object({
+export const timerSchema = z.object({
     id: uuidSchema.brand<'TimerId'>(),
     name: z.string(),
     totalDuration: z.number().nonnegative(),
 });
-type Timer = z.infer<typeof timerSchema>;
+export type Timer = z.infer<typeof timerSchema>;
 
-const taskGuardSchema = z.object({
+const baseGuardSchema = z.strictObject({
+    id: guardIdSchema,
+});
+
+export const taskGuardSchema = z.object({
+    ...baseGuardSchema.shape,
     type: z.literal('taskGuard'),
     /** Percentage of Task.totalDuration */
     minProgress: z.number().min(0).max(1),
@@ -44,7 +48,8 @@ const taskGuardSchema = z.object({
 });
 export type TaskGuard = Immutable<z.infer<typeof taskGuardSchema>>;
 
-const timerGuardSchema = z.object({
+export const timerGuardSchema = z.object({
+    ...baseGuardSchema.shape,
     type: z.literal('timerGuard'),
     /** Percentage of Timer.totalDuration past */
     minProgress: z.number().min(0).max(1),
@@ -61,24 +66,28 @@ export type TimerGuard = Immutable<z.infer<typeof timerGuardSchema>>;
  * The current workaround is to define them using interfaces.
  */
 
-const andGuardSchema = z.object({
+export const andGuardSchema = z.object({
+    ...baseGuardSchema.shape,
     type: z.literal('andGuard'),
     get guards() {
         return z.array(guardSchema);
     },
 });
 export interface AndGuard {
+    id: GuardId;
     type: 'andGuard';
     guards: Immutable<_Guard[]>;
 }
 
-const notGuardSchema = z.strictObject({
+export const notGuardSchema = z.object({
+    ...baseGuardSchema.shape,
     type: z.literal('notGuard'),
     get guard() {
         return guardSchema;
     },
 });
 export interface NotGuard {
+    id: GuardId;
     type: 'notGuard';
     guard: Immutable<_Guard>;
 }
@@ -96,10 +105,13 @@ export const guardSchema: z.ZodType<_Guard> = z.lazy(() =>
 export type Guard = Immutable<z.infer<typeof guardSchema>>;
 
 const stateMachineStateIdSchema = uuidSchema.brand<'StateMachineStateId'>();
-export const transitionSchema = z.object({
+
+export const transitionSchema = z.strictObject({
+    id: transitionIdSchema,
     targetState: stateMachineStateIdSchema,
     guard: guardSchema,
 });
+export type Transition = Immutable<z.infer<typeof transitionSchema>>;
 
 export const stateMachineStateSchema = z.object({
     id: stateMachineStateIdSchema,
@@ -111,7 +123,7 @@ export const stateMachineStateSchema = z.object({
      * maps taskId to the task-specific progress multiplier (default 1)
      * */
     possibleTasks: z.record(taskTypeSchema.shape.id, z.number()),
-    outgoingTransitions: z.array(transitionSchema),
+    outgoingTransitions: z.record(transitionIdSchema, transitionSchema),
 
     viewedByParticipant: z.boolean().optional().default(false),
 });
@@ -130,95 +142,38 @@ export function newTechnicalChallengeState(
         // eslint-disable-next-line no-param-reassign
         possibleTasks = Object.fromEntries(possibleTasks.map((id) => [id, 1]));
     }
+
     return {
         id: uuid() as StateMachineState['id'],
         title,
         image,
         userGeneratedContent: userGeneratedContent ?? newUserGeneratedContent(),
         possibleTasks,
-        outgoingTransitions,
+        outgoingTransitions: Object.fromEntries(
+            outgoingTransitions.map((t) => [t.id, t])
+        ),
         viewedByParticipant: false,
     };
 }
 
+/**
+ * Not currently called anywhere. If this becomes used to edit a live
+ * state machine's guard tree, the caller must also call
+ * {@link invalidateGuardIndex} for that state machine's id, since this
+ * changes the guard tree topology.
+ */
 export function addTransitionTo(
     state: StateMachineState,
     newTransition: Transition,
     priority?: number
 ): StateMachineState {
-    const newTransitions = [...state.outgoingTransitions];
-    newTransitions.splice(
-        priority ?? state.outgoingTransitions.length,
-        0,
-        newTransition
-    );
+    const newTransitions = { ...state.outgoingTransitions };
+    newTransitions[newTransition.id] = newTransition;
 
     return {
         ...state,
         outgoingTransitions: newTransitions,
     };
-}
-
-export function getTaskProgress(
-    taskId: TaskType['id'],
-    stateMachine: StateMachine
-): TaskProgress {
-    console.assert(
-        stateMachine.tasks[taskId],
-        `Task ${taskId} does not exist on stateMachine.`,
-        stateMachine
-    );
-    const timeSpent = stateMachine.taskTimeSpent[taskId] ?? 0;
-    const totalTaskDuration = stateMachine.tasks[taskId]!.totalDuration;
-    const progressPercentage = timeSpent / totalTaskDuration;
-    return { timeSpent, progressPercentage };
-}
-
-export function getTimerProgress(
-    timerId: Timer['id'],
-    stateMachine: StateMachine,
-    currentTime: ExerciseState['currentTime']
-): TimerProgress {
-    const relativeTime = currentTime - stateMachine.simulationStartTime;
-
-    const timer = stateMachine.timers[timerId]!;
-
-    const progressPercentage = relativeTime / timer.totalDuration;
-
-    return { relativeTime, progressPercentage };
-}
-
-export function getGuardProgress(
-    guard: Guard,
-    stateMachine: StateMachine,
-    currentTime: ExerciseState['currentTime']
-): GuardProgress {
-    switch (guard.type) {
-        case 'taskGuard':
-            return getTaskProgress(guard.taskId, stateMachine);
-        case 'timerGuard':
-            return getTimerProgress(guard.timerId, stateMachine, currentTime);
-        case 'andGuard': {
-            const res = guard.guards.reduce(
-                (v, g) =>
-                    v +
-                    getGuardProgress(g, stateMachine, currentTime)
-                        .progressPercentage,
-                0
-            );
-            return { progressPercentage: res / guard.guards.length };
-        }
-        case 'notGuard':
-            return {
-                progressPercentage: isGuardFulfilled(
-                    guard.guard,
-                    stateMachine,
-                    currentTime
-                )
-                    ? 0
-                    : 1,
-            };
-    }
 }
 
 export interface GuardProgress {
@@ -227,41 +182,15 @@ export interface GuardProgress {
 
 export interface TaskProgress extends GuardProgress {
     timeSpent: number;
+    rate: number;
 }
 
 export interface TimerProgress extends GuardProgress {
     relativeTime: number;
 }
 
-function isTaskGuardFulfilled(
-    taskGuard: TaskGuard,
-    stateMachine: StateMachine
-): boolean {
-    const { progressPercentage } = getTaskProgress(
-        taskGuard.taskId,
-        stateMachine
-    );
-    return progressPercentage >= taskGuard.minProgress;
-}
-
-function isTimerGuardFulfilled(
-    timerGuard: TimerGuard,
-    stateMachine: StateMachine,
-    currentTime: number
-): boolean {
-    const { progressPercentage } = getTimerProgress(
-        timerGuard.timerId,
-        stateMachine,
-        currentTime
-    );
-
-    return progressPercentage >= timerGuard.minProgress;
-}
-
-export type Transition = Immutable<z.infer<typeof transitionSchema>>;
-
 export const stateMachineDefinitionSchema = z.strictObject({
-    id: uuidSchema.brand<'StateMachineId'>(),
+    id: stateMachineIdSchema,
     name: z.string(),
     states: z.record(stateMachineStateSchema.shape.id, stateMachineStateSchema),
     initialStateId: stateMachineStateSchema.shape.id,
@@ -275,10 +204,7 @@ export const stateMachineSchema = z
         // runtime values:
         simulationStartTime: z.number().default(0),
         currentStateId: stateMachineStateSchema.shape.id,
-        taskTimeSpent: z.record(
-            taskTypeSchema.shape.id,
-            z.number().nonnegative()
-        ),
+        taskTimeSpent: z.record(taskTypeSchema.shape.id, taskTimeSpentSchema),
         assignedPersonnel: z.record(
             personnelSchema.shape.id,
             taskTypeSchema.shape.id
@@ -294,146 +220,3 @@ export const stateMachineSchema = z
         }
     });
 export type StateMachine = Immutable<z.infer<typeof stateMachineSchema>>;
-
-export function currentStateOf(
-    stateMachine: WritableDraft<StateMachine>
-): WritableDraft<StateMachineState>;
-export function currentStateOf(stateMachine: StateMachine): StateMachineState;
-export function currentStateOf(
-    stateMachine: StateMachine | WritableDraft<StateMachine>
-): StateMachineState | WritableDraft<StateMachineState> {
-    const state = stateMachine.states[stateMachine.currentStateId];
-    console.assert(
-        !!state,
-        `Invalid current state: ${stateMachine.currentStateId} for challenge ${stateMachine.id}`
-    );
-    return state!;
-}
-
-function currentlyPossibleTaskIds(
-    stateMachine: StateMachine
-): TaskType['id'][] {
-    const currentState = currentStateOf(stateMachine);
-
-    return TypeAssertedObject.keys(currentState.possibleTasks);
-}
-
-function unassignFromNonexistentTasks(
-    stateMachine: WritableDraft<StateMachine>
-): { personnelId: Personnel['id']; taskTypeId: TaskType['id'] }[] {
-    const unassignedPersonnel: {
-        taskTypeId: TaskType['id'];
-        personnelId: Personnel['id'];
-    }[] = [];
-    for (const [personnelId, taskTypeId] of Object.entries(
-        stateMachine.assignedPersonnel
-    )) {
-        if (!currentlyPossibleTaskIds(stateMachine).includes(taskTypeId)) {
-            delete stateMachine.assignedPersonnel[personnelId];
-            unassignedPersonnel.push({ taskTypeId, personnelId });
-        }
-    }
-    return unassignedPersonnel;
-}
-
-function isGuardFulfilled(
-    guard: Guard,
-    stateMachine: StateMachine,
-    currentTime: number
-): boolean {
-    switch (guard.type) {
-        case 'taskGuard':
-            return isTaskGuardFulfilled(guard, stateMachine);
-        case 'timerGuard':
-            return isTimerGuardFulfilled(guard, stateMachine, currentTime);
-        case 'andGuard':
-            return guard.guards.every((g) =>
-                isGuardFulfilled(g, stateMachine, currentTime)
-            );
-        case 'notGuard':
-            return !isGuardFulfilled(guard.guard, stateMachine, currentTime);
-    }
-}
-
-function simulateStateMachine(
-    stateMachine: WritableDraft<StateMachine>,
-    currentTime: number,
-    tickInterval: number,
-    logStateTransition?: (targetStateId: StateMachineState['id']) => void,
-    logPersonnelUnassigned?: (
-        personnelId: Personnel['id'],
-        taskTypeId: TaskType['id']
-    ) => void
-): void {
-    const state = currentStateOf(stateMachine);
-
-    for (const taskId of Object.values(stateMachine.assignedPersonnel)) {
-        if (state.possibleTasks[taskId]) {
-            stateMachine.taskTimeSpent[taskId] ??= 0;
-            stateMachine.taskTimeSpent[taskId] +=
-                tickInterval * state.possibleTasks[taskId];
-        }
-    }
-
-    const guardFulfilled = (t: Transition) =>
-        isGuardFulfilled(t.guard, stateMachine, currentTime);
-
-    // the next transition is not necessarily the first one to have its guard
-    // fulfilled
-    const nextTransition = state.outgoingTransitions.find(guardFulfilled);
-
-    if (!nextTransition) return;
-
-    logStateTransition?.(nextTransition.targetState);
-
-    stateMachine.currentStateId = nextTransition.targetState;
-
-    const unassignedPersonnel = unassignFromNonexistentTasks(stateMachine);
-
-    if (unassignedPersonnel.length > 0 && logPersonnelUnassigned) {
-        for (const { personnelId, taskTypeId } of unassignedPersonnel) {
-            logPersonnelUnassigned(personnelId, taskTypeId);
-        }
-    }
-}
-
-export function simulateTechnicalChallenge(
-    technicalChallenge: WritableDraft<TechnicalChallenge>,
-    exerciseState: WritableDraft<ExerciseState>,
-    tickInterval: number
-) {
-    for (const stateMachine of Object.values(
-        technicalChallenge.stateMachines
-    )) {
-        const currentStateId = stateMachine.currentStateId;
-        simulateStateMachine(
-            stateMachine,
-            exerciseState.currentTime,
-            tickInterval,
-            (targetStateId) =>
-                logTechnicalChallengeStateTransition(
-                    exerciseState,
-                    technicalChallenge.id,
-                    currentStateId,
-                    targetStateId
-                ),
-            (personnelId, taskTypeId) =>
-                logTechnicalChallengePersonnelUnassigned(
-                    exerciseState,
-                    technicalChallenge.id,
-                    personnelId,
-                    taskTypeId
-                )
-        );
-    }
-}
-
-export function simulateAllTechnicalChallenges(
-    draftState: WritableDraft<ExerciseState>,
-    tickInterval: number
-) {
-    // TODO@Julius: this is a naïve implementation, somebody should improve it
-    for (const challenge of Object.values(draftState.technicalChallenges)) {
-        simulateTechnicalChallenge(challenge, draftState, tickInterval);
-    }
-}

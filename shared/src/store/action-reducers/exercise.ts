@@ -25,8 +25,8 @@ import { type UUID, uuid } from '../../utils/uuid.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
-import { simulateAllTechnicalChallenges } from '../../models/technical-challenge/state-machine.js';
 import { viewportSchema } from '../../models/viewport.js';
+import { simulateAllTechnicalChallenges } from '../../state-helpers/state-machine.js';
 import { patientUpdateSchema } from './utils/patient-updates.js';
 import {
     logPatientVisibleStatusChanged,

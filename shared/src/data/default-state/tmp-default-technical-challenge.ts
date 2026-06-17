@@ -202,6 +202,280 @@ export namespace StateMachineTesting {
         [extinguishFireTask.id, rescuePatientTask.id],
         initialContent
     );
+
+    // ====================================================================
+    // Kellerexplosion in Mehrfamilienhaus
+    // ====================================================================
+
+    // --- Task Types ---
+
+    export const searchTask: TaskType = {
+        id: 'a1b2c3d4-e5f6-4890-8bcd-ef1234567890' as TaskType['id'],
+        type: 'taskType',
+        taskName: 'Suche',
+    };
+    export const firstAidTask: TaskType = {
+        id: 'c3d4e5f6-a7b8-4012-adef-123456789012' as TaskType['id'],
+        type: 'taskType',
+        taskName: 'Erstversorgung',
+    };
+    export const shoringTask: TaskType = {
+        id: 'd4e5f6a7-b8c9-4123-bef0-234567890123' as TaskType['id'],
+        type: 'taskType',
+        taskName: 'Abstützung',
+    };
+    export const debrisClearingTask: TaskType = {
+        id: 'e5f6a7b8-c9d0-4234-8f01-345678901234' as TaskType['id'],
+        type: 'taskType',
+        taskName: 'Trümmerräumung',
+    };
+
+    // --- Task Durations ---
+
+    export const searchTaskDuration = 45_000;
+    export const firstAidTaskDuration = 30_000;
+    export const shoringTaskDuration = 120_000;
+    export const debrisClearingTaskDuration = 90_000;
+    export const technicalExtricationTaskDuration = 80_000;
+
+    // --- Timer IDs & Durations ---
+
+    export const secondaryCollapseTimerId =
+        'f6a7b8c9-d0e1-4345-9012-456789012345' as TimerGuard['timerId'];
+    export const secondaryCollapseTimerDuration = 150_000;
+    export const survivalTimerId =
+        'a7b8c9d0-e1f2-4456-a123-567890123456' as TimerGuard['timerId'];
+    export const survivalTimerDuration = 200_000;
+    export const lossOfConsciousnessTimerId =
+        'b8c9d0e1-f2a3-4567-b234-678901234567' as TimerGuard['timerId'];
+    export const lossOfConsciousnessTimerDuration = 100_000;
+
+    // --- Guards ---
+
+    export const isShoringComplete = {
+        type: 'taskGuard',
+        minProgress: 1,
+        taskId: shoringTask.id,
+    } as const;
+    export const isDebrisCleared = {
+        type: 'taskGuard',
+        minProgress: 1,
+        taskId: debrisClearingTask.id,
+    } as const;
+    export const isSecondaryCollapse = {
+        type: 'timerGuard',
+        minProgress: 1,
+        timerId: secondaryCollapseTimerId,
+    } as const;
+    export const isSearchComplete = {
+        type: 'taskGuard',
+        minProgress: 1,
+        taskId: searchTask.id,
+    } as const;
+    export const isPersonExtricated = {
+        type: 'taskGuard',
+        minProgress: 1,
+        taskId: rescuePatientTask.id,
+    } as const;
+    export const isSurvivalTimerExpired = {
+        type: 'timerGuard',
+        minProgress: 1,
+        timerId: survivalTimerId,
+    } as const;
+    export const isPersonUnconscious = {
+        type: 'timerGuard',
+        minProgress: 1,
+        timerId: lossOfConsciousnessTimerId,
+    } as const;
+    export const isFirstAidComplete = {
+        type: 'taskGuard',
+        minProgress: 1,
+        taskId: firstAidTask.id,
+    } as const;
+
+    // --- SM1 States (Struktursicherung) ---
+
+    export const sm1AccessSecured = newTechnicalChallengeState(
+        'Zugang gesichert',
+        newImageProperties(
+            '/assets/kellerexplosion/shored_and_cleared.png',
+            300,
+            1
+        ),
+        [],
+        [],
+        {
+            type: 'userGeneratedContent',
+            content:
+                '<p>Die Einsturzstelle ist gesichert. Der Zugang ist freigegeben.</p>',
+        }
+    );
+    export const sm1SecondaryCollapse = newTechnicalChallengeState(
+        'Nachsturz eingetreten',
+        newImageProperties(
+            '/assets/kellerexplosion/secondary_collapse.png',
+            300,
+            1
+        ),
+        [],
+        [],
+        {
+            type: 'userGeneratedContent',
+            content:
+                '<p>Ein Nachsturz hat die Einsturzstelle erneut verschüttet. Der Zugang ist nicht mehr passierbar.</p>',
+        }
+    );
+    export const sm1StructureUnstable = newTechnicalChallengeState(
+        'Einsturzstelle instabil',
+        newImageProperties('/assets/kellerexplosion/base.png', 300, 1),
+        [
+            {
+                targetState: sm1AccessSecured.id,
+                guard: {
+                    type: 'andGuard',
+                    guards: [isShoringComplete, isDebrisCleared],
+                },
+            },
+            {
+                targetState: sm1SecondaryCollapse.id,
+                guard: isSecondaryCollapse,
+            },
+        ],
+        [shoringTask.id, debrisClearingTask.id],
+        {
+            type: 'userGeneratedContent',
+            content:
+                '<p>Die Einsturzstelle ist instabil. Struktur muss abgestützt und der Zugang freigeräumt werden – beide Maßnahmen müssen abgeschlossen sein, bevor ein sicheres Vorgehen möglich ist.</p>',
+        }
+    );
+
+    // --- SM2 States (Personenrettung) ---
+
+    export const sm2RescueSuccessful = newTechnicalChallengeState(
+        'Rettung erfolgreich',
+        // TODO: Replace with an image fitting a successful basement rescue
+        newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [],
+        [],
+        {
+            type: 'userGeneratedContent',
+            content:
+                '<p>Die Person wurde erfolgreich gerettet und befindet sich in einem stabilen Zustand.</p>',
+        }
+    );
+    export const sm2PersonCritical = newTechnicalChallengeState(
+        'Person notversorgt',
+        // TODO: Replace with an image fitting a critically injured person from a basement explosion
+        newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [],
+        [],
+        {
+            type: 'userGeneratedContent',
+            content:
+                '<p>Die Person wurde gerettet, befindet sich jedoch in einem kritischen Zustand.</p>',
+        }
+    );
+    export const sm2PersonDeceased = newTechnicalChallengeState(
+        'Person verstorben',
+        // TODO: Replace with an image fitting a fatal basement explosion outcome
+        newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
+        [],
+        [],
+        {
+            type: 'userGeneratedContent',
+            content:
+                '<p>Die Person ist ihren Verletzungen erlegen. Die Rettung kam zu spät.</p>',
+        }
+    );
+    export const sm2PersonExtricatedConscious = newTechnicalChallengeState(
+        'Person befreit (bei Bewusstsein)',
+        // TODO: Replace with an image fitting a conscious person being treated after basement rescue
+        newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [
+            {
+                targetState: sm2RescueSuccessful.id,
+                guard: isFirstAidComplete,
+            },
+        ],
+        [firstAidTask.id],
+        {
+            type: 'userGeneratedContent',
+            content:
+                '<p>Die Person wurde befreit und ist noch ansprechbar. Erstversorgung einleiten.</p>',
+        }
+    );
+    export const sm2PersonExtricatedUnconscious = newTechnicalChallengeState(
+        'Person befreit (bewusstlos)',
+        // TODO: Replace with an image fitting an unconscious person being treated after basement rescue
+        newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [
+            {
+                targetState: sm2PersonCritical.id,
+                guard: isFirstAidComplete,
+            },
+        ],
+        [firstAidTask.id],
+        {
+            type: 'userGeneratedContent',
+            content:
+                '<p>Die Person wurde befreit, ist jedoch nicht mehr ansprechbar. Sofortige Erstversorgung erforderlich.</p>',
+        }
+    );
+    export const sm2PersonLocated = newTechnicalChallengeState(
+        'Person gefunden',
+        // TODO: Replace with an image fitting a person found trapped under rubble in a basement
+        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
+        [
+            {
+                targetState: sm2PersonExtricatedConscious.id,
+                guard: {
+                    type: 'andGuard',
+                    guards: [
+                        isPersonExtricated,
+                        { type: 'notGuard', guard: isPersonUnconscious },
+                    ],
+                },
+            },
+            {
+                targetState: sm2PersonExtricatedUnconscious.id,
+                guard: {
+                    type: 'andGuard',
+                    guards: [isPersonExtricated, isPersonUnconscious],
+                },
+            },
+            {
+                targetState: sm2PersonDeceased.id,
+                guard: isSurvivalTimerExpired,
+            },
+        ],
+        [rescuePatientTask.id],
+        {
+            type: 'userGeneratedContent',
+            content:
+                '<p>Die vermisste Person wurde lokalisiert. Sie ist unter Trümmern eingeklemmt und benötigt technische Befreiung.</p>',
+        }
+    );
+    export const sm2PersonMissing = newTechnicalChallengeState(
+        'Person vermisst',
+        // TODO: Replace with an image fitting a basement explosion scene with a missing person
+        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
+        [
+            {
+                targetState: sm2PersonLocated.id,
+                guard: isSearchComplete,
+            },
+            {
+                targetState: sm2PersonDeceased.id,
+                guard: isSurvivalTimerExpired,
+            },
+        ],
+        [searchTask.id],
+        {
+            type: 'userGeneratedContent',
+            content:
+                '<p>Im Keller des Gebäudes wird eine Person vermisst. Letzte bekannte Position: Heizungsraum.</p>',
+        }
+    );
 }
 
 function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
@@ -310,5 +584,10 @@ export function getDefaultTasks(): { [key: UUID]: TaskType } {
             StateMachineTesting.extinguishFireTask,
         [StateMachineTesting.rescuePatientTask.id]:
             StateMachineTesting.rescuePatientTask,
+        [StateMachineTesting.searchTask.id]: StateMachineTesting.searchTask,
+        [StateMachineTesting.firstAidTask.id]: StateMachineTesting.firstAidTask,
+        [StateMachineTesting.shoringTask.id]: StateMachineTesting.shoringTask,
+        [StateMachineTesting.debrisClearingTask.id]:
+            StateMachineTesting.debrisClearingTask,
     };
 }

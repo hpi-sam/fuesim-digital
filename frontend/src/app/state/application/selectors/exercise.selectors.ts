@@ -435,7 +435,7 @@ export function createSelectActivityStatesByType<
     );
 }
 
-function createSelectCurrentStateOf(
+export function createSelectCurrentStateOf(
     technicalChallengeId: TechnicalChallengeId,
     stateMachineId: StateMachine['id']
 ) {

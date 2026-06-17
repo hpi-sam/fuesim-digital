@@ -4,12 +4,13 @@ import type {
     Personnel,
     TaskType,
     StateMachineState,
+    Transition,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import {
     currentStateOf,
+    getGuardProgress,
     getTaskProgress,
-    getTimerProgress,
 } from 'fuesim-digital-shared';
 import { ProgressBarComponent } from '../progress-bar/progress-bar.component.js';
 import {
@@ -71,41 +72,28 @@ export class StateMachineDetailsComponent {
         }[]
     > = computed(() =>
         this.currentState().outgoingTransitions.map((transition) => {
-            if (
-                transition.guard.type === 'andGuard' ||
-                transition.guard.type === 'notGuard'
-            ) {
-                throw Error('Not implemented');
-            }
-
             // TODO@Felix: refactor into helper function(s)
 
-            const currentProgress =
-                transition.guard.type === 'taskGuard'
-                    ? getTaskProgress(
-                          transition.guard.taskId,
-                          this.stateMachine()
-                      )
-                    : getTimerProgress(
-                          transition.guard.timerId,
-                          this.stateMachine(),
-                          this.currentTime()
-                      );
+            const currentProgress = getGuardProgress(
+                transition.guard,
+                this.stateMachine(),
+                this.currentTime()
+            );
 
-            const guardName =
-                transition.guard.type === 'taskGuard'
-                    ? selectStateSnapshot(
-                          createSelectTaskType(transition.guard.taskId),
-                          this.store
-                      ).taskName
-                    : this.stateMachine().timers[transition.guard.timerId]!
-                          .name;
+            const guardName = this.getGuardName(
+                transition.guard,
+                this.stateMachine()
+            );
 
             return {
                 id: transition.targetState,
                 targetStateName:
                     this.stateMachine().states[transition.targetState]!.title,
-                requiredProgress: transition.guard.minProgress * 100,
+                requiredProgress:
+                    (transition.guard.type === 'taskGuard' ||
+                    transition.guard.type === 'timerGuard'
+                        ? transition.guard.minProgress
+                        : 1) * 100,
                 currentProgress: currentProgress.progressPercentage * 100,
                 guardName,
             };
@@ -129,4 +117,28 @@ export class StateMachineDetailsComponent {
             totalDuration: timer.totalDuration / 1000,
         }))
     );
+
+    private getGuardName(
+        guard: Transition['guard'],
+        stateMachine: StateMachine
+    ): string {
+        switch (guard.type) {
+            case 'taskGuard':
+                return selectStateSnapshot(
+                    createSelectTaskType(guard.taskId),
+                    this.store
+                ).taskName;
+            case 'timerGuard':
+                return stateMachine.timers[guard.timerId]!.name;
+            case 'andGuard': {
+                const names = guard.guards.map((g) =>
+                    this.getGuardName(g, stateMachine)
+                );
+                if (names.length <= 1) return names[0] ?? '';
+                return `${names.slice(0, -1).join(', ')} und ${names.at(-1)}`;
+            }
+            case 'notGuard':
+                return `nicht ${this.getGuardName(guard.guard, stateMachine)}`;
+        }
+    }
 }

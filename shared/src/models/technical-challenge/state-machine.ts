@@ -74,7 +74,7 @@ export interface NotGuard {
     guard: _Guard;
 }
 
-type _Guard = AndGuard | NotGuard | TaskGuard | TimerGuard;
+type _Guard = Immutable<AndGuard | NotGuard | TaskGuard | TimerGuard>;
 export const guardSchema: z.ZodType<_Guard> = z.lazy(() =>
     z.discriminatedUnion('type', [
         taskGuardSchema,
@@ -151,7 +151,7 @@ export function addTransitionTo(
 export function getTaskProgress(
     taskId: TaskType['id'],
     stateMachine: StateMachine
-) {
+): TaskProgress {
     console.assert(
         stateMachine.tasks[taskId],
         `Task ${taskId} does not exist on stateMachine.`,
@@ -167,7 +167,7 @@ export function getTimerProgress(
     timerId: Timer['id'],
     stateMachine: StateMachine,
     currentTime: ExerciseState['currentTime']
-) {
+): TimerProgress {
     const relativeTime = currentTime - stateMachine.simulationStartTime;
 
     const timer = stateMachine.timers[timerId]!;
@@ -175,6 +175,51 @@ export function getTimerProgress(
     const progressPercentage = relativeTime / timer.totalDuration;
 
     return { relativeTime, progressPercentage };
+}
+
+export function getGuardProgress(
+    guard: _Guard,
+    stateMachine: StateMachine,
+    currentTime: ExerciseState['currentTime']
+): GuardProgress {
+    switch (guard.type) {
+        case 'taskGuard':
+            return getTaskProgress(guard.taskId, stateMachine);
+        case 'timerGuard':
+            return getTimerProgress(guard.timerId, stateMachine, currentTime);
+        case 'andGuard': {
+            const res = guard.guards.reduce(
+                (v, g) =>
+                    v +
+                    getGuardProgress(g, stateMachine, currentTime)
+                        .progressPercentage,
+                0
+            );
+            return { progressPercentage: res / guard.guards.length };
+        }
+        case 'notGuard':
+            return {
+                progressPercentage: isGuardFulfilled(
+                    guard.guard,
+                    stateMachine,
+                    currentTime
+                )
+                    ? 0
+                    : 1,
+            };
+    }
+}
+
+export interface GuardProgress {
+    progressPercentage: number;
+}
+
+export interface TaskProgress extends GuardProgress {
+    timeSpent: number;
+}
+
+export interface TimerProgress extends GuardProgress {
+    relativeTime: number;
 }
 
 function isTaskGuardFulfilled(

@@ -96,6 +96,12 @@ import {
 } from './models/technical-challenge/technical-challenge.js';
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
+import {
+    newTechnicalChallengeEventQueue,
+    type TechnicalChallengeEventQueue,
+    technicalChallengeEventQueueSchema,
+} from './models/technical-challenge/event.js';
+import { type ExerciseTime, exerciseTimeSchema } from './models/time.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -107,8 +113,8 @@ export class ExerciseState {
      *
      * It is guaranteed that the `ExerciseTickAction` is the only action that modifies this value.
      */
-    @IsZodSchema(z.int().nonnegative())
-    public readonly currentTime: number = 0;
+    @IsZodSchema(exerciseTimeSchema)
+    public readonly currentTime: ExerciseTime = 0;
 
     @IsZodSchema(exerciseTypeSchema)
     public readonly type: ExerciseType = 'standalone';
@@ -265,6 +271,10 @@ export class ExerciseState {
     @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
     public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
 
+    @IsZodSchema(technicalChallengeEventQueueSchema)
+    public readonly technicalChallengeEventQueue: TechnicalChallengeEventQueue =
+        newTechnicalChallengeEventQueue();
+
     /**
      * @deprecated Use {@link create} instead.
      */
@@ -279,5 +289,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 57;
+    static readonly currentStateVersion = 58;
 }

@@ -17,10 +17,19 @@ import {
     logTechnicalChallengePersonnelUnassigned,
     logTechnicalChallengeStateTransition,
 } from '../../store/action-reducers/utils/log.js';
+import {
+    insert,
+    modify,
+    peek,
+    pop,
+    remove,
+} from '../../state-helpers/events.js';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,
 } from './technical-challenge.js';
+import type { TechnicalChallengeEvent } from './event.js';
+import { newTechnicalChallengeEvent } from './event.js';
 
 export const technicalChallengeStateIdSchema = uuidSchema.brand(
     'TechnicalChallengeStateId'
@@ -90,7 +99,8 @@ function isProgressGuardFulfilled(
         'technicalChallenge',
         technicalChallengeId
     );
-    const progress = challenge.taskProgress[progressGuard.taskId] ?? 0;
+    const progress =
+        challenge.taskProgress[progressGuard.taskId]?.progress ?? 0;
     return (
         progress < (progressGuard.maxProgress ?? Number.MAX_VALUE) &&
         progress >= (progressGuard.minProgress ?? 0)
@@ -116,6 +126,7 @@ export const guardSchema = z.union([progressGuardSchema, timerGuardSchema]);
 export type Guard = ProgressGuard | TimerGuard;
 
 export const transitionSchema = z.object({
+    id: uuidSchema,
     to: technicalChallengeStateIdSchema,
     from: technicalChallengeStateIdSchema,
     guard: guardSchema,
@@ -150,7 +161,7 @@ export const stateMachineSchema = z.strictObject({
         technicalChallengeStateSchema
     ),
     relevantTasks: z.record(taskSchema.shape.id, taskSchema),
-    transitions: z.array(transitionSchema),
+    transitions: z.record(transitionSchema.shape.id, transitionSchema),
     simulationStartTime: z.number(),
 });
 
@@ -188,30 +199,244 @@ function unassignFromNonexistentTasks(
     return unassignedPersonnel;
 }
 
+export function updateTaskProgress(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallenge: WritableDraft<TechnicalChallenge>,
+    taskId: UUID,
+    state: TechnicalChallengeState | null = null
+) {
+    // eslint-disable-next-line no-param-reassign
+    state ??= currentStateOf(technicalChallenge);
+
+    if (!state.possibleTasks[taskId]) return;
+
+    const taskProgress = technicalChallenge.taskProgress[taskId];
+
+    if (!taskProgress) {
+        technicalChallenge.taskProgress[taskId] = {
+            progress: 0,
+            lastUpdatedAt: exerciseState.currentTime,
+        };
+        return;
+    }
+
+    const nAssignedPersonnel = Object.values(
+        technicalChallenge.assignedPersonnel
+    ).filter((_taskId) => _taskId === taskId).length;
+
+    taskProgress.progress =
+        taskProgress.progress +
+        (exerciseState.currentTime - taskProgress.lastUpdatedAt) *
+            nAssignedPersonnel *
+            state.possibleTasks[taskId];
+    taskProgress.lastUpdatedAt = exerciseState.currentTime;
+}
+
+export function updateAllTasksProgress(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallenge: WritableDraft<TechnicalChallenge>
+) {
+    const state = currentStateOf(technicalChallenge);
+
+    for (const taskId of Object.keys(state.possibleTasks))
+        updateTaskProgress(exerciseState, technicalChallenge, taskId);
+}
+
+function computeEarliestEvent(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallenge: WritableDraft<TechnicalChallenge>,
+    transitions: Transition[]
+): TechnicalChallengeEvent | null {
+    const state = currentStateOf(technicalChallenge);
+    let earliestTimestamp = Infinity;
+    let earliestEvent: TechnicalChallengeEvent | null = null;
+
+    for (const transition of transitions) {
+        const guard = transition.guard;
+        let eventTimestamp = Infinity;
+
+        switch (guard.type) {
+            case 'progressGuard': {
+                const nAssignedPersonnel = Object.values(
+                    technicalChallenge.assignedPersonnel
+                ).filter((taskId) => taskId === guard.taskId).length;
+
+                if (nAssignedPersonnel === 0) continue;
+
+                const taskProgress =
+                    technicalChallenge.taskProgress[guard.taskId]!;
+                eventTimestamp =
+                    exerciseState.currentTime +
+                    ((guard.minProgress ?? 0) - taskProgress.progress) /
+                        (nAssignedPersonnel *
+                            state.possibleTasks[guard.taskId]!);
+                break;
+            }
+            case 'timerGuard': {
+                eventTimestamp =
+                    technicalChallenge.simulationStartTime +
+                    guard.minTimePassed;
+                break;
+            }
+        }
+
+        if (eventTimestamp >= earliestTimestamp) continue;
+        earliestTimestamp = eventTimestamp;
+        earliestEvent = newTechnicalChallengeEvent(
+            eventTimestamp,
+            technicalChallenge.id,
+            transition.id
+        );
+    }
+
+    return earliestEvent;
+}
+
+function applyEventToQueue(
+    exerciseState: WritableDraft<ExerciseState>,
+    challengeId: TechnicalChallengeId,
+    earliestEvent: TechnicalChallengeEvent | null
+): void {
+    const queue = exerciseState.technicalChallengeEventQueue;
+
+    if (earliestEvent === null) {
+        remove(queue, challengeId);
+        return;
+    }
+    if (queue.indices[challengeId] === undefined) {
+        insert(queue, earliestEvent);
+        return;
+    }
+    const current = queue.events[queue.indices[challengeId]]!;
+    if (
+        current.transitionId === earliestEvent.transitionId &&
+        current.timestamp === earliestEvent.timestamp
+    )
+        return;
+    modify(queue, challengeId, earliestEvent);
+}
+
+/** Full recomputation across all transitions — use after state transitions and on initial creation. */
+export function updateEventQueue(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallenge: WritableDraft<TechnicalChallenge>
+): void {
+    const potentialTransitions = Object.values(
+        technicalChallenge.transitions
+    ).filter((t) => t.from === technicalChallenge.currentStateId);
+
+    if (potentialTransitions.length === 0) {
+        remove(
+            exerciseState.technicalChallengeEventQueue,
+            technicalChallenge.id
+        );
+        return;
+    }
+
+    const earliestEvent = computeEarliestEvent(
+        exerciseState,
+        technicalChallenge,
+        potentialTransitions
+    );
+    applyEventToQueue(exerciseState, technicalChallenge.id, earliestEvent);
+}
+
+/**
+ * Targeted update after a personnel is assigned to taskId.
+ * Only recomputes transitions for taskId; only updates the queue if the new
+ * event fires earlier than the current one.
+ */
+export function updateEventQueueAfterAssignment(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallenge: WritableDraft<TechnicalChallenge>,
+    taskId: UUID
+): void {
+    const affectedTransitions = Object.values(
+        technicalChallenge.transitions
+    ).filter(
+        (t) =>
+            t.from === technicalChallenge.currentStateId &&
+            t.guard.type === 'progressGuard' &&
+            t.guard.taskId === taskId
+    );
+
+    if (affectedTransitions.length === 0) return;
+
+    const newEvent = computeEarliestEvent(
+        exerciseState,
+        technicalChallenge,
+        affectedTransitions
+    );
+    if (newEvent === null) return;
+
+    const queue = exerciseState.technicalChallengeEventQueue;
+    if (queue.indices[technicalChallenge.id] === undefined) {
+        insert(queue, newEvent);
+        return;
+    }
+    const current = queue.events[queue.indices[technicalChallenge.id]!]!;
+    if (newEvent.timestamp < current.timestamp) {
+        modify(queue, technicalChallenge.id, newEvent);
+    }
+}
+
+/**
+ * Targeted update after a personnel is removed from taskId.
+ * If the current queue event is not for taskId, no recomputation is needed
+ * (non-affected transitions are unchanged, and affected ones only got slower).
+ * If it is for taskId, falls back to a full recomputation.
+ */
+export function updateEventQueueAfterUnassignment(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallenge: WritableDraft<TechnicalChallenge>,
+    taskId: UUID
+): void {
+    const queue = exerciseState.technicalChallengeEventQueue;
+    const idx = queue.indices[technicalChallenge.id];
+    if (idx === undefined) return;
+
+    const currentTransition =
+        technicalChallenge.transitions[queue.events[idx]!.transitionId];
+    if (
+        currentTransition?.guard.type !== 'progressGuard' ||
+        currentTransition.guard.taskId !== taskId
+    )
+        return;
+
+    updateEventQueue(exerciseState, technicalChallenge);
+}
+
 export function simulateTechnicalChallenge(
     technicalChallenge: WritableDraft<TechnicalChallenge>,
+    transitionId: WritableDraft<UUID>,
     exerciseState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {
-    const state = currentStateOf(technicalChallenge);
-    for (const taskId of Object.values(technicalChallenge.assignedPersonnel)) {
-        if (state.possibleTasks[taskId]) {
-            technicalChallenge.taskProgress[taskId] ??= 0;
-            technicalChallenge.taskProgress[taskId] +=
-                tickInterval * state.possibleTasks[taskId];
-        }
-    }
+    // const state = currentStateOf(technicalChallenge);
+    // for (const taskId of Object.values(technicalChallenge.assignedPersonnel)) {
+    //     if (state.possibleTasks[taskId]) {
+    //         technicalChallenge.taskProgress[taskId] ??= newTaskProgress();
+    //         technicalChallenge.taskProgress[taskId].progress +=
+    //             tickInterval * state.possibleTasks[taskId];
+    //         technicalChallenge.taskProgress[taskId].lastUpdatedAt =
+    //             exerciseState.currentTime;
+    //     }
+    // }
 
-    const fromCurrentState = (t: Transition) =>
-        t.from === technicalChallenge.currentStateId;
-    const guardFulfilled = (t: Transition) =>
-        isGuardFulfilled(t.guard, technicalChallenge.id, exerciseState);
+    // const fromCurrentState = (t: Transition) =>
+    //     t.from === technicalChallenge.currentStateId;
+    // const guardFulfilled = (t: Transition) =>
+    //     isGuardFulfilled(t.guard, technicalChallenge.id, exerciseState);
 
-    // the next transition is not necessarily the first one to have its guard
-    // fulfilled
-    const nextTransition = technicalChallenge.transitions
-        .filter(fromCurrentState)
-        .find(guardFulfilled);
+    // // the next transition is not necessarily the first one to have its guard
+    // // fulfilled
+    // const nextTransition = Object.values(technicalChallenge.transitions)
+    //     .filter(fromCurrentState)
+    //     .find(guardFulfilled);
+
+    // if (!nextTransition) return;
+
+    const nextTransition = technicalChallenge.transitions[transitionId];
 
     if (!nextTransition) return;
 
@@ -221,6 +446,8 @@ export function simulateTechnicalChallenge(
         technicalChallenge.currentStateId,
         nextTransition.to
     );
+
+    updateAllTasksProgress(exerciseState, technicalChallenge);
 
     technicalChallenge.currentStateId = nextTransition.to;
 
@@ -236,13 +463,22 @@ export function simulateTechnicalChallenge(
             );
         }
     }
+
+    updateEventQueue(exerciseState, technicalChallenge);
 }
 
 export function simulateAllTechnicalChallenges(
     draftState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {
-    Object.values(draftState.technicalChallenges).forEach((challenge) =>
-        simulateTechnicalChallenge(challenge, draftState, tickInterval)
-    );
+    const queue = draftState.technicalChallengeEventQueue;
+    while ((peek(queue)?.timestamp ?? Infinity) <= draftState.currentTime) {
+        const event = pop(queue)!;
+        simulateTechnicalChallenge(
+            draftState.technicalChallenges[event.technicalChallengeId]!,
+            event.transitionId,
+            draftState,
+            tickInterval
+        );
+    }
 }

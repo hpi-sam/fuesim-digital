@@ -8,6 +8,10 @@ import {
 } from '../models/utils/position/position-helpers.js';
 import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
+import {
+    updateEventQueueAfterUnassignment,
+    updateTaskProgress,
+} from '../models/technical-challenge/state-machine.js';
 
 export function isPersonnelAssigned(
     personnelId: UUID,
@@ -55,9 +59,12 @@ export function removeInvalidAssignments(
     const invalidChallenges = challenges.filter(
         (c) => !isValidAssignment(personnel, c)
     );
-    invalidChallenges.forEach(
-        (challenge) => delete challenge.assignedPersonnel[personnelId]
-    );
+    invalidChallenges.forEach((challenge) => {
+        const taskId = challenge.assignedPersonnel[personnelId]!;
+        updateTaskProgress(draftState, challenge, taskId);
+        delete challenge.assignedPersonnel[personnelId];
+        updateEventQueueAfterUnassignment(draftState, challenge, taskId);
+    });
 
     return draftState;
 }

@@ -71,7 +71,10 @@ export class StateMachineDetailsComponent {
         }[]
     > = computed(() =>
         this.currentState().outgoingTransitions.map((transition) => {
-            if (transition.guard.type === 'andGuard') {
+            if (
+                transition.guard.type === 'andGuard' ||
+                transition.guard.type === 'notGuard'
+            ) {
                 throw Error('Not implemented');
             }
 

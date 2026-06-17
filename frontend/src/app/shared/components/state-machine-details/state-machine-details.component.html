@@ -1,127 +1,121 @@
-    <div class="p-2 row">
-        <div class="col-6">
-            <div class="card mb-2">
-                <div class="card-body d-flex">
-                    <div class="col-8">
-                        <h6 class="card-title">
-                            Aktueller Zustand
-                        </h6>
-                        <p class="card-text">
-                            {{ currentState().title }}
-                        </p>
-                    </div>
-                    <div class="col-4">
-                        <img
-                            alt=""
-                            [src]="currentState().image.url"
-                            class="w-100"
-                        />
-                    </div>
+<div class="p-2 row">
+    <div class="col-6">
+        <div class="card mb-2">
+            <div class="card-body d-flex">
+                <div class="col-8">
+                    <h6 class="card-title">Aktueller Zustand</h6>
+                    <p class="card-text">
+                        {{ currentState().title }}
+                    </p>
+                </div>
+                <div class="col-4">
+                    <img
+                        alt=""
+                        [src]="currentState().image.url"
+                        class="w-100"
+                    />
                 </div>
             </div>
-
-            <div class="card mb-2">
-                <div class="card-body">
-                    <h6 class="card-title mb-0">Übergänge</h6>
-                </div>
-                <ul class="list-group list-group-flush">
-                    @for (transition of transitions(); track transition.id) {
-                        <li class="list-group-item">
-                            Wenn
-                            <em>{{ transition.guardName }}</em>
-                            passiert ist, dann
-                            <span class="text-nowrap">
-                                            <i class="bi bi-arrow-right" title="wechsle in Zustand"></i>
-                                            <em>{{ transition.targetStateName }}</em>
-                                        </span>
-
-                            <app-progress-bar
-                                class="mt-1"
-                                [paused]="!exerciseRunning()"
-                                [max]="transition.requiredProgress"
-                                [current]="transition.currentProgress"
-                                [unit]="'%'"
-                            ></app-progress-bar>
-                        </li>
-                    } @empty {
-                        <li class="list-group-item">
-                            <em>Keine weiteren Übergänge...</em>
-                        </li>
-                    }
-                </ul>
-            </div>
-
-
         </div>
-        <div class="col-6">
-            <div class="card mb-2">
-                <div class="card-body">
-                    <h6 class="card-title mb-0">Aufgaben</h6>
-                </div>
-                <ul class="list-group list-group-flush">
-                    @for (task of tasks(); track task.id) {
-                        <li
-                            class="list-group-item flex-column"
-                        >
-                            {{ task.name }}
-                            <app-progress-bar
-                                [current]="task.current"
-                                [max]="task.totalDuration / 1000"
-                                [paused]="!exerciseRunning()"
-                            ></app-progress-bar>
-                        </li>
-                    } @empty {
-                        <li class="list-group-item">
-                            <em>Keine Aufgaben</em>
-                        </li>
-                    }
-                </ul>
+
+        <div class="card mb-2">
+            <div class="card-body">
+                <h6 class="card-title mb-0">Übergänge</h6>
             </div>
+            <ul class="list-group list-group-flush">
+                @for (transition of transitions(); track transition.id) {
+                    <li class="list-group-item">
+                        Wenn
+                        <em>{{ transition.guardName }}</em>
+                        passiert ist, dann
+                        <span class="text-nowrap">
+                            <i
+                                class="bi bi-arrow-right"
+                                title="wechsle in Zustand"
+                            ></i>
+                            <em>{{ transition.targetStateName }}</em>
+                        </span>
 
-            <div class="card mb-2">
-
-                <div class="card-body">
-                    <h6 class="card-title">Timer</h6>
-                </div>
-                <ul class="list-group list-group-flush">
-                    @for ( timer of timers(); track timer.id) {
-                        <li
-                            class="list-group-item flex-column"
-                        >
-                            {{ timer.name }}
-                            <app-progress-bar
-                                [current]="challengeAge() / 1000"
-                                [max]="timer.totalDuration / 1000"
-                                [paused]="!exerciseRunning()"
-                            ></app-progress-bar>
-                        </li>
-                    }
-                </ul>
-            </div>
-
-            <div class="card mb-2">
-                <div class="card-body">
-                    <h6 class="card-title">
-                        Zugewiesenes Personal
-                    </h6>
-                </div>
-                <ul class="list-group list-group-flush">
-                    @for (assignment of assignedPersonnel();
-                        track assignment[0].id + assignment[1].id) {
-                        @let personnel = assignment[0];
-                        @let taskName = assignment[1].taskName;
-
-                        <li class="list-group-item">
-                            <img
-                                alt=""
-                                [src]="personnel.image.url"
-                                style="max-height: 40px"
-                            />
-                            {{ personnel.typeName }}:
-                            {{ taskName }}
-                        </li>
-                    }
-                </ul>
-            </div>
+                        <app-progress-bar
+                            class="mt-1"
+                            [paused]="!exerciseRunning()"
+                            [max]="transition.requiredProgress"
+                            [current]="transition.currentProgress"
+                            [unit]="'%'"
+                        ></app-progress-bar>
+                    </li>
+                } @empty {
+                    <li class="list-group-item">
+                        <em>Keine weiteren Übergänge...</em>
+                    </li>
+                }
+            </ul>
         </div>
     </div>
+    <div class="col-6">
+        <div class="card mb-2">
+            <div class="card-body">
+                <h6 class="card-title mb-0">Aufgaben</h6>
+            </div>
+            <ul class="list-group list-group-flush">
+                @for (task of tasks(); track task.id) {
+                    <li class="list-group-item flex-column">
+                        {{ task.name }}
+                        <app-progress-bar
+                            [current]="task.current"
+                            [max]="task.totalDuration"
+                            [paused]="!exerciseRunning()"
+                        ></app-progress-bar>
+                    </li>
+                } @empty {
+                    <li class="list-group-item">
+                        <em>Keine Aufgaben</em>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-body">
+                <h6 class="card-title">Timer</h6>
+            </div>
+            <ul class="list-group list-group-flush">
+                @for (timer of timers(); track timer.id) {
+                    <li class="list-group-item flex-column">
+                        {{ timer.name }}
+                        <app-progress-bar
+                            [current]="challengeAge() / 1000"
+                            [max]="timer.totalDuration"
+                            [paused]="!exerciseRunning()"
+                        ></app-progress-bar>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-body">
+                <h6 class="card-title">Zugewiesenes Personal</h6>
+            </div>
+            <ul class="list-group list-group-flush">
+                @for (
+                    assignment of assignedPersonnel();
+                    track assignment[0].id + assignment[1].id
+                ) {
+                    @let personnel = assignment[0];
+                    @let taskName = assignment[1].taskName;
+
+                    <li class="list-group-item">
+                        <img
+                            alt=""
+                            [src]="personnel.image.url"
+                            style="max-height: 40px"
+                        />
+                        {{ personnel.typeName }}:
+                        {{ taskName }}
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

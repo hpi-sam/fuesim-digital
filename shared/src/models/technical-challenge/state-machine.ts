@@ -63,12 +63,24 @@ export interface AndGuard {
     guards: _Guard[];
 }
 
-type _Guard = AndGuard | TaskGuard | TimerGuard;
+const notGuardSchema = z.strictObject({
+    type: z.literal('notGuard'),
+    get guard() {
+        return guardSchema;
+    },
+});
+export interface NotGuard {
+    type: 'notGuard';
+    guard: _Guard;
+}
+
+type _Guard = AndGuard | NotGuard | TaskGuard | TimerGuard;
 export const guardSchema: z.ZodType<_Guard> = z.lazy(() =>
     z.discriminatedUnion('type', [
         taskGuardSchema,
         timerGuardSchema,
         andGuardSchema,
+        notGuardSchema,
     ])
 );
 
@@ -282,6 +294,8 @@ function isGuardFulfilled(
             return guard.guards.every((g) =>
                 isGuardFulfilled(g, stateMachine, currentTime)
             );
+        case 'notGuard':
+            return !isGuardFulfilled(guard.guard, stateMachine, currentTime);
     }
 }
 

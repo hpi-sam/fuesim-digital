@@ -462,14 +462,19 @@ export function createSelectAvailableTasks(
         (challenge, taskTypes) =>
             Object.values(challenge.stateMachines).map((stateMachine) => {
                 const currentState = currentStateOf(stateMachine);
-                return Object.keys(currentState.possibleTasks).map((taskId) => {
-                    const taskType = taskTypes[taskId];
-                    if (!taskType)
-                        throw new Error(
-                            `Invalid taskTypeId ${taskId} in TechnicalChallenge(${technicalChallengeId}).StateMachine(${stateMachine.id}).`
-                        );
-                    return [stateMachine, taskTypes[taskId]];
-                });
+                return {
+                    stateMachine,
+                    tasks: Object.keys(currentState.possibleTasks).map(
+                        (taskId) => {
+                            const taskType = taskTypes[taskId];
+                            if (!taskType)
+                                throw new Error(
+                                    `Invalid taskTypeId ${taskId} in TechnicalChallenge(${technicalChallengeId}).StateMachine(${stateMachine.id}).`
+                                );
+                            return taskTypes[taskId];
+                        }
+                    ),
+                };
             })
     );
 }

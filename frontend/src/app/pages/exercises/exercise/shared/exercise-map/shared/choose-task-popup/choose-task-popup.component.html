@@ -1,13 +1,20 @@
 <div class="dropdown-menu chooser-popup-component">
-    @for (task of availableTasks(); track task[0].id+task[1].id) {
-        <button
-            (click)="assignTask(task[0].id, task[1].id)"
-            type="button"
-            class="dropdown-item"
-            data-cy="chooseTaskPopupAssignTaskButton"
-        >
-            {{ task[0].name }}: {{ task[1].taskName }}
-        </button>
+    @for (entry of availableTasks(); track entry) {
+        <h6 class="dropdown-header text-center">
+            {{ entry.stateMachine.name }}
+        </h6>
+        @for (task of entry.tasks; track task.id) {
+            <button
+                (click)="assignTask(entry.stateMachine.id, task.id)"
+                type="button"
+                class="dropdown-item"
+                data-cy="chooseTaskPopupAssignTaskButton"
+            >
+                {{ task.taskName }}
+            </button>
+        } @empty {
+            <div class="text-muted p-1 fst-italic">Keine Aktion möglich.</div>
+        }
     } @empty {
         <div class="text-muted p-1 fst-italic">Keine Aktion möglich.</div>
     }

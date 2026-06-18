@@ -119,6 +119,7 @@ describe('join parallel exercise', () => {
                 trainerKey: newExercise.trainerKey,
                 clientNames: [],
                 currentStatus: 'notStarted',
+                evalResults: {},
                 currentTime: 0,
                 isActive: false,
             } satisfies ParallelExerciseInstanceSummary);

@@ -70,14 +70,17 @@ export class DidacticOverviewModalComponent {
         this.results().filter((res) => this.rootCriteriaMap()[res.criterionId])
     );
     public readonly completedCriteriaCount = computed(() => {
-        let count = 0;
-        for (let i = 0; i < this.results().length; i += 1) {
-            const res = this.results().at(i);
-            if (res?.type === 'boolEvalResult' && res?.isCompleted) {
-                count += 1;
+        if (this.results()) {
+            let count = 0;
+            for (let i = 0; i < this.results().length; i += 1) {
+                const res = this.results().at(i);
+                if (res?.type === 'boolEvalResult' && res?.isCompleted) {
+                    count += 1;
+                }
             }
+            return count;
         }
-        return count;
+        return 0;
     });
     private readonly tcs = this.store.selectSignal(selectTechnicalChallenges);
     public readonly technicalChallenges = signal(Object.values(this.tcs()));

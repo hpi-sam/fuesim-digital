@@ -21,8 +21,6 @@
                         ></button>
                     </th>
                 }
-                <th></th>
-                <!-- open exerciseInstance -->
             </tr>
         </thead>
         <tbody>
@@ -33,63 +31,67 @@
             ) {
                 <td>
                     @if (exerciseInstance.isActive) {
-                        <span class="badge bg-primary">aktiv</span>
+                        <!-- TODO @JohannesPotzi @Jogius : improve this.-->
+                        <span class="badge rounded-pill">
+                            <span class="badge bg-primary">aktiv</span>
+                            <a
+                                [routerLink]="`/exercises/${exerciseInstance.trainerKey}`"
+                                class="btn btn-sm btn-outline-primary ms-1"
+                            >
+                                Öffnen
+                            </a>
+                        </span>
+                    } @else {
+                        <span class="badge bg-body-secondary">inaktiv</span>
                     }
-                </td>
-            }
-            <td></td>
-            @for (
-                exerciseInstance of exerciseInstances();
-                track exerciseInstance.participantKey
-            ) {
-                <td>
-                    <a
-                        [routerLink]="`/exercises/${exerciseInstance.trainerKey}`"
-                        class="btn btn-sm btn-outline-primary float-end"
-                    >
-                        Öffnen
-                    </a>
                 </td>
             }
 
             @for (criterion of this.rootCriteria(); track criterion.id) {
-                <td>{{ criterion.name }}</td>
-                <!-- Results -->
-                @for (
-                    exerciseInstance of exerciseInstances();
-                    track exerciseInstance.participantKey
-                ) {
-                    @let res =
-                        getLatestResFromCriterionOfInstace(
-                            criterion,
-                            exerciseInstance
-                        );
-                    @if (res) {
-                        <!-- TODO @JohannesPotzi @Jogius : implement and use the result badge -->
-                        @let isCompleted = getIsCompletedFromEvalResult(res);
-                        @if (isCompleted !== null) {
-                            <span
-                                class="badge rounded-pill"
-                                [ngStyle]="{
-                                    'background-color': isCompleted
-                                        ? 'green'
-                                        : 'red',
-                                }"
-                            >
-                                @if (isCompleted) {
-                                    <i class="bi bi-check"></i>
-                                } @else {
-                                    <i class="bi bi-x-lg"></i>
-                                }
-                            </span>
-                        }
-                        @if (getNumFromEvalResult(res); as resNum) {
-                            <span class="badge rounded-pill">
-                                {{ resNum }}
-                            </span>
+                <tr>
+                    <td>{{ criterion.name }}</td>
+                    <!-- Results -->
+                    @for (
+                        exerciseInstance of exerciseInstances();
+                        track exerciseInstance.participantKey
+                    ) {
+                        @let res =
+                            getResOfCriterionFromInstance(
+                                criterion,
+                                exerciseInstance
+                            );
+                        @if (res) {
+                            <!-- TODO @JohannesPotzi @Jogius : implement and use the result badge -->
+                            @let isCompleted =
+                                getIsCompletedFromEvalResult(res);
+                            @if (isCompleted !== null) {
+                                <td>
+                                    <span
+                                        class="badge rounded-pill"
+                                        [ngStyle]="{
+                                            'background-color': isCompleted
+                                                ? 'green'
+                                                : 'red',
+                                        }"
+                                    >
+                                        @if (isCompleted) {
+                                            <i class="bi bi-check"></i>
+                                        } @else {
+                                            <i class="bi bi-x-lg"></i>
+                                        }
+                                    </span>
+                                </td>
+                            }
+                            @if (getNumFromEvalResult(res); as resNum) {
+                                <td>
+                                    <span class="badge rounded-pill">
+                                        {{ resNum }}
+                                    </span>
+                                </td>
+                            }
                         }
                     }
-                }
+                </tr>
             }
             @if (this.exerciseInstances().length === 0) {
                 <tr>

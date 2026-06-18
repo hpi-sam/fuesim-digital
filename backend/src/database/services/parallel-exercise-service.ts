@@ -45,30 +45,22 @@ export class ParallelExerciseService {
     ) {
         this.newJoin.subscribe((join) => {
             this.evalResultsMap[join.activeExercise.exercise.id] = {};
-            const sub = join.activeExercise.tickApplied.subscribe(async () =>
-                this.onTickApplied(
-                    join.activeExercise.exercise.id,
-                    join.activeExercise.getStateSnapshot()
-                )
-            );
+            const sub = join.activeExercise.tickApplied.subscribe(async () => {
+                const id = join.activeExercise.exercise.id;
+                const state = join.activeExercise.getStateSnapshot();
+                const previousResults = this.evalResultsMap[id];
+                this.evalResultsMap[id] = updateEvalResultsMap(
+                    previousResults ?? {},
+                    state.evalCriteria,
+                    state.technicalChallenges,
+                    state.patients,
+                    state.scoutables,
+                    state.currentTime,
+                    false
+                );
+            });
             this.subscriptions.push(sub);
         });
-    }
-    public async onTickApplied(id: ExerciseId, state: ExerciseState) {
-        const previousResults = this.evalResultsMap[id];
-        /* TODO */
-        if (!previousResults) {
-            return;
-        }
-        this.evalResultsMap[id] = updateEvalResultsMap(
-            previousResults,
-            state.evalCriteria,
-            state.technicalChallenges,
-            state.patients,
-            state.scoutables,
-            state.currentTime,
-            false
-        );
     }
 
     public async getParallelExercisesOfOwner(session: SessionInformation) {

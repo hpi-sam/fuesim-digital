@@ -4,7 +4,6 @@ import {
     boolEvalCriterionSchema,
     CountEvalCriterion,
     EvalCriterion,
-    EvalcriterionType,
     FirstTrueAtEvalCriterion,
     GreaterThanEvalCriterion,
     isNumberEvalCriterion,
@@ -14,13 +13,11 @@ import {
     OrEvalCriterion,
     PatientAtStatusEvalCriterion,
     ReachTechnicalChallengeStateEvalCriterion,
-    temporalEvalCriterionTypes,
     ViewScoutableEvalCriterion,
     XPatientsAtStatusEvalCriterion,
 } from '../models/eval-criterion.js';
 import { Patient, Scoutable, TechnicalChallenge } from '../models/index.js';
 import { uuid, UUID, uuidSchema } from './uuid.js';
-import { ExerciseState } from '../state.js';
 
 export const evalResultBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -80,7 +77,7 @@ export function getEvalResultFromCriterion(
     switch (evalCriterion.criterionType) {
         /* ------------------------BOOL CRITERIA------------------------ */
         case 'doMeasureXTimesEvalCriterion': {
-            /* TODO @JohannesPotzi @Jogius */
+            /* TODO @JohannesPotzi @Jogius : implementation*/
             console.log(
                 'TODO: implement evaluation of doMeasureXTimesEvalCriterion'
             );
@@ -225,7 +222,7 @@ export function getEvalResultFromCriterion(
         }
         case 'firstTrueAtEvalCriterion': {
             const criterion = evalCriterion as FirstTrueAtEvalCriterion;
-            /* -1 in num means, that the child criterion has not been true yet */
+            /* -1 === num means, that the child criterion has not been true yet */
             num = -1;
             if (
                 previousResult &&
@@ -327,32 +324,34 @@ export function updateEvalResultsMap(
     temporalOnly: boolean
 ): { [criterionId: string]: EvalResult } {
     let tmpCache = {} as { [criterionId: string]: EvalResult };
-    return Object.values(evalCriteria)
-        .filter((crit) => {
-            if (!temporalOnly) {
-                return true;
-            }
+    return (
+        Object.values(evalCriteria)
             /* For non parallel exercises we only care to cache results for temporal criteria, because the rest is selected via the exeercise selector selectEvalResults. */
-            return isTemporalEvalCriterionType(crit.criterionType);
-        })
-        .flatMap((criterion: EvalCriterion): EvalResult => {
-            const previousRes = evalResultsMap[criterion.id];
-            return getEvalResultFromCriterion(
-                criterion,
-                evalCriteria,
-                technicalChallenges,
-                patients,
-                scoutables,
-                currentTime,
-                tmpCache,
-                previousRes
-            );
-        })
-        .reduce<{ [evalCriterionId: UUID]: EvalResult }>(
-            (evalResultObject, evalResult) => {
-                evalResultObject[evalResult.criterionId] = evalResult;
-                return evalResultObject;
-            },
-            {}
-        );
+            .filter((crit) => {
+                if (!temporalOnly) {
+                    return true;
+                }
+                return isTemporalEvalCriterionType(crit.criterionType);
+            })
+            .flatMap((criterion: EvalCriterion): EvalResult => {
+                const previousRes = evalResultsMap[criterion.id];
+                return getEvalResultFromCriterion(
+                    criterion,
+                    evalCriteria,
+                    technicalChallenges,
+                    patients,
+                    scoutables,
+                    currentTime,
+                    tmpCache,
+                    previousRes
+                );
+            })
+            .reduce<{ [criterionId: UUID]: EvalResult }>(
+                (evalResultObject, evalResult) => {
+                    evalResultObject[evalResult.criterionId] = evalResult;
+                    return evalResultObject;
+                },
+                {}
+            )
+    );
 }

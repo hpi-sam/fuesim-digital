@@ -103,6 +103,7 @@ export class OlMapInteractionsManager {
         this.interactions = defaultInteractions({
             pinchRotate: false,
             pinchZoom: !this._lockZoom,
+            doubleClickZoom: !this._lockZoom,
             altShiftDragRotate: false,
             keyboard: true,
         }).extend(

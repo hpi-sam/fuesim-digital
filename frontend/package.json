@@ -78,7 +78,7 @@
         "@types/lodash-es": "^4.17.12",
         "@types/node": "^22.14.0",
         "angular-eslint": "21.2.0",
-        "cypress": "^14.3.0",
+        "cypress": "^15.17.0",
         "eslint": "^9.28.0",
         "eslint-config-prettier": "^10.1.1",
         "eslint-plugin-import": "~2.31.0",

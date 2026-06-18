@@ -140,6 +140,14 @@ export class PatientsDetailsComponent implements OnChanges {
         });
     }
 
+    setTicket(ticket: string) {
+        this.exerciseService.proposeAction({
+            type: '[Patient] Set Ticket',
+            patientId: this.patientId(),
+            ticket,
+        });
+    }
+
     updateRemarks(remarks: string) {
         this.exerciseService.proposeAction({
             type: '[Patient] Set Remarks',

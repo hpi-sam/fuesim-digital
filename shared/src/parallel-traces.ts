@@ -105,6 +105,22 @@ export const actionProcessors = [
         },
         true
     ),
+    new ActionProcessor(
+        '[TechnicalChallenge] Assign a personnel to technical challenge',
+        (currentState, action) => {
+            const technicalChallenge = getElement(
+                currentState,
+                'technicalChallenge',
+                action.technicalChallengeId
+            );
+            const task = getElement(currentState, 'task', action.taskId);
+            return {
+                name: `[Assign Personnel] ${task.taskName} ${technicalChallenge.name}`,
+                verboseName: `Auftrag: ${task.taskName} bei ${technicalChallenge.name}`,
+            };
+        },
+        true
+    ),
     // new ActionProcessor(
     //     '[Patient] Set Visible Status',
     //     (currentState, action) => ({

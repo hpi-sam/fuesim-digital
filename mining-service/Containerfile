@@ -2,6 +2,8 @@ FROM docker.io/library/python:3.14
 
 WORKDIR /usr/local/app
 
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+
 RUN pip3 install poetry
 
 COPY . /usr/local/app/

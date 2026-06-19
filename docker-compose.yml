@@ -18,6 +18,11 @@ services:
             # The directory can contain terms.html, license.html, privacy.html and imprint.html
             # Example
             # - ./about:/usr/local/app/frontend/assets/about
+    mining-service:
+        build:
+            context: mining-service
+            dockerfile: Containerfile
+        restart: unless-stopped
     db:
         image: docker.io/postgres:18
         volumes:

@@ -38,3 +38,5 @@ frontend/cypress*
 docker-compose.yml
 
 docs/book
+
+mining-service/.venv

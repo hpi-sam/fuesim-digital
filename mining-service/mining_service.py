@@ -118,7 +118,7 @@ def do_process_mining():
     return jsonify(data), 200
 
 def main():
-    app.run("127.0.0.1", 4202)
+    app.run("0.0.0.0", 4202)
 
 
 if __name__ == "__main__":

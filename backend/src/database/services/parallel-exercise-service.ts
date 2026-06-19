@@ -25,6 +25,7 @@ import type { ParallelExerciseRepository } from '../repositories/parallel-exerci
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
+import { Config } from '../../config.js';
 import type { ExerciseManagerService } from './exercise-manager-service.js';
 import type { ExerciseService } from './exercise-service.js';
 
@@ -328,13 +329,16 @@ export class ParallelExerciseService {
         parallelExerciseId: ParallelExerciseId
     ): Promise<ParallelTracesOverview> {
         const processEvents = await this.preProcessTraces(parallelExerciseId);
-        const result = await fetch('http://localhost:4202/process', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(Object.values(processEvents).flat()),
-        });
+        const result = await fetch(
+            `${Config.parallelExerciseMiningService}/process`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(Object.values(processEvents).flat()),
+            }
+        );
         const data = miningServiceResponseSchema.parse(await result.json());
 
         return {

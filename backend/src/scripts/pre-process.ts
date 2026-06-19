@@ -60,14 +60,3 @@ const jsonContent = JSON.stringify(Object.values(processEvents).flat());
 fs.writeFile('events.json', jsonContent, (err) => {
     if (err) throw err;
 });
-
-/*
-const result = await fetch('http://localhost:4202/process', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: jsonContent,
-});
-console.log(await result.json());
-*/

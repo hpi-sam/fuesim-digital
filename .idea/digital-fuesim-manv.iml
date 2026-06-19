@@ -2,7 +2,7 @@
 <module type="WEB_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Python" name="Python facet">
-      <configuration sdkName="Python 3.13 (digital-fuesim-manv)" />
+      <configuration sdkName="Python 3.13 (digital-fuesim-manv) (2)" />
     </facet>
   </component>
   <component name="NewModuleRootManager">
@@ -10,6 +10,7 @@
       <sourceFolder url="file://$MODULE_DIR$/frontend/cypress" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/shared/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/backend/src/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/mining-service" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
@@ -20,9 +21,10 @@
       <excludeFolder url="file://$MODULE_DIR$/shared/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/frontend/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/backend/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/mining-service/.venv" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Python 3.13 (digital-fuesim-manv) interpreter library" level="application" />
+    <orderEntry type="library" name="Python 3.13 (digital-fuesim-manv) (2) interpreter library" level="application" />
   </component>
 </module>

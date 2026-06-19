@@ -41,6 +41,8 @@ export class Config {
 
     private static _parallelExercisesEnabled?: boolean;
 
+    private static _parallelExerciseMiningService?: string;
+
     public static get websocketPort(): number {
         this.throwIfNotInitialized();
         return this._websocketPort!;
@@ -136,6 +138,11 @@ export class Config {
         return this._parallelExercisesEnabled!;
     }
 
+    public static get parallelExerciseMiningService(): string {
+        this.throwIfNotInitialized();
+        return this._parallelExerciseMiningService!;
+    }
+
     private static createTCPPortValidator() {
         return makeValidator((x) => {
             const int = Number.parseInt(x);
@@ -215,6 +222,9 @@ export class Config {
             DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
             DFM_DEV_NO_WAITING_ROOM: bool({ default: false }),
             DFM_PARALLEL_EXERCISES_ENABLED: bool({ default: true }),
+            DFM_PARALLEL_EXERCISE_MINING_SERVICE: url({
+                default: 'http://localhost:4202',
+            }),
         });
     }
 
@@ -301,6 +311,8 @@ export class Config {
         this._parallelExercisesEnabled = testing
             ? true
             : env.DFM_PARALLEL_EXERCISES_ENABLED;
+        this._parallelExerciseMiningService =
+            env.DFM_PARALLEL_EXERCISE_MINING_SERVICE;
         this.isInitialized = true;
     }
 }

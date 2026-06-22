@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Fixed
+
+- Locking the map zoom now also disables zooming in by double clicking/tapping on the map.
+
 ## [0.15.0] - 2026-06-15
 
 ### Added

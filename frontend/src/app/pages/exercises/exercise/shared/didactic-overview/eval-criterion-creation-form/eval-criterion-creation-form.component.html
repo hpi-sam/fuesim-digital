@@ -209,11 +209,13 @@
                         <!-- TODO @JohannesPotzi @Jogius -->
                     </form>
                 }
-                @case ('countEvalCriterion') {
+                @case ('countCompletedEvalCriterion') {
                     <form class="ms-2">
                         <label>
                             Art:
-                            {{ evalCriterionTypesNames.countEvalCriterion }}
+                            {{
+                                evalCriterionTypesNames.countCompletedEvalCriterion
+                            }}
                         </label>
                         <!-- TODO @JohannesPotzi @Jogius -->
                     </form>

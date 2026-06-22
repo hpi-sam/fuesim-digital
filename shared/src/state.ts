@@ -96,7 +96,11 @@ import {
 } from './models/technical-challenge/technical-challenge.js';
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
-import { EvalCriterion, evalCriterionSchema } from './models/eval-criterion.js';
+import {
+    EvalCriterion,
+    evalCriterionBaseSchema,
+    evalCriterionSchema,
+} from './models/eval-criterion.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -266,7 +270,9 @@ export class ExerciseState {
     @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
     public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
 
-    @IsZodSchema(z.record(uuidSchema, evalCriterionSchema))
+    @IsZodSchema(
+        z.record(evalCriterionBaseSchema.shape.id, evalCriterionSchema)
+    )
     public readonly evalCriteria: {
         readonly [key: UUID]: EvalCriterion;
     } = {};

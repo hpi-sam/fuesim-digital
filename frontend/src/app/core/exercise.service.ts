@@ -2,6 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ClientToServerEvents,
+    EvalCriterionId,
     EvalResult,
     ExerciseAction,
     ExerciseKey,
@@ -88,7 +89,7 @@ export class ExerciseService {
     });
 
     public readonly evalResultsCache = signal<{
-        [criterionId: string]: EvalResult;
+        [criterionId: EvalCriterionId]: EvalResult;
     }>({});
 
     private optimisticActionHandler?: OptimisticActionHandler<

@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ParallelExerciseService } from '../../../../core/parallel-exercise.service';
 import {
     EvalCriterion,
+    EvalCriterionId,
     EvalResult,
     getIsCompletedFromEvalResult,
     getNumFromEvalResult,
@@ -106,7 +107,7 @@ export class ParallelExerciseEvaluationComponent {
                         console.log(crit.name);
                     });
                     const criteriaMap = criteria.reduce<{
-                        [criterionId: string]: EvalCriterion;
+                        [criterionId: EvalCriterionId]: EvalCriterion;
                     }>((mapObject, criterion) => {
                         mapObject[criterion.id] = criterion;
                         return mapObject;

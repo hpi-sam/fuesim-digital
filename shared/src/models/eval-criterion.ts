@@ -27,7 +27,7 @@ export type EvalCriterionId = z.infer<typeof evalCriterionIdSchema>;
 
 /* TODO @JohannesPotzi @Jogius : add showInTable attribute. Also, update addCriterion action accordingly. */
 export const evalCriterionBaseSchema = z.strictObject({
-    id: uuidSchema,
+    id: evalCriterionIdSchema,
     name: z.string(),
     type: z.literal('evalCriterion'),
 });
@@ -78,12 +78,14 @@ export const constNumEvalCriterionSchema = z.strictObject({
 });
 export type ConstNumEvalCriterion = z.infer<typeof constNumEvalCriterionSchema>;
 
-export const countEvalCriterionSchema = z.strictObject({
+export const countCompletedEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
-    criterionType: z.literal('countEvalCriterion'),
+    criterionType: z.literal('countCompletedEvalCriterion'),
     children: z.array(boolEvalCriterionIdSchema).min(1),
 });
-export type CountEvalCriterion = z.infer<typeof countEvalCriterionSchema>;
+export type CountCompletedEvalCriterion = z.infer<
+    typeof countCompletedEvalCriterionSchema
+>;
 
 export const timeStampEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -95,7 +97,7 @@ export type TimeStampEvalCriterion = z.infer<
 export const firstTrueAtEvalCriterionSchema = z.strictObject({
     ...timeStampEvalCriterionSchema.shape,
     criterionType: z.literal('firstTrueAtEvalCriterion'),
-    child: uuidSchema,
+    child: evalCriterionIdSchema,
 });
 export type FirstTrueAtEvalCriterion = z.infer<
     typeof firstTrueAtEvalCriterionSchema
@@ -192,7 +194,7 @@ export type BoolEvalCriterion = z.infer<typeof boolEvalCriterionSchema>;
 export const numberEvalCriterionSchema = z.discriminatedUnion('criterionType', [
     constNumEvalCriterionSchema,
     countPatientsAtStatusEvalCriterionSchema,
-    countEvalCriterionSchema,
+    countCompletedEvalCriterionSchema,
     timeStampEvalCriterionSchema,
     firstTrueAtEvalCriterionSchema,
 ]);
@@ -232,7 +234,7 @@ export type NumberEvalCriterionType = NumberEvalCriterion['criterionType'];
 export const numberEvalCriterionTypes = [
     'constNumEvalCriterion',
     'countPatientsAtStatusEvalCriterion',
-    'countEvalCriterion',
+    'countCompletedEvalCriterion',
     'firstTrueAtEvalCriterion',
     'timeStampEvalCriterion',
 ] satisfies NumberEvalCriterionType[];
@@ -241,7 +243,7 @@ export type EvalCriterionType = EvalCriterion['criterionType'];
 export const combinedEvalCriterionTypes = [
     'andEvalCriterion',
     'orEvalCriterion',
-    'countEvalCriterion',
+    'countCompletedEvalCriterion',
     'notEvalCriterion',
     'firstTrueAtEvalCriterion',
     'greaterThanEvalCriterion',
@@ -282,7 +284,7 @@ export const evalCriterionTypesNames: {
     orEvalCriterion: 'Oder-Kriterium',
     andEvalCriterion: 'Und-Kriterium',
     constNumEvalCriterion: 'konstante Zahl',
-    countEvalCriterion: 'Anzahl erfüllter Kriterien',
+    countCompletedEvalCriterion: 'Anzahl erfüllter Kriterien',
     greaterThanEvalCriterion: 'mindest-Anzahl Kriterium',
     notEvalCriterion: 'Negierung',
     timeStampEvalCriterion: 'Zeitpunkt',
@@ -294,7 +296,7 @@ export function newAndEvalCriterion(
     children?: BoolEvalCriterionId[]
 ): AndEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'andEvalCriterion',
@@ -306,7 +308,7 @@ export function newOrEvalCriterion(
     children?: BoolEvalCriterionId[]
 ): OrEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'orEvalCriterion',
@@ -318,7 +320,7 @@ export function newNotEvalCriterion(
     child: BoolEvalCriterionId
 ): NotEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'notEvalCriterion',
@@ -331,7 +333,7 @@ export function newGreaterThanEvalCriterion(
     rightChild: NumberEvalCriterionId
 ): GreaterThanEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'greaterThanEvalCriterion',
@@ -344,22 +346,22 @@ export function newConstNumEvalCriterion(
     num: number
 ): ConstNumEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'constNumEvalCriterion',
         num: num,
     };
 }
-export function newCountEvalCriterion(
+export function newCountCompletedEvalCriterion(
     name: string,
     children: BoolEvalCriterionId[]
-): CountEvalCriterion {
+): CountCompletedEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
-        criterionType: 'countEvalCriterion',
+        criterionType: 'countCompletedEvalCriterion',
         num: -1,
         children: children,
     };
@@ -369,7 +371,7 @@ export function newFirstTrueAtEvalCriterion(
     child: BoolEvalCriterionId
 ): FirstTrueAtEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'firstTrueAtEvalCriterion',
@@ -382,7 +384,7 @@ export function newTimeStampEvalCriterion(
     num: number
 ): TimeStampEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'timeStampEvalCriterion',
@@ -395,7 +397,7 @@ export function newDoMeasureXTimesEvalCriterion(
     targetMeasureId: UUID
 ): DoMeasureXTimesEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'doMeasureXTimesEvalCriterion',
@@ -409,7 +411,7 @@ export function newReachTechnicalChallengeStateEvalCriterion(
     targetTechnicalChallengeStateId: TechnicalChallengeStateId
 ): ReachTechnicalChallengeStateEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'reachTechnicalChallengeStateEvalCriterion',
@@ -423,7 +425,7 @@ export function newPatientAtStatusEvalCriterion(
     targetStatus: PatientStatus
 ): PatientAtStatusEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'patientAtStatusEvalCriterion',
@@ -437,7 +439,7 @@ export function newXPatientsAtStatusEvalCriterion(
     targetStatus: PatientStatus
 ): XPatientsAtStatusEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'xPatientsAtStatusEvalCriterion',
@@ -450,7 +452,7 @@ export function newViewScoutableEvalCriterion(
     targetScoutableId: UUID
 ): ViewScoutableEvalCriterion {
     return {
-        id: uuid(),
+        id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         criterionType: 'viewScoutableEvalCriterion',
@@ -471,7 +473,7 @@ export function getNumFromEvalCriterion(
     const type = criterion.criterionType;
     if (
         type === 'constNumEvalCriterion' ||
-        type === 'countEvalCriterion' ||
+        type === 'countCompletedEvalCriterion' ||
         type === 'firstTrueAtEvalCriterion' ||
         type === 'timeStampEvalCriterion'
     ) {
@@ -481,9 +483,9 @@ export function getNumFromEvalCriterion(
 }
 
 export function removeChildren(
-    criteriaMap: { [key: string]: EvalCriterion },
+    criteriaMap: { [key: EvalCriterionId]: EvalCriterion },
     currentCriterion?: EvalCriterion
-): { [key: string]: EvalCriterion } {
+): { [key: EvalCriterionId]: EvalCriterion } {
     if (!currentCriterion) {
         return criteriaMap;
     }
@@ -497,7 +499,7 @@ export function removeChildren(
     if (
         type === 'andEvalCriterion' ||
         type === 'orEvalCriterion' ||
-        type === 'countEvalCriterion'
+        type === 'countCompletedEvalCriterion'
     ) {
         for (let i = 0; i < currentCriterion.children.length; i += 1) {
             removeChildren(
@@ -520,9 +522,9 @@ export function removeChildren(
     return criteriaMap;
 }
 export function getRootCriteriaMap(criteriaMap: {
-    [key: string]: EvalCriterion;
+    [crtierionId: UUID]: EvalCriterion;
 }): {
-    [key: string]: EvalCriterion;
+    [CriterionId: UUID]: EvalCriterion;
 } {
     const criteria = Object.values(criteriaMap);
     for (let i = 0; i < criteria.length; i += 1) {

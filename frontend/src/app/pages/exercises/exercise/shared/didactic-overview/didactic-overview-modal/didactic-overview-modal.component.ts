@@ -22,11 +22,9 @@ import {
     evalCriterionTypesNames,
     getNumFromEvalCriterion,
     getRootCriteriaMap,
-    EvalCriterionCategory,
-} from '../../../../../../../../../shared/dist/models/evaluation-criterion';
-import {
-    EvalCriterionId,
-    EvalResult,
+    type EvalCriterionCategory,
+    type EvalCriterionId,
+    type EvalResult,
     type TechnicalChallengeId,
     type TechnicalChallengeStateId,
     getNumFromEvalResult,

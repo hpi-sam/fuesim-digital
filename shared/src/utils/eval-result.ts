@@ -2,8 +2,9 @@ import { z } from 'zod';
 import {
     AndEvalCriterion,
     boolEvalCriterionSchema,
-    CountEvalCriterion,
+    CountCompletedEvalCriterion,
     EvalCriterion,
+    EvalCriterionId,
     evalCriterionIdSchema,
     FirstTrueAtEvalCriterion,
     GreaterThanEvalCriterion,
@@ -49,7 +50,7 @@ export type EvalResult = z.infer<typeof evalResultSchema>;
 
 export function getEvalResultFromCriterion(
     evalCriterion: EvalCriterion,
-    evalCriteria: { [key: string]: EvalCriterion },
+    evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
     technicalChallenges: { [key: string]: TechnicalChallenge },
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
@@ -201,8 +202,8 @@ export function getEvalResultFromCriterion(
             num = evalCriterion.num;
             break;
         }
-        case 'countEvalCriterion': {
-            const criterion = evalCriterion as CountEvalCriterion;
+        case 'countCompletedEvalCriterion': {
+            const criterion = evalCriterion as CountCompletedEvalCriterion;
             num = 0;
             for (let i = 0; i < criterion.children.length; i += 1) {
                 const res = shortCritToRes(
@@ -210,7 +211,7 @@ export function getEvalResultFromCriterion(
                 );
                 if (res.type === 'numberEvalResult') {
                     console.log(
-                        '[logic Error] countEvalCriterion ' +
+                        '[logic Error] countCompletedEvalCriterion ' +
                             criterion.id +
                             ' contains numberEvalCriterion ' +
                             res.criterionId
@@ -278,7 +279,7 @@ export function getEvalResultFromCriterion(
     }
 }
 export function getEvalResultsFromCriteria(
-    evalCriteria: { [key: string]: EvalCriterion },
+    evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
     technicalChallenges: { [key: string]: TechnicalChallenge },
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
@@ -317,7 +318,7 @@ export function getIsCompletedFromEvalResult(
 }
 export function updateEvalResultsMap(
     evalResultsMap: { [criterionId: string]: EvalResult },
-    evalCriteria: { [key: string]: EvalCriterion },
+    evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
     technicalChallenges: { [key: string]: TechnicalChallenge },
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },

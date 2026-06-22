@@ -250,7 +250,7 @@ export class EvalCriterionCreationForm {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }
-            case 'countEvalCriterion': {
+            case 'countCompletedEvalCriterion': {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }

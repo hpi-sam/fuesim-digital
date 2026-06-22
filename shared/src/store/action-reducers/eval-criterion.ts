@@ -3,6 +3,7 @@ import type { ActionReducer } from '../action-reducer.js';
 import {
     BoolEvalCriterion,
     EvalCriterion,
+    evalCriterionIdSchema,
     evalCriterionSchema,
     isNumberEvalCriterion,
     NumberEvalCriterion,
@@ -29,7 +30,7 @@ export type NewCriterionAction = z.infer<
 >;
 const updateCriterionActionSchema = z.strictObject({
     type: z.literal('[EvalCriterion] Update Criterion'),
-    id: uuidSchema,
+    id: evalCriterionIdSchema,
     newCriterion: evalCriterionSchema,
 });
 export type UpdateCriterionAction = z.infer<typeof updateCriterionActionSchema>;

@@ -9,7 +9,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Changed
 
-- Anonymous, unused exercises are automatically deleted after a configurable amount of days.
+- Anonymous exercises are automatically deleted, if they are unused for a configurable amount of days.
 
 ### Fixed
 

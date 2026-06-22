@@ -10,6 +10,7 @@ import {
 } from '../../test/utils.js';
 import { exerciseTable } from '../schema.js';
 import { createParallelExercise } from '../../test/parallel-exercise-utils.js';
+import { Config } from '../../config.js';
 
 describe('Exercise-Service', () => {
     const environment = createTestEnvironment();
@@ -176,7 +177,9 @@ describe('Exercise-Service', () => {
             it('should not be deleted', async () => {
                 const trainerKey = await getTrainerKey();
                 const oldDate = new Date();
-                oldDate.setDate(oldDate.getDate() - 31);
+                oldDate.setDate(
+                    oldDate.getDate() - (Config.autoDeleteDays + 1)
+                );
                 await environment.services.databaseService.databaseConnection
                     .update(exerciseTable)
                     .set({ lastUsedAt: oldDate })
@@ -202,9 +205,25 @@ describe('Exercise-Service', () => {
 
         it('should delete outdated exercises', async () => {
             const exerciseNotToDelete = await createExercise(environment);
+            const newDate = new Date();
+            newDate.setDate(newDate.getDate() - Config.autoDeleteDays);
+            console.log(newDate);
+            newDate.setMinutes(newDate.getMinutes() + 1);
+            console.log(newDate);
+            await environment.services.databaseService.databaseConnection
+                .update(exerciseTable)
+                .set({ lastUsedAt: newDate })
+                .where(
+                    eq(
+                        exerciseTable.participantKey,
+                        exerciseNotToDelete.participantKey
+                    )
+                )
+                .returning();
+
             const exerciseToDelete = await createExercise(environment);
             const oldDate = new Date();
-            oldDate.setDate(oldDate.getDate() - 31);
+            oldDate.setDate(oldDate.getDate() - (Config.autoDeleteDays + 1));
             await environment.services.databaseService.databaseConnection
                 .update(exerciseTable)
                 .set({ lastUsedAt: oldDate })
@@ -223,9 +242,10 @@ describe('Exercise-Service', () => {
                     .select({ trainerKey: exerciseTable.trainerKey })
                     .from(exerciseTable);
 
-            expect(
-                new Set(...result.map(({ trainerKey }) => trainerKey))
-            ).toEqual(new Set(exerciseNotToDelete.trainerKey));
+            expect(result.length).toEqual(1);
+            expect(result[0]!.trainerKey).toEqual(
+                exerciseNotToDelete.trainerKey
+            );
             expect(
                 environment.services.exerciseService
                     .TESTING_getExerciseMap()

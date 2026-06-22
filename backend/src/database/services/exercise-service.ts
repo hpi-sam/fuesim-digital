@@ -339,7 +339,7 @@ export class ExerciseService {
 
             await Promise.all(
                 exerciseToDelete.map(async (exercise) => {
-                    this.deleteExerciseById(exercise.id);
+                    await this.deleteExerciseById(exercise.id);
                 })
             );
 

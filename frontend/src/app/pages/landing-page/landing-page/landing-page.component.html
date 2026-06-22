@@ -15,7 +15,7 @@
                     Bitte geben Sie hier die Übungs-PIN ein, die sie von der
                     Übungsleitung erhalten haben:
                 </p>
-                <div class="input-group mb-4">
+                <div class="input-group">
                     <input
                         [appAutofocus]="true"
                         (keydown.enter)="joinExercise()"
@@ -110,7 +110,7 @@
                 </div>
 
                 @if (exerciseHasBeenCreated) {
-                    <div class="alert alert-success" role="alert">
+                    <div class="alert alert-success mb-0" role="alert">
                         Sie haben eine Übung mit der Übungsleitungs-PIN
                         <span
                             class="font-monospace fw-bolder user-select-all"

@@ -32,7 +32,6 @@ import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
     selectConfiguration,
-    selectVehicles,
     selectCurrentTime,
     createSelectPatient,
 } from '../../../../../../state/application/selectors/exercise.selectors';
@@ -105,7 +104,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             .select(
                 createSelector(
                     selectConfiguration,
-                    selectVehicles,
+                    selectVisibleVehicles,
                     selectCurrentTime,
                     (configuration, vehicles, currentTime) => ({
                         configuration,

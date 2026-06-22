@@ -101,7 +101,6 @@ export function createExercise() {
 
     cy.get('@backendBaseUrl', { log: false }).then((backendBaseUrl) =>
         cy
-            // eslint-disable-next-line @typescript-eslint/no-base-to-string
             .request('POST', `${backendBaseUrl}/api/exercise`)
             .its('body')
             .as('createBody')
@@ -115,7 +114,6 @@ export function createExercise() {
 
 export function joinExerciseAsTrainer() {
     cy.get('@trainerKey', { log: false }).then((trainerKey) =>
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         cy.visit(`exercises/${trainerKey}`)
     );
     cy.get('[data-cy=joinExerciseModalButton]').click();
@@ -124,7 +122,6 @@ export function joinExerciseAsTrainer() {
 
 export function joinExerciseAsParticipant() {
     cy.get('@participantKey', { log: false }).then((participantKey) =>
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         cy.visit(`exercises/${participantKey}`)
     );
     cy.get('[data-cy=joinExerciseModalButton]').click();

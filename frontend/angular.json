@@ -160,7 +160,8 @@
                                 "@noble/hashes/crypto",
                                 "rbush-knn",
                                 "tinyqueue",
-                                "class-transformer"
+                                "class-transformer",
+                                "uuid"
                             ]
                         }
                     },

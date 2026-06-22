@@ -10,6 +10,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Fixed
 
 - Locking the map zoom now also disables zooming in by double clicking/tapping on the map.
+- Participants, who are restricted to a viewport can again see all vehicles that arrive in their viewport. Due to a bug, vehicles were invisible if the vehicle status display or load times were used in an exercise.
 
 ## [0.15.0] - 2026-06-15
 

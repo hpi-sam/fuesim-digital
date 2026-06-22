@@ -1,7 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { cloneDeepMutable, ExerciseConfiguration } from 'fuesim-digital-shared';
+import {
+    cloneDeepMutable,
+    ElementHighlightingMode,
+    PatientTicketMode,
+} from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
@@ -83,6 +87,13 @@ export class ExerciseSettingsModalComponent {
         });
     }
 
+    public setPatientTicketMode(patientTicketMode: PatientTicketMode) {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set patientTicketMode',
+            patientTicketMode,
+        });
+    }
+
     public setVehicleStatusHighlightFlag(
         vehicleStatusHighlightEnabled: boolean
     ) {
@@ -103,7 +114,7 @@ export class ExerciseSettingsModalComponent {
     }
 
     public setHighlightRelatedElements(
-        highlightRelatedElements: ExerciseConfiguration['highlightRelatedElements']
+        highlightRelatedElements: ElementHighlightingMode
     ) {
         this.exerciseService.proposeAction({
             type: '[Configuration] Set highlightRelatedElements',

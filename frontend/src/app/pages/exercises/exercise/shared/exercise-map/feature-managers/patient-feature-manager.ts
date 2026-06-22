@@ -3,6 +3,7 @@ import {
     type UUID,
     type Patient,
     getPatientVisibleStatus,
+    newImageProperties,
 } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
@@ -76,6 +77,13 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
                 : [-0.25, 0]
     );
 
+    private readonly ticketImageStyleHelper = new ImageStyleHelper(
+        (feature) => ({
+            ...newImageProperties('/assets/ticket.svg', 20, 1),
+        }),
+        (_) => [0, 50]
+    );
+
     private readonly openPopupCircleStyleHelper = new CircleStyleHelper(
         (_) => ({
             radius: 75,
@@ -111,6 +119,9 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
             new PointGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => {
+            const patient = this.getElementFromFeature(
+                feature as Feature
+            ) as Patient;
             const styles = [
                 this.imageStyleHelper.getStyle(feature as Feature, resolution),
                 this.visibleStatusCircleStyleHelper.getStyle(
@@ -118,6 +129,14 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
                     resolution
                 ),
             ];
+
+            if (patient.ticket !== '')
+                styles.push(
+                    this.ticketImageStyleHelper.getStyle(
+                        feature as Feature,
+                        resolution
+                    )
+                );
 
             this.addMarking(
                 feature,

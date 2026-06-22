@@ -184,20 +184,53 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <th scope="col">Ticket</th>
-                            <td>
-                                <div class="d-flex">
-                                    <input
-                                        [ngModel]="patient().ticket"
-                                        (appSaveOnTyping)="setTicket($event)"
-                                        class="form-control"
-                                        type="text"
-                                        data-cy="patientTicketInput"
-                                    />
-                                </div>
-                            </td>
-                        </tr>
+                        @let patientTicketMode =
+                            (configuration$ | async)?.patientTicketMode ??
+                            'none';
+                        @if (patientTicketMode !== 'none') {
+                            <tr>
+                                <th scope="col">Ticket</th>
+                                <td>
+                                    @switch (patientTicketMode) {
+                                        @case ('freeText') {
+                                            <div class="d-flex">
+                                                <input
+                                                    [ngModel]="patient().ticket"
+                                                    (appSaveOnTyping)="
+                                                        setTicket($event)
+                                                    "
+                                                    class="form-control"
+                                                    type="text"
+                                                    data-cy="patientTicketInput"
+                                                />
+                                            </div>
+                                        }
+                                        @case ('external') {
+                                            <div class="form-check form-switch">
+                                                <input
+                                                    [ngModel]="
+                                                        patient().ticket !== ''
+                                                    "
+                                                    (ngModelChange)="
+                                                        setTicket($event)
+                                                    "
+                                                    [id]="`patient-${patient().id}-ticket`"
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    data-cy="patientTicketInput"
+                                                />
+                                                <label
+                                                    class="form-check-label"
+                                                    [for]="`patient-${patient().id}-ticket`"
+                                                >
+                                                    Zugewiesen?
+                                                </label>
+                                            </div>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
                         <tr>
                             <th scope="col">Verletzungen</th>
                             <td class="font-monospace">

@@ -140,7 +140,13 @@ export class PatientsDetailsComponent implements OnChanges {
         });
     }
 
-    setTicket(ticket: string) {
+    setTicket(newValue: boolean | string) {
+        const ticket =
+            typeof newValue === 'boolean'
+                ? newValue
+                    ? 'extern zugewiesen'
+                    : ''
+                : newValue;
         this.exerciseService.proposeAction({
             type: '[Patient] Set Ticket',
             patientId: this.patientId(),

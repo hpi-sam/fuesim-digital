@@ -9,15 +9,32 @@ import {
     operationsMapPropertiesSchema,
 } from './utils/map-properties.js';
 
+export const patientTicketModeSchema = z.literal([
+    'none',
+    'freeText',
+    'external',
+]);
+export type PatientTicketMode = z.infer<typeof patientTicketModeSchema>;
+
+export const elementHighlightingModeSchema = z.literal([
+    'off',
+    'trainersOnly',
+    'all',
+]);
+export type ElementHighlightingMode = z.infer<
+    typeof elementHighlightingModeSchema
+>;
+
 export const exerciseConfigurationSchema = z.strictObject({
     type: z.literal('exerciseConfiguration'),
     pretriageEnabled: z.boolean(),
     bluePatientsEnabled: z.boolean(),
     patientIdentifierPrefix: z.string(),
+    patientTicketMode: patientTicketModeSchema,
     vehicleStatusHighlight: z.boolean(),
     vehicleStatusInPatientStatusColor: z.boolean(),
     vehicleLoadTimesEnabled: z.boolean(),
-    highlightRelatedElements: z.literal(['off', 'trainersOnly', 'all']),
+    highlightRelatedElements: elementHighlightingModeSchema,
     participantLoadAllEnabled: z.boolean(),
     tileMapProperties: tileMapPropertiesSchema,
     operationsMapProperties: operationsMapPropertiesSchema,
@@ -31,6 +48,7 @@ export function newExerciseConfiguration(): ExerciseConfiguration {
         pretriageEnabled: true,
         bluePatientsEnabled: false,
         patientIdentifierPrefix: '',
+        patientTicketMode: 'freeText',
         vehicleStatusHighlight: false,
         vehicleStatusInPatientStatusColor: false,
         vehicleLoadTimesEnabled: true,

@@ -31,18 +31,17 @@
             ) {
                 <td>
                     @if (exerciseInstance.isActive) {
-                        <!-- TODO @JohannesPotzi @Jogius : improve this.-->
-                        <span class="badge rounded-pill">
-                            <span class="badge bg-primary">aktiv</span>
-                            <a
-                                [routerLink]="`/exercises/${exerciseInstance.trainerKey}`"
-                                class="btn btn-sm btn-outline-primary ms-1"
-                            >
-                                Öffnen
-                            </a>
-                        </span>
+                        <span class="badge bg-primary">aktiv</span>
+                        <a
+                            [routerLink]="`/exercises/${exerciseInstance.trainerKey}`"
+                            class="btn btn-sm btn-outline-primary ms-1"
+                        >
+                            Öffnen
+                        </a>
                     } @else {
-                        <span class="badge bg-body-secondary">inaktiv</span>
+                        <span class="badge bg-opacity-50 bg-black"
+                            >inaktiv</span
+                        >
                     }
                 </td>
             }
@@ -55,41 +54,26 @@
                         exerciseInstance of exerciseInstances();
                         track exerciseInstance.participantKey
                     ) {
-                        @let res =
-                            getResOfCriterionFromInstance(
-                                criterion,
-                                exerciseInstance
-                            );
-                        @if (res) {
-                            <!-- TODO @JohannesPotzi @Jogius : implement and use the result badge -->
-                            @let isCompleted =
-                                getIsCompletedFromEvalResult(res);
-                            @if (isCompleted !== null) {
-                                <td>
-                                    <span
-                                        class="badge rounded-pill"
-                                        [ngStyle]="{
-                                            'background-color': isCompleted
-                                                ? 'green'
-                                                : 'red',
-                                        }"
-                                    >
-                                        @if (isCompleted) {
-                                            <i class="bi bi-check"></i>
-                                        } @else {
-                                            <i class="bi bi-x-lg"></i>
-                                        }
-                                    </span>
-                                </td>
+                        <td>
+                            @let res =
+                                getResOfCriterionFromInstance(
+                                    criterion,
+                                    exerciseInstance
+                                );
+                            @if (res && resultsMap(); as globalResultsMap) {
+                                @if (
+                                    globalResultsMap[
+                                        exerciseInstance.participantKey
+                                    ];
+                                    as instanceResultsMap
+                                ) {
+                                    <app-eval-result-status-badge
+                                        [result]="res"
+                                        [resultsMap]="instanceResultsMap"
+                                    />
+                                }
                             }
-                            @if (getNumFromEvalResult(res); as resNum) {
-                                <td>
-                                    <span class="badge rounded-pill">
-                                        {{ resNum }}
-                                    </span>
-                                </td>
-                            }
-                        }
+                        </td>
                     }
                 </tr>
             }

@@ -1,6 +1,11 @@
 import { Component, computed, input } from '@angular/core';
-import { BoolEvalResult, NumberEvalResult } from 'fuesim-digital-shared';
-import { NgStyle } from '../../../../../../../../node_modules/@angular/common/types/_common_module-chunk';
+import {
+    EvalCriterionId,
+    EvalResult,
+    getIsCompletedFromEvalResult,
+    getNumFromEvalResult,
+} from 'fuesim-digital-shared';
+import { NgStyle } from '@angular/common';
 
 @Component({
     selector: 'app-eval-result-status-badge',
@@ -9,23 +14,50 @@ import { NgStyle } from '../../../../../../../../node_modules/@angular/common/ty
     imports: [NgStyle],
 })
 export class EvalResultStatusBadgeComponent {
-    public readonly boolEvalResult = input<BoolEvalResult>();
-    public readonly leftNumResult = input<NumberEvalResult>();
-    public readonly rightNumResult = input<NumberEvalResult>();
-    public readonly singleNumResult = input<NumberEvalResult>();
+    public readonly result = input.required<EvalResult>();
+    public readonly resultsMap = input.required<{
+        [criterionId: EvalCriterionId]: EvalResult;
+    }>();
+    public readonly isCompleted = computed(() =>
+        getIsCompletedFromEvalResult(this.result())
+    );
+    public readonly singleNum = computed(() =>
+        getNumFromEvalResult(this.result())
+    );
+    public readonly leftNumResult = computed(() => {
+        const result = this.result();
+        if (
+            result &&
+            result.criterion.criterionType === 'greaterThanEvalCriterion'
+        ) {
+            const resultMap = this.resultsMap();
+            return resultMap[result.criterion.leftChild] ?? null;
+        }
+        return null;
+    });
+    public readonly rightNumResult = computed(() => {
+        const result = this.result();
+        if (
+            result &&
+            result.criterion.criterionType === 'greaterThanEvalCriterion'
+        ) {
+            const resultMap = this.resultsMap();
+            return resultMap[result.criterion.rightChild] ?? null;
+        }
+        return null;
+    });
     public readonly color = computed(() => {
-        const boolRes = this.boolEvalResult();
-        if (boolRes !== undefined) {
-            return boolRes.isCompleted ? 'green' : 'red';
+        const isCompleted = this.isCompleted();
+        if (isCompleted !== undefined) {
+            return isCompleted ? 'green' : 'red';
         }
         const leftRes = this.leftNumResult();
         const rightRes = this.rightNumResult();
         if (leftRes && rightRes) {
-            return leftRes.num === 0
-                ? 'red'
-                : leftRes.num === rightRes.num
-                  ? 'green'
-                  : 'yellow';
+            return getNumFromEvalResult(leftRes) ===
+                getNumFromEvalResult(rightRes)
+                ? 'green'
+                : 'red';
         }
         return 'grey';
     });

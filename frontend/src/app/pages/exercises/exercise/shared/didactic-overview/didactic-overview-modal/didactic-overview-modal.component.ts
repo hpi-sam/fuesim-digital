@@ -25,6 +25,8 @@ import {
     EvalCriterionCategory,
 } from '../../../../../../../../../shared/dist/models/evaluation-criterion';
 import {
+    EvalCriterionId,
+    EvalResult,
     type TechnicalChallengeId,
     type TechnicalChallengeStateId,
     getNumFromEvalResult,
@@ -32,6 +34,7 @@ import {
     statusNames,
 } from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';
+import { EvalResultStatusBadgeComponent } from '../result-status-badge/eval-result-status-badge.component';
 @Component({
     selector: 'app-didactic-overview',
     templateUrl: './didactic-overview-modal.component.html',
@@ -43,12 +46,14 @@ import { ExerciseService } from '../../../../../../core/exercise.service';
         NgbDropdownMenu,
         NgbDropdownButtonItem,
         NgbDropdownItem,
+        EvalResultStatusBadgeComponent,
     ],
 })
 export class DidacticOverviewModalComponent {
     private readonly activeModal = inject(NgbActiveModal);
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
+    public readonly resultsCache = this.exerciseService.evalResultsCache;
     public readonly rootCriteriaMap = computed(() =>
         this.getRootCriteriaMap(this.store.selectSignal(selectEvalCriteria)())
     );
@@ -56,14 +61,20 @@ export class DidacticOverviewModalComponent {
         Object.values(this.store.selectSignal(selectEvalResults)()).map(
             (res) => {
                 if (isTemporalEvalCriterionType(res.criterion.criterionType)) {
-                    const cacheHit =
-                        this.exerciseService.evalResultsCache()[
-                            res.criterionId
-                        ];
+                    const cacheHit = this.resultsCache()[res.criterionId];
                     return cacheHit ?? res;
                 }
                 return res;
             }
+        )
+    );
+    public readonly resultsMap = computed(() =>
+        this.results().reduce<{ [crieterionId: EvalCriterionId]: EvalResult }>(
+            (mapObject, result) => {
+                mapObject[result.criterionId] = result;
+                return mapObject;
+            },
+            {}
         )
     );
     public readonly rootResults = computed(() =>

@@ -18,7 +18,12 @@ export const numberEvalCriterionIdSchema = uuidSchema.brand(
 );
 export type NumberEvalCriterionId = z.infer<typeof numberEvalCriterionIdSchema>;
 
-export type EvalCriterionId = BoolEvalCriterionId | NumberEvalCriterionId;
+export const evalCriterionIdSchema = z.union([
+    boolEvalCriterionIdSchema,
+    numberEvalCriterionIdSchema,
+]);
+
+export type EvalCriterionId = z.infer<typeof evalCriterionIdSchema>;
 
 /* TODO @JohannesPotzi @Jogius : add showInTable attribute. Also, update addCriterion action accordingly. */
 export const evalCriterionBaseSchema = z.strictObject({
@@ -161,7 +166,6 @@ export const boolEvalCriterionLeafSchema = z.discriminatedUnion(
         reachTechnicalChallengeStateEvalCriterionSchema,
         patientAtStatusEvalCriterionSchema,
         viewScoutableEvalCriterionSchema,
-        greaterThanEvalCriterionSchema,
         doMeasureXTimesEvalCriterionSchema,
         xPatientsAtStatusEvalCriterionSchema,
     ]
@@ -181,6 +185,7 @@ export const boolEvalCriterionSchema = z.discriminatedUnion('criterionType', [
     andEvalCriterionSchema,
     orEvalCriterionSchema,
     notEvalCriterionSchema,
+    greaterThanEvalCriterionSchema,
 ]);
 export type BoolEvalCriterion = z.infer<typeof boolEvalCriterionSchema>;
 

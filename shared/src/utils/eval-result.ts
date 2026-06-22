@@ -4,6 +4,7 @@ import {
     boolEvalCriterionSchema,
     CountEvalCriterion,
     EvalCriterion,
+    evalCriterionIdSchema,
     FirstTrueAtEvalCriterion,
     GreaterThanEvalCriterion,
     isNumberEvalCriterion,
@@ -21,7 +22,7 @@ import { uuid, UUID, uuidSchema } from './uuid.js';
 
 export const evalResultBaseSchema = z.strictObject({
     id: uuidSchema,
-    criterionId: uuidSchema,
+    criterionId: evalCriterionIdSchema,
     timestamp: z.number(),
 });
 export const numberEvalResultSchema = z.strictObject({

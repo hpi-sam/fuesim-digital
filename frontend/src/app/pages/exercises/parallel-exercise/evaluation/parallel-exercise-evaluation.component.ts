@@ -15,12 +15,13 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NgStyle } from '@angular/common';
 import { HttpResourceRef } from '@angular/common/http';
 import { ApiService } from '../../../../core/api.service';
+import { EvalResultStatusBadgeComponent } from '../../exercise/shared/didactic-overview/result-status-badge/eval-result-status-badge.component';
 
 @Component({
     selector: 'app-parallel-exercise-evaluation',
     templateUrl: './parallel-exercise-evaluation.component.html',
     styleUrls: ['parallel-exercise-evaluation.component.scss'],
-    imports: [RouterLink, NgStyle],
+    imports: [RouterLink, NgStyle, EvalResultStatusBadgeComponent],
 })
 export class ParallelExerciseEvaluationComponent {
     public readonly parallelExerciseService = inject(ParallelExerciseService);

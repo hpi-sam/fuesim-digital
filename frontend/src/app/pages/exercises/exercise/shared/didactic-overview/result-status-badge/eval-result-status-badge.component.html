@@ -4,8 +4,8 @@
         'background-color': this.color(),
     }"
 >
-    @if (this.boolEvalResult(); as res) {
-        @if (res.isCompleted) {
+    @if (this.isCompleted() !== undefined) {
+        @if (this.isCompleted()) {
             <i class="bi bi-check"></i>
         } @else {
             <i class="bi bi-x-lg"></i>
@@ -16,7 +16,7 @@
             {{ leftNum + '/' + rightNum }}
         }
     }
-    @if (this.singleNumResult(); as res) {
-        {{ res.num }}
+    @if (this.singleNum(); as num) {
+        {{ num }}
     }
 </span>

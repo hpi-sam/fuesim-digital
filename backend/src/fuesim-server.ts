@@ -14,6 +14,9 @@ export class FuesimServer {
 
     public async saveTick() {
         await this.services.exerciseService.saveUnsavedExercises();
+
+        // also delete unused exercises here as the operation is very cheap
+        await this.services.exerciseService.deleteUnusedExercises();
     }
 
     public constructor(private readonly services: Services) {

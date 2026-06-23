@@ -131,7 +131,7 @@ export default {
 
                 patterns: [
                     {
-                        group: ['*/dist/*'],
+                        group: ['**/dist/**'],
                         message: 'Please only import from the source.',
                     },
                 ],

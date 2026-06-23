@@ -1,5 +1,6 @@
 import {
     exerciseExistsResponseDataSchema,
+    getExerciseConfigResponseDataSchema,
     isExerciseKey,
     isTrainerKey,
 } from 'fuesim-digital-shared';
@@ -7,9 +8,19 @@ import { isEmpty } from 'lodash-es';
 import { Router } from 'express';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ApiError, NotFoundError } from '../utils/http.js';
+import { Config } from '../config.js';
 
 export function createExerciseRouter(exerciseService: ExerciseService): Router {
     const router = Router();
+
+    router.route('/config').get(async (req, res) => {
+        res.send(
+            getExerciseConfigResponseDataSchema.encode({
+                parallelExercisesEnabled: Config.parallelExercisesEnabled,
+                autoDeleteDays: Config.autoDeleteDays,
+            })
+        );
+    });
 
     router.post('/exercise', async (req, res) => {
         const optionalData = req.session

@@ -57,9 +57,6 @@ export function createParallelExerciseRouter(
             );
         });
 
-    router.route('/enabled').get(async (req, res) => {
-        res.send(Config.parallelExercisesEnabled);
-    });
     router
         .route('/join/:key')
         .all(areParallelExercisesEnabled)

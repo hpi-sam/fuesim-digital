@@ -45,6 +45,14 @@ const stringToDate = z.codec(
     }
 );
 
+export const getExerciseConfigResponseDataSchema = z.object({
+    autoDeleteDays: z.int().nonnegative(),
+    parallelExercisesEnabled: z.boolean(),
+});
+export type GetExerciseConfigResponseData = z.infer<
+    typeof getExerciseConfigResponseDataSchema
+>;
+
 export const getExerciseResponseDataSchema = z.object({
     participantKey: participantKeySchema,
     trainerKey: trainerKeySchema,

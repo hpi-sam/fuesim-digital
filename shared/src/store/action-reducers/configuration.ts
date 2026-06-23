@@ -73,6 +73,12 @@ export class SetVehicleStatusInPatientStatusColorEnabled implements Action {
     public readonly vehicleStatusInPatientStatusColor!: boolean;
 }
 
+export class SetEvaluationEnabledAction implements Action {
+    @IsValue('[Configuration] Set evaluationEnabled' as const)
+    public readonly type = '[Configuration] Set evaluationEnabled';
+    @IsBoolean()
+    public readonly evaluationEnabled!: boolean;
+}
 export class SetHighlightRelatedElements implements Action {
     @IsValue('[Configuration] Set highlightRelatedElements' as const)
     public readonly type = '[Configuration] Set highlightRelatedElements';
@@ -160,6 +166,15 @@ export namespace ConfigurationActionReducers {
             reducer(draftState, { vehicleStatusInPatientStatusColor }) {
                 draftState.configuration.vehicleStatusInPatientStatusColor =
                     vehicleStatusInPatientStatusColor;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+    export const setEvaluationEnabled: ActionReducer<SetEvaluationEnabledAction> =
+        {
+            action: SetEvaluationEnabledAction,
+            reducer(draftState, { evaluationEnabled }) {
+                draftState.configuration.evaluationEnabled = evaluationEnabled;
                 return draftState;
             },
             rights: 'trainer',

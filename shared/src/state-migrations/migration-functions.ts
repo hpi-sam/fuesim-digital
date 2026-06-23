@@ -55,6 +55,7 @@ import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loadi
 import { addTechnicalChallenges55 } from './55-add-technical-challenges.js';
 import { extendScoutables56 } from './56-extend-scoutables.js';
 import { addMeasures57 } from './57-add-measures.js';
+import { addEvalCriteria58 } from './58-add-eval-criteria.js';
 
 /**
  * Migrate a single action
@@ -138,4 +139,5 @@ export const migrations: {
     55: addTechnicalChallenges55,
     56: extendScoutables56,
     57: addMeasures57,
+    58: addEvalCriteria58,
 };

@@ -1,6 +1,15 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
-import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbModal,
+    NgbNav,
+    NgbNavContent,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbNavOutlet,
+    NgbTooltip,
+} from '@ng-bootstrap/ng-bootstrap';
 import {
     GetParallelExerciseResponseData,
     PatchParallelExerciseRequestData,
@@ -16,6 +25,7 @@ import { ExerciseStateBadgeInnerComponent } from '../../../../shared/components/
 import { ParallelExerciseInstanceRowComponent } from '../instance-row/parallel-exercise-instance-row.component';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { InlineTextEditorComponent } from '../../../../shared/components/inline-text-editor/inline-text-editor.component';
+import { ParallelExerciseEvaluationComponent } from '../evaluation/parallel-exercise-evaluation.component';
 
 @Component({
     selector: 'app-parallel-exercise',
@@ -29,6 +39,13 @@ import { InlineTextEditorComponent } from '../../../../shared/components/inline-
         FooterComponent,
         NgbTooltip,
         InlineTextEditorComponent,
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbNavContent,
+        NgbNavOutlet,
+        ParallelExerciseEvaluationComponent,
     ],
 })
 export class ParallelExerciseComponent {

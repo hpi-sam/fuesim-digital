@@ -102,6 +102,12 @@ export class ExerciseSettingsModalComponent {
         });
     }
 
+    public setEvaluationEnabledFlag(evaluationEnabled: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set evaluationEnabled',
+            evaluationEnabled,
+        });
+    }
     public setHighlightRelatedElements(
         highlightRelatedElements: ExerciseConfiguration['highlightRelatedElements']
     ) {

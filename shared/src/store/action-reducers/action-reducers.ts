@@ -26,6 +26,8 @@ import { MeasureTemplateActionReducers } from './measure-templates.js';
 import { MeasureTemplateActionReducers as MeasureTemplateCategoryActionReducers } from './measure-template-categories.js';
 import { DrawingActionReducers } from './drawing.js';
 import { TechnicalChallengeActionReducers } from './technical-challenge.js';
+import { EvalCriterionActionReducers } from './eval-criterion.js';
+
 /**
  * All action reducers of the exercise must be registered here
  */
@@ -57,6 +59,7 @@ const actionReducers = {
     ...MeasureTemplateActionReducers,
     ...MeasureTemplateCategoryActionReducers,
     ...DrawingActionReducers,
+    ...EvalCriterionActionReducers,
 } as const;
 
 type ExerciseActionReducer =

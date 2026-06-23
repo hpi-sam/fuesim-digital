@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, isDevMode } from '@angular/core';
 import {
     NgbModal,
     NgbTooltip,
@@ -53,6 +53,7 @@ import {
 } from '../shared/clients-modal/open-clients-modal';
 import { environment } from '../../../../../environments/environment.js';
 import { MapOperatorMapComponent } from '../shared/map-operator-map/map-operator-map.component';
+import { openDidacticOverviewModal } from '../shared/didactic-overview/didactic-overview-modal/open-didactic-overview-modal';
 
 @Component({
     selector: 'app-exercise',
@@ -91,6 +92,8 @@ export class ExerciseComponent implements OnDestroy {
     public readonly exerciseStateMode$ = this.store.select(
         selectExerciseStateMode
     );
+    public readonly isDevMode = isDevMode;
+
     public readonly participantKey =
         this.store.selectSignal(selectParticipantKey);
     public readonly exerciseKey = this.store.selectSignal(selectExerciseKey);
@@ -128,6 +131,10 @@ export class ExerciseComponent implements OnDestroy {
             title: 'Zurück in die Zukunft!',
             color: 'info',
         });
+    }
+
+    public openDidacticOverviewModal() {
+        openDidacticOverviewModal(this.modalService);
     }
 
     public async exportExerciseWithHistory() {

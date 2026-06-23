@@ -90,6 +90,15 @@
                     </button>
                 }
                 <div class="flex-grow-1"></div>
+                <!-- TODO @JohannesPotzi @Jogius : show criteria progress ("3/10 Kriterien erfüllt")-->
+                @if (isDevMode()) {
+                    <div
+                        class="btn btn-outline-success me-3"
+                        (click)="openDidacticOverviewModal()"
+                    >
+                        Auswertung
+                    </div>
+                }
                 <div class="d-flex gap-2 align-items-center">
                     <div ngbDropdown>
                         <button

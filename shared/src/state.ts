@@ -96,6 +96,11 @@ import {
 } from './models/technical-challenge/technical-challenge.js';
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
+import {
+    EvalCriterion,
+    evalCriterionBaseSchema,
+    evalCriterionSchema,
+} from './models/eval-criterion.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -265,6 +270,13 @@ export class ExerciseState {
     @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
     public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
 
+    @IsZodSchema(
+        z.record(evalCriterionBaseSchema.shape.id, evalCriterionSchema)
+    )
+    public readonly evalCriteria: {
+        readonly [key: UUID]: EvalCriterion;
+    } = {};
+
     /**
      * @deprecated Use {@link create} instead.
      */
@@ -279,5 +291,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 57;
+    static readonly currentStateVersion = 58;
 }

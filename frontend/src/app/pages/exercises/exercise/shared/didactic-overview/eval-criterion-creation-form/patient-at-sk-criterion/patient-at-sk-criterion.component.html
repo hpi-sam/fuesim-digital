@@ -1,0 +1,97 @@
+<div ngbDropdown class="d-inline-block">
+    <button ngbDropdownToggle class="btn btn-outline-primary ms-3">
+        @if (this.selectedTargetStatus(); as status) {
+            Ziel: <app-patient-status-badge [status]="status" />
+        } @else {
+            Ziel SK auswählen
+        }
+    </button>
+    <div ngbDropdownMenu class="position-absolute">
+        @for (value of this.patientStatusAllowedValues; track value) {
+            <button
+                ngbDropdownItem
+                (click)="this.selectedTargetStatus.set(value)"
+            >
+                {{ this.statusNames[value] }}
+            </button>
+        }
+    </div>
+</div>
+<hr />
+<div class="row h-100">
+    <div class="col-md-8 col-md-5 h-100" style="overflow-y: scroll">
+        <div class="cards">
+            @for (patient of this.patients(); track patient.id) {
+                <app-simulated-region-preview-card
+                    dataCy="criterionPatientWithVisibleStatusDiv"
+                    [imageUrl]="patient.image.url"
+                    [darkBackground]="selected()?.id === patient.id"
+                    [title]="patient.identifier"
+                    (elementMousedown)="selectPatient(patient)"
+                >
+                    <div class="d-flex">
+                        <div class="flex-grow-1"></div>
+                        @if (selectedPatients().includes(patient)) {
+                            <button
+                                style="max-width: 25%; min-width: 25%"
+                                class="btn btn-outline-success p-1 me-2"
+                                (click)="
+                                    removePatient(patient.id);
+                                    updateSelectedPatientStatusMap(
+                                        patient.id,
+                                        null
+                                    )
+                                "
+                            >
+                                <i class="bi bi-check2-square"></i>
+                                @if (
+                                    selectedPatientStatusMap()[patient.id];
+                                    as status
+                                ) {
+                                    <app-patient-status-badge
+                                        class="ms-1"
+                                        [status]="status"
+                                    />
+                                } @else {
+                                    no status selected
+                                }
+                            </button>
+                        } @else {
+                            <button
+                                style="max-width: 25%; min-width: 25%"
+                                class="btn btn-outline-secondary p-1 me-2"
+                                (click)="
+                                    addPatient(patient);
+                                    updateSelectedPatientStatusMap(
+                                        patient.id,
+                                        this.selectedTargetStatus()
+                                    )
+                                "
+                            >
+                                <i class="bi bi-square"></i>
+                            </button>
+                        }
+                    </div>
+                </app-simulated-region-preview-card>
+            }
+        </div>
+    </div>
+    <div class="col-md-4 h-100" style="border-left: 1px solid darkgrey">
+        @if (selected(); as selected) {
+            <h4>Patient <app-patient-header [patientId]="selected.id" /></h4>
+            <app-patients-details
+                class="overflow-auto w-100 d-inline-block flex-grow-1"
+                [patientId]="selected.id"
+            />
+            <app-didactic-overview-patient-interaction-bar
+                [patient]="selected"
+                [selectedGlobalTargetStatus]="this.selectedTargetStatus()"
+                [criterionForm]="this.criterionForm()"
+                (targetPatient)="addPatient($event)"
+                (targetStatus)="
+                    updateSelectedPatientStatusMap(selected.id, $event)
+                "
+            />
+        }
+    </div>
+</div>

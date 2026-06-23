@@ -19,6 +19,7 @@ export const exerciseConfigurationSchema = z.strictObject({
     participantLoadAllEnabled: z.boolean(),
     tileMapProperties: tileMapPropertiesSchema,
     operationsMapProperties: operationsMapPropertiesSchema,
+    evaluationEnabled: z.boolean(),
 });
 export type ExerciseConfiguration = z.infer<typeof exerciseConfigurationSchema>;
 export function newExerciseConfiguration(): ExerciseConfiguration {
@@ -33,5 +34,6 @@ export function newExerciseConfiguration(): ExerciseConfiguration {
         participantLoadAllEnabled: true,
         tileMapProperties: defaultTileMapProperties,
         operationsMapProperties: defaultOperationsMapProperties,
+        evaluationEnabled: true,
     };
 }

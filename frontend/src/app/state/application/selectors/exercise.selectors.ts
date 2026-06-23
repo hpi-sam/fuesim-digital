@@ -20,6 +20,7 @@ import {
     isInTransferFromAlarmgroup,
     nestedCoordinatesOf,
     scoutableElementTypes,
+    getEvalResultsFromCriteria,
 } from 'fuesim-digital-shared';
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
@@ -89,6 +90,7 @@ export const selectMeasureTemplates = createSelector(
     (categories): { [key: UUID]: MeasureTemplate } =>
         Object.assign({}, ...Object.values(categories).map((c) => c.templates))
 );
+export const selectEvalCriteria = selectPropertyFactory('evalCriteria');
 // Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');
@@ -161,6 +163,9 @@ export const createSelectScoutable =
 export const createSelectMeasureTemplate = createSelectElementFromMapFactory(
     selectMeasureTemplates
 );
+export const createSelectEvalCriterion =
+    createSelectElementFromMapFactory(selectEvalCriteria);
+
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,
@@ -464,4 +469,20 @@ export const selectWorkingPersonnel = createSelector(
         }
         return workingPersonnel;
     }
+);
+
+export const selectEvalResults = createSelector(
+    selectEvalCriteria,
+    selectTechnicalChallenges,
+    selectPatients,
+    selectScoutables,
+    selectCurrentTime,
+    (evalCriteria, technicalChallenges, patients, scoutables, currentTime) =>
+        getEvalResultsFromCriteria(
+            evalCriteria,
+            technicalChallenges,
+            patients,
+            scoutables,
+            currentTime
+        )
 );

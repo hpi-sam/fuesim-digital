@@ -1,0 +1,105 @@
+import { z } from 'zod';
+import {
+    organisationIdSchema,
+    organisationInviteLinkIdSchema,
+    organisationMembershipIdSchema,
+} from '../ids.js';
+import { validationMessages } from '../validation-messages.js';
+import { stringToDate } from './utils.js';
+
+export const organisationMembershipRoleAllowedValues = [
+    'viewer',
+    'editor',
+    'admin',
+] as const;
+export const organisationMembershipRoleSchema = z.literal(
+    organisationMembershipRoleAllowedValues
+);
+export type OrganisationMembershipRole = z.infer<
+    typeof organisationMembershipRoleSchema
+>;
+
+export const organisationMembershipRoleToGermanNameDictionary: {
+    [Key in OrganisationMembershipRole]: string;
+} = {
+    viewer: 'Betrachter',
+    editor: 'Bearbeiter',
+    admin: 'Administrator',
+} as const;
+
+export const getOrganisationResponseDataSchema = z.object({
+    id: organisationIdSchema,
+    name: z.string(),
+    description: z.string(),
+    createdAt: stringToDate,
+    personalOrganisationOf: z.string().nullable(),
+});
+
+export type GetOrganisationResponseData = z.infer<
+    typeof getOrganisationResponseDataSchema
+>;
+
+export const getOrganisationDetailsResponseDataSchema = z.object({
+    ...getOrganisationResponseDataSchema.shape,
+    userRole: organisationMembershipRoleSchema.nullable(),
+    membersCount: z.int(),
+    members: z.array(
+        z.object({
+            id: organisationMembershipIdSchema,
+            user: z.object({
+                id: z.string(),
+                displayName: z.string(),
+            }),
+            role: organisationMembershipRoleSchema,
+        })
+    ),
+});
+
+export type GetOrganisationDetailsResponseData = z.infer<
+    typeof getOrganisationDetailsResponseDataSchema
+>;
+
+export const getOrganisationsResponseDataSchema = z.array(
+    z.object({
+        ...getOrganisationResponseDataSchema.shape,
+        userRole: organisationMembershipRoleSchema.nullable(),
+        membersCount: z.int(),
+    })
+);
+export type GetOrganisationsResponseData = z.infer<
+    typeof getOrganisationsResponseDataSchema
+>;
+
+export const postOrganisationRequestDataSchema = z.object({
+    name: z
+        .string()
+        .nonempty(validationMessages.required)
+        .max(255, validationMessages.tooLong)
+        .trim(),
+    description: z.string().trim(),
+});
+export type PostOrganisationRequestData = z.infer<
+    typeof postOrganisationRequestDataSchema
+>;
+
+export const patchOrganisationRequestDataSchema =
+    postOrganisationRequestDataSchema.partial();
+export type PatchOrganisationRequestData = z.infer<
+    typeof patchOrganisationRequestDataSchema
+>;
+
+export const postOrganisationInviteLinkResponseDataSchema = z.object({
+    id: organisationInviteLinkIdSchema,
+    inviteLink: z.url(),
+    expirationDate: stringToDate,
+});
+export type PostOrganisationInviteLinkResponseData = z.infer<
+    typeof postOrganisationInviteLinkResponseDataSchema
+>;
+
+export const patchOrganisationMembershipRequestDataSchema = z.object({
+    role: organisationMembershipRoleSchema,
+});
+export type PatchOrganisationMembershipRequestData = z.infer<
+    typeof patchOrganisationMembershipRequestDataSchema
+>;

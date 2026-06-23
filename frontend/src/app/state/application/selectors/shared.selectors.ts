@@ -21,6 +21,7 @@ import {
     isInViewport,
     isElementGenericScoutable,
     scoutableImages,
+    currentStateOf,
 } from 'fuesim-digital-shared';
 
 import { pickBy } from 'lodash-es';
@@ -183,9 +184,16 @@ export const selectVisibleScoutableIndicators = createSelector(
     selectCurrentMainRole,
     selectScoutables,
     selectRestrictedViewport,
+    selectVisibleTechnicalChallenges,
     ...scoutableElementSelectors,
-    (currentRole, scoutables, viewport, ...elementSelectors) =>
-        elementSelectors
+    (
+        currentRole,
+        scoutables,
+        viewport,
+        technicalChallenges,
+        ...elementSelectors
+    ) => {
+        const normalScoutables = elementSelectors
             .flatMap((selector) =>
                 Object.values(selector)
                     .filter(
@@ -199,7 +207,7 @@ export const selectVisibleScoutableIndicators = createSelector(
                         const scoutable = scoutables[element.scoutableId!]!;
 
                         if (
-                            currentRole !== 'trainer' &&
+                            currentRole === 'participant' &&
                             !scoutable.isVisibleForParticipants
                         ) {
                             return null;
@@ -221,9 +229,14 @@ export const selectVisibleScoutableIndicators = createSelector(
 
                         const imageKey1 =
                             scoutable.viewedByParticipants &&
-                            currentRole === 'trainer'
+                            currentRole !== 'participant'
                                 ? 'viewed'
                                 : 'unviewed';
+                        console.log(
+                            imageKey1,
+                            currentRole,
+                            scoutable.viewedByParticipants
+                        );
                         const imageKey2 =
                             element.type === 'patient' ? 'patient' : 'generic';
                         return {
@@ -242,13 +255,40 @@ export const selectVisibleScoutableIndicators = createSelector(
                     scoutableIndicator !== null &&
                     (!viewport ||
                         isInViewport(viewport, scoutableIndicator.position))
-            )
-            .reduce<{ [id: `${UUID}:${UUID}`]: ScoutableIndicator }>(
-                (scoutableIndicatorsObject, scoutableIndicator) => {
-                    scoutableIndicatorsObject[scoutableIndicator!.id] =
-                        scoutableIndicator!;
-                    return scoutableIndicatorsObject;
-                },
-                {}
-            )
+            );
+        const technicalChallengeScoutables: ScoutableIndicator[] =
+            Object.values(technicalChallenges).map((challenge) => {
+                const currentState = currentStateOf(challenge);
+
+                const offset = { x: challenge.size.width, y: 0 };
+                const elementPos = currentCoordinatesOf(challenge);
+
+                const position = newMapCoordinatesAt(
+                    elementPos.x + offset.x,
+                    elementPos.y + offset.y
+                );
+
+                const viewStatus =
+                    currentState.viewedByParticipants &&
+                    currentRole === 'trainer'
+                        ? 'viewed'
+                        : 'unviewed';
+                return {
+                    id: `${challenge.id}:${currentState.id}`,
+                    position,
+                    scoutableElementType: 'technicalChallenge',
+                    scoutableElementId: challenge.id,
+                    imageUrl: scoutableImages[viewStatus].generic,
+                    height: 50,
+                };
+            });
+
+        return [...normalScoutables, ...technicalChallengeScoutables].reduce<{
+            [id: `${UUID}:${UUID}`]: ScoutableIndicator;
+        }>((scoutableIndicatorsObject, scoutableIndicator) => {
+            scoutableIndicatorsObject[scoutableIndicator!.id] =
+                scoutableIndicator!;
+            return scoutableIndicatorsObject;
+        }, {});
+    }
 );

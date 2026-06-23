@@ -1,0 +1,108 @@
+<app-header />
+<main class="container">
+    @if (organisation.hasValue()) {
+        @let org = organisation.value();
+        <div class="mb-4 card">
+            <div class="card-body pb-0">
+                <h1 class="d-flex align-items-center">
+                    @if (
+                        org.userRole === 'admin' && !org.personalOrganisationOf
+                    ) {
+                        <app-inline-text-editor
+                            class="flex-grow-1"
+                            [required]="true"
+                            [value]="org.name"
+                            name="Name der Organisation"
+                            (update)="
+                                patchOrganisation({
+                                    name: $event,
+                                })
+                            "
+                            [singleLine]="true"
+                        />
+                    } @else {
+                        {{ org.name }}
+                    }
+                </h1>
+            </div>
+            <hr />
+            <div class="card-body pt-0">
+                @if (org.personalOrganisationOf) {
+                    <span class="badge bg-primary"
+                        ><i class="bi bi-house"></i> Persönliche
+                        Organisation</span
+                    >
+                } @else if (org.userRole === 'admin') {
+                    <app-inline-text-editor
+                        class="flex-grow-1"
+                        [value]="org.description"
+                        name="Beschreibung der Organisation"
+                        (update)="
+                            patchOrganisation({
+                                description: $event,
+                            })
+                        "
+                    />
+                } @else {
+                    {{ org.description }}
+                }
+            </div>
+        </div>
+
+        @if (org.personalOrganisationOf) {
+            <p class="alert alert-primary">
+                <i class="bi bi-info-circle me-2"></i>
+                Dies ist Ihre persönliche Organisation. Alle Inhalte sind privat
+                und nur Ihnen zugänglich.
+            </p>
+        }
+
+        <nav ngbNav #nav="ngbNav" class="nav-tabs">
+            <ng-container ngbNavItem="content">
+                <a ngbNavLink>
+                    <i class="bi bi-box-seam me-1"></i>
+                    Inhalte
+                    <span class="badge text-bg-secondary">4</span>
+                </a>
+                <ng-template ngbNavContent>
+                    <app-organisation-tab-content
+                        [organisation]="org"
+                        (update)="reload()"
+                    />
+                </ng-template>
+            </ng-container>
+            @if (!org.personalOrganisationOf) {
+                <ng-container ngbNavItem="members">
+                    <a ngbNavLink>
+                        <i class="bi bi-people me-1"></i>
+                        Mitglieder
+                        <span class="badge text-bg-secondary">
+                            {{ org.members.length }}
+                        </span>
+                    </a>
+                    <ng-template ngbNavContent>
+                        <app-organisation-tab-members
+                            [organisation]="org"
+                            (update)="reload()"
+                        />
+                    </ng-template>
+                </ng-container>
+                <div class="flex-grow-1"></div>
+                <ng-container ngbNavItem="settings">
+                    <a ngbNavLink>
+                        <i class="bi bi-gear me-1"></i>
+                        Einstellungen
+                    </a>
+                    <ng-template ngbNavContent>
+                        <app-organisation-tab-settings
+                            [organisation]="org"
+                            (update)="reload()"
+                        />
+                    </ng-template>
+                </ng-container>
+            }
+        </nav>
+        <div [ngbNavOutlet]="nav"></div>
+    }
+</main>
+<app-footer />

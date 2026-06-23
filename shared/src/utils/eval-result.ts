@@ -1,25 +1,22 @@
 import { z } from 'zod';
-import {
-    AndEvalCriterion,
-    boolEvalCriterionSchema,
-    CountCompletedEvalCriterion,
+import type {
+    BoolEvalCriterion,
     EvalCriterion,
     EvalCriterionId,
+    NumberEvalCriterion,
+} from '../models/eval-criterion.js';
+import {
+    boolEvalCriterionSchema,
     evalCriterionIdSchema,
-    FirstTrueAtEvalCriterion,
-    GreaterThanEvalCriterion,
     isNumberEvalCriterion,
     isTemporalEvalCriterionType,
-    NotEvalCriterion,
     numberEvalCriterionSchema,
-    OrEvalCriterion,
-    PatientAtStatusEvalCriterion,
-    ReachTechnicalChallengeStateEvalCriterion,
-    ViewScoutableEvalCriterion,
-    XPatientsAtStatusEvalCriterion,
 } from '../models/eval-criterion.js';
-import { Patient, Scoutable, TechnicalChallenge } from '../models/index.js';
-import { uuid, UUID, uuidSchema } from './uuid.js';
+import type { Patient } from '../models/patient.js';
+import type { Scoutable } from '../models/scoutable.js';
+import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
+import type { UUID } from './uuid.js';
+import { uuid, uuidSchema } from './uuid.js';
 
 export const evalResultBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -71,7 +68,7 @@ export function getEvalResultFromCriterion(
     }
     /* TODO @JohannesPotzi @Jogius : This reduces redundant visits to criteria in the tree. Can we do Better? */
     if (cache[evalCriterion.id] !== undefined) {
-        return cache[evalCriterion.id] as EvalResult;
+        return cache[evalCriterion.id]!;
     }
 
     let isCompleted = false;
@@ -86,8 +83,7 @@ export function getEvalResultFromCriterion(
             break;
         }
         case 'reachTechnicalChallengeStateEvalCriterion': {
-            const criterion =
-                evalCriterion as ReachTechnicalChallengeStateEvalCriterion;
+            const criterion = evalCriterion;
             const targetChallengeId = criterion.targetTechnicalChallengeId;
             const targetStateId = criterion.targetTechnicalChallengeStateId;
             const technicalChallenge = technicalChallenges[targetChallengeId]!;
@@ -95,14 +91,14 @@ export function getEvalResultFromCriterion(
             break;
         }
         case 'patientAtStatusEvalCriterion': {
-            const criterion = evalCriterion as PatientAtStatusEvalCriterion;
+            const criterion = evalCriterion;
             const targetId = criterion.targetPatientId;
             const patient = patients[targetId]!;
             isCompleted = patient.realStatus === criterion.targetStatus;
             break;
         }
         case 'xPatientsAtStatusEvalCriterion': {
-            const criterion = evalCriterion as XPatientsAtStatusEvalCriterion;
+            const criterion = evalCriterion;
             num = Object.values(patients).filter(
                 (patient) => patient.realStatus === criterion.targetStatus
             ).length;
@@ -110,17 +106,17 @@ export function getEvalResultFromCriterion(
             break;
         }
         case 'viewScoutableEvalCriterion': {
-            const criterion = evalCriterion as ViewScoutableEvalCriterion;
+            const criterion = evalCriterion;
             const scoutable = scoutables[criterion.targetScoutableId]!;
             isCompleted = scoutable.viewedByParticipants;
             break;
         }
         case 'andEvalCriterion': {
-            const Criterion = evalCriterion as AndEvalCriterion;
+            const criterion = evalCriterion;
             isCompleted = true;
-            for (let i = 0; i < Criterion.children.length; i += 1) {
+            for (let i = 0; i < criterion.children.length; i += 1) {
                 const res = shortCritToRes(
-                    evalCriteria[Criterion.children[i]!]!
+                    evalCriteria[criterion.children[i]!]!
                 );
                 if (res.type !== 'boolEvalResult' || !res.isCompleted) {
                     isCompleted = false;
@@ -130,7 +126,7 @@ export function getEvalResultFromCriterion(
             break;
         }
         case 'orEvalCriterion': {
-            const Criterion = evalCriterion as OrEvalCriterion;
+            const Criterion = evalCriterion;
             isCompleted = false;
             for (let i = 0; i < Criterion.children.length; i += 1) {
                 const res = shortCritToRes(
@@ -146,22 +142,23 @@ export function getEvalResultFromCriterion(
             break;
         }
         case 'notEvalCriterion': {
-            const criterion = evalCriterion as NotEvalCriterion;
+            const criterion = evalCriterion;
             const res = shortCritToRes(criterion);
             isCompleted =
                 res.type === 'boolEvalResult' ? res.isCompleted : true;
             break;
         }
         case 'greaterThanEvalCriterion': {
-            const criterion = evalCriterion as GreaterThanEvalCriterion;
+            const criterion = evalCriterion;
             const leftCrit = evalCriteria[criterion.leftChild];
             const rightCrit = evalCriteria[criterion.rightChild];
             if (!leftCrit || !rightCrit) {
                 console.log(
-                    '[logic Error] comparing criteria but some are missing with ids: ' +
-                        (leftCrit ? '' : criterion.leftChild) +
-                        (!leftCrit && !rightCrit ? ', ' : '') +
-                        (rightCrit ? '' : criterion.rightChild)
+                    `[logic Error] comparing criteria but some are missing with ids: ${
+                        leftCrit ? '' : criterion.leftChild
+                    }${
+                        !leftCrit && !rightCrit ? ', ' : ''
+                    }${rightCrit ? '' : criterion.rightChild}`
                 );
                 break;
             }
@@ -173,10 +170,11 @@ export function getEvalResultFromCriterion(
             const isRightNum = rightRes.type === 'numberEvalResult';
             if (!isLeftNum || !isRightNum) {
                 console.log(
-                    '[logic Error] comparing criteria but some are not numberCriteria with ids: ' +
-                        (isLeftNum ? '' : criterion.leftChild) +
-                        (!isLeftNum && !isRightNum ? ', ' : '') +
-                        (isRightNum ? '' : criterion.rightChild)
+                    `[logic Error] comparing criteria but some are not numberCriteria with ids: ${
+                        isLeftNum ? '' : criterion.leftChild
+                    }${
+                        !isLeftNum && !isRightNum ? ', ' : ''
+                    }${isRightNum ? '' : criterion.rightChild}`
                 );
             }
             /* boolean are converted to numbers appropiately */
@@ -203,7 +201,7 @@ export function getEvalResultFromCriterion(
             break;
         }
         case 'countCompletedEvalCriterion': {
-            const criterion = evalCriterion as CountCompletedEvalCriterion;
+            const criterion = evalCriterion;
             num = 0;
             for (let i = 0; i < criterion.children.length; i += 1) {
                 const res = shortCritToRes(
@@ -211,10 +209,9 @@ export function getEvalResultFromCriterion(
                 );
                 if (res.type === 'numberEvalResult') {
                     console.log(
-                        '[logic Error] countCompletedEvalCriterion ' +
-                            criterion.id +
-                            ' contains numberEvalCriterion ' +
-                            res.criterionId
+                        `[logic Error] countCompletedEvalCriterion ${
+                            criterion.id
+                        } contains numberEvalCriterion ${res.criterionId}`
                     );
                 } else if (res.isCompleted) {
                     num += 1;
@@ -223,12 +220,11 @@ export function getEvalResultFromCriterion(
             break;
         }
         case 'firstTrueAtEvalCriterion': {
-            const criterion = evalCriterion as FirstTrueAtEvalCriterion;
+            const criterion = evalCriterion;
             /* -1 === num means, that the child criterion has not been true yet */
             num = -1;
             if (
-                previousResult &&
-                previousResult.criterionId === criterion.id &&
+                previousResult?.criterionId === criterion.id &&
                 previousResult.type === 'numberEvalResult' &&
                 previousResult.num !== -1
             ) {
@@ -249,34 +245,33 @@ export function getEvalResultFromCriterion(
     if (isNumberEvalCriterion(evalCriterion)) {
         if (!num) {
             console.log(
-                '[logic Error]: trying to return result of numberCriterion' +
-                    evalCriterion.id +
-                    ' without calculating the number value.'
+                `[logic Error]: trying to return result of numberCriterion${
+                    evalCriterion.id
+                } without calculating the number value.`
             );
             num = 0;
         }
-        const res = {
-            id: id,
+        const res: NumberEvalResult = {
+            id,
             type: 'numberEvalResult',
             criterionId: evalCriterion.id,
-            criterion: evalCriterion,
-            num: num,
+            criterion: evalCriterion as NumberEvalCriterion,
+            num,
             timestamp: currentTime,
-        } as NumberEvalResult;
-        cache[evalCriterion.id] = res;
-        return res;
-    } else {
-        const res = {
-            id: uuid(),
-            criterionId: evalCriterion.id,
-            criterion: evalCriterion,
-            type: 'boolEvalResult',
-            isCompleted: isCompleted,
-            timestamp: currentTime,
-        } as BoolEvalResult;
+        };
         cache[evalCriterion.id] = res;
         return res;
     }
+    const critRes: BoolEvalResult = {
+        id: uuid(),
+        criterionId: evalCriterion.id,
+        criterion: evalCriterion as BoolEvalCriterion,
+        type: 'boolEvalResult',
+        isCompleted,
+        timestamp: currentTime,
+    };
+    cache[evalCriterion.id] = critRes;
+    return critRes;
 }
 export function getEvalResultsFromCriteria(
     evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
@@ -286,7 +281,7 @@ export function getEvalResultsFromCriteria(
     currentTime: number
 ): { [evalCriterionId: UUID]: EvalResult } {
     const criteria = Object.values(evalCriteria);
-    let cache = {} as { [key: string]: EvalResult };
+    const cache: { [key: string]: EvalResult } = {};
     return criteria
         .flatMap(
             (criterion: EvalCriterion): EvalResult =>
@@ -325,7 +320,7 @@ export function updateEvalResultsMap(
     currentTime: number,
     temporalOnly: boolean
 ): { [criterionId: string]: EvalResult } {
-    let tmpCache = {} as { [criterionId: string]: EvalResult };
+    const tmpCache: { [criterionId: string]: EvalResult } = {};
     return (
         Object.values(evalCriteria)
             /* For non parallel exercises we only care to cache results for temporal criteria, because the rest is selected via the exeercise selector selectEvalResults. */

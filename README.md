@@ -354,6 +354,25 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <small>Student 2025/26<small>
         </td>
         <td style="text-align: center">
+            <a href="https://github.com/jogius">
+                <img
+                    src="https://avatars.githubusercontent.com/u/46572555?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>Julius Makowski</b></sub>
+            </a>
+            <br />
+            <a
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=jogius"
+                title="Code"
+                >💻</a
+            >
+            <span title="Review">👀</span>
+            <br />
+            <small>Student 2025/26<small>
+        </td>
+        <td style="text-align: center">
             <a href="https://github.com/JohannesPotzi">
                 <img
                     src="https://avatars.githubusercontent.com/u/119885768?v=4"
@@ -391,6 +410,8 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Student 2025/26<small>
         </td>
+    </tr>
+    <tr>
         <td style="text-align: center">
             <a href="https://github.com/hansegucker">
                 <img
@@ -410,9 +431,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Student 2025/26<small>
         </td>
-        </tr>
-    <tr>
-    <td style="text-align: center">
+        <td style="text-align: center">
             <a href="https://github.com/Greenscreen23">
                 <img
                     src="https://avatars.githubusercontent.com/u/43916057?v=4"
@@ -469,6 +488,8 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Student 2022/23<small>
         </td>
+    </tr>
+    <tr>
         <td style="text-align: center">
             <a href="https://github.com/lukasrad02">
                 <img
@@ -488,7 +509,6 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Student 2022/23<small>
         </td>
-        </tr><tr>
         <td style="text-align: center">
             <a href="https://github.com/Dassderdie">
                 <img
@@ -545,6 +565,8 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Student 2021/22<small>
         </td>
+    </tr>
+    <tr>
         <td style="text-align: center">
             <a href="https://github.com/anonym-HPI">
                 <img
@@ -564,7 +586,6 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Student 2021/22<small>
         </td>
-        </tr><tr>
         <td style="text-align: center">
             <a href="https://github.com/mbarkowsky">
                 <img
@@ -600,6 +621,8 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Contributor <a href="https://github.com/hpi-sam/fuesim-digital/pull/1109">#1109</a><small>
         </td>
+    </tr>
+    <tr>
         <td style="text-align: center">
             Konstantin Ebeling
             <br />
@@ -607,8 +630,6 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Contributor <a href="https://github.com/hpi-sam/fuesim-digital/pull/1109">#1109</a><small>
         </td>
-    </tr>
-    <tr>
         <td style="text-align: center">
             Jan Berndt
             <br />
@@ -643,6 +664,9 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             💻
             <br />
             <small>Student 2025<small>
+        </td>
+    </tr>
+    <tr>
         </td>
             <td style="text-align: center">
             <a href="https://github.com/polarfuchs23">

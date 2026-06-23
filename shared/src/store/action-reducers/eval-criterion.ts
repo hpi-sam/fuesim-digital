@@ -1,18 +1,12 @@
 import { z } from 'zod';
 import type { ActionReducer } from '../action-reducer.js';
 import {
-    BoolEvalCriterion,
-    EvalCriterion,
     evalCriterionIdSchema,
     evalCriterionSchema,
-    isNumberEvalCriterion,
-    NumberEvalCriterion,
 } from '../../models/eval-criterion.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { uuidSchema } from '../../utils/uuid.js';
 import { ReducerError } from '../reducer-error.js';
 import { getElement } from './utils/get-element.js';
-import { evalResultSchema } from '../../utils/eval-result.js';
 
 /* The EvalCriteria at criterionType are:
 doMeasureXTimesEvalCriterion
@@ -47,9 +41,9 @@ export namespace EvalCriterionActionReducers {
         type: createNewCriterionsActionSchema.shape.type.value,
         actionSchema: createNewCriterionsActionSchema,
         reducer: (draftState, { criterions }) => {
-            for (let i = 0; i < criterions.length; i += 1) {
-                const criterion = cloneDeepMutable(criterions[i]!);
-                draftState.evalCriteria[criterion.id] = criterion;
+            for (const criterion of criterions) {
+                const criterionClone = cloneDeepMutable(criterion);
+                draftState.evalCriteria[criterion.id] = criterionClone;
             }
             return draftState;
         },

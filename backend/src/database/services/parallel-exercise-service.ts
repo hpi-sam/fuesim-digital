@@ -1,18 +1,17 @@
 import type {
     EvalCriterionId,
     EvalResult,
-    ExerciseState,
     ParallelExerciseId,
     SetAutojoinViewportAction,
     ParallelExerciseKey,
     ExerciseId,
 } from 'fuesim-digital-shared';
 import {
-    getEvalResultsFromCriteria,
     parallelExerciseInstanceSummarySchema,
     updateEvalResultsMap,
 } from 'fuesim-digital-shared';
-import { Subject, Subscription } from 'rxjs';
+import type { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ParallelExercise, ParallelExerciseInsert } from '../schema.js';
 import {
@@ -213,12 +212,15 @@ export class ParallelExerciseService {
             await this.parallelExerciseRepository.getParallelExerciseInstancesById(
                 parallelExercise.id
             );
-        const activeExercises = exerciseInstances.map((exerciseEntry) =>
-            this.exerciseService.getExerciseByKey(exerciseEntry.participantKey)
+        const activeExercises = await Promise.all(
+            exerciseInstances.map(async (exerciseEntry) =>
+                this.exerciseService.getExerciseByKey(
+                    exerciseEntry.participantKey
+                )
+            )
         );
         return activeExercises;
     }
-    public async updateEvalResults() {}
 
     public async getParallelExerciseInstanceSummariesById(
         id: ParallelExerciseId,

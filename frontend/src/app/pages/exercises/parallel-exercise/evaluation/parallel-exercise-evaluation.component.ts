@@ -22,7 +22,7 @@ import { EvalResultStatusBadgeComponent } from '../../exercise/shared/didactic-o
     selector: 'app-parallel-exercise-evaluation',
     templateUrl: './parallel-exercise-evaluation.component.html',
     styleUrls: ['parallel-exercise-evaluation.component.scss'],
-    imports: [RouterLink, NgStyle, EvalResultStatusBadgeComponent],
+    imports: [RouterLink, EvalResultStatusBadgeComponent],
 })
 export class ParallelExerciseEvaluationComponent {
     public readonly parallelExerciseService = inject(ParallelExerciseService);

@@ -18,9 +18,13 @@ import {
 import { taskSchema } from '../../models/task.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
+import { createScoutableTag } from '../../models/utils/tag-helpers.js';
 import { getElement } from './utils/get-element.js';
 import { lookupReducerFor } from './action-reducers.js';
-import { logTechnicalChallengePersonnelAssigned } from './utils/log.js';
+import {
+    logTechnicalChallenge,
+    logTechnicalChallengePersonnelAssigned,
+} from './utils/log.js';
 
 const createTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Create technical challenge'),
@@ -64,6 +68,12 @@ const updateTechnicalChallengeStateContentActionSchema = z.strictObject({
     technicalChallengeId: technicalChallengeIdSchema,
     stateId: technicalChallengeStateIdSchema,
     userGeneratedContent: userGeneratedContentSchema,
+});
+
+const markTechnicalChallengeStateAsViewedActionSchema = z.strictObject({
+    type: z.literal('[TechnicalChallenge] Mark state as viewed'),
+    technicalChallengeId: technicalChallengeIdSchema,
+    stateId: technicalChallengeStateIdSchema,
 });
 
 export namespace TechnicalChallengeActionReducers {
@@ -169,5 +179,33 @@ export namespace TechnicalChallengeActionReducers {
             return draftState;
         },
         rights: 'trainer',
+    };
+    export const markTechnicalChallengeStateAsViewed: ActionReducer<
+        z.infer<typeof markTechnicalChallengeStateAsViewedActionSchema>
+    > = {
+        type: markTechnicalChallengeStateAsViewedActionSchema.shape.type.value,
+        actionSchema: markTechnicalChallengeStateAsViewedActionSchema,
+        reducer: (draftState, action) => {
+            const challenge = getElement(
+                draftState,
+                'technicalChallenge',
+                action.technicalChallengeId
+            );
+            const state = challenge.states[action.stateId];
+            if (!state)
+                throw new ReducerError(
+                    `Unknown StateId ${action.stateId} in TechnicalChallenge ${action.technicalChallengeId}`
+                );
+            state.viewedByParticipants = true;
+
+            logTechnicalChallenge(
+                draftState,
+                [createScoutableTag(challenge.name, state.id)],
+                `Es wurde "${state.title}" erkundet.`,
+                challenge.id
+            );
+            return draftState;
+        },
+        rights: 'participant',
     };
 }

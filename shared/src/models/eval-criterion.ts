@@ -210,8 +210,8 @@ export type EvalCriterion = z.infer<typeof evalCriterionSchema>;
 
 export type EvalCriterionCategory =
     | 'boolEvalCriterion'
-    | 'numberEvalCriterion'
-    | 'combinedEvalCriterion';
+    | 'combinedEvalCriterion'
+    | 'numberEvalCriterion';
 
 export const evalCriterionCategoryNames = {
     boolEvalCriterion: 'Erfüllbares Kriterium',
@@ -264,8 +264,8 @@ export const temporalEvalCriterionSchema = z.discriminatedUnion(
 export function isTemporalEvalCriterionType(
     evalCriterionType: EvalCriterionType
 ): boolean {
-    for (let i = 0; i < temporalEvalCriterionTypes.length; i += 1) {
-        if (evalCriterionType === temporalEvalCriterionTypes[i]) {
+    for (const temporalEvalCriterionType of temporalEvalCriterionTypes) {
+        if (evalCriterionType === temporalEvalCriterionType) {
             return true;
         }
     }
@@ -326,7 +326,7 @@ export function newNotEvalCriterion(
         name,
         type: 'evalCriterion',
         criterionType: 'notEvalCriterion',
-        child: child,
+        child,
     };
 }
 export function newGreaterThanEvalCriterion(
@@ -339,8 +339,8 @@ export function newGreaterThanEvalCriterion(
         name,
         type: 'evalCriterion',
         criterionType: 'greaterThanEvalCriterion',
-        leftChild: leftChild,
-        rightChild: rightChild,
+        leftChild,
+        rightChild,
     };
 }
 export function newConstNumEvalCriterion(
@@ -352,7 +352,7 @@ export function newConstNumEvalCriterion(
         name,
         type: 'evalCriterion',
         criterionType: 'constNumEvalCriterion',
-        num: num,
+        num,
     };
 }
 export function newCountCompletedEvalCriterion(
@@ -365,7 +365,7 @@ export function newCountCompletedEvalCriterion(
         type: 'evalCriterion',
         criterionType: 'countCompletedEvalCriterion',
         num: -1,
-        children: children,
+        children,
     };
 }
 export function newFirstTrueAtEvalCriterion(
@@ -378,7 +378,7 @@ export function newFirstTrueAtEvalCriterion(
         type: 'evalCriterion',
         criterionType: 'firstTrueAtEvalCriterion',
         num: -1,
-        child: child,
+        child,
     };
 }
 export function newTimeStampEvalCriterion(
@@ -390,7 +390,7 @@ export function newTimeStampEvalCriterion(
         name,
         type: 'evalCriterion',
         criterionType: 'timeStampEvalCriterion',
-        num: num,
+        num,
     };
 }
 export function newDoMeasureXTimesEvalCriterion(
@@ -462,11 +462,9 @@ export function newViewScoutableEvalCriterion(
     };
 }
 export function isNumberEvalCriterion(criterion: EvalCriterion): boolean {
-    return numberEvalCriterionTypes.find(
+    return numberEvalCriterionTypes.some(
         (type) => type === criterion.criterionType
-    )
-        ? true
-        : false;
+    );
 }
 /* TypeScript and Angular don't understand, that isNumberEvalCriterion(criterion)===true also means that criterion.num exists.*/
 export function getNumFromEvalCriterion(
@@ -529,10 +527,9 @@ export function getRootCriteriaMap(criteriaMap: {
     [CriterionId: UUID]: EvalCriterion;
 } {
     const criteria = Object.values(criteriaMap);
-    for (let i = 0; i < criteria.length; i += 1) {
-        const criterion = criteria[i]!;
+    for (const criterion of criteria) {
         if (
-            combinedEvalCriterionTypes.find(
+            combinedEvalCriterionTypes.some(
                 (type) => type === criterion.criterionType
             )
         ) {

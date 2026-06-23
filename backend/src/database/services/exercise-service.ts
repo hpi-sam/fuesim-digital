@@ -27,12 +27,14 @@ import {
     PermissionDeniedError,
 } from '../../utils/http.js';
 import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
+import type { OrganisationRepository } from '../repositories/organisation-repository.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 
 export class ExerciseService {
     public constructor(
         private readonly exerciseRepository: ExerciseRepository,
-        private readonly actionRepository: ActionRepository
+        private readonly actionRepository: ActionRepository,
+        private readonly organisationRepository: OrganisationRepository
     ) {}
 
     private readonly exerciseMap = new Map<
@@ -40,7 +42,7 @@ export class ExerciseService {
         ActiveExercise
     >();
 
-    public getExerciseByKey(
+    public async getExerciseByKey(
         exerciseKey: ExerciseKey,
         session?: SessionInformation
     ) {
@@ -51,7 +53,12 @@ export class ExerciseService {
 
         if (
             exercise.template &&
-            (exercise.template.user !== session?.user.id ||
+            (!session ||
+                !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                    exercise.template.organisationId,
+                    session.user.id,
+                    ['editor', 'admin']
+                )) ||
                 !isTrainerKey(exerciseKey))
         ) {
             throw new PermissionDeniedError();
@@ -244,15 +251,18 @@ export class ExerciseService {
                 );
 
                 const exercises = await Promise.all(
-                    (await exerciseRepoTransaction.getAllExercises()).map(
-                        async (exerciseEntity) => {
-                            const exercise = new ActiveExercise(exerciseEntity);
-                            exercise.template = exerciseEntity.template ?? null;
-                            exercise.resetStopped();
-                            this.loadExercise(exercise);
-                            return exercise;
-                        }
-                    )
+                    (
+                        await exerciseRepoTransaction.getAllExercisesWithActionsCount()
+                    ).map(async (exerciseEntity) => {
+                        const exercise = new ActiveExercise(exerciseEntity);
+                        exercise.template = exerciseEntity.template ?? null;
+                        exercise.incrementIdGenerator.setCurrent(
+                            exerciseEntity.actionsCount!
+                        );
+                        exercise.resetStopped();
+                        this.loadExercise(exercise);
+                        return exercise;
+                    })
                 );
                 return exercises;
             }
@@ -274,7 +284,10 @@ export class ExerciseService {
             throw new PermissionDeniedError();
         }
 
-        const activeExercise = this.getExerciseByKey(exerciseKey, session);
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
 
         const exerciseEntry = await this.exerciseRepository.getExerciseById(
             activeExercise.exercise.id
@@ -328,7 +341,10 @@ export class ExerciseService {
         exerciseKey: ExerciseKey,
         session?: SessionInformation
     ): Promise<ExerciseTimeline> {
-        const activeExercise = this.getExerciseByKey(exerciseKey, session);
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
                 await this.actionRepository.getActionsForExerciseId(

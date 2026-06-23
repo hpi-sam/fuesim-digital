@@ -1,10 +1,10 @@
 import type { ExerciseState } from '../state.js';
 import type {
-    JoinExerciseResponseDataInput,
     JoinParallelExerciseResponseData,
     UpdateParallelExerciseResponseData,
-} from '../http-interfaces.js';
+} from '../interfaces/parallel-exercise.js';
 import type { ExerciseKey } from '../exercise-keys.js';
+import type { JoinExerciseResponseDataInput } from '../interfaces/exercise.js';
 import type { ExerciseAction } from '../store/action-reducers/action-reducers.js';
 import type { UUID } from '../utils/uuid.js';
 

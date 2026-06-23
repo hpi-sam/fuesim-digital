@@ -3,6 +3,21 @@
 Auf dieser Seite informieren wir über aktuelle Änderungen in der FüSim Digital. Zudem gibt es einen [Mailverteiler](https://lists.myhpi.de/8NGBl7FhFMPbVxPK7Pa0cRMfCezUkjHksbD9HxOM),
 der auch über die Änderungen informiert.
 
+## Version 0.16.0 -- 23.06.2026
+
+[Release 0.16.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.16.0)
+
+### Änderungen
+
+- Anonyme Übungen werden automatisch gelöscht, wenn sie für eine konfigurierbare Anzahl von Tagen nicht genutzt wurden.
+  Um dies zu vermeiden, könnt ihr Übungen und Übungsvorlagen in eurem Benutzerkonto verwalten.
+
+### Fehlerbehebungen
+
+- Durch das Sperren des Zooms auf der Karte wird nun auch das Vergrößern durch Doppelklick/Doppeltippen auf der Karte deaktiviert.
+- Teilnehmende, die auf eine Ansicht beschränkt sind, können wieder alle Fahrzeuge sehen, die in ihrer Ansicht ankommen.
+  Aufgrund eines Fehlers waren Fahrzeuge unsichtbar, wenn die Fahrzeugstatusanzeige oder Ladezeiten in einer Übung verwendet wurden.
+
 ## Version 0.15.0 -- 15.06.2026
 
 [Release 0.15.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.15.0)

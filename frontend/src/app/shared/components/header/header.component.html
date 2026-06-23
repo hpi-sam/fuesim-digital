@@ -24,7 +24,7 @@
                         Übungsvorlagen
                     </a>
                 </li>
-                @if (parallelExercisesEnabled()) {
+                @if (exerciseConfig()?.parallelExercisesEnabled) {
                     <li ngbNavItem="parallel" class="nav-item mx-2">
                         <a
                             ngbNavLink

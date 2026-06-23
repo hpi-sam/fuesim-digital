@@ -80,6 +80,15 @@ export type SetHighlightRelatedElements = Immutable<
     z.infer<typeof setHighlightRelatedElementsActionSchema>
 >;
 
+export const setVehicleLoadTimesEnabledActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set vehicleLoadTimesEnabled'),
+    vehicleLoadTimesEnabled:
+        exerciseConfigurationSchema.shape.vehicleLoadTimesEnabled,
+});
+export type SetVehicleLoadTimesEnabled = Immutable<
+    z.infer<typeof setVehicleLoadTimesEnabledActionSchema>
+>;
+
 export const setParticipantLoadAllEnabledActionSchema = z.strictObject({
     type: z.literal('[Configuration] Set participantLoadAllEnabled'),
     participantLoadAllEnabled:
@@ -168,6 +177,18 @@ export namespace ConfigurationActionReducers {
             reducer(draftState, { vehicleStatusInPatientStatusColor }) {
                 draftState.configuration.vehicleStatusInPatientStatusColor =
                     vehicleStatusInPatientStatusColor;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setVehicleLoadTimesEnabled: ActionReducer<SetVehicleLoadTimesEnabled> =
+        {
+            type: setVehicleLoadTimesEnabledActionSchema.shape.type.value,
+            actionSchema: setVehicleLoadTimesEnabledActionSchema,
+            reducer(draftState, { vehicleLoadTimesEnabled }) {
+                draftState.configuration.vehicleLoadTimesEnabled =
+                    vehicleLoadTimesEnabled;
                 return draftState;
             },
             rights: 'trainer',

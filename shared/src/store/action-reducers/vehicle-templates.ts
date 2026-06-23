@@ -24,6 +24,7 @@ const editVehicleTemplateActionSchema = z.strictObject({
     name: vehicleTemplateSchema.shape.name,
     vehicleType: vehicleTemplateSchema.shape.vehicleType,
     patientCapacity: vehicleTemplateSchema.shape.patientCapacity,
+    patientLoadMinutes: vehicleTemplateSchema.shape.patientLoadMinutes,
     image: vehicleTemplateSchema.shape.image,
     materialTemplateIds: vehicleTemplateSchema.shape.materialTemplateIds,
     personnelTemplateIds: vehicleTemplateSchema.shape.personnelTemplateIds,
@@ -69,6 +70,7 @@ export namespace VehicleTemplateActionReducers {
                     vehicleType,
                     image,
                     patientCapacity,
+                    patientLoadMinutes,
                     materialTemplateIds,
                     personnelTemplateIds,
                 }
@@ -77,6 +79,7 @@ export namespace VehicleTemplateActionReducers {
                 vehicleTemplate.image = cloneDeepMutable(image);
                 vehicleTemplate.name = name;
                 vehicleTemplate.patientCapacity = patientCapacity;
+                vehicleTemplate.patientLoadMinutes = patientLoadMinutes;
                 vehicleTemplate.vehicleType = vehicleType;
                 vehicleTemplate.materialTemplateIds =
                     cloneDeepMutable(materialTemplateIds);

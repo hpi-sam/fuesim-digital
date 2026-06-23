@@ -33,6 +33,7 @@ import {
     logSimulatedRegionNameChange,
 } from './utils/log.js';
 import { getElement, getElementByPredicate } from './utils/get-element.js';
+import { isVehicleLoading } from './vehicle.js';
 
 const addSimulatedRegionActionSchema = z.strictObject({
     type: z.literal('[SimulatedRegion] Add simulated region'),
@@ -251,13 +252,22 @@ export namespace SimulatedRegionActionReducers {
                     elementToBeAddedId
                 );
 
-                if (
-                    element.type === 'vehicle' &&
-                    !isCompletelyLoaded(draftState, element)
-                ) {
-                    throw new ExpectedReducerError(
-                        'Das Fahrzeug kann nur in die simulierte Region verschoben werden, wenn Personal und Material eingestiegen sind.'
-                    );
+                if (element.type === 'vehicle') {
+                    if (!isCompletelyLoaded(draftState, element))
+                        throw new ExpectedReducerError(
+                            'Das Fahrzeug kann nur in die simulierte Region verschoben werden, wenn Personal und Material eingestiegen sind.'
+                        );
+
+                    if (
+                        isVehicleLoading(
+                            element,
+                            draftState.currentTime,
+                            draftState.configuration
+                        )
+                    )
+                        throw new ExpectedReducerError(
+                            'Das Fahrzeug wird gerade beladen und kann daher nicht bewegt werden'
+                        );
                 }
 
                 logSimulatedRegionAddElement(

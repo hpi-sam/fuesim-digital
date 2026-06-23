@@ -16,6 +16,7 @@ import {
     actionTable,
 } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
+import { Config } from '../../config.js';
 import { BaseRepository } from './base-repository.js';
 
 export interface ExerciseTemplateDetailsEntry extends ExerciseTemplateEntry {
@@ -212,5 +213,21 @@ export class ExerciseRepository extends BaseRepository {
                 .values(exercise)
                 .returning()
         );
+    }
+
+    public getUnusedExercises() {
+        const deadline = new Date();
+        deadline.setDate(deadline.getDate() - Config.autoDeleteDays);
+        return this.databaseConnection
+            .select()
+            .from(exerciseTable)
+            .where(
+                and(
+                    lt(exerciseTable.lastUsedAt, deadline),
+                    isNull(exerciseTable.user),
+                    isNull(exerciseTable.parallelExerciseId),
+                    isNull(exerciseTable.templateId)
+                )
+            );
     }
 }

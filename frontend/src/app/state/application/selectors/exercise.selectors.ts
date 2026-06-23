@@ -15,6 +15,7 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     currentStateOf,
+    elementTypePluralMap,
     isInSpecificSimulatedRegion,
     isInTransfer,
     isInTransferFromAlarmgroup,
@@ -23,7 +24,6 @@ import {
 } from 'fuesim-digital-shared';
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
-import { elementTypePluralMap } from '../../../../../../shared/dist/utils/element-type-plural-map';
 import type { ScoutableIndicator } from '../../../shared/types/scoutable-indicator.js';
 
 // Properties

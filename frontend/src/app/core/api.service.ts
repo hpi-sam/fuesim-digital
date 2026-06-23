@@ -27,6 +27,7 @@ import {
     PatchOrganisationRequestData,
     postOrganisationInviteLinkResponseDataSchema,
     ParallelExerciseKey,
+    getExerciseConfigResponseDataSchema,
     OrganisationMembershipId,
     OrganisationMembershipRole,
     getExerciseTemplateResponseDataSchema,
@@ -34,7 +35,6 @@ import {
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
-import { z } from 'zod';
 import type { AppState } from '../state/app.state';
 import { selectExerciseKey } from '../state/application/selectors/application.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
@@ -48,6 +48,8 @@ export class ApiService {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly messageService = inject(MessageService);
     private readonly httpClient = inject(HttpClient);
+
+    readonly exerciseConfig = this.getExerciseConfigResource();
 
     public async createExercise() {
         return lastValueFrom(
@@ -103,19 +105,16 @@ export class ApiService {
         });
     }
 
-    public getParallelExercisesEnabledResource() {
-        return httpResource(
-            () => `${httpOrigin}/api/parallel_exercises/enabled`,
-            {
-                parse: z.boolean().parse,
-            }
-        );
+    public getExerciseConfigResource() {
+        return httpResource(() => `${httpOrigin}/api/config`, {
+            parse: getExerciseConfigResponseDataSchema.parse,
+        });
     }
 
-    public async getParallelExercisesEnabled() {
+    public async getExerciseConfig() {
         return lastValueFrom(
-            this.httpClient.get(`${httpOrigin}/api/parallel_exercises/enabled`)
-        ).then(z.boolean().parse);
+            this.httpClient.get(`${httpOrigin}/api/config`)
+        ).then(getExerciseConfigResponseDataSchema.parse);
     }
 
     public getParallelExerciseResource(id: ParallelExerciseId) {

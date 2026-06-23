@@ -133,6 +133,7 @@ describe('transfer to hospital behavior', () => {
                             uuid(),
                             {},
                             0,
+                            2,
                             newImageProperties('', 0, 0),
                             newSimulatedRegionPositionIn(simulatedRegion.id),
                             occupation
@@ -163,6 +164,7 @@ describe('transfer to hospital behavior', () => {
                 uuid(),
                 {},
                 10,
+                2,
                 newImageProperties('', 0, 0),
                 newSimulatedRegionPositionIn(uuid()),
                 newPatientTransferOccupation(uuid())

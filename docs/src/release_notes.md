@@ -3,6 +3,34 @@
 Auf dieser Seite informieren wir über aktuelle Änderungen in der FüSim Digital. Zudem gibt es einen [Mailverteiler](https://lists.myhpi.de/8NGBl7FhFMPbVxPK7Pa0cRMfCezUkjHksbD9HxOM),
 der auch über die Änderungen informiert.
 
+## Version 0.16.0 -- 23.06.2026
+
+[Release 0.16.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.16.0)
+
+### Änderungen
+
+- Anonyme Übungen werden automatisch gelöscht, wenn sie für eine konfigurierbare Anzahl von Tagen nicht genutzt wurden.
+  Um dies zu vermeiden, könnt ihr Übungen und Übungsvorlagen in eurem Benutzerkonto verwalten.
+
+### Fehlerbehebungen
+
+- Durch das Sperren des Zooms auf der Karte wird nun auch das Vergrößern durch Doppelklick/Doppeltippen auf der Karte deaktiviert.
+- Teilnehmende, die auf eine Ansicht beschränkt sind, können wieder alle Fahrzeuge sehen, die in ihrer Ansicht ankommen.
+  Aufgrund eines Fehlers waren Fahrzeuge unsichtbar, wenn die Fahrzeugstatusanzeige oder Ladezeiten in einer Übung verwendet wurden.
+
+## Version 0.15.0 -- 15.06.2026
+
+[Release 0.15.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.15.0)
+
+### Neue Features
+
+- Es können Ladezeiten für Patienten für Fahrzeuge festgelegt werden. Wenn ein Patient in das Fahrzeug eingeladen wird, kann er nicht bewegt oder transportiert werden und es kann kein zweiter Patient gleichzeitig eingeladen werden. Ladezeiten können pro Fahrzeugvorlage konfiguriert werden und können pro Übung deaktiviert werden. Wenn die Ladezeit läuft, wird ein Countdown über dem Fahrzeug angezeigt.
+
+### Änderungen
+
+- `fuesim-manv.de` wurde in `fuesim.digital` umbenannt.
+- Es wurde ein Hilfelink in der Fußleiste hinzugefügt.
+
 ## Version 0.14.0 -- 11.06.2026
 
 [Release 0.14.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.14.0)
@@ -35,7 +63,7 @@ Diese Version enthielt nur eine kleine Fehlerbehebung für Version 0.13.0.
 
 ### Anleitung/Hilfe
 
-Bislang gab es für die FüSim Digital keine offizielle Anleitung: Dies hat sich nun geändert. Unter [fuesim-manv.de/about/help](https://fuesim-manv.de/about/help) findet sich die offizielle Anleitung mit Informationen zu allen wichtigen Features. In der Zukunft wird diese auch noch um ein Tutorial ergänzt, welches das Erstellen und Durchführen von Übungen erklären wird. Auch in der Software findet ihr nun an zahlreichen Stellen den Button „Hilfe“, welcher euch direkt zur richtigen Stelle in der Anleitung führt.
+Bislang gab es für die FüSim Digital keine offizielle Anleitung: Dies hat sich nun geändert. Unter [fuesim.digital/about/help](https://fuesim.digital/about/help) findet sich die offizielle Anleitung mit Informationen zu allen wichtigen Features. In der Zukunft wird diese auch noch um ein Tutorial ergänzt, welches das Erstellen und Durchführen von Übungen erklären wird. Auch in der Software findet ihr nun an zahlreichen Stellen den Button „Hilfe“, welcher euch direkt zur richtigen Stelle in der Anleitung führt.
 
 ### Neue Features
 
@@ -86,7 +114,7 @@ Diese Version enthielt nur eine kleine Fehlerbehebung für Version 0.11.0.
 
 Bislang mussten zum Sichern von Übungsvorlagen mühsam Dateien exportiert und später wieder importiert werden. Dafür gibt es nun eine deutlich angenehmere Lösung: FüSim Digital unterstützt nun Benutzerkonten. Ihr könnt euch also auf der Startseite unter „Registrieren“ euer eigenes Benutzerkonto anlegen. Sobald ihr angemeldet seit, werden automatisch alle eure Übungen in eurem Konto gespeichert. Ihr könnt sie dann jederzeit unter „Übungen“ wiederfinden. Zusätzlich haben wir sogenannte Übungsvorlagen eingeführt: Unter dem entsprechenden Menüpunkt könnt ihr neue Vorlagen erstellen oder aus alten Übungsdateien importieren. Diese Vorlagen lassen sich dann beliebig oft verwenden, um neue Übungen zu erstellen.
 
-In der von uns betriebenen öffentlichen Version unter [fuesim-manv.de](http://fuesim-manv.de) werden die personenbezogenen Daten dabei gemäß aktuellen Datenschutzvorgaben auf den Servern des Hasso-Plattner-Instituts gespeichert und verarbeitet (siehe unsere [Datenschutzerklärung](https://fuesim-manv.de/about/privacy)). Bei selbst betriebenen Servern ist auf eine entsprechende Erweiterung der jeweiligen Datenschutzbedingungen zu achten.
+In der von uns betriebenen öffentlichen Version unter [fuesim.digital](http://fuesim.digital) werden die personenbezogenen Daten dabei gemäß aktuellen Datenschutzvorgaben auf den Servern des Hasso-Plattner-Instituts gespeichert und verarbeitet (siehe unsere [Datenschutzerklärung](https://fuesim.digital/about/privacy)). Bei selbst betriebenen Servern ist auf eine entsprechende Erweiterung der jeweiligen Datenschutzbedingungen zu achten.
 
 ### Neue Features in der Übungslogik
 

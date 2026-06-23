@@ -10,7 +10,7 @@ import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { vehicleSchema } from '../../models/vehicle.js';
 import { isCompletelyLoaded } from './utils/completely-load-vehicle.js';
 import { getElement } from './utils/get-element.js';
-import { deleteVehicle } from './vehicle.js';
+import { deleteVehicle, isVehicleLoading } from './vehicle.js';
 import { logVehicle } from './utils/log.js';
 
 export const addHospitalActionSchema = z.strictObject({
@@ -123,6 +123,17 @@ export namespace HospitalActionReducers {
             reducer: (draftState, { hospitalId, vehicleId }) => {
                 const hospital = getElement(draftState, 'hospital', hospitalId);
                 const vehicle = getElement(draftState, 'vehicle', vehicleId);
+
+                if (
+                    isVehicleLoading(
+                        vehicle,
+                        draftState.currentTime,
+                        draftState.configuration
+                    )
+                )
+                    throw new ExpectedReducerError(
+                        'Das Fahrzeug wird gerade beladen und kann daher nicht bewegt werden'
+                    );
 
                 if (!isCompletelyLoaded(draftState, vehicle)) {
                     throw new ExpectedReducerError(

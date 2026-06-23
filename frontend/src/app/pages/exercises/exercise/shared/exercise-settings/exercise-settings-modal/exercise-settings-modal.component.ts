@@ -118,6 +118,13 @@ export class ExerciseSettingsModalComponent {
         });
     }
 
+    public setVehicleLoadTimesEnabled(vehicleLoadTimesEnabled: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set vehicleLoadTimesEnabled',
+            vehicleLoadTimesEnabled,
+        });
+    }
+
     public close() {
         this.activeModal.close();
     }

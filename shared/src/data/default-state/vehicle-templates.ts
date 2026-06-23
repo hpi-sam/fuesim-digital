@@ -185,6 +185,7 @@ const lhfVehicleTemplate: VehicleTemplate = {
     name: 'LHF ???',
     image: lhfImage,
     patientCapacity: 0,
+    patientLoadMinutes: 0,
     personnelTemplateIds: [
         defaultPersonnelTemplates.sf.id,
         defaultPersonnelTemplates.fireSquad.id,

@@ -9,7 +9,7 @@ import {
     createTestUserSession,
     defaultTestUserSessionData,
 } from '../../test/utils.js';
-import { exerciseTable } from '../schema.js';
+import { exerciseTable, type OrganisationEntry } from '../schema.js';
 import { createParallelExercise } from '../../test/parallel-exercise-utils.js';
 import { Config } from '../../config.js';
 
@@ -155,8 +155,13 @@ describe('Exercise-Service', () => {
 
     describe('delete unused exercises', () => {
         let session: string;
+        let personalOrganisation: OrganisationEntry;
         beforeEach(async () => {
             session = await createTestUserSession(environment);
+            personalOrganisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
         });
 
         describe.each([
@@ -168,8 +173,13 @@ describe('Exercise-Service', () => {
             [
                 'template',
                 async () =>
-                    (await createExerciseTemplate(environment, session))
-                        .trainerKey,
+                    (
+                        await createExerciseTemplate(
+                            environment,
+                            session,
+                            personalOrganisation.id
+                        )
+                    ).trainerKey,
             ],
             [
                 'part of parallel exercise',

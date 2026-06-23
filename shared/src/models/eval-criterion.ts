@@ -56,7 +56,7 @@ export const notEvalCriterionSchema = z.strictObject({
 });
 export type NotEvalCriterion = z.infer<typeof notEvalCriterionSchema>;
 
-/* TODO @JohannesPotzi @Jogius : maybe generalise this and include an operator? */
+/* TODO @JohannesPotzi @Jogius : maybe generalise this and include a comparative operator? */
 export const greaterThanEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('greaterThanEvalCriterion'),
@@ -117,6 +117,7 @@ export const doMeasureXTimesEvalCriterionSchema = z.strictObject({
     targetCount: z.number(),
     targetMeasureId: uuidSchema,
 });
+/* TODO @JohannesPotzi @Jogius : Drop this and add a measure count criterion and a template to the combined criteria creation form using the greater than criterion with comparative operator attribute. */
 export type DoMeasureXTimesEvalCriterion = z.infer<
     typeof doMeasureXTimesEvalCriterionSchema
 >;
@@ -141,6 +142,7 @@ export type PatientAtStatusEvalCriterion = z.infer<
     typeof patientAtStatusEvalCriterionSchema
 >;
 
+/* TODO @JohannesPotzi @Jogius : Drop this and add a patient count criterion and a template to the combined criteria creation form using the greater than criterion with comparative operator attribute. */
 export const xPatientsAtStatusEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('xPatientsAtStatusEvalCriterion'),
@@ -160,7 +162,7 @@ export type ViewScoutableEvalCriterion = z.infer<
     typeof viewScoutableEvalCriterionSchema
 >;
 
-/* TODO @JohannesPotzi @Jogius : lessThanXUnqualifiedMeasuresEvalCriterion */
+/* TODO @JohannesPotzi @Jogius : lessThanXUnqualifiedMeasuresEvalCriterion : as a template in the combined criteria creation form using the greater than criterion with comparative operator attribute. */
 
 export const boolEvalCriterionLeafSchema = z.discriminatedUnion(
     'criterionType',
@@ -271,7 +273,7 @@ export function isTemporalEvalCriterionType(
 }
 export type TemporalEvalCriterion = z.infer<typeof temporalEvalCriterionSchema>;
 
-/* TODO @JohannesPotzi @Jogius : Zu überarbeiten. */
+/* TODO @JohannesPotzi @Jogius : To be revised. */
 export const evalCriterionTypesNames: {
     [key in EvalcriterionType]: string;
 } = {
@@ -280,15 +282,15 @@ export const evalCriterionTypesNames: {
         'Zustand Technischer Herausforderung',
     patientAtStatusEvalCriterion: 'Patient mit SK',
     xPatientsAtStatusEvalCriterion: 'X Patienten mit SK',
-    viewScoutableEvalCriterion: 'Erkunde auf der Karte',
+    viewScoutableEvalCriterion: 'Erkundung auf der Karte',
     orEvalCriterion: 'Oder-Kriterium',
     andEvalCriterion: 'Und-Kriterium',
-    constNumEvalCriterion: 'konstante Zahl',
+    constNumEvalCriterion: 'Konstante Zahl',
     countCompletedEvalCriterion: 'Anzahl erfüllter Kriterien',
-    greaterThanEvalCriterion: 'mindest-Anzahl Kriterium',
-    notEvalCriterion: 'Negierung',
+    greaterThanEvalCriterion: 'Mindest-Anzahl Kriterium',
+    notEvalCriterion: 'Negation',
     timeStampEvalCriterion: 'Zeitpunkt',
-    firstTrueAtEvalCriterion: 'Frist',
+    firstTrueAtEvalCriterion: 'Zeitpunkt von Kriterium Erfüllung',
     countPatientsAtStatusEvalCriterion: 'Anzahl von Patienten mit Status',
 } as const;
 export function newAndEvalCriterion(

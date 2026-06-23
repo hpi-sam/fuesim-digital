@@ -41,7 +41,6 @@
         <div class="card-body" p-4>
             @switch (criterionCreationType()) {
                 @case (null) {
-                    <!-- TODO @JohannesPotzi @Jogius -->
                     <span class="text-muted"
                         >Bitte wählen sie eine Art von Kriterium im Drop-Down
                         oben aus.</span
@@ -138,7 +137,6 @@
                             ) {
                                 <label class="mt-1">
                                     Ziel-Zustand:
-                                    <!-- TODO @JohannesPotzi @Jogius : Make the me-2 work -->
                                     <select
                                         class="form-select me-2"
                                         [formField]="

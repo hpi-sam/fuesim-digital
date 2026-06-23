@@ -79,10 +79,11 @@ export class DidacticOverviewModalComponent {
         this.results().filter((res) => this.rootCriteriaMap()[res.criterionId])
     );
     public readonly completedCriteriaCount = computed(() => {
-        if (this.results()) {
+        const results = this.results();
+        if (results) {
             let count = 0;
-            for (let i = 0; i < this.results().length; i += 1) {
-                const res = this.results().at(i);
+            for (let i = 0; i < results.length; i += 1) {
+                const res = results.at(i);
                 if (res?.type === 'boolEvalResult' && res?.isCompleted) {
                     count += 1;
                 }

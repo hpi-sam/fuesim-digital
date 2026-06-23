@@ -43,9 +43,7 @@ export class ExerciseTemplateCardComponent {
         ConfirmationModalService
     );
     private readonly ngbModalService = inject(NgbModal);
-    private readonly parallelExerciseService = inject(ParallelExerciseService);
-    protected readonly parallelExercisesEnabled =
-        this.parallelExerciseService.parallelExercisesEnabled.value;
+    protected readonly exerciseConfig = this.apiService.exerciseConfig.value;
 
     readonly exerciseTemplate = input<GetExerciseTemplateDetailsResponseData>();
     readonly updated = output();

@@ -55,6 +55,7 @@ import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loadi
 import { addTechnicalChallenges55 } from './55-add-technical-challenges.js';
 import { extendScoutables56 } from './56-extend-scoutables.js';
 import { addMeasures57 } from './57-add-measures.js';
+import { vehicleLoadTimes55 } from './55-vehicle-load-times.js';
 
 /**
  * Migrate a single action
@@ -135,6 +136,7 @@ export const migrations: {
     52: fixInfinity52,
     53: addIsActiveToClient53,
     54: configVehicleLoadingAndHighlighting54,
+    55: vehicleLoadTimes55,
     55: addTechnicalChallenges55,
     56: extendScoutables56,
     57: addMeasures57,

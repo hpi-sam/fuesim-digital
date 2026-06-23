@@ -14,3 +14,4 @@ export * from './format-duration.js';
 export * from './string-compare.js';
 export * from './make-optional.js';
 export * from './string-coordinates.js';
+export * from './element-type-plural-map.js';

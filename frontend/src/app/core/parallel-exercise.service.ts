@@ -1,5 +1,4 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Store } from '@ngrx/store';
 import {
     ClientToServerEvents,
     ParallelExerciseId,
@@ -13,20 +12,16 @@ import {
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import type { AppState } from '../state/app.state';
 import { websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
-import { ApiService } from './api.service.js';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ParallelExerciseService {
-    private readonly store = inject<Store<AppState>>(Store);
     private readonly messageService = inject(MessageService);
     private readonly ngbModalService = inject(NgbModal);
-    private readonly apiService = inject(ApiService);
 
     private readonly socket: Socket<
         ServerToClientEvents,
@@ -34,9 +29,6 @@ export class ParallelExerciseService {
     > = io(websocketOrigin, {
         ...socketIoTransports,
     });
-
-    readonly parallelExercisesEnabled =
-        this.apiService.getParallelExercisesEnabledResource();
 
     public readonly exerciseInstances = signal<
         ParallelExerciseInstanceSummary[]

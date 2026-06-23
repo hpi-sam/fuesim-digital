@@ -58,6 +58,7 @@ const rtwVehicleTemplate: VehicleTemplate = {
     name: 'RTW ???',
     image: rtwImage,
     patientCapacity: 1,
+    patientLoadMinutes: 2,
     personnelTemplateIds: [
         defaultPersonnelTemplates.notSan.id,
         defaultPersonnelTemplates.rettSan.id,
@@ -72,6 +73,7 @@ const nawVehicleTemplate: VehicleTemplate = {
     name: `NAW ???`,
     image: nawImage,
     patientCapacity: 1,
+    patientLoadMinutes: 2,
     personnelTemplateIds: [
         defaultPersonnelTemplates.notarzt.id,
         defaultPersonnelTemplates.notSan.id,
@@ -87,6 +89,7 @@ const ktwVehicleTemplate: VehicleTemplate = {
     name: `KTW ???`,
     image: ktwImage,
     patientCapacity: 1,
+    patientLoadMinutes: 2,
     personnelTemplateIds: [
         defaultPersonnelTemplates.san.id,
         defaultPersonnelTemplates.rettSan.id,
@@ -101,6 +104,7 @@ const carryingUnitVehicleTemplate: VehicleTemplate = {
     name: `Tragetrupp ???`,
     image: carryingUnitImage,
     patientCapacity: 1,
+    patientLoadMinutes: 2,
     personnelTemplateIds: [],
     materialTemplateIds: [],
 };
@@ -112,6 +116,7 @@ const ktwKatSchutzVehicleTemplate: VehicleTemplate = {
     name: `KTW (KatSchutz) ???`,
     image: ktwImage,
     patientCapacity: 2,
+    patientLoadMinutes: 2,
     personnelTemplateIds: [
         defaultPersonnelTemplates.san.id,
         defaultPersonnelTemplates.rettSan.id,
@@ -126,6 +131,7 @@ const gwSanVehicleTemplate: VehicleTemplate = {
     name: `GW-San ???`,
     image: gwSanImage,
     patientCapacity: 0,
+    patientLoadMinutes: 2,
     personnelTemplateIds: [
         defaultPersonnelTemplates.gf.id,
         defaultPersonnelTemplates.rettSan.id,
@@ -149,6 +155,7 @@ const nefVehicleTemplate: VehicleTemplate = {
     name: `NEF ???`,
     image: nefImage,
     patientCapacity: 0,
+    patientLoadMinutes: 2,
     personnelTemplateIds: [
         defaultPersonnelTemplates.notarzt.id,
         defaultPersonnelTemplates.notSan.id,
@@ -163,6 +170,7 @@ const rthVehicleTemplate: VehicleTemplate = {
     name: `RTH ???`,
     image: rthImage,
     patientCapacity: 1,
+    patientLoadMinutes: 2,
     personnelTemplateIds: [
         defaultPersonnelTemplates.notarzt.id,
         defaultPersonnelTemplates.notSan.id,

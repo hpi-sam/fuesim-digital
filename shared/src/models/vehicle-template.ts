@@ -10,6 +10,7 @@ export const vehicleTemplateSchema = z.strictObject({
     name: z.string(),
     image: imagePropertiesSchema,
     patientCapacity: z.number(),
+    patientLoadMinutes: z.number().nonnegative(),
     personnelTemplateIds: z.array(uuidSchema),
     materialTemplateIds: z.array(uuidSchema),
 });

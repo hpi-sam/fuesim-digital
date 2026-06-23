@@ -6,7 +6,7 @@ import {
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
+import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { newNoPosition } from '../../models/utils/position/no-position.js';
@@ -47,6 +47,8 @@ import { newNewPatientEvent } from '../../simulation/events/new-patient.js';
 import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
 import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import type { Vehicle } from '../../models/vehicle.js';
+import type { ExerciseConfiguration } from '../../models/exercise-configuration.js';
 import { getElement } from './utils/get-element.js';
 import { deletePatient } from './patient.js';
 import { completelyLoadVehicle as completelyLoadVehicleHelper } from './utils/completely-load-vehicle.js';
@@ -54,6 +56,44 @@ import { removeElementPosition } from './utils/spatial-elements.js';
 import { logVehicleAdded, logVehicleRemoved } from './utils/log.js';
 import { checkRestrictedVehicleMovementOrThrow } from './utils/restricted-vehicle-movement.js';
 import { fillPositionAt } from './utils/operational-assignment-positions.js';
+
+/**
+ * Gets the remaining load time for a vehicle
+ * @param vehicle The vehicle to get the remaining load time for
+ * @param time The time to check the loading state at. Should typically be the current time
+ * @param config The current {@link ExerciseConfiguration}, to check whether load times are enabled
+ * @returns The remaining load time of the vehicle in seconds
+ */
+export function getRemainingVehicleLoadSeconds(
+    vehicle: Vehicle,
+    time: number,
+    config: ExerciseConfiguration
+) {
+    if (!config.vehicleLoadTimesEnabled) return 0;
+
+    const patientLoadTime = vehicle.patientLoadMinutes * 60 * 1000;
+    return Object.values(vehicle.patientLoadTimes)
+        .map((loadTime) =>
+            Math.ceil((patientLoadTime - (time - loadTime)) / 1000)
+        )
+        .filter((remainingSeconds) => remainingSeconds > 0)
+        .reduce((a, b) => Math.max(a, b), 0);
+}
+
+/**
+ * Checks whether a vehicle is being loaded at the given time
+ * @param vehicle The vehicle to check whether it is being loaded
+ * @param time The time to check the loading state at. Should typically be the current time
+ * @param config The current {@link ExerciseConfiguration}, to check whether load times are enabled
+ * @returns `true`, is the vehicle is currently being loaded, `false` otherwise
+ */
+export function isVehicleLoading(
+    vehicle: Vehicle,
+    time: number,
+    config: ExerciseConfiguration
+) {
+    return getRemainingVehicleLoadSeconds(vehicle, time, config) > 0;
+}
 
 /**
  * Performs all necessary actions to remove a vehicle from the state.
@@ -286,6 +326,18 @@ export namespace VehicleActionReducers {
     export const moveVehicle: ActionReducer<MoveVehicleAction> = {
         action: MoveVehicleAction,
         reducer: (draftState, { vehicleId, targetPosition }) => {
+            const vehicle = getElement(draftState, 'vehicle', vehicleId);
+            if (
+                isVehicleLoading(
+                    vehicle,
+                    draftState.currentTime,
+                    draftState.configuration
+                )
+            )
+                throw new ExpectedReducerError(
+                    'Das Fahrzeug wird gerade beladen und kann daher nicht bewegt werden'
+                );
+
             changePositionWithId(
                 vehicleId,
                 newMapPositionAt(targetPosition),
@@ -362,6 +414,7 @@ export namespace VehicleActionReducers {
                         draftState
                     );
                     delete vehicle.patientIds[patientId];
+                    delete vehicle.patientLoadTimes[patientId];
                 }
 
                 for (const personnelId of personnelIds) {
@@ -521,6 +574,7 @@ export namespace VehicleActionReducers {
                         'patient',
                         elementToBeLoadedId
                     );
+
                     if (
                         Object.keys(vehicle.patientIds).length >=
                         vehicle.patientCapacity
@@ -529,7 +583,20 @@ export namespace VehicleActionReducers {
                             `Vehicle with id ${vehicle.id} is already full`
                         );
                     }
+                    if (
+                        isVehicleLoading(
+                            vehicle,
+                            draftState.currentTime,
+                            draftState.configuration
+                        )
+                    )
+                        throw new ExpectedReducerError(
+                            'Es kann nur ein Patient gleichzeitig eingeladen werden'
+                        );
+
                     vehicle.patientIds[elementToBeLoadedId] = true;
+                    vehicle.patientLoadTimes[elementToBeLoadedId] =
+                        draftState.currentTime;
                     changePosition(
                         patient,
                         newVehiclePositionIn(vehicleId),

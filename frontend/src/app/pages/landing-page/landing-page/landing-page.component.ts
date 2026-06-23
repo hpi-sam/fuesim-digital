@@ -46,6 +46,8 @@ export class LandingPageComponent {
     private readonly messageService = inject(MessageService);
     readonly auth = inject(AuthService);
 
+    protected readonly exerciseConfig = this.apiService.exerciseConfig.value;
+
     public loginUrl = this.auth.loginUrl;
 
     public exerciseHasBeenCreated = false;

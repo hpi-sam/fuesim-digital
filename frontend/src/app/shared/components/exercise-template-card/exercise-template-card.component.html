@@ -58,7 +58,7 @@
                 Öffnen
             </a>
 
-            @if (parallelExercisesEnabled()) {
+            @if (exerciseConfig()?.parallelExercisesEnabled) {
                 <div ngbDropdown autoClose="outside">
                     <button
                         ngbDropdownToggle

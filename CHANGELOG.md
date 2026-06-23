@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Changed
+
+- Anonymous exercises are automatically deleted, if they are unused for a configurable amount of days.
+
 ### Fixed
 
 - Locking the map zoom now also disables zooming in by double clicking/tapping on the map.

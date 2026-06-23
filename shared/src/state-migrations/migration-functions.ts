@@ -1,4 +1,3 @@
-import type { ExerciseState } from '../state.js';
 import { renameDeleteTransferAction10 } from './10-rename-delete-transfer-action.js';
 import { addMapImageIsLocked11 } from './11-add-map-image-is-locked.js';
 import { renameIncorrectPatientImages12 } from './12-rename-incorrect-patient-images.js';
@@ -55,6 +54,7 @@ import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loadi
 import { addTechnicalChallenges55 } from './55-add-technical-challenges.js';
 import { extendScoutables56 } from './56-extend-scoutables.js';
 import { addMeasures57 } from './57-add-measures.js';
+import { addCollections58 } from './58-add-collections.js';
 
 /**
  * Migrate a single action
@@ -64,7 +64,7 @@ import { addMeasures57 } from './57-add-measures.js';
  * @throws a {@link RestoreError} when a migration is not possible.
  */
 type MigrateActionFunction = (
-    intermediaryState: ExerciseState,
+    intermediaryState: object,
     action: object
 ) => boolean;
 
@@ -77,6 +77,7 @@ type MigrateStateFunction = (state: object) => void;
 export interface Migration {
     action: MigrateActionFunction | null;
     state: MigrateStateFunction | null;
+    unmigratableActions?: true;
 }
 
 export const migrations: {
@@ -138,4 +139,5 @@ export const migrations: {
     55: addTechnicalChallenges55,
     56: extendScoutables56,
     57: addMeasures57,
+    58: addCollections58,
 };

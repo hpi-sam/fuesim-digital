@@ -5,6 +5,7 @@ import type { SessionRepository } from './session-repository.js';
 import type { UserRepository } from './user-repository.js';
 import type { ParallelExerciseRepository } from './parallel-exercise-repository.js';
 import type { OrganisationRepository } from './organisation-repository.js';
+import type { CollectionRepository } from './collection-repository.js';
 
 export interface Repositories {
     accessKeyRepository: AccessKeyRepository;
@@ -14,4 +15,5 @@ export interface Repositories {
     userRepository: UserRepository;
     parallelExerciseRepository: ParallelExerciseRepository;
     organisationRepository: OrganisationRepository;
+    collectionRepository: CollectionRepository;
 }

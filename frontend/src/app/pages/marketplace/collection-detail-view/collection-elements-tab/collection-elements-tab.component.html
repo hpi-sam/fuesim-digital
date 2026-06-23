@@ -1,0 +1,7 @@
+<app-collection-elements-list
+    [collection]="collectionData().collection"
+    [collectionElements]="collectionData().objects"
+    [publishedElements]="this.collectionData().publishedElements.direct"
+    [editable]="checkRole(collectionData().ownRole).isAtLeast('editor')"
+    [allowCreation]="checkRole(collectionData().ownRole).isAtLeast('editor')"
+/>

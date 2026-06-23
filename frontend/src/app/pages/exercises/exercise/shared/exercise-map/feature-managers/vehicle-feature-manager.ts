@@ -13,6 +13,7 @@ import type { TranslateEvent } from 'ol/interaction/Translate';
 import type OlMap from 'ol/Map';
 import { pairwise, startWith, takeUntil, type Subject } from 'rxjs';
 import { Fill, Stroke, Style, Text as OlText } from 'ol/style';
+import type { Immutable } from 'immer';
 import { VehiclePopupComponent } from '../shared/vehicle-popup/vehicle-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
@@ -214,7 +215,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
     }
 
     public override onFeatureDrop(
-        droppedElement: Element | undefined,
+        droppedElement: Immutable<Element> | undefined,
         droppedOnFeature: Feature<Point>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

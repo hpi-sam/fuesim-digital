@@ -1,0 +1,14 @@
+@if (!disabled()) {
+    <div class="d-flex justify-content-between pt-2">
+        <button
+            class="btn btn-primary"
+            [disabled]="form()().invalid()"
+            (click)="submitData.emit()"
+        >
+            {{ submitButtonText() }}
+        </button>
+        <button class="btn btn-outline-danger" (click)="discardChanges.emit()">
+            Änderungen verwerfen
+        </button>
+    </div>
+}

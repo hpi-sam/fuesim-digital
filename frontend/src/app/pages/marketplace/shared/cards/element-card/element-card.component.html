@@ -1,0 +1,88 @@
+@let content = element().content;
+
+@switch (content.type) {
+    @case ('alarmGroup') {
+        <app-generic-element-card
+            [title]="content.name"
+            [subtitle]="
+                (content.alarmGroupVehicles | values).length + ' Fahrzeuge'
+            "
+            [editable]="mode() === 'edit'"
+            [showIndicator]="effectiveIndicator()"
+            [small]="small()"
+            (click)="openEditor()"
+            (delete)="deleteElement()"
+            (duplicate)="duplicateElement()"
+            (duplicateExternal)="duplicateElementExternal()"
+            (restore)="restoreElement()"
+        />
+    }
+    @case ('vehicleTemplate') {
+        <app-generic-element-card
+            [image]="content.image.url"
+            [title]="content.vehicleType"
+            [subtitle]="content.name"
+            [editable]="mode() === 'edit'"
+            [small]="small()"
+            [showIndicator]="effectiveIndicator()"
+            (click)="openEditor()"
+            (delete)="deleteElement()"
+            (duplicate)="duplicateElement()"
+            (duplicateExternal)="duplicateElementExternal()"
+            (restore)="restoreElement()"
+        />
+    }
+    @case ('personnelTemplate') {
+        <app-generic-element-card
+            [image]="content.image.url"
+            [title]="content.name"
+            [subtitle]="content.personnelType"
+            [editable]="mode() === 'edit'"
+            [small]="small()"
+            [showIndicator]="effectiveIndicator()"
+            (click)="openEditor()"
+            (delete)="deleteElement()"
+            (duplicate)="duplicateElement()"
+            (duplicateExternal)="duplicateElementExternal()"
+            (restore)="restoreElement()"
+        />
+    }
+    @case ('materialTemplate') {
+        <app-generic-element-card
+            [image]="content.image.url"
+            [title]="content.name"
+            [editable]="mode() === 'edit'"
+            [small]="small()"
+            [showIndicator]="effectiveIndicator()"
+            (click)="openEditor()"
+            (delete)="deleteElement()"
+            (duplicate)="duplicateElement()"
+            (duplicateExternal)="duplicateElementExternal()"
+            (restore)="restoreElement()"
+        />
+    }
+    @case ('mapImageTemplate') {
+        <app-generic-element-card
+            [image]="content.image.url"
+            [title]="content.name"
+            [editable]="mode() === 'edit'"
+            [small]="small()"
+            [showIndicator]="effectiveIndicator()"
+            (click)="openEditor()"
+            (delete)="deleteElement()"
+            (duplicate)="duplicateElement()"
+            (duplicateExternal)="duplicateElementExternal()"
+            (restore)="restoreElement()"
+        />
+    }
+
+    @default {
+        <app-generic-element-card
+            [title]="element().title"
+            subtitle="Unbekannter Typ"
+            [editable]="false"
+            [showIndicator]="effectiveIndicator()"
+            [small]="small()"
+        />
+    }
+}

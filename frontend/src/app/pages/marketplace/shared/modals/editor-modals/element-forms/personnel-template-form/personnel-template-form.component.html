@@ -1,0 +1,88 @@
+<div class="form-group mb-3">
+    <label class="form-label">Name</label>
+    <input
+        [formField]="personnelForm.name"
+        type="text"
+        class="form-control"
+        placeholder="z.B. Rettungssanitäter"
+    />
+    <app-display-model-validation
+        [field]="personnelForm.name()"
+    ></app-display-model-validation>
+</div>
+
+<div class="row row-cols-2">
+    <div class="form-group mb-3">
+        <label class="form-label">Personal-Typ</label>
+        <input
+            [formField]="personnelForm.personnelType"
+            type="text"
+            class="form-control"
+            placeholder="z.B. san"
+        />
+        <app-display-model-validation
+            [field]="personnelForm.personnelType()"
+        ></app-display-model-validation>
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="form-label">Abkürzung</label>
+        <input
+            [formField]="personnelForm.abbreviation"
+            type="text"
+            class="form-control"
+            placeholder="z.B. San"
+        />
+        <app-display-model-validation
+            [field]="personnelForm.abbreviation()"
+        ></app-display-model-validation>
+    </div>
+</div>
+
+<app-image-partial-form [imageForm]="personnelForm.image" />
+
+<div class="card">
+    <div class="card-body">
+        <h5>Patientenbehandlung</h5>
+
+        <app-cater-for-form [caterForForm]="personnelForm.canCaterFor" />
+
+        <div class="row row-cols-2">
+            <div class="form-group mb-3">
+                <label class="form-label">Behandlungsreichweite</label>
+                <input
+                    [formField]="personnelForm.treatmentRange"
+                    type="number"
+                    class="form-control"
+                    placeholder="z.B. 5.5"
+                />
+                <app-display-model-validation
+                    [field]="personnelForm.treatmentRange()"
+                ></app-display-model-validation>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="form-label"
+                    >Überschreibende Behandlungsreichweite</label
+                >
+                <input
+                    [formField]="personnelForm.overrideTreatmentRange"
+                    type="number"
+                    class="form-control"
+                    placeholder="z.B. 2.5"
+                />
+                <app-display-model-validation
+                    [field]="personnelForm.overrideTreatmentRange()"
+                ></app-display-model-validation>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-marketplace-form-submit-button-bar
+    [form]="personnelForm"
+    [type]="data().type"
+    [disabled]="disabled()"
+    (submitData)="submitData()"
+    (discardChanges)="discardChanges.emit()"
+/>

@@ -66,6 +66,14 @@ export class ExerciseService {
         return exercise;
     }
 
+    public getExerciseById(exerciseId: ExerciseId) {
+        const exercise = this.exerciseMap.get(exerciseId);
+        if (!exercise) {
+            throw new NotFoundError();
+        }
+        return exercise;
+    }
+
     public getAllExercises() {
         return new Set(this.exerciseMap.values());
     }

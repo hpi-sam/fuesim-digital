@@ -1,11 +1,13 @@
 import { z } from 'zod';
 import { uuid, uuidSchema } from '../utils/uuid.js';
+import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
 import {
     type ImageProperties,
     imagePropertiesSchema,
 } from './utils/image-properties.js';
 
 export const mapImageTemplateSchema = z.strictObject({
+    ...versionedElementModelSchema.partial().shape,
     id: uuidSchema,
     type: z.literal('mapImageTemplate'),
     name: z.string(),

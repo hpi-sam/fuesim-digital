@@ -1,0 +1,80 @@
+import { z } from 'zod';
+import { collectionElementTypeSchema } from '../models/collection-element-type.js';
+import { marketplaceElementContentSchema } from '../elements/marketplace-elements.js';
+import { templateVersionSchema } from '../models/marketplace-element.js';
+import type { ImmutableInfer } from './../../utils/infer.js';
+import { changeTargetSchema } from './exercise-collection-change-target.js';
+
+export const sharedChangeApplySchema = z.object({
+    marketplaceElement: templateVersionSchema,
+    target: changeTargetSchema,
+});
+
+export const removeReplaceChangeApplySchema = z.object({
+    type: z.literal('removed'),
+    action: z.literal('replace'),
+    replaceWith: marketplaceElementContentSchema,
+    ...sharedChangeApplySchema.shape,
+});
+
+export type RemoveReplaceChangeApply = ImmutableInfer<
+    typeof removeReplaceChangeApplySchema
+>;
+
+export const removeChangeApplySchema = z.discriminatedUnion('action', [
+    z.object({
+        type: z.literal('removed'),
+        action: z.union([
+            // Remove the element from the exercise at this target
+            z.literal('remove'),
+            // Orphan the element, i.e. keep it in the exercise but
+            // remove the relationship to the marketplace
+            z.literal('orphan'),
+        ]),
+        ...sharedChangeApplySchema.shape,
+    }),
+    removeReplaceChangeApplySchema,
+]);
+
+export type RemoveChangeApply = ImmutableInfer<typeof removeChangeApplySchema>;
+
+export const editableChangeApplyActionSchema = z.literal(['keep', 'update']);
+
+const editableBasicChangeApplySchema = z.object({
+    type: z.literal('editable'),
+    action: editableChangeApplyActionSchema,
+    ...sharedChangeApplySchema.shape,
+});
+
+const editableCustomChangeApplySchema = z.object({
+    type: z.literal('editable'),
+    action: z.literal('replace'),
+    newContent: z.union([z.string(), z.looseObject({})]),
+    ...sharedChangeApplySchema.shape,
+});
+
+export const editableChangeApplySchema = z.discriminatedUnion('action', [
+    editableBasicChangeApplySchema,
+    editableCustomChangeApplySchema,
+]);
+
+export type EditableChangeApply = ImmutableInfer<
+    typeof editableChangeApplySchema
+>;
+
+export const addedChangeApplySchema = z.object({
+    type: z.literal('added'),
+    action: z.literal('keep'),
+    collectionElementType: collectionElementTypeSchema,
+    ...sharedChangeApplySchema.shape,
+});
+
+export type AddedChangeApply = ImmutableInfer<typeof addedChangeApplySchema>;
+
+export const changeApplySchema = z.discriminatedUnion('type', [
+    removeChangeApplySchema,
+    editableChangeApplySchema,
+    addedChangeApplySchema,
+]);
+
+export type ChangeApply = ImmutableInfer<typeof changeApplySchema>;

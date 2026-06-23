@@ -1,22 +1,28 @@
-import crypto from 'node:crypto';
-import {
-    type ActionId,
-    type ExerciseAction,
-    type ExerciseId,
-    type ExerciseState,
-    type ExerciseTemplateId,
-    type ParticipantKey,
-    type AccessKey,
-    type TrainerKey,
-    type ParallelExerciseId,
-    type OrganisationId,
-    type OrganisationMembershipId,
-    type OrganisationMembershipRole,
-    type ParallelExerciseKey,
-    type OrganisationInviteLinkId,
+import type {
+    ActionId,
+    CollectionEntityId,
+    CollectionRelationshipType,
+    CollectionVersionId,
+    ElementEntityId,
+    ElementVersionId,
+    ExerciseAction,
+    ExerciseId,
+    ExerciseState,
+    ExerciseTemplateId,
+    ParticipantKey,
+    AccessKey,
+    TrainerKey,
+    MarketplaceElementContent,
+    ParallelExerciseId,
+    OrganisationId,
+    OrganisationMembershipId,
+    OrganisationMembershipRole,
+    ParallelExerciseKey,
+    OrganisationInviteLinkId,
 } from 'fuesim-digital-shared';
+import { uuid as fuesimUUID } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { relations, sql } from 'drizzle-orm';
+import { relations } from 'drizzle-orm';
 import {
     char,
     integer,
@@ -31,18 +37,23 @@ import {
     pgEnum,
     unique,
     index,
+    boolean,
+    primaryKey,
 } from 'drizzle-orm/pg-core';
 
-function typedUUID<T>() {
+function typedUUID<T = string>() {
     return uuid().$type<T>();
+}
+function defaultUUID<T = string>() {
+    return typedUUID<T>().$defaultFn(() => fuesimUUID() as T);
+}
+function defaultPrefixedUUID(prefix: string) {
+    return varchar().$defaultFn(() => `${prefix}_${fuesimUUID()}`);
 }
 
 function baseTable<T>() {
     return {
-        id: typedUUID<T>()
-            .default(sql`uuid_generate_v4()`)
-            .primaryKey()
-            .notNull(),
+        id: defaultUUID<T>().primaryKey().notNull(),
     };
 }
 
@@ -240,6 +251,176 @@ export const actionTable = pgTable(
     ]
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;
+
+function stateVersionedEntity<EntityBrand, VersionBrand>(prefix: string) {
+    return {
+        // VersionId uniquely indentifies an entry in the entire elements/collections table
+        versionId: defaultPrefixedUUID(`${prefix}_version`)
+            .unique()
+            .notNull()
+            .primaryKey()
+            .$type<VersionBrand>(),
+        // EntityId references a set of multiple versions of an element/collection
+        // and is therefore not unique.
+        entityId: defaultPrefixedUUID(`${prefix}_entity`)
+            .notNull()
+            .$type<EntityBrand>(),
+        // A natural integer increasing by one with every new version of an element/collection.
+        // This is used to easily determine the latest version of an element/collection.
+        version: integer().notNull(),
+        // Used to determine the data-model version used in the content of an element/collection
+        // (for migrations)
+        stateVersion: integer().notNull(),
+        createdAt: timestamp({ withTimezone: true, mode: 'date' })
+            .defaultNow()
+            .notNull(),
+        editedAt: timestamp({ withTimezone: true, mode: 'date' })
+            .$onUpdateFn(() => new Date())
+            .defaultNow()
+            .notNull(),
+    };
+}
+
+export const collectionTable = pgTable(
+    'collections',
+    {
+        ...stateVersionedEntity<CollectionEntityId, CollectionVersionId>(
+            'collection'
+        ),
+        title: varchar().notNull(),
+        description: varchar().notNull(),
+        visibility: varchar().notNull().default('private'),
+        draftState: boolean().notNull(),
+        archived: boolean().notNull().default(false),
+        // fyi: we cant use computed/generated columns for
+        // elementCount here bc we need to access the
+        // mappings table (external table lookups are not allowed)
+    },
+    (table) => [
+        // Each Entity (set of multiple versions) should
+        // only every have each version number once
+        unique('unique_collection_version').on(table.entityId, table.version),
+    ]
+);
+
+// This table maps each element-version to a collection-version.
+//
+// An element-version can be mapped to multiple collection-versions of the same collection-entity,
+// however there should always be exactly one mapping with isBaseReference=true for a set of
+// element-version (1) to (n) collection-entity entries.
+//
+// isBaseReference in this case means that this mapping points to the collection-version
+// in which the associated element-version was originally created / it belongs to.
+export const elementCollectionMappingTable = pgTable(
+    'element_to_collection_mapping',
+    {
+        collectionEntityId: varchar().notNull().$type<CollectionEntityId>(),
+        collectionVersionId: varchar()
+            .notNull()
+            .$type<CollectionVersionId>()
+            .references(() => collectionTable.versionId, {
+                onDelete: 'cascade',
+            }),
+        elementEntityId: varchar().notNull().$type<ElementEntityId>(),
+        elementVersionId: varchar()
+            .notNull()
+            .$type<ElementVersionId>()
+            .references(() => elementTable.versionId, {
+                onDelete: 'cascade',
+            }),
+        // isBaseReference=true means that the connected element-version was initially created in this collection-version.
+        // If this entry belong to the draftState collection version we are currently working on, we can edit this entry directly.
+        //
+        // isBaseReference=false means that the connected element-version is only referenced in the associated collection-version,
+        // but was created for a different collection-version.
+        // We can therefore not edit this connected element-version directly but must create a new version of the element onWrite
+        // and create a new mapping entry with isBaseReference=true for the new element-version and the current collection-version.
+        isBaseReference: boolean().default(false),
+    },
+    (table) => [
+        // Each element-version should only be mapped once to a collection-version.
+        // (e.g. Collection A (v1) should not have two mappings to RTW (v1))
+        unique('unique_element_collection_mapping').on(
+            table.collectionVersionId,
+            table.elementVersionId
+        ),
+        // each collection version should not have multiple mappings to the same element-entity
+        // (e.g. Collection A (v1) should not have two mappings to RTW (v1) and RTW (v2) at the same time.
+        unique('unique_element_collection_mapping_2').on(
+            table.collectionVersionId,
+            table.elementEntityId
+        ),
+    ]
+);
+
+export const collectionDependencyMappingTable = pgTable(
+    'collection_dependency_mapping',
+    {
+        // The Parent Collection
+        dependentCollectionEntityId: varchar()
+            .notNull()
+            .$type<CollectionEntityId>(),
+        dependentCollectionVersionId: varchar()
+            .notNull()
+            .$type<CollectionVersionId>()
+            .references(() => collectionTable.versionId, {
+                onDelete: 'cascade',
+            }),
+        // Our Dependency
+        collectionEntityId: varchar().notNull().$type<CollectionEntityId>(),
+        collectionVersionId: varchar()
+            .notNull()
+            .$type<CollectionVersionId>()
+            .references(() => collectionTable.versionId, {
+                onDelete: 'cascade',
+            }),
+    },
+    (table) => [
+        // Each collection-version should only have one mapping to a specific dependency collection-version.
+        // (e.g. Collection A (v1) should not have two mappings to Collection B (v1))
+        // +
+        // Each collection-version should only have one mapping to a specific dependency collection-entity.
+        // (e.g. Collection A (v1) should not have two mappings to Collection B (v1) and Collection B (v2) at the same time.
+        //
+        // The latter is also enforced since they share an EntityId
+        unique('unique_collection_dependency').on(
+            table.dependentCollectionVersionId,
+            table.collectionEntityId
+        ),
+    ]
+);
+
+export const elementTable = pgTable(
+    'elements',
+    {
+        ...stateVersionedEntity<ElementEntityId, ElementVersionId>('element'),
+        title: varchar().notNull(),
+        description: varchar().notNull(),
+        content: json().$type<MarketplaceElementContent>().notNull(),
+    },
+    (table) => [
+        unique('unique_template_version').on(table.entityId, table.version),
+        unique('unique_template_id').on(table.entityId, table.versionId),
+    ]
+);
+
+export const collectionUserMappingTable = pgTable(
+    'collection_user_mapping',
+    {
+        collection: varchar().notNull().$type<CollectionEntityId>(),
+        userId: varchar()
+            .notNull()
+            .references(() => userTable.id, { onDelete: 'cascade' }),
+        role: varchar().notNull().$type<CollectionRelationshipType>(),
+    },
+    (table) => [primaryKey({ columns: [table.collection, table.userId] })]
+);
+
+export const collectionJoinCodesTable = pgTable('collection_join_codes', {
+    code: varchar().primaryKey().notNull(),
+    collection: varchar().notNull().unique().$type<CollectionEntityId>(),
+    expiresAt: timestamp({ withTimezone: true, mode: 'date' }).notNull(),
+});
 
 export const actionEntityRelations = relations(actionTable, ({ one }) => ({
     exerciseWrapperEntity: one(exerciseTable, {

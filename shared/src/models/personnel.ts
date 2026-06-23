@@ -2,12 +2,16 @@ import { z } from 'zod';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { uuidSetSchema } from '../utils/uuid-set.js';
+import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
+import { hybridIdSchema } from '../utils/hybrid-id.js';
 import type { PersonnelTemplate } from './personnel-template.js';
 import { canCaterForSchema } from './utils/cater-for.js';
 import { imagePropertiesSchema } from './utils/image-properties.js';
 import { type Position, positionSchema } from './utils/position/position.js';
+import { registerEditableValue } from './utils/editable-values-registry.js';
 
 export const personnelSchema = z.strictObject({
+    ...versionedElementModelSchema.partial().shape,
     id: uuidSchema,
     type: z.literal('personnel'),
     vehicleId: uuidSchema,
@@ -16,7 +20,7 @@ export const personnelSchema = z.strictObject({
      * @deprecated This will be refactored into a capability-based system. Please already consider using {@link templateId} if you only need an opaque identifier of the type and you don't assert any properties of the personnel.
      */
     personnelType: z.string(),
-    templateId: uuidSchema,
+    templateId: hybridIdSchema,
     typeName: z.string(),
     typeAbbreviation: z.string(),
     assignedPatientIds: uuidSetSchema,
@@ -44,10 +48,11 @@ export function newPersonnelFromTemplate(
     personnelTemplate: PersonnelTemplate,
     vehicleId: UUID,
     vehicleName: string,
-    position: Position
+    position: Position,
+    id?: UUID
 ): Personnel {
     return {
-        id: uuid(),
+        id: id ?? uuid(),
         type: 'personnel',
         vehicleId,
         vehicleName,
@@ -63,3 +68,22 @@ export function newPersonnelFromTemplate(
         position,
     };
 }
+
+registerEditableValue({ model: 'personnel', template: 'personnelTemplate' }, [
+    {
+        id: 'model',
+        name: 'Modell',
+        asString: () => {
+            throw new Error('Not supported');
+        },
+        equality: () => {
+            throw new Error('Not supported');
+        },
+        keep: () => {
+            throw new Error('Not supported');
+        },
+        replace: () => {
+            throw new Error('Not supported');
+        },
+    },
+]);

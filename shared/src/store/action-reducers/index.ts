@@ -15,5 +15,6 @@ export * from './technical-challenge.js';
 export * from './measure.js';
 export * from './measure-templates.js';
 export * from './drawing.js';
+export * from './collections.js';
 
 // Don't forget to register the actionReducer in `action-reducers.ts`

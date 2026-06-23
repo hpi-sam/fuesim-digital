@@ -1,3 +1,5 @@
+import { v4 } from 'uuid';
+import { sha256 } from '@noble/hashes/sha256';
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
 import { newMaterialFromTemplate } from '../models/material.js';
 import { newPersonnelFromTemplate } from '../models/personnel.js';
@@ -14,6 +16,7 @@ import { newMapPositionAt } from '../models/utils/position/map-position.js';
 import { newNoOccupation } from '../models/utils/occupations/no-occupation.js';
 import type { MaterialTemplate } from '../models/material-template.js';
 import type { PersonnelTemplate } from '../models/personnel-template.js';
+import type { VersionedElementModel } from '../marketplace/models/versioned-element-model.js';
 
 /**
  * @returns a vehicle with personnel and materials to be added to the map
@@ -24,8 +27,19 @@ export function createVehicleParameters(
     vehicleTemplate: VehicleTemplate,
     materialTemplates: { readonly [key in UUID]: MaterialTemplate },
     personnelTemplates: { readonly [key in UUID]: PersonnelTemplate },
-    vehiclePosition: MapCoordinates
+    vehiclePosition: MapCoordinates,
+    entity?: VersionedElementModel['entity'],
+    deterministicId: boolean = false
 ): VehicleParameters {
+    let _lastUUID: UUID = vehicleId;
+    const getUUID = () => {
+        _lastUUID = v4({ random: sha256(_lastUUID) });
+        console.log({ _lastUUID });
+        return _lastUUID;
+    };
+
+    console.log('USING DETERMINISTIC ID', deterministicId);
+
     const materials = vehicleTemplate.materialTemplateIds
         .map((materialTemplateId: UUID) => {
             const materialTemplate = materialTemplates[materialTemplateId];
@@ -34,7 +48,8 @@ export function createVehicleParameters(
                 materialTemplate,
                 vehicleId,
                 vehicleTemplate.name,
-                newVehiclePositionIn(vehicleId)
+                newVehiclePositionIn(vehicleId),
+                deterministicId ? getUUID() : undefined
             );
         })
         .filter((val) => val !== null);
@@ -46,12 +61,14 @@ export function createVehicleParameters(
                 personnelTemplate,
                 vehicleId,
                 vehicleTemplate.name,
-                newVehiclePositionIn(vehicleId)
+                newVehiclePositionIn(vehicleId),
+                deterministicId ? getUUID() : undefined
             );
         })
         .filter((val) => val !== null);
 
     const vehicle: Vehicle = {
+        entity,
         id: vehicleId,
         type: 'vehicle',
         templateId: vehicleTemplate.id,

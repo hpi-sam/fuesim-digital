@@ -19,6 +19,8 @@ import type { Services } from './database/services/index.js';
 import { ParallelExerciseService } from './database/services/parallel-exercise-service.js';
 import { OrganisationService } from './database/services/organisation-service.js';
 import { OrganisationRepository } from './database/repositories/organisation-repository.js';
+import { CollectionRepository } from './database/repositories/collection-repository.js';
+import { CollectionService } from './database/services/collection-service.js';
 
 async function main() {
     Config.initialize();
@@ -58,6 +60,9 @@ async function main() {
         organisationRepository: new OrganisationRepository(
             databaseService.databaseConnection
         ),
+        collectionRepository: new CollectionRepository(
+            databaseService.databaseConnection
+        ),
     };
 
     const exerciseService = new ExerciseService(
@@ -79,6 +84,12 @@ async function main() {
         repositories.organisationRepository,
         repositories.userRepository
     );
+    const collectionService = new CollectionService(
+        exerciseService,
+        repositories.collectionRepository
+    );
+
+    await collectionService.initialize();
 
     let authService: AuthService;
     try {
@@ -99,6 +110,7 @@ async function main() {
         parallelExerciseService,
         databaseService,
         organisationService,
+        collectionService,
     };
 
     if (Config.useDb) {
@@ -136,6 +148,24 @@ async function main() {
         }
 
         await organisationService.ensurePersonalOrganisationsForAllUsers();
+
+        // Upgrading Element StateVersions
+        try {
+            const startTime = performance.now();
+            const versionCount =
+                await collectionService.upgradeAllElementStateVersionsToLatest();
+            const endTime = performance.now();
+            console.log(
+                `✅ Successfully upgraded ${versionCount} Element StateVersions in ${(
+                    endTime - startTime
+                ).toFixed(3)} ms.`
+            );
+        } catch (e: unknown) {
+            console.error(
+                '❌ An error occurred while upgrading Element StateVersions.'
+            );
+            throw e;
+        }
     }
 
     // eslint-disable-next-line no-new

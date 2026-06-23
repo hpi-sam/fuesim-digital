@@ -75,6 +75,7 @@ import {
     updateRequestVehiclesDelay,
 } from '../../simulation/behaviors/manage-patient-transport-to-hospital.js';
 import { UnloadArrivingVehiclesBehaviorState } from '../../simulation/behaviors/unload-arrived-vehicles.js';
+import { getTemplates } from '../../models/template.js';
 import {
     getActivityById,
     getBehaviorById,
@@ -1489,8 +1490,10 @@ export namespace SimulationActionReducers {
 
                 const prioritiesString = priorities
                     .map((priority, i) => {
-                        const vehicleType =
-                            draftState.vehicleTemplates[priority]!.vehicleType;
+                        const vehicleType = getTemplates(
+                            draftState,
+                            'vehicleTemplate'
+                        )[priority]!.vehicleType;
                         return `${i + 1}. ${vehicleType}`;
                     })
                     .join(' ');

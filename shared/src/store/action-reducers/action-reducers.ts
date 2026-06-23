@@ -26,6 +26,8 @@ import { MeasureTemplateActionReducers } from './measure-templates.js';
 import { MeasureTemplateActionReducers as MeasureTemplateCategoryActionReducers } from './measure-template-categories.js';
 import { DrawingActionReducers } from './drawing.js';
 import { TechnicalChallengeActionReducers } from './technical-challenge.js';
+import { CollectionReducers } from './collections.js';
+
 /**
  * All action reducers of the exercise must be registered here
  */
@@ -50,6 +52,7 @@ const actionReducers = {
     ...RadiogramActionReducers,
     ...VehicleTemplateActionReducers,
     ...RestrictedZoneActionReducers,
+    ...CollectionReducers,
     ...OperationalSectionActionReducers,
     ...ScoutableActionReducers,
     ...TechnicalChallengeActionReducers,

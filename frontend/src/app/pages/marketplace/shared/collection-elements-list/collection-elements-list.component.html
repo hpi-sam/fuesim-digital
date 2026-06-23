@@ -1,0 +1,92 @@
+@for (type of visibleElementTypes; track type) {
+    @let elementsOfType = elementsGroupedByType()[type.type] ?? [];
+    @if (elementsOfType.length > 0 || allowCreation()) {
+        <div [class.mb-5]="!smallCards()" [class.mb-3]="smallCards()">
+            <div
+                class="d-flex justify-content-between align-items-center"
+                [class.mb-3]="!smallCards()"
+                [class.mb-1]="smallCards()"
+            >
+                <div
+                    [class.h4]="!smallCards()"
+                    [class.h5]="smallCards()"
+                    [class.text-muted]="elementsOfType.length === 0"
+                >
+                    {{
+                        (type.type | versionedElementDisplayName)?.plural ??
+                            '???'
+                    }}
+                </div>
+
+                @if (allowCreation()) {
+                    <div
+                        class="d-flex justify-content-between align-items-center gap-2"
+                    >
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary"
+                            (click)="type.create()"
+                        >
+                            {{
+                                (type.type | versionedElementDisplayName)
+                                    ?.singular ?? 'Element'
+                            }}
+                            erstellen
+                        </button>
+                    </div>
+                }
+            </div>
+            <div class="container mb-3">
+                <div
+                    class="row g-2"
+                    [class.row-cols-4]="smallCards()"
+                    [class.row-cols-2]="!smallCards()"
+                    [class.row-cols-md-3]="!smallCards()"
+                    [class.row-cols-lg-6]="!smallCards()"
+                >
+                    @for (
+                        exerciseObject of elementsOfType;
+                        track exerciseObject.versionId
+                    ) {
+                        <app-element-card
+                            [element]="exerciseObject"
+                            [collectionElements]="collectionElements()"
+                            [collection]="collection()"
+                            [mode]="editable() ? 'edit' : 'view'"
+                            [hideVersionHistory]="!editable()"
+                            [showIndicator]="
+                                getElementCardIndicatorForChangeType(
+                                    elementHasChanges()[exerciseObject.entityId]
+                                )
+                            "
+                            [small]="smallCards()"
+                        />
+                    }
+                </div>
+                @if (elementsOfType.length === 0) {
+                    <div class="col flex-grow-1">
+                        <p
+                            class="bg-light p-4 rounded-3 lead mb-0 d-flex flex-column gap-2"
+                        >
+                            <span
+                                >Sie haben noch keine
+                                {{
+                                    (type.type | versionedElementDisplayName)
+                                        ?.plural ?? 'Elemente von diesem Typ'
+                                }}</span
+                            >
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+
+@if (visibleElements().length === 0 && !allowCreation()) {
+    <div class="col flex-grow-1">
+        <p class="bg-light p-4 rounded-3 lead mb-0 d-flex flex-column gap-2">
+            <span>Diese Sammlung hat noch keine Elemente</span>
+        </p>
+    </div>
+}

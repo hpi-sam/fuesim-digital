@@ -463,6 +463,7 @@ export function newViewScoutableEvalCriterion(
 }
 export function isNumberEvalCriterion(criterion: EvalCriterion): boolean {
     return numberEvalCriterionTypes.includes(
+        //@ts-expect-error: not assignable
         criterion.criterionType
     );
 }
@@ -529,13 +530,16 @@ export function getRootCriteriaMap(criteriaMap: {
     const criteria = Object.values(criteriaMap);
     let tmpMap = criteriaMap;
     for (const criterion of criteria) {
-        if (
-            combinedEvalCriterionTypes.includes(
-                criterion.criterionType
-            )
-        ) {
+        if (isCombinedEvalCriterion(criterion)) {
             tmpMap = removeChildren(criteriaMap, criterion);
         }
     }
     return tmpMap;
+}
+
+export function isCombinedEvalCriterion(evalCriterion: EvalCriterion) {
+    return combinedEvalCriterionTypes.includes(
+        //@ts-expect-error: not assignable
+        evalCriterion.criterionType
+    );
 }

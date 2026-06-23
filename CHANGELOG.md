@@ -7,6 +7,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-06-23
+
 ### Changed
 
 - Anonymous exercises are automatically deleted, if they are unused for a configurable amount of days.
@@ -481,7 +483,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.15.0...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.1...v0.14.0
 [0.13.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.0...v0.13.1

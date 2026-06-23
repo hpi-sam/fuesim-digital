@@ -1,4 +1,4 @@
-@if (this.currentRole() === 'trainer') {
+@if (this.currentRole() !== 'participant') {
     <nav #nav="ngbNav" ngbNav class="nav-tabs">
         <ng-container ngbNavItem="properties">
             <a ngbNavLink data-cy="technicalDetailsPopUpPropertiesNav"

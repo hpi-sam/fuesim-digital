@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const logicalOperatorSchema = z.literal(['and', 'or']);
-export type LogicalOperator = z.infer<typeof logicalOperatorSchema>;
+export type LogicalOperator = Immutable<z.infer<typeof logicalOperatorSchema>>;
 
 export const canCaterForSchema = z.strictObject({
     /**
@@ -25,7 +26,7 @@ export const canCaterForSchema = z.strictObject({
     green: z.int().min(0),
     logicalOperator: logicalOperatorSchema,
 });
-export type CanCaterFor = z.infer<typeof canCaterForSchema>;
+export type CanCaterFor = Immutable<z.infer<typeof canCaterForSchema>>;
 
 export function newCanCaterFor(
     red: number,

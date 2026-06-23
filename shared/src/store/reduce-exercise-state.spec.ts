@@ -1,4 +1,5 @@
-import { ExerciseState } from '../state.js';
+import type { ExerciseState } from '../state.js';
+import { newExerciseState } from '../state.js';
 import type { ParticipantKey } from '../exercise-keys.js';
 import type { Viewport } from '../models/viewport.js';
 import { newMapPositionAt } from '../models/utils/position/map-position.js';
@@ -35,7 +36,7 @@ describe('exerciseReducer', () => {
     }
 
     beforeEach(() => {
-        state = ExerciseState.create('123456' as ParticipantKey);
+        state = newExerciseState('123456' as ParticipantKey);
     });
 
     it('should apply simple actions', () => {

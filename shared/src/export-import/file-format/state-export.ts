@@ -1,62 +1,44 @@
-import { Type } from 'class-transformer';
-import { IsArray, IsObject, IsOptional, ValidateNested } from 'class-validator';
-import { type WritableDraft } from 'immer';
-import { ExerciseState } from '../../state.js';
+import { z } from 'zod';
+import type { Immutable } from 'immer';
+import { type ExerciseState } from '../../state.js';
 import type { ExerciseAction } from '../../store/action-reducers/action-reducers.js';
-import { IsExerciseAction } from '../../store/validate-exercise-action.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { BaseExportImportFile } from './base-file.js';
+import { exportImportFileSchema } from './export-import-file.js';
 
-export class StateHistoryCompound {
-    @IsArray()
-    @IsExerciseAction({ each: true })
-    public actionHistory: ExerciseAction[];
+export const stateHistoryCompoundSchema = z.object({
+    actionHistory: z.array(z.looseObject({})),
+    /*
+ This can be some arbitrary object because we can get an invalid or not migrated state
+  */
+    initialState: z.looseObject({}),
+});
+export type StateHistoryCompound = Immutable<
+    z.infer<typeof stateHistoryCompoundSchema>
+>;
 
-    @ValidateNested()
-    @Type(() => ExerciseState)
-    public initialState: WritableDraft<ExerciseState>;
-
-    public constructor(
-        actionHistory: ExerciseAction[],
-        initialState: WritableDraft<ExerciseState>
-    ) {
-        this.actionHistory = actionHistory;
-        this.initialState = initialState;
-    }
+export interface MigratedStateHistoryCompound {
+    readonly actionHistory: readonly ExerciseAction[];
+    /*
+        This can be some arbitrary object because we can get an invalid or not migrated state
+     */
+    readonly initialState: ExerciseState;
 }
 
-export class StateExport extends BaseExportImportFile {
-    @IsValue('complete' as const)
-    public readonly type: 'complete' = 'complete';
+export const stateExportSchema = z.object({
+    ...exportImportFileSchema.shape,
+    type: z.literal('complete'),
+    /*
+        This can be some arbitrary object because we can get an invalid or not migrated state
+     */
+    currentState: z.looseObject({}),
+    history: stateHistoryCompoundSchema.optional(),
+});
 
-    @IsObject()
-    public currentState: object;
+export type StateExport = Immutable<z.infer<typeof stateExportSchema>>;
 
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => StateHistoryCompound)
-    public readonly history?: StateHistoryCompound;
-
-    public constructor(
-        currentState: object,
-        stateHistory?: StateHistoryCompound
-    ) {
-        super();
-        this.currentState = currentState;
-        this.history = stateHistory;
-    }
-}
-
-export class MigratedStateExport extends StateExport {
-    @ValidateNested()
-    @Type(() => ExerciseState)
-    public override currentState: WritableDraft<ExerciseState>;
-
-    public constructor(
-        currentState: WritableDraft<ExerciseState>,
-        stateHistory?: StateHistoryCompound
-    ) {
-        super(currentState, stateHistory);
-        this.currentState = currentState;
-    }
+export interface MigratedStateExport {
+    readonly type: 'complete';
+    readonly fileVersion: number;
+    readonly dataVersion: number;
+    readonly currentState: ExerciseState;
+    readonly history?: MigratedStateHistoryCompound;
 }

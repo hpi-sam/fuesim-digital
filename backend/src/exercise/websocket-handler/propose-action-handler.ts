@@ -5,6 +5,7 @@ import {
     validateExerciseAction,
     validatePermissions,
 } from 'fuesim-digital-shared';
+import { ZodError } from 'zod';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
 import { ExerciseClientWrapper } from '../client-wrapper.js';
@@ -27,16 +28,22 @@ export function registerProposeActionHandler(
                 });
                 return;
             }
+
             // 1. validate json
-            const errors = validateExerciseAction(action);
-            if (errors.length > 0) {
-                callback({
-                    success: false,
-                    message: `Invalid payload: ${errors}`,
-                    expected: false,
-                });
-                return;
+            try {
+                validateExerciseAction(action);
+            } catch (err) {
+                if (err instanceof ZodError) {
+                    callback({
+                        success: false,
+                        message: `Invalid payload: ${err.message}`,
+                        expected: false,
+                    });
+                    return;
+                }
+                throw err;
             }
+
             // 2. Get matching exercise wrapper & client wrapper
             const activeExercise = clientWrapper.exercise;
             if (!activeExercise) {

@@ -1,7 +1,8 @@
-import type { Immutable, WritableDraft } from 'immer';
+import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
 import type { ParticipantKey } from '../../exercise-keys.js';
-import { ExerciseState } from '../../state.js';
+import type { ExerciseState } from '../../state.js';
+import { newExerciseState } from '../../state.js';
 import {
     getDefaultTechnicalChallengeTemplate,
     StateMachineTesting,
@@ -26,10 +27,7 @@ const simulateOneTick = produce((draftState: WritableDraft<ExerciseState>) => {
         refreshTreatments: true,
     });
 });
-function simulateNTicks(
-    state: Immutable<ExerciseState>,
-    n: number
-): Immutable<ExerciseState> {
+function simulateNTicks(state: ExerciseState, n: number): ExerciseState {
     let newState = state;
     for (let i = 0; i < n; i++) {
         newState = simulateOneTick(newState);
@@ -42,9 +40,7 @@ const assignPersonnel = produce(
     ).reducer
 );
 
-const emptyState: Immutable<ExerciseState> = ExerciseState.create(
-    '123456' as ParticipantKey
-);
+const emptyState: ExerciseState = newExerciseState('123456' as ParticipantKey);
 const challengeTemplate = getDefaultTechnicalChallengeTemplate();
 const challenge = {
     ...newTechnicalChallengeFromTemplate(challengeTemplate, 0),
@@ -63,16 +59,13 @@ const personnelB = newPersonnelFromTemplate(
     newNoPosition()
 );
 
-const initialState: Immutable<ExerciseState> = produce(
-    emptyState,
-    (draftState) => {
-        draftState.technicalChallenges[challenge.id] = challenge;
-        draftState.personnel[personnelA.id] = personnelA;
-        draftState.personnel[personnelB.id] = personnelB;
-    }
-);
+const initialState: ExerciseState = produce(emptyState, (draftState) => {
+    draftState.technicalChallenges[challenge.id] = challenge;
+    draftState.personnel[personnelA.id] = personnelA;
+    draftState.personnel[personnelB.id] = personnelB;
+});
 
-const stateWithAssignedPersonnel: Immutable<ExerciseState> = assignPersonnel(
+const stateWithAssignedPersonnel: ExerciseState = assignPersonnel(
     initialState,
     {
         type: '[TechnicalChallenge] Assign a personnel to technical challenge',
@@ -177,7 +170,7 @@ describe('TechnicalChallenges', () => {
             });
         });
 
-        const currentState = (state: Immutable<ExerciseState>) =>
+        const currentState = (state: ExerciseState) =>
             state.technicalChallenges[newChallenge.id]?.currentStateId;
 
         expect(currentState(withNewChallenge)).toBe(

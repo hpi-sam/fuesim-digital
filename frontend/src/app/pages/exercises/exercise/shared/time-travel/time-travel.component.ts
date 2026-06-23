@@ -2,7 +2,7 @@ import type { OnDestroy } from '@angular/core';
 import { Component, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { cloneDeepMutable, StateExport } from 'fuesim-digital-shared';
+import { currentStateVersion, StateExport } from 'fuesim-digital-shared';
 import { throttle } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
@@ -149,13 +149,17 @@ export class TimeTravelComponent implements OnDestroy {
     }
 
     public async createNewExerciseFromTheCurrentState() {
-        const currentExerciseState = selectStateSnapshot(
+        const currentState = selectStateSnapshot(
             selectExerciseState,
             this.store
         );
-        const { trainerKey } = await this.apiService.importExercise(
-            new StateExport(cloneDeepMutable(currentExerciseState))
-        );
+        const { trainerKey } = await this.apiService.importExercise({
+            type: 'complete',
+            fileVersion: 1,
+            dataVersion: currentStateVersion,
+            currentState,
+            history: undefined,
+        } satisfies StateExport);
         this.messageService.postMessage({
             color: 'success',
             title: 'Neue Übung erstellt',

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 import type { ExerciseState } from '../../state.js';
 import { taskSchema } from '../task.js';
@@ -40,8 +40,8 @@ export const technicalChallengeStateSchema = z.object({
      * */
     possibleTasks: z.record(taskSchema.shape.id, z.number()),
 });
-export type TechnicalChallengeState = z.infer<
-    typeof technicalChallengeStateSchema
+export type TechnicalChallengeState = Immutable<
+    z.infer<typeof technicalChallengeStateSchema>
 >;
 
 export function newTechnicalChallengeState(
@@ -70,7 +70,7 @@ const progressGuardSchema = z.object({
     taskId: uuidSchema,
     name: z.string().optional(),
 });
-export type ProgressGuard = z.infer<typeof progressGuardSchema>;
+export type ProgressGuard = Immutable<z.infer<typeof progressGuardSchema>>;
 
 const timerGuardSchema = z.object({
     type: z.literal('timerGuard'),
@@ -78,7 +78,7 @@ const timerGuardSchema = z.object({
     minTimePassed: z.number().nonnegative(),
     name: z.string().optional(),
 });
-export type TimerGuard = z.infer<typeof timerGuardSchema>;
+export type TimerGuard = Immutable<z.infer<typeof timerGuardSchema>>;
 
 function isProgressGuardFulfilled(
     progressGuard: ProgressGuard,
@@ -121,7 +121,7 @@ export const transitionSchema = z.object({
     guard: guardSchema,
 });
 
-export type Transition = z.infer<typeof transitionSchema>;
+export type Transition = Immutable<z.infer<typeof transitionSchema>>;
 
 export function isGuardFulfilled(
     guard: Guard,
@@ -154,15 +154,15 @@ export const stateMachineSchema = z.strictObject({
     simulationStartTime: z.number(),
 });
 
-export function currentStateOf(
-    technicalChallenge: TechnicalChallenge
-): TechnicalChallengeState {
+export function currentStateOf<
+    TC extends TechnicalChallenge | WritableDraft<TechnicalChallenge>,
+>(technicalChallenge: TC) {
     const state = technicalChallenge.states[technicalChallenge.currentStateId];
     console.assert(
         !!state,
         `Invalid current state: ${technicalChallenge.currentStateId} for challenge ${technicalChallenge.id}`
     );
-    return state!;
+    return state! as TC['states'][TechnicalChallengeStateId];
 }
 
 export function currentlyPossibleTaskIds(

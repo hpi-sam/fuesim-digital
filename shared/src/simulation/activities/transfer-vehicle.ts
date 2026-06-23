@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { publishRadiogram } from '../../models/radiogram/radiogram-helpers-mutable.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { nextUUID } from '../utils/randomness.js';
@@ -42,8 +43,8 @@ export const transferVehicleActivityStateSchema = z.strictObject({
     successorOccupation: exerciseOccupationSchema.optional(),
     key: z.string().optional(),
 });
-export type TransferVehicleActivityState = z.infer<
-    typeof transferVehicleActivityStateSchema
+export type TransferVehicleActivityState = Immutable<
+    z.infer<typeof transferVehicleActivityStateSchema>
 >;
 
 export function newTransferVehicleActivityState(

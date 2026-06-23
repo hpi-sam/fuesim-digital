@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { alarmGroupVehicleSchema } from './utils/alarm-group-vehicle.js';
 
@@ -10,7 +11,7 @@ export const alarmGroupSchema = z.strictObject({
     triggerCount: z.number().nonnegative(),
     triggerLimit: z.number().nonnegative().nullable(),
 });
-export type AlarmGroup = z.infer<typeof alarmGroupSchema>;
+export type AlarmGroup = Immutable<z.infer<typeof alarmGroupSchema>>;
 
 export function newAlarmGroup(name: string): AlarmGroup {
     return {

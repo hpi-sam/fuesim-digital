@@ -1,8 +1,8 @@
 /* eslint-disable no-bitwise */
 import { sha256 } from '@noble/hashes/sha256';
 import { v4 } from 'uuid';
-import type { WritableDraft } from 'immer';
 import { z } from 'zod';
+import type { Immutable, WritableDraft } from 'immer';
 import type { ExerciseState } from '../../state.js';
 import type { UUID } from '../../utils/uuid.js';
 
@@ -11,7 +11,7 @@ export const randomStateSchema = z.strictObject({
     algo: z.literal('sha256-id-ctr'),
     counter: z.int().nonnegative(),
 });
-export type RandomState = z.infer<typeof randomStateSchema>;
+export type RandomState = Immutable<z.infer<typeof randomStateSchema>>;
 
 export function newSeededRandomState(): RandomState {
     return {

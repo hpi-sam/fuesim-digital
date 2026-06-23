@@ -22,8 +22,10 @@ import type { PersonnelTemplate } from '../models/personnel-template.js';
 export function createVehicleParameters(
     vehicleId: UUID,
     vehicleTemplate: VehicleTemplate,
-    materialTemplates: { readonly [key in UUID]: MaterialTemplate },
-    personnelTemplates: { readonly [key in UUID]: PersonnelTemplate },
+    materialTemplates: { [key in UUID]: MaterialTemplate },
+    personnelTemplates: {
+        [key in UUID]: PersonnelTemplate;
+    },
     vehiclePosition: MapCoordinates
 ): VehicleParameters {
     const materials = vehicleTemplate.materialTemplateIds

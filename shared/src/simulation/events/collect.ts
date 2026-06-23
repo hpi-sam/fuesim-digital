@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import {
     type ReportableInformation,
@@ -12,8 +13,8 @@ export const collectInformationEventSchema = z.strictObject({
     generateReportActivityId: uuidSchema,
     informationType: reportableInformationSchema,
 });
-export type CollectInformationEvent = z.infer<
-    typeof collectInformationEventSchema
+export type CollectInformationEvent = Immutable<
+    z.infer<typeof collectInformationEventSchema>
 >;
 
 export function newCollectInformationEvent(

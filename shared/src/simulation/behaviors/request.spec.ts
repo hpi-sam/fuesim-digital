@@ -1,5 +1,6 @@
 import { produce, type WritableDraft } from 'immer';
-import { ExerciseState } from '../../state.js';
+import type { ExerciseState } from '../../state.js';
+import { newExerciseState } from '../../state.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { handleSimulationEvents } from '../utils/simulation.js';
 import { addActivity } from '../activities/utils.js';
@@ -35,7 +36,7 @@ import {
 } from './request.js';
 
 // constants
-const emptyState = ExerciseState.create('123456' as ParticipantKey);
+const emptyState = newExerciseState('123456' as ParticipantKey);
 const currentTime = 12345;
 const requestKey = 'initial-request';
 const oldTime = currentTime - 100;

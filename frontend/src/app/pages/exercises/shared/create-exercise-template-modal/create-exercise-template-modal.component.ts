@@ -2,11 +2,11 @@ import { output, signal, Component, inject, effect } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import {
-    ExportImportFile,
     GetOrganisationsResponseData,
     OrganisationId,
     PostExerciseTemplateRequestData,
     postExerciseTemplateRequestDataSchema,
+    validateExerciseExport,
 } from 'fuesim-digital-shared';
 import { HttpResourceRef } from '@angular/common/http';
 import {
@@ -15,6 +15,7 @@ import {
     FormField,
     validateStandardSchema,
 } from '@angular/forms/signals';
+import { ZodError } from 'zod';
 import { ApiService } from '../../../../core/api.service';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { DisplayModelValidationComponent } from '../../../../shared/validation/display-model-validation/display-model-validation.component.js';
@@ -85,9 +86,11 @@ export class CreateExerciseTemplateModalComponent {
             const file = fileList.item(0);
             if (!file) return;
             const importString = await file.text();
-            const importPlain = JSON.parse(importString) as ExportImportFile;
-            const type = importPlain.type;
-            if (type !== 'complete') {
+            const importPlain = JSON.parse(importString);
+
+            const importObject = validateExerciseExport(importPlain);
+
+            if (importObject.type !== 'complete') {
                 this.messageService.postMessage({
                     color: 'danger',
                     title: 'Unerlaubter Importtyp',
@@ -95,12 +98,21 @@ export class CreateExerciseTemplateModalComponent {
                 });
                 return;
             }
+
             this.importFileName.set(file.name);
             this.model.set({
                 ...this.model(),
-                importObject: importPlain,
+                importObject,
             });
         } catch (error: unknown) {
+            if (error instanceof ZodError) {
+                this.messageService.postMessage({
+                    color: 'danger',
+                    title: 'Fehlerhafte Datei',
+                    body: 'Die Datei hat das falsche Format.',
+                });
+                return;
+            }
             this.messageService.postError({
                 title: 'Fehler beim Importieren',
                 error,

@@ -29,9 +29,9 @@ export const treatmentSystemImprovements8: Migration = {
     state: (state: any) => {
         // Spatial tree
         state.spatialTrees = cloneDeepMutable({
-            materials: SpatialTree.create(),
-            patients: SpatialTree.create(),
-            personnel: SpatialTree.create(),
+            materials: SpatialTree.newSpatialTree(),
+            patients: SpatialTree.newSpatialTree(),
+            personnel: SpatialTree.newSpatialTree(),
         });
         for (const material of TypeAssertedObject.values(state.materials)) {
             migrateMaterial(material);

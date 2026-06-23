@@ -1,6 +1,5 @@
 import type { ExerciseId, ExerciseState } from 'fuesim-digital-shared';
-import { applyMigrations } from 'fuesim-digital-shared';
-import type { WritableDraft } from 'immer';
+import { applyMigrations, currentStateVersion } from 'fuesim-digital-shared';
 import { RestoreError } from '../utils/restore-error.js';
 import type { ExerciseRepository } from './repositories/exercise-repository.js';
 import type { ActionRepository } from './repositories/action-repository.js';
@@ -23,22 +22,18 @@ export async function migrateInDatabase(
     const loadedCurrentState = exercise.currentStateString;
     const loadedActions =
         await actionRepository.getActionsForExerciseId(exerciseId);
-    const {
-        newVersion,
-        migratedProperties: { currentState, history },
-    } = applyMigrations(exercise.stateVersion, {
+    const { currentState, history } = applyMigrations(exercise.stateVersion, {
         currentState: loadedCurrentState,
         history: {
             initialState: loadedInitialState,
-            actions: loadedActions.map((action) => action.actionString),
+            actionHistory: loadedActions.map((action) => action.actionString),
         },
     });
 
-    const initialState: WritableDraft<ExerciseState> =
-        history?.initialState ?? currentState;
-    const actions = history?.actions ?? [];
+    const initialState: ExerciseState = history?.initialState ?? currentState;
+    const actions = history?.actionHistory ?? [];
 
-    exercise.stateVersion = newVersion;
+    exercise.stateVersion = currentStateVersion;
     exercise.initialStateString = initialState;
     exercise.currentStateString = currentState;
 
@@ -51,9 +46,6 @@ export async function migrateInDatabase(
     let patchedActionsIndex = 0;
     const actionsToUpdate: ActionEntry[] = [];
     actions.forEach((action, i) => {
-        if (action === null) {
-            return;
-        }
         const previousAction = loadedActions[i]!;
         actionsToUpdate.push({
             ...previousAction,

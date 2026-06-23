@@ -1,4 +1,5 @@
-import { ExerciseState } from '../../state.js';
+import type { ExerciseState } from '../../state.js';
+import { newExerciseState } from '../../state.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
 import { type UUID } from '../../utils/uuid.js';
 import { reduceExerciseState } from '../reduce-exercise-state.js';
@@ -10,7 +11,7 @@ describe('ClientActionReducers', () => {
     let clientId: UUID;
 
     beforeEach(() => {
-        state = ExerciseState.create('123456' as ParticipantKey);
+        state = newExerciseState('123456' as ParticipantKey);
         // Add a client to the state
         const client = newClient(
             'Test Client',

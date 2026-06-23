@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
@@ -8,7 +9,9 @@ export const leaderChangedEventSchema = z.strictObject({
     oldLeaderId: uuidSchema.nullable(),
     newLeaderId: uuidSchema.nullable(),
 });
-export type LeaderChangedEvent = z.infer<typeof leaderChangedEventSchema>;
+export type LeaderChangedEvent = Immutable<
+    z.infer<typeof leaderChangedEventSchema>
+>;
 
 export function newLeaderChangedEvent(
     oldLeaderId: UUID | null,

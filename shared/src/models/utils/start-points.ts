@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 
 const transferStartPointSchema = z.strictObject({
@@ -17,9 +18,13 @@ export const startPointSchema = z.union([
     transferStartPointSchema,
 ]);
 
-export type StartPoint = z.infer<typeof startPointSchema>;
-export type TransferStartPoint = z.infer<typeof transferStartPointSchema>;
-export type AlarmGroupStartPoint = z.infer<typeof alarmGroupStartPointSchema>;
+export type StartPoint = Immutable<z.infer<typeof startPointSchema>>;
+export type TransferStartPoint = Immutable<
+    z.infer<typeof transferStartPointSchema>
+>;
+export type AlarmGroupStartPoint = Immutable<
+    z.infer<typeof alarmGroupStartPointSchema>
+>;
 
 export function newTransferStartPoint(
     transferPointId: UUID

@@ -1,9 +1,9 @@
+import { currentStateVersion } from 'fuesim-digital-shared';
 import type {
     ExerciseId,
     ExerciseTemplateId,
     TrainerKey,
 } from 'fuesim-digital-shared';
-import { ExerciseState } from 'fuesim-digital-shared';
 import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import {
     type ExerciseEntry,
@@ -176,12 +176,7 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .select()
             .from(exerciseTable)
-            .where(
-                lt(
-                    exerciseTable.stateVersion,
-                    ExerciseState.currentStateVersion
-                )
-            );
+            .where(lt(exerciseTable.stateVersion, currentStateVersion));
     }
 
     public async saveExerciseState(

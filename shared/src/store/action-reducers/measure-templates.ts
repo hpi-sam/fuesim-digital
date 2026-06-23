@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     measureTemplateCategorySchema,
     measureTemplateSchema,
@@ -17,8 +18,8 @@ export const addMeasureTemplateActionSchema = z.strictObject({
     measureTemplate: measureTemplateSchema,
     categoryName: measureTemplateCategorySchema.shape.name,
 });
-export type AddMeasureTemplateAction = z.infer<
-    typeof addMeasureTemplateActionSchema
+export type AddMeasureTemplateAction = Immutable<
+    z.infer<typeof addMeasureTemplateActionSchema>
 >;
 
 export const editMeasureTemplateActionSchema = z.strictObject({
@@ -28,8 +29,8 @@ export const editMeasureTemplateActionSchema = z.strictObject({
     properties: measureTemplateSchema.shape.properties,
     replacePrevious: measureTemplateSchema.shape.replacePrevious,
 });
-export type EditMeasureTemplateAction = z.infer<
-    typeof editMeasureTemplateActionSchema
+export type EditMeasureTemplateAction = Immutable<
+    z.infer<typeof editMeasureTemplateActionSchema>
 >;
 
 export const changeCategoryOfMeasureTemplateActionSchema = z.strictObject({
@@ -37,20 +38,20 @@ export const changeCategoryOfMeasureTemplateActionSchema = z.strictObject({
     id: measureTemplateSchema.shape.id,
     categoryName: measureTemplateCategorySchema.shape.name,
 });
-export type ChangeCategoryOfMeasureTemplateAction = z.infer<
-    typeof changeCategoryOfMeasureTemplateActionSchema
+export type ChangeCategoryOfMeasureTemplateAction = Immutable<
+    z.infer<typeof changeCategoryOfMeasureTemplateActionSchema>
 >;
 
 export const removeMeasureTemplateActionSchema = z.strictObject({
     type: z.literal('[MeasureTemplate] Remove MeasureTemplate'),
     id: measureTemplateSchema.shape.id,
 });
-export type RemoveMeasureTemplateAction = z.infer<
-    typeof removeMeasureTemplateActionSchema
+export type RemoveMeasureTemplateAction = Immutable<
+    z.infer<typeof removeMeasureTemplateActionSchema>
 >;
 export namespace MeasureTemplateActionReducers {
     export const addMeasureTemplate: ActionReducer<AddMeasureTemplateAction> = {
-        type: '[MeasureTemplate] Add MeasureTemplate',
+        type: addMeasureTemplateActionSchema.shape.type.value,
         actionSchema: addMeasureTemplateActionSchema,
         reducer: (draftState, { measureTemplate, categoryName }) => {
             const templateAlreadyExists = Object.values(
@@ -71,7 +72,7 @@ export namespace MeasureTemplateActionReducers {
 
     export const editMeasureTemplate: ActionReducer<EditMeasureTemplateAction> =
         {
-            type: '[MeasureTemplate] Edit MeasureTemplate',
+            type: editMeasureTemplateActionSchema.shape.type.value,
             actionSchema: editMeasureTemplateActionSchema,
             reducer: (
                 draftState,
@@ -88,7 +89,7 @@ export namespace MeasureTemplateActionReducers {
 
     export const changeCategoryOfMeasureTemplate: ActionReducer<ChangeCategoryOfMeasureTemplateAction> =
         {
-            type: '[MeasureTemplate] Change Category of MeasureTemplate',
+            type: changeCategoryOfMeasureTemplateActionSchema.shape.type.value,
             actionSchema: changeCategoryOfMeasureTemplateActionSchema,
             reducer: (draftState, { id, categoryName: category }) => {
                 const previousCategory = getCategoryForMeasureTemplateId(
@@ -112,7 +113,7 @@ export namespace MeasureTemplateActionReducers {
 
     export const removeMeasureTemplate: ActionReducer<RemoveMeasureTemplateAction> =
         {
-            type: '[MeasureTemplate] Remove MeasureTemplate',
+            type: removeMeasureTemplateActionSchema.shape.type.value,
             actionSchema: removeMeasureTemplateActionSchema,
             reducer: (draftState, { id }) => {
                 const category = getCategoryForMeasureTemplateId(

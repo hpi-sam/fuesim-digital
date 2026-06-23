@@ -1,5 +1,5 @@
 import { groupBy } from 'lodash-es';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { z } from 'zod';
 import type { ExerciseState } from '../../state.js';
 import { addActivity, terminateActivity } from '../activities/utils.js';
@@ -41,8 +41,8 @@ export const treatPatientsIntervalsSchema = z.strictObject({
      */
     countingTimePerPatient: z.int().nonnegative(),
 });
-export type TreatPatientsIntervals = z.infer<
-    typeof treatPatientsIntervalsSchema
+export type TreatPatientsIntervals = Immutable<
+    z.infer<typeof treatPatientsIntervalsSchema>
 >;
 
 export function newTreatPatientsIntervals(
@@ -69,8 +69,8 @@ export const treatPatientsBehaviorStateSchema = z.strictObject({
     treatmentActivityId: uuidSchema.nullable(),
     treatmentProgress: treatmentProgressSchema,
 });
-export type TreatPatientsBehaviorState = z.infer<
-    typeof treatPatientsBehaviorStateSchema
+export type TreatPatientsBehaviorState = Immutable<
+    z.infer<typeof treatPatientsBehaviorStateSchema>
 >;
 
 export function newTreatPatientsBehaviorState(): TreatPatientsBehaviorState {

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
@@ -9,8 +10,8 @@ export const transferConnectionMissingEventSchema = z.strictObject({
     key: z.string().optional(),
 });
 
-export type TransferConnectionMissingEvent = z.infer<
-    typeof transferConnectionMissingEventSchema
+export type TransferConnectionMissingEvent = Immutable<
+    z.infer<typeof transferConnectionMissingEventSchema>
 >;
 
 export function newTransferConnectionMissingEvent(

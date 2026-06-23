@@ -1,47 +1,40 @@
 import * as z from 'zod';
-import { Action, ActionReducer } from '../action-reducer.js';
+import type { Immutable } from 'immer';
+import type { ActionReducer } from '../action-reducer.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { type UUID, uuidSchema } from '../../utils/uuid.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { type Drawing, drawingSchema } from '../../models/drawing.js';
-import {
-    type MapCoordinates,
-    mapCoordinatesSchema,
-} from '../../models/utils/position/map-coordinates.js';
+import { drawingSchema } from '../../models/drawing.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { ReducerError } from '../reducer-error.js';
 
-export class AddDrawingAction implements Action {
-    @IsValue('[Drawing] Add drawing' as const)
-    public readonly type = '[Drawing] Add drawing';
+export const addDrawingActionSchema = z.strictObject({
+    type: z.literal('[Drawing] Add drawing'),
+    drawing: drawingSchema,
+});
+export type AddDrawingAction = Immutable<
+    z.infer<typeof addDrawingActionSchema>
+>;
 
-    @IsZodSchema(drawingSchema)
-    public readonly drawing!: Drawing;
-}
+export const moveDrawingActionSchema = z.strictObject({
+    type: z.literal('[Drawing] Move drawing'),
+    drawingId: drawingSchema.shape.id,
+    newPoints: drawingSchema.shape.points,
+});
+export type MoveDrawingAction = Immutable<
+    z.infer<typeof moveDrawingActionSchema>
+>;
 
-export class MoveDrawingAction implements Action {
-    @IsValue('[Drawing] Move drawing' as const)
-    public readonly type = '[Drawing] Move drawing';
-
-    @IsZodSchema(uuidSchema)
-    public readonly drawingId!: UUID;
-
-    @IsZodSchema(z.array(mapCoordinatesSchema).min(2))
-    public readonly newPoints!: readonly MapCoordinates[];
-}
-
-export class RemoveDrawingAction implements Action {
-    @IsValue('[Drawing] Remove drawing' as const)
-    public readonly type = '[Drawing] Remove drawing';
-
-    @IsZodSchema(uuidSchema)
-    public readonly drawingId!: UUID;
-}
+export const removeDrawingActionSchema = z.strictObject({
+    type: z.literal('[Drawing] Remove drawing'),
+    drawingId: drawingSchema.shape.id,
+});
+export type RemoveDrawingAction = Immutable<
+    z.infer<typeof removeDrawingActionSchema>
+>;
 
 export namespace DrawingActionReducers {
     export const addDrawing: ActionReducer<AddDrawingAction> = {
-        action: AddDrawingAction,
+        type: addDrawingActionSchema.shape.type.value,
+        actionSchema: addDrawingActionSchema,
         reducer: (draftState, { drawing }) => {
             draftState.drawings[drawing.id] = cloneDeepMutable(drawing);
             return draftState;
@@ -50,7 +43,8 @@ export namespace DrawingActionReducers {
     };
 
     export const moveDrawing: ActionReducer<MoveDrawingAction> = {
-        action: MoveDrawingAction,
+        type: moveDrawingActionSchema.shape.type.value,
+        actionSchema: moveDrawingActionSchema,
         reducer: (draftState, { drawingId, newPoints }) => {
             if (newPoints.length < 2) {
                 throw new ReducerError(
@@ -75,7 +69,8 @@ export namespace DrawingActionReducers {
     };
 
     export const removeDrawing: ActionReducer<RemoveDrawingAction> = {
-        action: RemoveDrawingAction,
+        type: removeDrawingActionSchema.shape.type.value,
+        actionSchema: removeDrawingActionSchema,
         reducer: (draftState, { drawingId }) => {
             delete draftState.drawings[drawingId];
             return draftState;

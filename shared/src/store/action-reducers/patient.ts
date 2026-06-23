@@ -1,6 +1,6 @@
-import { WritableDraft } from 'immer';
-import { IsBoolean, IsString, IsUUID, MaxLength } from 'class-validator';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import type { Immutable, WritableDraft } from 'immer';
+import { z } from 'zod';
+import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
@@ -18,18 +18,9 @@ import {
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import { newPatientRemovedEvent } from '../../simulation/events/patient-removed.js';
 import type { ExerciseState } from '../../state.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { type Patient, patientSchema } from '../../models/patient.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import {
-    type MapCoordinates,
-    mapCoordinatesSchema,
-} from '../../models/utils/position/map-coordinates.js';
-import {
-    type PatientStatus,
-    patientStatusSchema,
-} from '../../models/utils/patient-status.js';
+import { type UUID } from '../../utils/uuid.js';
+import { patientSchema } from '../../models/patient.js';
+import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
 import { updateTreatments } from './utils/calculate-treatments.js';
 import { logPatientAdded, logPatientRemoved } from './utils/log.js';
@@ -53,90 +44,80 @@ export function deletePatient(
     delete draftState.patients[patientId];
 }
 
-export class AddPatientAction implements Action {
-    @IsValue('[Patient] Add patient' as const)
-    public readonly type = '[Patient] Add patient';
+const addPatientActionSchema = z.strictObject({
+    type: z.literal('[Patient] Add patient'),
+    patient: patientSchema,
+});
+export type AddPatientAction = Immutable<
+    z.infer<typeof addPatientActionSchema>
+>;
 
-    @IsZodSchema(patientSchema)
-    public readonly patient!: Patient;
-}
+const movePatientActionSchema = z.strictObject({
+    type: z.literal('[Patient] Move patient'),
+    patientId: patientSchema.shape.id,
+    targetPosition: mapCoordinatesSchema,
+});
+export type MovePatientAction = Immutable<
+    z.infer<typeof movePatientActionSchema>
+>;
 
-export class MovePatientAction implements Action {
-    @IsValue('[Patient] Move patient' as const)
-    public readonly type = '[Patient] Move patient';
+const removePatientFromSimulatedRegionActionSchema = z.strictObject({
+    type: z.literal('[Patient] Remove patient from simulated region'),
+    patientId: patientSchema.shape.id,
+});
+export type RemovePatientFromSimulatedRegionAction = Immutable<
+    z.infer<typeof removePatientFromSimulatedRegionActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly patientId!: UUID;
+const removePatientActionSchema = z.strictObject({
+    type: z.literal('[Patient] Remove patient'),
+    patientId: patientSchema.shape.id,
+});
+export type RemovePatientAction = Immutable<
+    z.infer<typeof removePatientActionSchema>
+>;
 
-    @IsZodSchema(mapCoordinatesSchema)
-    public readonly targetPosition!: MapCoordinates;
-}
+const setVisibleStatusActionSchema = z.strictObject({
+    type: z.literal('[Patient] Set Visible Status'),
+    patientId: patientSchema.shape.id,
+    patientStatus: patientSchema.shape.pretriageStatus,
+});
+export type SetVisibleStatusAction = Immutable<
+    z.infer<typeof setVisibleStatusActionSchema>
+>;
 
-export class RemovePatientFromSimulatedRegionAction implements Action {
-    @IsValue('[Patient] Remove patient from simulated region' as const)
-    public readonly type = '[Patient] Remove patient from simulated region';
+const setUserTextActionSchema = z.strictObject({
+    type: z.literal('[Patient] Set Remarks'),
+    patientId: patientSchema.shape.id,
+    remarks: patientSchema.shape.remarks,
+});
+export type SetUserTextAction = Immutable<
+    z.infer<typeof setUserTextActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly patientId!: UUID;
-}
+const setCustomQRCodeActionSchema = z.strictObject({
+    type: z.literal('[Patient] Set Custom QR Code'),
+    patientId: patientSchema.shape.id,
+    customQRCode: patientSchema.shape.customQRCode,
+});
+export type SetCustomQRCodeAction = Immutable<
+    z.infer<typeof setCustomQRCodeActionSchema>
+>;
 
-export class RemovePatientAction implements Action {
-    @IsValue('[Patient] Remove patient' as const)
-    public readonly type = '[Patient] Remove patient';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly patientId!: UUID;
-}
-
-export class SetVisibleStatusAction implements Action {
-    @IsValue('[Patient] Set Visible Status' as const)
-    public readonly type = '[Patient] Set Visible Status';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly patientId!: UUID;
-
-    @IsZodSchema(patientStatusSchema)
-    public readonly patientStatus!: PatientStatus;
-}
-
-export class SetUserTextAction implements Action {
-    @IsValue('[Patient] Set Remarks' as const)
-    public readonly type = '[Patient] Set Remarks';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly patientId!: UUID;
-
-    @IsString()
-    @MaxLength(65535)
-    public readonly remarks!: string;
-}
-
-export class SetCustomQRCodeAction implements Action {
-    @IsValue('[Patient] Set Custom QR Code' as const)
-    public readonly type = '[Patient] Set Custom QR Code';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly patientId!: UUID;
-
-    @IsString()
-    @MaxLength(65535)
-    public readonly customQRCode!: string;
-}
-
-export class SetPatientTransportPriorityAction implements Action {
-    @IsValue('[Patient] Set Transport Priority' as const)
-    public readonly type = '[Patient] Set Transport Priority';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly patientId!: UUID;
-
-    @IsBoolean()
-    public readonly hasTransportPriority!: boolean;
-}
+const setPatientTransportPriorityActionSchema = z.strictObject({
+    type: z.literal('[Patient] Set Transport Priority'),
+    patientId: patientSchema.shape.id,
+    hasTransportPriority: patientSchema.shape.hasTransportPriority,
+});
+export type SetPatientTransportPriorityAction = Immutable<
+    z.infer<typeof setPatientTransportPriorityActionSchema>
+>;
 
 export namespace PatientActionReducers {
     export const setPatientTransportPriority: ActionReducer<SetPatientTransportPriorityAction> =
         {
-            action: SetPatientTransportPriorityAction,
+            type: setPatientTransportPriorityActionSchema.shape.type.value,
+            actionSchema: setPatientTransportPriorityActionSchema,
             reducer: (draftState, { patientId, hasTransportPriority }) => {
                 const patient = getElement(draftState, 'patient', patientId);
                 if (patient.hasTransportPriority !== hasTransportPriority) {
@@ -149,7 +130,8 @@ export namespace PatientActionReducers {
         };
 
     export const addPatient: ActionReducer<AddPatientAction> = {
-        action: AddPatientAction,
+        type: addPatientActionSchema.shape.type.value,
+        actionSchema: addPatientActionSchema,
         reducer: (draftState, { patient }) => {
             if (
                 Object.entries(patient.healthStates).some(
@@ -198,7 +180,8 @@ export namespace PatientActionReducers {
     };
 
     export const movePatient: ActionReducer<MovePatientAction> = {
-        action: MovePatientAction,
+        type: movePatientActionSchema.shape.type.value,
+        actionSchema: movePatientActionSchema,
         reducer: (draftState, { patientId, targetPosition }) => {
             changePositionWithId(
                 patientId,
@@ -213,7 +196,8 @@ export namespace PatientActionReducers {
 
     export const removePatientFromSimulatedRegion: ActionReducer<RemovePatientFromSimulatedRegionAction> =
         {
-            action: RemovePatientFromSimulatedRegionAction,
+            type: removePatientFromSimulatedRegionActionSchema.shape.type.value,
+            actionSchema: removePatientFromSimulatedRegionActionSchema,
             reducer: (draftState, { patientId }) => {
                 const patient = getElement(draftState, 'patient', patientId);
 
@@ -255,7 +239,8 @@ export namespace PatientActionReducers {
         };
 
     export const removePatient: ActionReducer<RemovePatientAction> = {
-        action: RemovePatientAction,
+        type: removePatientActionSchema.shape.type.value,
+        actionSchema: removePatientActionSchema,
         reducer: (draftState, { patientId }) => {
             const patient = getElement(draftState, 'patient', patientId);
             if (isInSimulatedRegion(patient)) {
@@ -277,7 +262,8 @@ export namespace PatientActionReducers {
     };
 
     export const setVisibleStatus: ActionReducer<SetVisibleStatusAction> = {
-        action: SetVisibleStatusAction,
+        type: setVisibleStatusActionSchema.shape.type.value,
+        actionSchema: setVisibleStatusActionSchema,
         reducer: (draftState, { patientId, patientStatus }) => {
             const patient = getElement(draftState, 'patient', patientId);
             patient.pretriageStatus = patientStatus;
@@ -291,8 +277,9 @@ export namespace PatientActionReducers {
         rights: 'participant',
     };
 
-    export const setUserTextAction: ActionReducer<SetUserTextAction> = {
-        action: SetUserTextAction,
+    export const setUserText: ActionReducer<SetUserTextAction> = {
+        type: setUserTextActionSchema.shape.type.value,
+        actionSchema: setUserTextActionSchema,
         reducer: (draftState, { patientId, remarks }) => {
             const patient = getElement(draftState, 'patient', patientId);
             patient.remarks = remarks;
@@ -301,8 +288,9 @@ export namespace PatientActionReducers {
         rights: 'participant',
     };
 
-    export const setCustomQRCodeAction: ActionReducer<SetCustomQRCodeAction> = {
-        action: SetCustomQRCodeAction,
+    export const setCustomQRCode: ActionReducer<SetCustomQRCodeAction> = {
+        type: setCustomQRCodeActionSchema.shape.type.value,
+        actionSchema: setCustomQRCodeActionSchema,
         reducer: (draftState, { patientId, customQRCode }) => {
             const patient = getElement(draftState, 'patient', patientId);
             patient.customQRCode = customQRCode;

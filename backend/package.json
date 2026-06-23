@@ -39,8 +39,6 @@
     "dependencies": {
         "@electric-sql/pglite": "^0.3.14",
         "@types/cookie-parser": "^1.4.10",
-        "class-transformer": "^0.5.1",
-        "class-validator": "^0.14.1",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",

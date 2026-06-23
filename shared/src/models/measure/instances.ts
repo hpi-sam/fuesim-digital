@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuidSchema } from '../../utils/uuid.js';
 import { vehicleParametersSchema } from '../utils/vehicle-parameters.js';
 import { alarmGroupSchema } from '../alarm-group.js';
@@ -27,6 +28,6 @@ export const measurePropertyInstanceSchema = z.discriminatedUnion('type', [
     drawingPropertyInstanceSchema,
 ]);
 
-export type MeasurePropertyInstance = z.infer<
-    typeof measurePropertyInstanceSchema
+export type MeasurePropertyInstance = Immutable<
+    z.infer<typeof measurePropertyInstanceSchema>
 >;

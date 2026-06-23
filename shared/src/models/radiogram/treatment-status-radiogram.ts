@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { treatmentProgressSchema } from '../../simulation/utils/treatment.js';
 import type { UUID } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
@@ -10,8 +11,8 @@ export const treatmentStatusRadiogramSchema = z.strictObject({
     treatmentStatus: treatmentProgressSchema,
     treatmentStatusChanged: z.boolean(),
 });
-export type TreatmentStatusRadiogram = z.infer<
-    typeof treatmentStatusRadiogramSchema
+export type TreatmentStatusRadiogram = Immutable<
+    z.infer<typeof treatmentStatusRadiogramSchema>
 >;
 
 export function newTreatmentStatusRadiogram(

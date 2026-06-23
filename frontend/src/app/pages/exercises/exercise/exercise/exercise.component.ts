@@ -12,9 +12,8 @@ import {
 import { Store } from '@ngrx/store';
 import {
     StateExport,
-    cloneDeepMutable,
-    StateHistoryCompound,
     exportPatientsToCSV,
+    currentStateVersion,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import { RouterLink } from '@angular/router';
@@ -137,17 +136,18 @@ export class ExerciseComponent implements OnDestroy {
             this.store
         );
         const blob = new Blob([
-            JSON.stringify(
-                new StateExport(
-                    cloneDeepMutable(currentState),
-                    new StateHistoryCompound(
-                        history.actionsWrappers.map(
-                            (actionWrapper) => actionWrapper.action
-                        ),
-                        cloneDeepMutable(history.initialState)
-                    )
-                )
-            ),
+            JSON.stringify({
+                type: 'complete',
+                fileVersion: 1,
+                dataVersion: currentStateVersion,
+                currentState,
+                history: {
+                    actionHistory: history.actionsWrappers.map(
+                        (actionWrapper) => actionWrapper.action
+                    ),
+                    initialState: history.initialState,
+                },
+            } satisfies StateExport),
         ]);
         saveBlob(blob, `exercise-state-${currentState.participantKey}.json`);
     }
@@ -172,7 +172,13 @@ export class ExerciseComponent implements OnDestroy {
             this.store
         );
         const blob = new Blob([
-            JSON.stringify(new StateExport(cloneDeepMutable(currentState))),
+            JSON.stringify({
+                type: 'complete',
+                fileVersion: 1,
+                dataVersion: currentStateVersion,
+                currentState,
+                history: undefined,
+            } satisfies StateExport),
         ]);
         saveBlob(blob, `exercise-state-${currentState.participantKey}.json`);
     }

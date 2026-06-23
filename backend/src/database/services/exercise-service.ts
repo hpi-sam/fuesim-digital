@@ -5,14 +5,17 @@ import type {
     ExerciseTimeline,
     ParticipantKey,
     TrainerKey,
+    ExerciseState,
 } from 'fuesim-digital-shared';
 import {
     isTrainerKey,
-    ExerciseState,
     migrateStateExport,
     validateExerciseExport,
     ReducerError,
+    newExerciseState,
+    currentStateVersion,
 } from 'fuesim-digital-shared';
+import { ZodError } from 'zod';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { ActiveExercise } from '../../exercise/active-exercise.js';
 import { pushAll } from '../../utils/array.js';
@@ -26,7 +29,6 @@ import {
     NotFoundError,
     PermissionDeniedError,
 } from '../../utils/http.js';
-import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
 import type { OrganisationRepository } from '../repositories/organisation-repository.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 
@@ -102,7 +104,7 @@ export class ExerciseService {
                     await accessKeyRepository.generateKey<TrainerKey>(8);
 
                 const initialState: ExerciseState = {
-                    ...ExerciseState.create(participantKey),
+                    ...newExerciseState(participantKey),
                     type: optionalData.templateId ? 'template' : 'standalone',
                 };
                 const exerciseInsert = {
@@ -111,7 +113,7 @@ export class ExerciseService {
                     trainerKey,
                     initialStateString: initialState,
                     currentStateString: initialState,
-                    stateVersion: ExerciseState.currentStateVersion,
+                    stateVersion: currentStateVersion,
                 } satisfies ExerciseInsert;
 
                 const exerciseEntry =
@@ -144,20 +146,17 @@ export class ExerciseService {
                         await accessKeyRepository.generateKey<TrainerKey>(8);
 
                     const migratedImportObject = migrateStateExport(file);
-                    const validationErrors =
-                        validateExerciseExport(migratedImportObject);
-                    if (validationErrors.length > 0) {
-                        throw new ValidationErrorWrapper(validationErrors);
-                    }
+                    validateExerciseExport(migratedImportObject);
 
-                    const newInitialState =
-                        migratedImportObject.history?.initialState ??
-                        migratedImportObject.currentState;
-                    const newCurrentState = migratedImportObject.currentState;
-
-                    // Set new participant id
-                    newInitialState.participantKey = participantKey;
-                    newCurrentState.participantKey = participantKey;
+                    const newInitialState = {
+                        ...(migratedImportObject.history?.initialState ??
+                            migratedImportObject.currentState),
+                        participantKey,
+                    };
+                    const newCurrentState = {
+                        ...migratedImportObject.currentState,
+                        participantKey,
+                    };
 
                     const exerciseType = optionalData.templateId
                         ? 'template'
@@ -171,7 +170,7 @@ export class ExerciseService {
                         trainerKey,
                         initialStateString: newInitialState,
                         currentStateString: newCurrentState,
-                        stateVersion: ExerciseState.currentStateVersion,
+                        stateVersion: currentStateVersion,
                     } satisfies ExerciseInsert;
                     const exerciseEntry =
                         await exerciseRepository.createExercise(exerciseInsert);
@@ -202,9 +201,9 @@ export class ExerciseService {
 
                     return activeExercise;
                 } catch (err) {
-                    if (err instanceof ValidationErrorWrapper) {
+                    if (err instanceof ZodError) {
                         throw new ApiError(
-                            `The validation of the import failed: ${err.errors}`
+                            `The validation of the import failed: ${err.message}`
                         );
                     }
                     if (err instanceof ReducerError) {

@@ -1,4 +1,4 @@
-import type { WritableDraft } from 'immer';
+import { castDraft, type WritableDraft } from 'immer';
 import { newLogEntry } from '../../../models/log-entry.js';
 import type { Tag } from '../../../models/tag.js';
 import {
@@ -60,7 +60,9 @@ export function log(
 ) {
     if (!logActive(state)) return;
 
-    const logEntry = newLogEntry(description, tags, state.currentTime);
+    const logEntry = castDraft(
+        newLogEntry(description, tags, state.currentTime)
+    );
 
     if (state.logEntries) {
         state.logEntries.push(logEntry);

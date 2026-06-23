@@ -16,7 +16,6 @@ import {
     PostParallelExerciseRequestData,
     TrainerKey,
     type ExerciseTimeline,
-    type StateExport,
     type PatchExerciseTemplateRequestData,
     ExerciseTemplateId,
     ParallelExerciseId,
@@ -32,6 +31,7 @@ import {
     OrganisationMembershipId,
     OrganisationMembershipRole,
     getExerciseTemplateResponseDataSchema,
+    type StateExport,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';

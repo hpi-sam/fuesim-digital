@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { UUID } from '../../utils/uuid.js';
 import { uuid, uuidSchema } from '../../utils/uuid.js';
 import { validationMessages } from '../../validation-messages.js';
@@ -52,11 +53,11 @@ export const measureTemplateSchema = z.strictObject({
     replacePrevious: z.boolean(),
 });
 
-export type MeasureTemplate = z.infer<typeof measureTemplateSchema>;
+export type MeasureTemplate = Immutable<z.infer<typeof measureTemplateSchema>>;
 
 export function newMeasureTemplate(
     name: string,
-    properties: MeasureProperty[],
+    properties: readonly MeasureProperty[],
     replacePrevious: boolean
 ): MeasureTemplate {
     return measureTemplateSchema.parse({
@@ -74,8 +75,8 @@ export const measureTemplateCategorySchema = z.strictObject({
     templates: z.record(measureTemplateSchema.shape.id, measureTemplateSchema),
 });
 
-export type MeasureTemplateCategory = z.infer<
-    typeof measureTemplateCategorySchema
+export type MeasureTemplateCategory = Immutable<
+    z.infer<typeof measureTemplateCategorySchema>
 >;
 
 export function newMeasureTemplateCategory(
@@ -98,7 +99,7 @@ export const measureSchema = z.strictObject({
     instances: z.array(measurePropertyInstanceSchema),
 });
 
-export type Measure = z.infer<typeof measureSchema>;
+export type Measure = Immutable<z.infer<typeof measureSchema>>;
 
 export function newMeasure(
     timestamp: number,

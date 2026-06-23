@@ -1,5 +1,6 @@
 import { isEmpty } from 'lodash-es';
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { uuidSetSchema } from '../utils/uuid-set.js';
 import type { PatientHealthState } from './patient-health-state.js';
@@ -78,7 +79,7 @@ export const patientSchema = z.strictObject({
     treatmentTime: z.number().nonnegative(),
     scoutableId: uuidSchema.nullable(),
 });
-export type Patient = z.infer<typeof patientSchema>;
+export type Patient = Immutable<z.infer<typeof patientSchema>>;
 export const patientPretriageTimeThreshold: number = 60 * 1000; // 1 minute
 
 export function newPatient(

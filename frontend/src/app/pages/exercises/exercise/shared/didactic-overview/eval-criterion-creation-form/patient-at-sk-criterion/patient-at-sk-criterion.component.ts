@@ -3,11 +3,11 @@ import {
     computed,
     effect,
     inject,
+    input,
     output,
     signal,
 } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import { AppState } from '../../../../../../../state/app.state';
 import {
     getPatientVisibleStatus,
     Patient,
@@ -17,6 +17,15 @@ import {
     UUID,
 } from 'fuesim-digital-shared';
 import {
+    NgbDropdown,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
+} from '@ng-bootstrap/ng-bootstrap';
+import { FieldTree } from '@angular/forms/signals';
+import { AppState } from '../../../../../../../state/app.state';
+import {
     selectConfiguration,
     selectPatients,
 } from '../../../../../../../state/application/selectors/exercise.selectors';
@@ -24,16 +33,9 @@ import { comparePatientsByVisibleStatus } from '../../../simulation/trainer-moda
 import { SimulatedRegionPreviewCardComponent } from '../../../simulation/trainer-modal/preview-card/simulated-region-preview-card.component';
 import { PatientHeaderComponent } from '../../../../../../../shared/components/patient-header/patient-header.component';
 import { PatientsDetailsComponent } from '../../../../../../../shared/components/patients-details/patients-details.component';
-import { DidacticOverviewPatientInteractionBarComponent } from './interaction-bar/didactic-overview-patient-interaction-bar.component';
 import { PatientStatusBadgeComponent } from '../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
-import {
-    NgbDropdown,
-    NgbDropdownButtonItem,
-    NgbDropdownItem,
-    NgbDropdownMenu,
-    NgbDropdownToggle,
-} from '@ng-bootstrap/ng-bootstrap';
-import { elementAt } from 'rxjs';
+import { InputData } from '../utils/input-data';
+import { DidacticOverviewPatientInteractionBarComponent } from './interaction-bar/didactic-overview-patient-interaction-bar.component';
 
 @Component({
     selector: 'app-patient-at-sk-criterion',
@@ -53,12 +55,16 @@ import { elementAt } from 'rxjs';
     ],
 })
 export class PatientAtSKCriterionComponent {
+    private readonly store = inject<Store<AppState>>(Store);
+
+    public readonly criterionForm =
+        input.required<FieldTree<InputData>>();
+
     readonly selectedPatientsOut = output<Patient[]>();
     readonly selectedPatientStatusMapOut = output<{
         [id: UUID]: PatientStatus;
     }>();
 
-    private readonly store = inject<Store<AppState>>(Store);
     readonly selected = signal<Patient | null>(null);
     readonly selectedPatients = signal<Patient[]>([]);
     readonly selectedTargetStatus = signal<PatientStatus | null>(null);
@@ -97,11 +103,9 @@ export class PatientAtSKCriterionComponent {
     readonly patientIds = computed(() => this.patients().map((p) => p.id));
     constructor() {
         effect(() => {
-            if (this.patientIds()) {
-                const selection = this.selected();
-                if (selection && !this.patientIds().includes(selection.id)) {
-                    this.selected.set(null);
-                }
+            const selection = this.selected();
+            if (selection && !this.patientIds().includes(selection.id)) {
+                this.selected.set(null);
             }
         });
     }
@@ -114,12 +118,10 @@ export class PatientAtSKCriterionComponent {
         }
     }
     public addPatient(patient: Patient) {
-        if (this.selectedPatients().find((pat) => pat.id === patient.id)) {
+        if (this.selectedPatients().some((pat) => pat.id === patient.id)) {
             this.removePatient(patient.id);
         } else {
-            this.selectedPatients.update((pat) => {
-                return [...pat, patient];
-            });
+            this.selectedPatients.update((pat) => [...pat, patient]);
             this.selectedPatientsOut.emit(this.selectedPatients());
         }
     }
@@ -137,7 +139,7 @@ export class PatientAtSKCriterionComponent {
         id: UUID,
         status: PatientStatus | null
     ) {
-        if (!this.selectedPatients().find((pat) => pat.id === id)) {
+        if (!this.selectedPatients().some((pat) => pat.id === id)) {
             console.log(
                 'trying to assign a PatientStatus to a Patient not in selection.'
             );

@@ -9,7 +9,6 @@ import {
     NgbNavLinkBase,
     NgbNavOutlet,
     NgbTooltip,
-    NgbCollapse,
 } from '@ng-bootstrap/ng-bootstrap';
 import {
     GetParallelExerciseResponseData,

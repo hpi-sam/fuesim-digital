@@ -1,13 +1,11 @@
 import { Component, inject, input, output, signal } from '@angular/core';
-import { EvalCriterionCreationForm } from '../../eval-criterion-creation-form.component';
-import { ExerciseService } from '../../../../../../../../core/exercise.service';
 import {
+    
     Patient,
     PatientStatus,
     patientStatusAllowedValues,
     statusNames,
 } from 'fuesim-digital-shared';
-import { SelectPatientService } from '../../../../simulation/trainer-modal/select-patient.service';
 import {
     NgbDropdown,
     NgbDropdownButtonItem,
@@ -15,7 +13,11 @@ import {
     NgbDropdownMenu,
     NgbDropdownToggle,
 } from '@ng-bootstrap/ng-bootstrap';
+import { FieldTree } from '@angular/forms/signals';
+import { ExerciseService } from '../../../../../../../../core/exercise.service';
+import { SelectPatientService } from '../../../../simulation/trainer-modal/select-patient.service';
 import { PatientStatusBadgeComponent } from '../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { InputData } from '../../utils/input-data';
 
 @Component({
     selector: 'app-didactic-overview-patient-interaction-bar',
@@ -33,12 +35,12 @@ import { PatientStatusBadgeComponent } from '../../../../../../../../shared/comp
 export class DidacticOverviewPatientInteractionBarComponent {
     private readonly exerciseService = inject(ExerciseService);
     readonly selectPatientService = inject(SelectPatientService);
-    public submitCriterion = inject(EvalCriterionCreationForm).submitCriterion;
-    criterionForm = inject(EvalCriterionCreationForm).criterionForm;
-    deleteDisabled: boolean = false;
+    deleteDisabled = false;
     public readonly patientStatusAllowedValues = patientStatusAllowedValues;
     public readonly statusNames = statusNames;
 
+    public readonly criterionForm =
+        input.required<FieldTree<InputData>>();
     readonly patient = input.required<Patient>();
     readonly selectedGlobalTargetStatus =
         input.required<PatientStatus | null>();

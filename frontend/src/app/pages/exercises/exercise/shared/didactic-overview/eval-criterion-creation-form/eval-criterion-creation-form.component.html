@@ -163,6 +163,7 @@
                 }
                 @case ('patientAtStatusEvalCriterion') {
                     <app-patient-at-sk-criterion
+                        [criterionForm]="this.criterionForm"
                         (selectedPatientsOut)="addPatients($event)"
                         (selectedPatientStatusMapOut)="
                             updateSelectedPatientStatusMap($event)

@@ -26,10 +26,7 @@ export class EvalResultStatusBadgeComponent {
     );
     public readonly leftNumResult = computed(() => {
         const result = this.result();
-        if (
-            result &&
-            result.criterion.criterionType === 'greaterThanEvalCriterion'
-        ) {
+        if (result.criterion.criterionType === 'greaterThanEvalCriterion') {
             const resultMap = this.resultsMap();
             return resultMap[result.criterion.leftChild] ?? null;
         }
@@ -37,10 +34,7 @@ export class EvalResultStatusBadgeComponent {
     });
     public readonly rightNumResult = computed(() => {
         const result = this.result();
-        if (
-            result &&
-            result.criterion.criterionType === 'greaterThanEvalCriterion'
-        ) {
+        if (result.criterion.criterionType === 'greaterThanEvalCriterion') {
             const resultMap = this.resultsMap();
             return resultMap[result.criterion.rightChild] ?? null;
         }
@@ -48,7 +42,7 @@ export class EvalResultStatusBadgeComponent {
     });
     public readonly color = computed(() => {
         const isCompleted = this.isCompleted();
-        if (isCompleted !== undefined) {
+        if (isCompleted !== null) {
             return isCompleted ? 'green' : 'red';
         }
         const leftRes = this.leftNumResult();

@@ -1,34 +1,14 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
-import { ExerciseService } from '../../../../../../core/exercise.service';
 import {
     type Patient,
     type PatientStatus,
     patientStatusAllowedValues,
     statusNames,
-    type TechnicalChallengeId,
-    type TechnicalChallengeStateId,
     type UUID,
 } from 'fuesim-digital-shared';
-import {
-    boolEvalCritrionTypes,
-    combinedEvalCriterionTypes,
-    type EvalCriterion,
-    EvalCriterionCategory,
-    type EvalCriterionType,
-    evalCriterionTypesNames,
-    newPatientAtStatusEvalCriterion,
-    newReachTechnicalChallengeStateEvalCriterion,
-    newXPatientsAtStatusEvalCriterion,
-    numberEvalCriterionTypes,
-    evalCriterionCategoryNames,
-} from '../../../../../../../../../shared/dist/models/eval-criterion';
-import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { AppState } from '../../../../../../state/app.state';
-import { selectTechnicalChallenges } from '../../../../../../state/application/selectors/exercise.selectors';
-import { PatientAtSKCriterionComponent } from './patient-at-sk-criterion/patient-at-sk-criterion.component';
 import {
     NgbDropdown,
     NgbDropdownButtonItem,
@@ -36,15 +16,25 @@ import {
     NgbDropdownMenu,
     NgbDropdownToggle,
 } from '@ng-bootstrap/ng-bootstrap';
-
-interface InputData {
-    countInput: number;
-    targetPatients: Patient[];
-    patientStatusInput: PatientStatus;
-    patientTargetStatusMap: { [id: UUID]: PatientStatus };
-    technicalChallengeId: TechnicalChallengeId | '';
-    targetTechnicalChallengeState: TechnicalChallengeStateId | '';
-}
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import {
+    boolEvalCritrionTypes,
+    combinedEvalCriterionTypes,
+    EvalCriterionCategory,
+    type EvalCriterionType,
+    evalCriterionTypesNames,
+    numberEvalCriterionTypes,
+    evalCriterionCategoryNames,
+    EvalCriterion,
+    newXPatientsAtStatusEvalCriterion,
+    newReachTechnicalChallengeStateEvalCriterion,
+    newPatientAtStatusEvalCriterion,
+} from '../../../../../../../../../shared/dist/models/eval-criterion';
+import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
+import { AppState } from '../../../../../../state/app.state';
+import { selectTechnicalChallenges } from '../../../../../../state/application/selectors/exercise.selectors';
+import { PatientAtSKCriterionComponent } from './patient-at-sk-criterion/patient-at-sk-criterion.component';
+import { InputData } from './utils/input-data';
 @Component({
     selector: 'app-eval-criterion-creation-form',
     templateUrl: './eval-criterion-creation-form.component.html',
@@ -61,7 +51,7 @@ interface InputData {
         NgbDropdownItem,
     ],
 })
-export class EvalCriterionCreationForm {
+export class EvalCriterionCreationFormComponent {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     public readonly criterionCreationCategory =
@@ -89,10 +79,10 @@ export class EvalCriterionCreationForm {
     public readonly selectedTechnicalChallengeStates = computed(() => {
         if (this.criterionForm.technicalChallengeId().value() !== '') {
             const id = this.criterionForm.technicalChallengeId().value();
-            const tc =
+            const tcWithId =
                 this.technicalChallenges().filter((tc) => tc.id === id)[0] ??
                 null;
-            return Object.values(tc!.states);
+            return Object.values(tcWithId!.states);
         }
         return null;
     });
@@ -114,12 +104,12 @@ export class EvalCriterionCreationForm {
     });
     criterionForm = form(this.inputModel);
     public addPatients(patients: Patient[]) {
-        patients = patients.filter(
+        const tmpPatients = patients.filter(
             (pat) => !this.criterionForm.targetPatients().value().includes(pat)
         );
         this.criterionForm
             .targetPatients()
-            .value.update((vals) => [...vals, ...patients]);
+            .value.update((vals) => [...vals, ...tmpPatients]);
     }
     public updateSelectedPatientStatusMapEntry(
         id: UUID,
@@ -129,7 +119,7 @@ export class EvalCriterionCreationForm {
             !this.criterionForm
                 .targetPatients()
                 .value()
-                .find((pat) => pat.id === id)
+                .some((pat) => pat.id === id)
         ) {
             console.log(
                 'trying to assign a PatientStatus to a Patient not in selection.'
@@ -204,13 +194,13 @@ export class EvalCriterionCreationForm {
                     .targetPatients()
                     .value()
                     .map((pat) => {
-                        let status =
+                        const status =
                             this.selectedPatientStatusMap()[pat.id] ?? 'black';
                         return newPatientAtStatusEvalCriterion(
-                            'Patient ' +
-                                pat.identifier +
-                                ' erreicht Status ' +
-                                statusNames[status],
+                            `Patient ${ 
+                                pat.identifier 
+                                } erreicht Status ${ 
+                                statusNames[status]}`,
                             pat.id,
                             status
                         );

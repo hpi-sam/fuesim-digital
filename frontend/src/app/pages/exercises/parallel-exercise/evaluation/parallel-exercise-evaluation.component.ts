@@ -1,5 +1,4 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ParallelExerciseService } from '../../../../core/parallel-exercise.service';
 import {
     EvalCriterion,
     EvalCriterionId,
@@ -13,8 +12,8 @@ import {
     UUID,
 } from 'fuesim-digital-shared';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { NgStyle } from '@angular/common';
 import { HttpResourceRef } from '@angular/common/http';
+import { ParallelExerciseService } from '../../../../core/parallel-exercise.service';
 import { ApiService } from '../../../../core/api.service';
 import { EvalResultStatusBadgeComponent } from '../../exercise/shared/didactic-overview/result-status-badge/eval-result-status-badge.component';
 
@@ -48,13 +47,9 @@ export class ParallelExerciseEvaluationComponent {
             return mapObject;
         }, {})
     );
-    public readonly rootCriteria = computed(() => {
-        const rootCriteriaMap = this.rootCriteriaMap();
-        if (rootCriteriaMap) {
-            return Object.values(rootCriteriaMap);
-        }
-        return null;
-    });
+    public readonly rootCriteria = computed(() =>
+        Object.values(this.rootCriteriaMap())
+    );
     parallelExercise: HttpResourceRef<
         GetParallelExerciseResponseData | undefined
     >;
@@ -88,13 +83,13 @@ export class ParallelExerciseEvaluationComponent {
                             criteriaObject.forEach((crit) => {
                                 console.log(crit.name);
                             });
-                            const newIds = Object.values(resultMap).map(
-                                (res) => res.id
+                            const newIds = new Set(
+                                Object.values(resultMap).map((res) => res.id)
                             );
-                            criteriaObject = criteriaObject.filter(
-                                (crit) => !newIds.includes(crit.id)
+                            const newObject = criteriaObject.filter(
+                                (crit) => !newIds.has(crit.id)
                             );
-                            return criteriaObject;
+                            return newObject;
                         },
                         [
                             ...Object.values(results.at(0)!).map(

@@ -55,9 +55,9 @@ export function getEvalResultFromCriterion(
     cache: { [key: string]: EvalResult },
     previousResult?: EvalResult
 ): EvalResult {
-    function shortCritToRes(evalCriterion: EvalCriterion): EvalResult {
+    function shortCritToRes(criterion: EvalCriterion): EvalResult {
         return getEvalResultFromCriterion(
-            evalCriterion,
+            criterion,
             evalCriteria,
             technicalChallenges,
             patients,
@@ -114,10 +114,8 @@ export function getEvalResultFromCriterion(
         case 'andEvalCriterion': {
             const criterion = evalCriterion;
             isCompleted = true;
-            for (let i = 0; i < criterion.children.length; i += 1) {
-                const res = shortCritToRes(
-                    evalCriteria[criterion.children[i]!]!
-                );
+            for (const childId of criterion.children) {
+                const res = shortCritToRes(evalCriteria[childId]!);
                 if (res.type !== 'boolEvalResult' || !res.isCompleted) {
                     isCompleted = false;
                     break;
@@ -126,11 +124,11 @@ export function getEvalResultFromCriterion(
             break;
         }
         case 'orEvalCriterion': {
-            const Criterion = evalCriterion;
+            const criterion = evalCriterion;
             isCompleted = false;
-            for (let i = 0; i < Criterion.children.length; i += 1) {
+            for (let i = 0; i < criterion.children.length; i += 1) {
                 const res = shortCritToRes(
-                    evalCriteria[Criterion.children.at(i)!]!
+                    evalCriteria[criterion.children.at(i)!]!
                 );
                 if (res.type !== 'boolEvalResult') {
                     break;

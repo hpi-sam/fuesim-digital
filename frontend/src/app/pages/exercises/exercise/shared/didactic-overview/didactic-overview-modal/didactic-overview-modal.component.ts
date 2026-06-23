@@ -9,13 +9,6 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
-    selectEvalCriteria,
-    selectEvalResults,
-    selectTechnicalChallenges,
-} from '../../../../../../state/application/selectors/exercise.selectors';
-import { AppState } from '../../../../../../state/app.state';
-import { EvalCriterionCreationForm } from '../eval-criterion-creation-form/eval-criterion-creation-form.component';
-import {
     boolEvalCritrionTypes,
     numberEvalCriterionTypes,
     combinedEvalCriterionTypes,
@@ -31,6 +24,13 @@ import {
     isTemporalEvalCriterionType,
     statusNames,
 } from 'fuesim-digital-shared';
+import {
+    selectEvalCriteria,
+    selectEvalResults,
+    selectTechnicalChallenges,
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { AppState } from '../../../../../../state/app.state';
+import { EvalCriterionCreationFormComponent } from '../eval-criterion-creation-form/eval-criterion-creation-form.component';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import { EvalResultStatusBadgeComponent } from '../result-status-badge/eval-result-status-badge.component';
 @Component({
@@ -38,7 +38,7 @@ import { EvalResultStatusBadgeComponent } from '../result-status-badge/eval-resu
     templateUrl: './didactic-overview-modal.component.html',
     styleUrls: ['./didactic-overview-modal.component.scss'],
     imports: [
-        EvalCriterionCreationForm,
+        EvalCriterionCreationFormComponent,
         NgbDropdown,
         NgbDropdownToggle,
         NgbDropdownMenu,
@@ -80,17 +80,14 @@ export class DidacticOverviewModalComponent {
     );
     public readonly completedCriteriaCount = computed(() => {
         const results = this.results();
-        if (results) {
-            let count = 0;
-            for (let i = 0; i < results.length; i += 1) {
-                const res = results.at(i);
-                if (res?.type === 'boolEvalResult' && res?.isCompleted) {
-                    count += 1;
-                }
+        let count = 0;
+        for (let i = 0; i < results.length; i += 1) {
+            const res = results.at(i);
+            if (res?.type === 'boolEvalResult' && res.isCompleted) {
+                count += 1;
             }
-            return count;
         }
-        return 0;
+        return count;
     });
     private readonly tcs = this.store.selectSignal(selectTechnicalChallenges);
     public readonly technicalChallenges = signal(Object.values(this.tcs()));
@@ -115,10 +112,10 @@ export class DidacticOverviewModalComponent {
         tcId: TechnicalChallengeId,
         stateId: TechnicalChallengeStateId
     ) {
-        const tc = this.technicalChallenges()
+        const tcWithId = this.technicalChallenges()
             .filter((tc) => tc.id === tcId)
             .at(0);
-        return tc?.states[stateId]?.title;
+        return tcWithId?.states[stateId]?.title;
     }
     public getNumFromEvalResult = getNumFromEvalResult;
     public getNumFromEvalCriterion = getNumFromEvalCriterion;

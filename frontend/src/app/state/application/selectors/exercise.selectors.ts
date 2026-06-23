@@ -12,7 +12,6 @@ import type {
     UUID,
     Vehicle,
     WithPosition,
-    EvalCriterion,
 } from 'fuesim-digital-shared';
 import {
     currentStateOf,
@@ -21,8 +20,6 @@ import {
     isInTransferFromAlarmgroup,
     nestedCoordinatesOf,
     scoutableElementTypes,
-    EvalResult,
-    getEvalResultFromCriterion,
     getEvalResultsFromCriteria,
 } from 'fuesim-digital-shared';
 import type { AppState } from '../../app.state';

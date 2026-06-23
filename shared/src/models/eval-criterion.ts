@@ -462,8 +462,8 @@ export function newViewScoutableEvalCriterion(
     };
 }
 export function isNumberEvalCriterion(criterion: EvalCriterion): boolean {
-    return numberEvalCriterionTypes.some(
-        (type) => type === criterion.criterionType
+    return numberEvalCriterionTypes.includes(
+        criterion.criterionType
     );
 }
 /* TypeScript and Angular don't understand, that isNumberEvalCriterion(criterion)===true also means that criterion.num exists.*/
@@ -527,14 +527,15 @@ export function getRootCriteriaMap(criteriaMap: {
     [CriterionId: UUID]: EvalCriterion;
 } {
     const criteria = Object.values(criteriaMap);
+    let tmpMap = criteriaMap;
     for (const criterion of criteria) {
         if (
-            combinedEvalCriterionTypes.some(
-                (type) => type === criterion.criterionType
+            combinedEvalCriterionTypes.includes(
+                criterion.criterionType
             )
         ) {
-            criteriaMap = removeChildren(criteriaMap, criterion);
+            tmpMap = removeChildren(criteriaMap, criterion);
         }
     }
-    return criteriaMap;
+    return tmpMap;
 }

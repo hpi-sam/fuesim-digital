@@ -31,7 +31,7 @@ export interface ParallelExerciseJoin {
 }
 export class ParallelExerciseService {
     public newJoin = new Subject<ParallelExerciseJoin>();
-    private readonly subscriptions: Subscription[] = [];
+    private readonly subscriptions: { [key: ExerciseId]: Subscription } = {};
     public evalResultsMap: {
         [exerciseId: ExerciseId]: {
             [criterionId: EvalCriterionId]: EvalResult;
@@ -43,22 +43,26 @@ export class ParallelExerciseService {
         private readonly exerciseService: ExerciseService
     ) {
         this.newJoin.subscribe((join) => {
-            this.evalResultsMap[join.activeExercise.exercise.id] = {};
-            const sub = join.activeExercise.tickApplied.subscribe(async () => {
-                const id = join.activeExercise.exercise.id;
-                const state = join.activeExercise.getStateSnapshot();
-                const previousResults = this.evalResultsMap[id];
-                this.evalResultsMap[id] = updateEvalResultsMap(
-                    previousResults ?? {},
-                    state.evalCriteria,
-                    state.technicalChallenges,
-                    state.patients,
-                    state.scoutables,
-                    state.currentTime,
-                    false
+            if (!this.subscriptions[join.activeExercise.exercise.id]) {
+                this.evalResultsMap[join.activeExercise.exercise.id] = {};
+                const sub = join.activeExercise.tickApplied.subscribe(
+                    async () => {
+                        const id = join.activeExercise.exercise.id;
+                        const state = join.activeExercise.getStateSnapshot();
+                        const previousResults = this.evalResultsMap[id];
+                        this.evalResultsMap[id] = updateEvalResultsMap(
+                            previousResults ?? {},
+                            state.evalCriteria,
+                            state.technicalChallenges,
+                            state.patients,
+                            state.scoutables,
+                            state.currentTime,
+                            false
+                        );
+                    }
                 );
-            });
-            this.subscriptions.push(sub);
+                this.subscriptions[join.activeExercise.exercise.id] = sub;
+            }
         });
     }
 

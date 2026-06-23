@@ -461,7 +461,9 @@ export function newViewScoutableEvalCriterion(
         targetScoutableId,
     };
 }
-export function isNumberEvalCriterion(criterion: EvalCriterion): boolean {
+export function isNumberEvalCriterion(
+    criterion: EvalCriterion
+): criterion is NumberEvalCriterion {
     return numberEvalCriterionTypes.includes(
         //@ts-expect-error: not assignable
         criterion.criterionType
@@ -471,18 +473,17 @@ export function isNumberEvalCriterion(criterion: EvalCriterion): boolean {
 export function getNumFromEvalCriterion(
     criterion: EvalCriterion
 ): number | null {
-    const type = criterion.criterionType;
-    if (
-        type === 'constNumEvalCriterion' ||
-        type === 'countCompletedEvalCriterion' ||
-        type === 'firstTrueAtEvalCriterion' ||
-        type === 'timeStampEvalCriterion'
-    ) {
+    if (isNumberEvalCriterion(criterion)) {
         return criterion.num;
     }
     return null;
 }
-
+/**
+ * recursively removes the childCriteria of an initial eval criterion from the input map
+ * @param criteriaMap
+ * @param currentCriterion
+ * @returns a the modified input map, without the children criteria of the specified criterion
+ */
 export function removeChildren(
     criteriaMap: { [key: EvalCriterionId]: EvalCriterion },
     currentCriterion?: EvalCriterion

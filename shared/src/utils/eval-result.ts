@@ -321,7 +321,9 @@ export function updateEvalResultsMap(
     const tmpCache: { [criterionId: string]: EvalResult } = {};
     return (
         Object.values(evalCriteria)
-            /* For non parallel exercises we only care to cache results for temporal criteria, because the rest is selected via the exeercise selector selectEvalResults. */
+            /* For non parallel exercises we only care to cache results
+            for temporal criteria, because the rest is selected via
+            the exercise selector selectEvalResults. */
             .filter((crit) => {
                 if (!temporalOnly) {
                     return true;

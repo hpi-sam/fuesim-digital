@@ -98,13 +98,8 @@
 
         <div class="row">
             <div class="col">
-                <nav
-                    #nav="ngbNav"
-                    ngbNav
-                    [activeId]="activeNavId()"
-                    class="nav-tabs"
-                >
-                    <ng-container ngbNavItem [ngbNavItem]="'participants'">
+                <nav #nav="ngbNav" ngbNav class="nav-tabs">
+                    <ng-container ngbNavItem ngbNavItem="participants">
                         <a ngbNavLink data-cy="paralellExerciseParticipantsNav"
                             >Teilnehmenden Übersicht</a
                         >
@@ -158,14 +153,14 @@
                             </div>
                         </ng-template>
                     </ng-container>
-                    <ng-container ngbNavItem [ngbNavItem]="'didactic overview'">
+                    <ng-container ngbNavItem ngbNavItem="didactic overview">
                         <a
                             ngbNavLink
                             data-cy="paralellExerciseDidacticOverviewNav"
                             >Auswertung</a
                         >
-                        <ng-template ngbNavContent
-                            ><app-parallel-exercise-evaluation />
+                        <ng-template ngbNavContent>
+                            <app-parallel-exercise-evaluation />
                         </ng-template>
                     </ng-container>
                 </nav>

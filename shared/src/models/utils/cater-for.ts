@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const logicalOperatorSchema = z.literal(['and', 'or', 'not']);
+export const logicalOperatorSchema = z.literal(['and', 'or']);
 export type LogicalOperator = z.infer<typeof logicalOperatorSchema>;
 
 export const canCaterForSchema = z.strictObject({

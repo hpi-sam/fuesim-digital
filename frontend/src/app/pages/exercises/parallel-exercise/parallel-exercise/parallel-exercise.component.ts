@@ -58,7 +58,6 @@ export class ParallelExerciseComponent {
     parallelExercise: HttpResourceRef<
         GetParallelExerciseResponseData | undefined
     >;
-    readonly activeNavId = signal<string>('participants');
     readonly participantUrl = computed(
         () =>
             `${location.origin}/exercises/parallel/join/${this.parallelExercise.value()?.participantKey}`

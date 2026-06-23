@@ -16,7 +16,7 @@ import { openClientsModal } from '../clients-modal/open-clients-modal';
 import { openEmergencyOperationsCenterModal } from '../emergency-operations-center/open-emergency-operations-center-modal';
 import { openExerciseSettingsModal } from '../exercise-settings/open-exercise-settings-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
-import { openDidacticOverviewModal } from '../didactic-overview/tag/open-didacti-overview-modal';
+import { openDidacticOverviewModal } from '../didactic-overview/didactic-overview-modal/open-didactic-overview-modal';
 import { openHospitalEditorModal } from '../hospital-editor/hospital-editor-modal';
 import { openTrainerOperationsTabletModal } from '../operations-tablet-view/trainer-operations-tablet-modal/open-trainer-operations-tablet-modal';
 import { openSimulationTrainerModal } from '../simulation/trainer-modal/open-simulation-trainer-modal';

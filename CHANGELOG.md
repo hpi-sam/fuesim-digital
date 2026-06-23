@@ -11,7 +11,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - There are now notifications when viewing an exercise replay whenever a measure is taken or a scoutable element is viewed.
 - There is now a banner that is displayed when the application is unable to start properly, informing the user about potential causes.
-- There is now a didactic overview for trainers in "Auswertung" -> "Didaktische Übersicht" wich allows trainers to set criteria see live results. In the Parallel Overview an equivalent overview for all instances has been added.
+- There is now a didactic overview for trainers in "Auswertung" -> "Didaktische Übersicht" which allows trainers to set criteria and see live results. In the parallel exercise dashboard an equivalent overview for all instances has been added.
 
 ### Fixed
 

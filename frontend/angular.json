@@ -155,8 +155,7 @@
                                 "@noble/hashes/sha256",
                                 "@noble/hashes/crypto",
                                 "rbush-knn",
-                                "tinyqueue",
-                                "class-transformer"
+                                "tinyqueue"
                             ]
                         }
                     },

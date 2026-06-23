@@ -44,8 +44,8 @@ export type MoveTransferPointAction = Immutable<
 const renameTransferPointActionSchema = z.strictObject({
     type: z.literal('[TransferPoint] Rename TransferPoint'),
     transferPointId: transferPointSchema.shape.id,
-    internalName: z.string().optional(),
-    externalName: z.string().optional(),
+    internalName: transferPointSchema.shape.internalName.optional(),
+    externalName: transferPointSchema.shape.externalName.optional(),
 });
 export type RenameTransferPointAction = Immutable<
     z.infer<typeof renameTransferPointActionSchema>

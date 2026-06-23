@@ -19,7 +19,7 @@ export type AddAlarmGroupAction = Immutable<
 export const renameAlarmGroupActionSchema = z.strictObject({
     type: z.literal('[AlarmGroup] Rename AlarmGroup'),
     alarmGroupId: alarmGroupSchema.shape.id,
-    name: z.string(),
+    name: alarmGroupSchema.shape.name,
 });
 
 export type RenameAlarmGroupAction = Immutable<
@@ -29,7 +29,7 @@ export type RenameAlarmGroupAction = Immutable<
 export const limitAlarmGroupActionSchema = z.strictObject({
     type: z.literal('[AlarmGroup] Limit AlarmGroup'),
     alarmGroupId: alarmGroupSchema.shape.id,
-    triggerLimit: z.int().nonnegative().nullable(),
+    triggerLimit: alarmGroupSchema.shape.triggerLimit,
 });
 
 export type LimitAlarmGroupAction = Immutable<
@@ -58,8 +58,8 @@ export const editAlarmGroupVehicleActionSchema = z.strictObject({
     type: z.literal('[AlarmGroup] Edit AlarmGroupVehicle'),
     alarmGroupId: alarmGroupSchema.shape.id,
     alarmGroupVehicleId: alarmGroupVehicleSchema.shape.id,
-    time: z.int().nonnegative(),
-    name: z.string(),
+    time: alarmGroupVehicleSchema.shape.time,
+    name: alarmGroupSchema.shape.name,
 });
 export type EditAlarmGroupVehicleAction = Immutable<
     z.infer<typeof editAlarmGroupVehicleActionSchema>
@@ -76,7 +76,7 @@ export type RemoveAlarmGroupVehicleAction = Immutable<
 
 export namespace AlarmGroupActionReducers {
     export const addAlarmGroup: ActionReducer<AddAlarmGroupAction> = {
-        type: '[AlarmGroup] Add AlarmGroup',
+        type: addAlarmGroupActionSchema.shape.type.value,
         actionSchema: addAlarmGroupActionSchema,
         reducer: (draftState, { alarmGroup }) => {
             draftState.alarmGroups[alarmGroup.id] =
@@ -87,7 +87,7 @@ export namespace AlarmGroupActionReducers {
     };
 
     export const renameAlarmGroup: ActionReducer<RenameAlarmGroupAction> = {
-        type: '[AlarmGroup] Rename AlarmGroup',
+        type: renameAlarmGroupActionSchema.shape.type.value,
         actionSchema: renameAlarmGroupActionSchema,
         reducer: (draftState, { alarmGroupId, name }) => {
             const alarmGroup = getElement(
@@ -102,7 +102,7 @@ export namespace AlarmGroupActionReducers {
     };
 
     export const limitAlarmGroup: ActionReducer<LimitAlarmGroupAction> = {
-        type: '[AlarmGroup] Limit AlarmGroup',
+        type: limitAlarmGroupActionSchema.shape.type.value,
         actionSchema: limitAlarmGroupActionSchema,
         reducer: (draftState, { alarmGroupId, triggerLimit }) => {
             const alarmGroup = getElement(
@@ -117,7 +117,7 @@ export namespace AlarmGroupActionReducers {
     };
 
     export const removeAlarmGroup: ActionReducer<RemoveAlarmGroupAction> = {
-        type: '[AlarmGroup] Remove AlarmGroup',
+        type: removeAlarmGroupActionSchema.shape.type.value,
         actionSchema: removeAlarmGroupActionSchema,
         reducer: (draftState, { alarmGroupId }) => {
             getElement(draftState, 'alarmGroup', alarmGroupId);
@@ -141,7 +141,7 @@ export namespace AlarmGroupActionReducers {
 
     export const addAlarmGroupVehicle: ActionReducer<AddAlarmGroupVehicleAction> =
         {
-            type: '[AlarmGroup] Add AlarmGroupVehicle',
+            type: addAlarmGroupVehicleActionSchema.shape.type.value,
             actionSchema: addAlarmGroupVehicleActionSchema,
             reducer: (draftState, { alarmGroupId, alarmGroupVehicle }) => {
                 const alarmGroup = getElement(
@@ -158,7 +158,7 @@ export namespace AlarmGroupActionReducers {
 
     export const editAlarmGroupVehicle: ActionReducer<EditAlarmGroupVehicleAction> =
         {
-            type: '[AlarmGroup] Edit AlarmGroupVehicle',
+            type: editAlarmGroupVehicleActionSchema.shape.type.value,
             actionSchema: editAlarmGroupVehicleActionSchema,
             reducer: (
                 draftState,
@@ -182,7 +182,7 @@ export namespace AlarmGroupActionReducers {
 
     export const removeAlarmGroupVehicle: ActionReducer<RemoveAlarmGroupVehicleAction> =
         {
-            type: '[AlarmGroup] Remove AlarmGroupVehicle',
+            type: removeAlarmGroupVehicleActionSchema.shape.type.value,
             actionSchema: removeAlarmGroupVehicleActionSchema,
             reducer: (draftState, { alarmGroupId, alarmGroupVehicleId }) => {
                 const alarmGroup = getElement(

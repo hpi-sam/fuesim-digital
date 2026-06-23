@@ -3,7 +3,6 @@ import type { Immutable } from 'immer';
 import type { ActionReducer } from '../action-reducer.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { drawingSchema } from '../../models/drawing.js';
-import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { ReducerError } from '../reducer-error.js';
 
@@ -18,7 +17,7 @@ export type AddDrawingAction = Immutable<
 export const moveDrawingActionSchema = z.strictObject({
     type: z.literal('[Drawing] Move drawing'),
     drawingId: drawingSchema.shape.id,
-    newPoints: z.array(mapCoordinatesSchema).min(2),
+    newPoints: drawingSchema.shape.points,
 });
 export type MoveDrawingAction = Immutable<
     z.infer<typeof moveDrawingActionSchema>
@@ -34,7 +33,7 @@ export type RemoveDrawingAction = Immutable<
 
 export namespace DrawingActionReducers {
     export const addDrawing: ActionReducer<AddDrawingAction> = {
-        type: '[Drawing] Add drawing',
+        type: addDrawingActionSchema.shape.type.value,
         actionSchema: addDrawingActionSchema,
         reducer: (draftState, { drawing }) => {
             draftState.drawings[drawing.id] = cloneDeepMutable(drawing);
@@ -44,7 +43,7 @@ export namespace DrawingActionReducers {
     };
 
     export const moveDrawing: ActionReducer<MoveDrawingAction> = {
-        type: '[Drawing] Move drawing',
+        type: moveDrawingActionSchema.shape.type.value,
         actionSchema: moveDrawingActionSchema,
         reducer: (draftState, { drawingId, newPoints }) => {
             if (newPoints.length < 2) {
@@ -70,7 +69,7 @@ export namespace DrawingActionReducers {
     };
 
     export const removeDrawing: ActionReducer<RemoveDrawingAction> = {
-        type: '[Drawing] Remove drawing',
+        type: removeDrawingActionSchema.shape.type.value,
         actionSchema: removeDrawingActionSchema,
         reducer: (draftState, { drawingId }) => {
             delete draftState.drawings[drawingId];

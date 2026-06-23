@@ -8,7 +8,6 @@ import {
     mapImageTemplateSchema,
 } from '../../models/map-image-template.js';
 import { type UUID } from '../../utils/uuid.js';
-import { imagePropertiesSchema } from '../../models/utils/image-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 
 export const addMapImageTemplateActionSchema = z.strictObject({
@@ -22,8 +21,8 @@ export type AddMapImageTemplateAction = Immutable<
 export const editMapImageTemplateActionSchema = z.strictObject({
     type: z.literal('[MapImageTemplate] Edit mapImageTemplate'),
     id: mapImageTemplateSchema.shape.id,
-    name: z.string(),
-    image: imagePropertiesSchema,
+    name: mapImageTemplateSchema.shape.name,
+    image: mapImageTemplateSchema.shape.image,
 });
 export type EditMapImageTemplateAction = Immutable<
     z.infer<typeof editMapImageTemplateActionSchema>
@@ -40,7 +39,7 @@ export type DeleteMapImageTemplateAction = Immutable<
 export namespace MapImageTemplatesActionReducers {
     export const addMapImageTemplate: ActionReducer<AddMapImageTemplateAction> =
         {
-            type: '[MapImageTemplate] Add mapImageTemplate',
+            type: addMapImageTemplateActionSchema.shape.type.value,
             actionSchema: addMapImageTemplateActionSchema,
             reducer: (draftState, { mapImageTemplate }) => {
                 if (draftState.mapImageTemplates[mapImageTemplate.id]) {
@@ -57,7 +56,7 @@ export namespace MapImageTemplatesActionReducers {
 
     export const editMapImageTemplate: ActionReducer<EditMapImageTemplateAction> =
         {
-            type: '[MapImageTemplate] Edit mapImageTemplate',
+            type: editMapImageTemplateActionSchema.shape.type.value,
             actionSchema: editMapImageTemplateActionSchema,
             reducer: (draftState, { id, name, image }) => {
                 const mapImageTemplate = getMapImageTemplate(draftState, id);
@@ -70,7 +69,7 @@ export namespace MapImageTemplatesActionReducers {
 
     export const deleteMapImageTemplate: ActionReducer<DeleteMapImageTemplateAction> =
         {
-            type: '[MapImageTemplate] Delete mapImageTemplate',
+            type: deleteMapImageTemplateActionSchema.shape.type.value,
             actionSchema: deleteMapImageTemplateActionSchema,
             reducer: (draftState, { id }) => {
                 getMapImageTemplate(draftState, id);

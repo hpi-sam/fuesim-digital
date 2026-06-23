@@ -119,8 +119,7 @@ export function migratePartialExport(
 }
 
 /**
- * Migrates {@link propertiesToMigrate} to the newest version ({@link ExerciseState.currentStateVersion})
- * Might mutate the input.
+ * Migrates {@link propertiesToMigrate} to the newest version ({@link currentStateVersion})
  * @returns The new state version
  */
 export function applyMigrations<H extends StateHistoryCompound | undefined>(

@@ -5,7 +5,6 @@ import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
-import { sizeSchema } from '../../models/utils/size.js';
 import {
     restrictedZoneSchema,
     type VehicleRestriction,
@@ -46,7 +45,7 @@ export type RemoveRestrictedZoneAction = Immutable<
 const renameRestrictedZoneActionSchema = z.strictObject({
     type: z.literal('[RestrictedZone] Rename restricted zone'),
     restrictedZoneId: restrictedZoneSchema.shape.id,
-    newName: z.string(),
+    newName: restrictedZoneSchema.shape.name,
 });
 export type RenameRestrictedZoneAction = Immutable<
     z.infer<typeof renameRestrictedZoneActionSchema>
@@ -56,7 +55,7 @@ const resizeRestrictedZoneActionSchema = z.strictObject({
     type: z.literal('[RestrictedZone] Resize restricted zone'),
     restrictedZoneId: restrictedZoneSchema.shape.id,
     targetPosition: mapCoordinatesSchema,
-    newSize: sizeSchema,
+    newSize: restrictedZoneSchema.shape.size,
 });
 export type ResizeRestrictedZoneAction = Immutable<
     z.infer<typeof resizeRestrictedZoneActionSchema>
@@ -65,7 +64,7 @@ export type ResizeRestrictedZoneAction = Immutable<
 const setRestrictedZoneCapacityActionSchema = z.strictObject({
     type: z.literal('[RestrictedZone] Set capacity'),
     restrictedZoneId: restrictedZoneSchema.shape.id,
-    newCapacity: z.number(), // TODO
+    newCapacity: restrictedZoneSchema.shape.capacity,
 });
 export type SetRestrictedZoneCapacityAction = Immutable<
     z.infer<typeof setRestrictedZoneCapacityActionSchema>
@@ -74,7 +73,7 @@ export type SetRestrictedZoneCapacityAction = Immutable<
 const setRestrictedZoneColorActionSchema = z.strictObject({
     type: z.literal('[RestrictedZone] Set color'),
     restrictedZoneId: restrictedZoneSchema.shape.id,
-    newColor: z.string(),
+    newColor: restrictedZoneSchema.shape.color,
 });
 export type SetRestrictedZoneColorAction = Immutable<
     z.infer<typeof setRestrictedZoneColorActionSchema>
@@ -83,7 +82,7 @@ export type SetRestrictedZoneColorAction = Immutable<
 const setRestrictedZoneNameVisibleActionSchema = z.strictObject({
     type: z.literal('[RestrictedZone] Set nameVisible'),
     restrictedZoneId: restrictedZoneSchema.shape.id,
-    newNameVisible: z.boolean(),
+    newNameVisible: restrictedZoneSchema.shape.nameVisible,
 });
 export type SetRestrictedZoneNameVisibleAction = Immutable<
     z.infer<typeof setRestrictedZoneNameVisibleActionSchema>
@@ -92,7 +91,7 @@ export type SetRestrictedZoneNameVisibleAction = Immutable<
 const setRestrictedZoneCapacityVisibleActionSchema = z.strictObject({
     type: z.literal('[RestrictedZone] Set capacityVisible'),
     restrictedZoneId: restrictedZoneSchema.shape.id,
-    newCapacityVisible: z.boolean(),
+    newCapacityVisible: restrictedZoneSchema.shape.capacityVisible,
 });
 export type SetRestrictedZoneCapacityVisibleAction = Immutable<
     z.infer<typeof setRestrictedZoneCapacityVisibleActionSchema>

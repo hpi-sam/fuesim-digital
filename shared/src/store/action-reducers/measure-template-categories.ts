@@ -36,7 +36,7 @@ export type RemoveMeasureTemplateCategoryAction = z.infer<
 export namespace MeasureTemplateActionReducers {
     export const addMeasureTemplateCategory: ActionReducer<AddMeasureTemplateCategoryAction> =
         {
-            type: '[MeasureTemplateCategory] Add MeasureTemplateCategory',
+            type: addMeasureTemplateCategoryActionSchema.shape.type.value,
             actionSchema: addMeasureTemplateCategoryActionSchema,
             reducer: (draftState, { name }) => {
                 if (draftState.measureTemplates[name] !== undefined) {
@@ -53,7 +53,7 @@ export namespace MeasureTemplateActionReducers {
         };
     export const renameMeasureTemplateCategory: ActionReducer<RenameMeasureTemplateCategoryAction> =
         {
-            type: '[MeasureTemplateCategory] Rename MeasureTemplateCategory',
+            type: renameMeasureTemplateCategoryActionSchema.shape.type.value,
             actionSchema: renameMeasureTemplateCategoryActionSchema,
             reducer: (draftState, { previousName, newName }) => {
                 if (previousName === newName) return draftState;
@@ -69,7 +69,7 @@ export namespace MeasureTemplateActionReducers {
         };
     export const removeMeasureTemplateCategory: ActionReducer<RemoveMeasureTemplateCategoryAction> =
         {
-            type: '[MeasureTemplateCategory] Remove MeasureTemplateCategory',
+            type: removeMeasureTemplateCategoryActionSchema.shape.type.value,
             actionSchema: removeMeasureTemplateCategoryActionSchema,
             reducer: (draftState, { name }) => {
                 if (Object.entries(draftState.measureTemplates).length === 1) {

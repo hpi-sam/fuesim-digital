@@ -6,9 +6,7 @@ import {
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ActionReducer } from '../action-reducer.js';
 import { viewportSchema } from '../../models/viewport.js';
-import { uuidSchema } from '../../utils/uuid.js';
 import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
-import { sizeSchema } from '../../models/utils/size.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { getElement } from './utils/get-element.js';
@@ -23,7 +21,7 @@ export type AddViewportAction = Immutable<
 
 const removeViewportActionSchema = z.strictObject({
     type: z.literal('[Viewport] Remove viewport'),
-    viewportId: uuidSchema,
+    viewportId: viewportSchema.shape.id,
 });
 export type RemoveViewportAction = Immutable<
     z.infer<typeof removeViewportActionSchema>
@@ -31,7 +29,7 @@ export type RemoveViewportAction = Immutable<
 
 const moveViewportActionSchema = z.strictObject({
     type: z.literal('[Viewport] Move viewport'),
-    viewportId: uuidSchema,
+    viewportId: viewportSchema.shape.id,
     targetPosition: mapCoordinatesSchema,
 });
 
@@ -43,7 +41,7 @@ const resizeViewportActionSchema = z.strictObject({
     type: z.literal('[Viewport] Resize viewport'),
     viewportId: viewportSchema.shape.id,
     targetPosition: mapCoordinatesSchema,
-    newSize: sizeSchema,
+    newSize: viewportSchema.shape.size,
 });
 export type ResizeViewportAction = Immutable<
     z.infer<typeof resizeViewportActionSchema>
@@ -52,7 +50,7 @@ export type ResizeViewportAction = Immutable<
 const renameViewportActionSchema = z.strictObject({
     type: z.literal('[Viewport] Rename viewport'),
     viewportId: viewportSchema.shape.id,
-    newName: z.string(),
+    newName: viewportSchema.shape.name,
 });
 export type RenameViewportAction = Immutable<
     z.infer<typeof renameViewportActionSchema>

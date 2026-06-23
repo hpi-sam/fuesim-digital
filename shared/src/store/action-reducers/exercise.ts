@@ -106,7 +106,7 @@ export type SetParticipantIdAction = Immutable<
 
 export namespace ExerciseActionReducers {
     export const pauseExercise: ActionReducer<PauseExerciseAction> = {
-        type: '[Exercise] Pause',
+        type: pauseExerciseActionSchema.shape.type.value,
         actionSchema: pauseExerciseActionSchema,
         reducer: (draftState) => {
             if (draftState.currentStatus !== 'running') {
@@ -119,7 +119,7 @@ export namespace ExerciseActionReducers {
     };
 
     export const startExercise: ActionReducer<StartExerciseAction> = {
-        type: '[Exercise] Start',
+        type: startExerciseActionSchema.shape.type.value,
         actionSchema: startExerciseActionSchema,
         reducer: (draftState) => {
             if (draftState.currentStatus === 'running') {
@@ -133,7 +133,7 @@ export namespace ExerciseActionReducers {
 
     export const setAutojoinViewport: ActionReducer<SetAutojoinViewportAction> =
         {
-            type: '[Exercise] Set autojoin viewport',
+            type: setAutojoinViewportActionSchema.shape.type.value,
             actionSchema: setAutojoinViewportActionSchema,
             reducer: (draftState, { viewportId }) => {
                 draftState.autojoinViewportId = viewportId;
@@ -143,7 +143,7 @@ export namespace ExerciseActionReducers {
         };
 
     export const exerciseTick: ActionReducer<ExerciseTickAction> = {
-        type: '[Exercise] Tick',
+        type: exerciseTickActionSchema.shape.type.value,
         actionSchema: exerciseTickActionSchema,
         reducer: (draftState, { patientUpdates, tickInterval }) => {
             // Refresh the current time
@@ -209,7 +209,7 @@ export namespace ExerciseActionReducers {
     };
 
     export const templateImport: ActionReducer<ImportTemplatesAction> = {
-        type: '[Exercise] Import Templates',
+        type: importTemplatesActionSchema.shape.type.value,
         actionSchema: importTemplatesActionSchema,
         reducer: (draftState, { mode, partialExport }) => {
             const mutablePartialExport = cloneDeepMutable(partialExport);

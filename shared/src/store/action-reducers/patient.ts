@@ -21,7 +21,6 @@ import type { ExerciseState } from '../../state.js';
 import { type UUID } from '../../utils/uuid.js';
 import { patientSchema } from '../../models/patient.js';
 import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
-import { patientStatusSchema } from '../../models/utils/patient-status.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
 import { updateTreatments } from './utils/calculate-treatments.js';
 import { logPatientAdded, logPatientRemoved } from './utils/log.js';
@@ -81,7 +80,7 @@ export type RemovePatientAction = Immutable<
 const setVisibleStatusActionSchema = z.strictObject({
     type: z.literal('[Patient] Set Visible Status'),
     patientId: patientSchema.shape.id,
-    patientStatus: patientStatusSchema,
+    patientStatus: patientSchema.shape.pretriageStatus,
 });
 export type SetVisibleStatusAction = Immutable<
     z.infer<typeof setVisibleStatusActionSchema>
@@ -90,7 +89,7 @@ export type SetVisibleStatusAction = Immutable<
 const setUserTextActionSchema = z.strictObject({
     type: z.literal('[Patient] Set Remarks'),
     patientId: patientSchema.shape.id,
-    remarks: z.string().max(65535),
+    remarks: patientSchema.shape.remarks,
 });
 export type SetUserTextAction = Immutable<
     z.infer<typeof setUserTextActionSchema>
@@ -99,7 +98,7 @@ export type SetUserTextAction = Immutable<
 const setCustomQRCodeActionSchema = z.strictObject({
     type: z.literal('[Patient] Set Custom QR Code'),
     patientId: patientSchema.shape.id,
-    customQRCode: z.string().max(65535),
+    customQRCode: patientSchema.shape.customQRCode,
 });
 export type SetCustomQRCodeAction = Immutable<
     z.infer<typeof setCustomQRCodeActionSchema>
@@ -108,7 +107,7 @@ export type SetCustomQRCodeAction = Immutable<
 const setPatientTransportPriorityActionSchema = z.strictObject({
     type: z.literal('[Patient] Set Transport Priority'),
     patientId: patientSchema.shape.id,
-    hasTransportPriority: z.boolean(),
+    hasTransportPriority: patientSchema.shape.hasTransportPriority,
 });
 export type SetPatientTransportPriorityAction = Immutable<
     z.infer<typeof setPatientTransportPriorityActionSchema>

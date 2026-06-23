@@ -33,7 +33,7 @@ export type MakeElementScoutableAction = z.infer<
 const setIsVisibleForParticipantsActionSchema = z.strictObject({
     type: z.literal('[Scoutable] Set isVisibleForParticipants'),
     scoutableId: scoutableSchema.shape.id,
-    value: z.boolean(),
+    value: scoutableSchema.shape.isVisibleForParticipants,
 });
 export type SetIsVisibleForParticipantsAction = z.infer<
     typeof setIsVisibleForParticipantsActionSchema
@@ -48,7 +48,7 @@ export type MarkAsViewedAction = z.infer<typeof markAsViewedActionSchema>;
 const renameActionSchema = z.strictObject({
     type: z.literal('[Scoutable] Rename'),
     scoutableId: scoutableSchema.shape.id,
-    name: z.string(),
+    name: scoutableSchema.shape.name,
 });
 export type RenameAction = z.infer<typeof renameActionSchema>;
 

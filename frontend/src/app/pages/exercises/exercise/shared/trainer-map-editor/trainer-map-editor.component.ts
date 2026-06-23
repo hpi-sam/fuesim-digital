@@ -216,7 +216,10 @@ export class TrainerMapEditorComponent implements OnInit {
 
             const partialExport = validateExerciseExport(importedPlainObject);
             if (partialExport.type !== 'partial') {
-                throw Error('');
+                this.messageService.postError({
+                    title: 'An dieser Stelle können keine vollständigen Übungsexports importiert werden.',
+                });
+                return;
             }
             const migratedPartialExport = migratePartialExport(
                 partialExport,

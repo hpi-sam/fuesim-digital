@@ -26,7 +26,7 @@ export type SetOperationsMapPropertiesAction = Immutable<
 
 export const setPretriageEnabledActionSchema = z.strictObject({
     type: z.literal('[Configuration] Set pretriageEnabled'),
-    pretriageEnabled: z.boolean(),
+    pretriageEnabled: exerciseConfigurationSchema.shape.pretriageEnabled,
 });
 export type SetPretriageEnabledAction = Immutable<
     z.infer<typeof setPretriageEnabledActionSchema>
@@ -34,7 +34,7 @@ export type SetPretriageEnabledAction = Immutable<
 
 export const setBluePatientsEnabledFlagActionSchema = z.strictObject({
     type: z.literal('[Configuration] Set bluePatientsEnabled'),
-    bluePatientsEnabled: z.boolean(),
+    bluePatientsEnabled: exerciseConfigurationSchema.shape.bluePatientsEnabled,
 });
 export type SetBluePatientsEnabledFlagAction = Immutable<
     z.infer<typeof setBluePatientsEnabledFlagActionSchema>
@@ -42,7 +42,8 @@ export type SetBluePatientsEnabledFlagAction = Immutable<
 
 export const setPatientIdentifierPrefixActionSchema = z.strictObject({
     type: z.literal('[Configuration] Set patientIdentifierPrefix'),
-    patientIdentifierPrefix: z.string(),
+    patientIdentifierPrefix:
+        exerciseConfigurationSchema.shape.patientIdentifierPrefix,
 });
 export type SetPatientIdentifierPrefixAction = Immutable<
     z.infer<typeof setPatientIdentifierPrefixActionSchema>
@@ -50,7 +51,8 @@ export type SetPatientIdentifierPrefixAction = Immutable<
 
 export const setVehicleStatusHighlightEnabledActionSchema = z.strictObject({
     type: z.literal('[Configuration] Set vehicleStatusHighlightEnabled'),
-    vehicleStatusHighlightEnabled: z.boolean(),
+    vehicleStatusHighlightEnabled:
+        exerciseConfigurationSchema.shape.vehicleStatusHighlight,
 });
 export type SetVehicleStatusHighlightEnabled = Immutable<
     z.infer<typeof setVehicleStatusHighlightEnabledActionSchema>
@@ -61,7 +63,8 @@ export const setVehicleStatusInPatientStatusColorEnabledSchema = z.strictObject(
         type: z.literal(
             '[Configuration] Set vehicleStatusInPatientStatusColorEnabled'
         ),
-        vehicleStatusInPatientStatusColor: z.boolean(),
+        vehicleStatusInPatientStatusColor:
+            exerciseConfigurationSchema.shape.vehicleStatusInPatientStatusColor,
     }
 );
 export type SetVehicleStatusInPatientStatusColorEnabled = Immutable<
@@ -89,7 +92,7 @@ export type SetParticipantLoadAllEnabled = Immutable<
 export namespace ConfigurationActionReducers {
     export const setTileMapProperties: ActionReducer<SetTileMapPropertiesAction> =
         {
-            type: '[Configuration] Set tileMapProperties',
+            type: setTileMapPropertiesActionSchema.shape.type.value,
             actionSchema: setTileMapPropertiesActionSchema,
             reducer: (draftState, { tileMapProperties }) => {
                 draftState.configuration.tileMapProperties =
@@ -101,7 +104,7 @@ export namespace ConfigurationActionReducers {
 
     export const setOperationsMapProperties: ActionReducer<SetOperationsMapPropertiesAction> =
         {
-            type: '[Configuration] Set operationsMapProperties',
+            type: setOperationsMapPropertiesActionSchema.shape.type.value,
             actionSchema: setOperationsMapPropertiesActionSchema,
             reducer: (draftState, { operationsMapProperties }) => {
                 draftState.configuration.operationsMapProperties =
@@ -112,7 +115,7 @@ export namespace ConfigurationActionReducers {
         };
 
     export const setPretriageFlag: ActionReducer<SetPretriageEnabledAction> = {
-        type: '[Configuration] Set pretriageEnabled',
+        type: setPretriageEnabledActionSchema.shape.type.value,
         actionSchema: setPretriageEnabledActionSchema,
         reducer: (draftState, { pretriageEnabled }) => {
             draftState.configuration.pretriageEnabled = pretriageEnabled;
@@ -123,7 +126,7 @@ export namespace ConfigurationActionReducers {
 
     export const setBluePatientsFlag: ActionReducer<SetBluePatientsEnabledFlagAction> =
         {
-            type: '[Configuration] Set bluePatientsEnabled',
+            type: setBluePatientsEnabledFlagActionSchema.shape.type.value,
             actionSchema: setBluePatientsEnabledFlagActionSchema,
             reducer: (draftState, { bluePatientsEnabled }) => {
                 draftState.configuration.bluePatientsEnabled =
@@ -135,7 +138,7 @@ export namespace ConfigurationActionReducers {
 
     export const setPatientIdentifierPrefix: ActionReducer<SetPatientIdentifierPrefixAction> =
         {
-            type: '[Configuration] Set patientIdentifierPrefix',
+            type: setPatientIdentifierPrefixActionSchema.shape.type.value,
             actionSchema: setPatientIdentifierPrefixActionSchema,
             reducer(draftState, { patientIdentifierPrefix }) {
                 draftState.configuration.patientIdentifierPrefix =
@@ -147,7 +150,7 @@ export namespace ConfigurationActionReducers {
 
     export const setVehicleStatusHighlight: ActionReducer<SetVehicleStatusHighlightEnabled> =
         {
-            type: '[Configuration] Set vehicleStatusHighlightEnabled',
+            type: setVehicleStatusHighlightEnabledActionSchema.shape.type.value,
             actionSchema: setVehicleStatusHighlightEnabledActionSchema,
             reducer(draftState, { vehicleStatusHighlightEnabled }) {
                 draftState.configuration.vehicleStatusHighlight =
@@ -159,7 +162,8 @@ export namespace ConfigurationActionReducers {
 
     export const setVehicleStatusInSkColor: ActionReducer<SetVehicleStatusInPatientStatusColorEnabled> =
         {
-            type: '[Configuration] Set vehicleStatusInPatientStatusColorEnabled',
+            type: setVehicleStatusInPatientStatusColorEnabledSchema.shape.type
+                .value,
             actionSchema: setVehicleStatusInPatientStatusColorEnabledSchema,
             reducer(draftState, { vehicleStatusInPatientStatusColor }) {
                 draftState.configuration.vehicleStatusInPatientStatusColor =
@@ -171,7 +175,7 @@ export namespace ConfigurationActionReducers {
 
     export const setHighlightRelatedElements: ActionReducer<SetHighlightRelatedElements> =
         {
-            type: '[Configuration] Set highlightRelatedElements',
+            type: setHighlightRelatedElementsActionSchema.shape.type.value,
             actionSchema: setHighlightRelatedElementsActionSchema,
             reducer(draftState, { highlightRelatedElements }) {
                 draftState.configuration.highlightRelatedElements =
@@ -183,7 +187,7 @@ export namespace ConfigurationActionReducers {
 
     export const setParticipantLoadAllEnabled: ActionReducer<SetParticipantLoadAllEnabled> =
         {
-            type: '[Configuration] Set participantLoadAllEnabled',
+            type: setParticipantLoadAllEnabledActionSchema.shape.type.value,
             actionSchema: setParticipantLoadAllEnabledActionSchema,
             reducer(draftState, { participantLoadAllEnabled }) {
                 draftState.configuration.participantLoadAllEnabled =

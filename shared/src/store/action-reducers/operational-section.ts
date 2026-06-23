@@ -5,7 +5,7 @@ import {
     localOperationsCommandAssignmentSchema,
     operationalSectionAssignmentSchema,
     operationalSectionSchema,
-    operationalSectionBaseAssignmentSchema,
+    operationalSectionMemberAssignmentSchema,
 } from '../../models/operational-section.js';
 import { ReducerError } from '../reducer-error.js';
 import { vehicleSchema } from '../../models/vehicle.js';
@@ -16,8 +16,8 @@ import {
 
 const addOperationalSectionActionSchema = z.strictObject({
     type: z.literal('[OperationalSection] Add Operational Section'),
-    sectionId: operationalSectionBaseAssignmentSchema.shape.sectionId,
-    title: z.string(),
+    sectionId: operationalSectionSchema.shape.id,
+    title: operationalSectionSchema.shape.title,
 });
 export type AddOperationalSectionAction = Immutable<
     z.infer<typeof addOperationalSectionActionSchema>
@@ -25,8 +25,8 @@ export type AddOperationalSectionAction = Immutable<
 
 const renameOperationalSectionActionSchema = z.strictObject({
     type: z.literal('[OperationalSection] Rename Operational Section'),
-    sectionId: operationalSectionBaseAssignmentSchema.shape.sectionId,
-    newTitle: z.string(),
+    sectionId: operationalSectionSchema.shape.id,
+    newTitle: operationalSectionSchema.shape.title,
 });
 export type RenameOperationalSectionAction = Immutable<
     z.infer<typeof renameOperationalSectionActionSchema>
@@ -34,7 +34,7 @@ export type RenameOperationalSectionAction = Immutable<
 
 const removeOperationalSectionActionSchema = z.strictObject({
     type: z.literal('[OperationalSection] Remove Operational Section'),
-    sectionId: operationalSectionBaseAssignmentSchema.shape.sectionId,
+    sectionId: operationalSectionSchema.shape.id,
 });
 export type RemoveOperationalSectionAction = Immutable<
     z.infer<typeof removeOperationalSectionActionSchema>
@@ -42,11 +42,11 @@ export type RemoveOperationalSectionAction = Immutable<
 
 const moveVehicleToOperationalSectionActionSchema = z.strictObject({
     type: z.literal('[OperationalSection] Move Vehicle To Operational Section'),
-    sectionId:
-        operationalSectionBaseAssignmentSchema.shape.sectionId.nullable(),
+    sectionId: operationalSectionSchema.shape.id.nullable(),
     vehicleId: vehicleSchema.shape.id,
     assignAsSectionLeader: z.boolean(),
-    position: z.number().optional(),
+    position:
+        operationalSectionMemberAssignmentSchema.shape.position.optional(),
 });
 export type MoveVehicleToOperationalSectionAction = Immutable<
     z.infer<typeof moveVehicleToOperationalSectionActionSchema>

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Immutable } from 'immer';
+import { castDraft, type Immutable } from 'immer';
 import { hospitalSchema } from '../../models/hospital.js';
 import { newHospitalPatientFromPatient } from '../../models/hospital-patient.js';
 import type { ActionReducer } from '../action-reducer.js';
@@ -143,13 +143,14 @@ export namespace HospitalActionReducers {
                         'patient',
                         patientId
                     );
-                    draftState.hospitalPatients[patientId] =
+                    draftState.hospitalPatients[patientId] = castDraft(
                         newHospitalPatientFromPatient(
                             patient,
                             vehicle.vehicleType,
                             draftState.currentTime,
                             hospital.transportDuration + draftState.currentTime
-                        );
+                        )
+                    );
                     hospital.patientIds[patientId] = true;
                 }
                 deleteVehicle(draftState, vehicleId);

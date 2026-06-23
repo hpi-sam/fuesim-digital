@@ -2,7 +2,6 @@ import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { clientSchema } from '../../models/client.js';
 import type { ActionReducer } from '../action-reducer.js';
-import { specificRoleSchema } from '../../models/utils/role.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { viewportSchema } from '../../models/viewport.js';
 import { getElement } from './utils/get-element.js';
@@ -33,7 +32,7 @@ export type RestrictViewToViewportAction = Immutable<
 export const setWaitingRoomActionSchema = z.strictObject({
     type: z.literal('[Client] Set waitingroom'),
     clientId: clientSchema.shape.id,
-    shouldBeInWaitingRoom: z.boolean(),
+    shouldBeInWaitingRoom: clientSchema.shape.isInWaitingRoom,
 });
 export type SetWaitingRoomAction = Immutable<
     z.infer<typeof setWaitingRoomActionSchema>
@@ -42,7 +41,7 @@ export type SetWaitingRoomAction = Immutable<
 export const changeSpecificClientRoleActionSchema = z.strictObject({
     type: z.literal('[Client] Change specific client role'),
     clientId: clientSchema.shape.id,
-    newRole: specificRoleSchema,
+    newRole: clientSchema.shape.role.shape.specificRole,
 });
 export type ChangeSpecificClientRoleAction = Immutable<
     z.infer<typeof changeSpecificClientRoleActionSchema>
@@ -66,7 +65,7 @@ export type SetClientActiveAction = Immutable<
 
 export namespace ClientActionReducers {
     export const addClient: ActionReducer<AddClientAction> = {
-        type: '[Client] Add client',
+        type: addClientActionSchema.shape.type.value,
         actionSchema: addClientActionSchema,
         reducer: (draftState, { client }) => {
             const clientMutable = cloneDeepMutable(client);
@@ -92,7 +91,7 @@ export namespace ClientActionReducers {
     };
 
     export const removeClient: ActionReducer<RemoveClientAction> = {
-        type: '[Client] Remove client',
+        type: removeClientActionSchema.shape.type.value,
         actionSchema: removeClientActionSchema,
         reducer: (draftState, { clientId }) => {
             getElement(draftState, 'client', clientId);
@@ -104,7 +103,7 @@ export namespace ClientActionReducers {
 
     export const restrictViewToViewport: ActionReducer<RestrictViewToViewportAction> =
         {
-            type: '[Client] Restrict to viewport',
+            type: restrictViewToViewportActionSchema.shape.type.value,
             actionSchema: restrictViewToViewportActionSchema,
             reducer: (draftState, { clientId, viewportId }) => {
                 const client = getElement(draftState, 'client', clientId);
@@ -120,7 +119,7 @@ export namespace ClientActionReducers {
         };
 
     export const setWaitingRoom: ActionReducer<SetWaitingRoomAction> = {
-        type: '[Client] Set waitingroom',
+        type: setWaitingRoomActionSchema.shape.type.value,
         actionSchema: setWaitingRoomActionSchema,
         reducer: (draftState, { clientId, shouldBeInWaitingRoom }) => {
             const client = getElement(draftState, 'client', clientId);
@@ -132,7 +131,7 @@ export namespace ClientActionReducers {
 
     export const changeSpecificClientRole: ActionReducer<ChangeSpecificClientRoleAction> =
         {
-            type: '[Client] Change specific client role',
+            type: changeSpecificClientRoleActionSchema.shape.type.value,
             actionSchema: changeSpecificClientRoleActionSchema,
             reducer: (draftState, { clientId, newRole }) => {
                 const client = getElement(draftState, 'client', clientId);
@@ -143,7 +142,7 @@ export namespace ClientActionReducers {
         };
 
     export const setClientInactive: ActionReducer<SetClientInactiveAction> = {
-        type: '[Client] Set client inactive',
+        type: setClientInactiveActionSchema.shape.type.value,
         actionSchema: setClientInactiveActionSchema,
         reducer: (draftState, { clientId }) => {
             const client = getElement(draftState, 'client', clientId);
@@ -154,7 +153,7 @@ export namespace ClientActionReducers {
     };
 
     export const setClientActive: ActionReducer<SetClientActiveAction> = {
-        type: '[Client] Set client active',
+        type: setClientActiveActionSchema.shape.type.value,
         actionSchema: setClientActiveActionSchema,
         reducer: (draftState, { clientId }) => {
             const client = getElement(draftState, 'client', clientId);

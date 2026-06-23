@@ -18,7 +18,7 @@ export type AddMeasureAction = Immutable<
 
 export namespace MeasureActionReducers {
     export const addMeasure: ActionReducer<AddMeasureAction> = {
-        type: '[Measure] Add Measure',
+        type: addMeasureActionSchema.shape.type.value,
         actionSchema: addMeasureActionSchema,
         reducer: (draftState, { measure }) => {
             let newDraftState = draftState;

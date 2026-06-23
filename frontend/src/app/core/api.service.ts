@@ -30,7 +30,7 @@ import {
     OrganisationMembershipId,
     OrganisationMembershipRole,
     getExerciseTemplateResponseDataSchema,
-    StateExport,
+    type StateExport,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';

@@ -128,7 +128,7 @@ export type AddVehicleAction = Immutable<
 const renameVehicleActionSchema = z.strictObject({
     type: z.literal('[Vehicle] Rename vehicle'),
     vehicleId: vehicleSchema.shape.id,
-    name: z.string(),
+    name: vehicleSchema.shape.name,
 });
 export type RenameVehicleAction = Immutable<
     z.infer<typeof renameVehicleActionSchema>

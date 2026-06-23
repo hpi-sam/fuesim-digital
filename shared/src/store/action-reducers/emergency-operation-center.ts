@@ -21,9 +21,9 @@ import { VehicleActionReducers } from './vehicle.js';
 
 export const addLogEntryActionSchema = z.strictObject({
     type: z.literal('[Emergency Operation Center] Add Log Entry'),
-    name: z.string().max(255),
-    message: z.string().max(65535),
-    isPrivate: z.boolean(),
+    name: eocLogEntrySchema.shape.clientName,
+    message: eocLogEntrySchema.shape.message,
+    isPrivate: eocLogEntrySchema.shape.isPrivate,
     id: eocLogEntrySchema.shape.id,
 });
 export type AddLogEntryAction = Immutable<
@@ -46,7 +46,7 @@ export type SendAlarmGroupAction = Immutable<
 
 export namespace EmergencyOperationCenterActionReducers {
     export const addLogEntry: ActionReducer<AddLogEntryAction> = {
-        type: '[Emergency Operation Center] Add Log Entry',
+        type: addLogEntryActionSchema.shape.type.value,
         actionSchema: addLogEntryActionSchema,
         reducer: (draftState, { name, message, isPrivate, id }) => {
             const logEntry = newEocLogEntry(
@@ -67,7 +67,7 @@ export namespace EmergencyOperationCenterActionReducers {
         },
     };
     export const sendAlarmGroup: ActionReducer<SendAlarmGroupAction> = {
-        type: '[Emergency Operation Center] Send Alarm Group',
+        type: sendAlarmGroupActionSchema.shape.type.value,
         actionSchema: sendAlarmGroupActionSchema,
         reducer: (
             draftState,

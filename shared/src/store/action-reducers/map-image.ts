@@ -31,8 +31,8 @@ export type MoveMapImageAction = Immutable<
 export const scaleMapImageActionSchema = z.strictObject({
     type: z.literal('[MapImage] Scale MapImage'),
     mapImageId: mapImageSchema.shape.id,
-    newHeight: z.number().positive().optional(),
-    newAspectRatio: z.number().positive().optional(),
+    newHeight: mapImageSchema.shape.image.shape.height.optional(),
+    newAspectRatio: mapImageSchema.shape.image.shape.aspectRatio.optional(),
 });
 export type ScaleMapImageAction = Immutable<
     z.infer<typeof scaleMapImageActionSchema>
@@ -49,7 +49,7 @@ export type RemoveMapImageAction = Immutable<
 export const setIsLockedMapImageActionSchema = z.strictObject({
     type: z.literal('[MapImage] Set isLocked'),
     mapImageId: mapImageSchema.shape.id,
-    newLocked: z.boolean(),
+    newLocked: mapImageSchema.shape.isLocked,
 });
 export type SetIsLockedMapImageAction = Immutable<
     z.infer<typeof setIsLockedMapImageActionSchema>
@@ -61,7 +61,7 @@ export const reconfigureMapImageUrlActionSchema = z.strictObject({
     /**
      * Data URI or URL of new image
      */
-    newUrl: z.string(),
+    newUrl: mapImageSchema.shape.image.shape.url,
 });
 export type ReconfigureMapImageUrlAction = Immutable<
     z.infer<typeof reconfigureMapImageUrlActionSchema>
@@ -85,7 +85,7 @@ export type ChangeZIndexMapImageAction = Immutable<
 
 export namespace MapImagesActionReducers {
     export const addMapImage: ActionReducer<AddMapImageAction> = {
-        type: '[MapImage] Add MapImage',
+        type: addMapImageActionSchema.shape.type.value,
         actionSchema: addMapImageActionSchema,
         reducer: (draftState, { mapImage }) => {
             const newMapImage = cloneDeepMutable(mapImage);
@@ -99,7 +99,7 @@ export namespace MapImagesActionReducers {
     };
 
     export const moveMapImage: ActionReducer<MoveMapImageAction> = {
-        type: '[MapImage] Move MapImage',
+        type: moveMapImageActionSchema.shape.type.value,
         actionSchema: moveMapImageActionSchema,
         reducer: (draftState, { mapImageId, targetPosition }) => {
             const mapImage = getElement(draftState, 'mapImage', mapImageId);
@@ -130,7 +130,7 @@ export namespace MapImagesActionReducers {
     };
 
     export const removeMapImage: ActionReducer<RemoveMapImageAction> = {
-        type: '[MapImage] Remove MapImage',
+        type: removeMapImageActionSchema.shape.type.value,
         actionSchema: removeMapImageActionSchema,
         reducer: (draftState, { mapImageId }) => {
             getElement(draftState, 'mapImage', mapImageId);
@@ -142,7 +142,7 @@ export namespace MapImagesActionReducers {
 
     export const reconfigureMapImageUrl: ActionReducer<ReconfigureMapImageUrlAction> =
         {
-            type: '[MapImage] Reconfigure Url',
+            type: reconfigureMapImageUrlActionSchema.shape.type.value,
             actionSchema: reconfigureMapImageUrlActionSchema,
             reducer: (draftState, { mapImageId, newUrl }) => {
                 const mapImage = getElement(draftState, 'mapImage', mapImageId);
@@ -153,7 +153,7 @@ export namespace MapImagesActionReducers {
         };
 
     export const setLockedMapImage: ActionReducer<SetIsLockedMapImageAction> = {
-        type: '[MapImage] Set isLocked',
+        type: setIsLockedMapImageActionSchema.shape.type.value,
         actionSchema: setIsLockedMapImageActionSchema,
         reducer: (draftState, { mapImageId, newLocked }) => {
             const mapImage = getElement(draftState, 'mapImage', mapImageId);
@@ -164,7 +164,7 @@ export namespace MapImagesActionReducers {
     };
 
     export const changeZIndex: ActionReducer<ChangeZIndexMapImageAction> = {
-        type: '[MapImage] Change zIndex',
+        type: changeZIndexMapImageActionSchema.shape.type.value,
         actionSchema: changeZIndexMapImageActionSchema,
         reducer: (draftState, { mapImageId, mode }) => {
             const mapImage = getElement(draftState, 'mapImage', mapImageId);

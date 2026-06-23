@@ -8,10 +8,7 @@ import {
     vehicleTemplateSchema,
 } from '../../models/vehicle-template.js';
 import { type UUID } from '../../utils/uuid.js';
-import { imagePropertiesSchema } from '../../models/utils/image-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { materialTemplateSchema } from '../../models/material-template.js';
-import { personnelTemplateSchema } from '../../models/personnel-template.js';
 
 const addVehicleTemplateActionSchema = z.strictObject({
     type: z.literal('[VehicleTemplate] Add vehicleTemplate'),
@@ -24,12 +21,12 @@ export type AddVehicleTemplateAction = Immutable<
 const editVehicleTemplateActionSchema = z.strictObject({
     type: z.literal('[VehicleTemplate] Edit vehicleTemplate'),
     id: vehicleTemplateSchema.shape.id,
-    name: z.string(),
+    name: vehicleTemplateSchema.shape.name,
     vehicleType: vehicleTemplateSchema.shape.vehicleType,
-    patientCapacity: z.number(),
-    image: imagePropertiesSchema,
-    materialTemplateIds: z.array(materialTemplateSchema.shape.id),
-    personnelTemplateIds: z.array(personnelTemplateSchema.shape.id),
+    patientCapacity: vehicleTemplateSchema.shape.patientCapacity,
+    image: vehicleTemplateSchema.shape.image,
+    materialTemplateIds: vehicleTemplateSchema.shape.materialTemplateIds,
+    personnelTemplateIds: vehicleTemplateSchema.shape.personnelTemplateIds,
 });
 export type EditVehicleTemplateAction = Immutable<
     z.infer<typeof editVehicleTemplateActionSchema>

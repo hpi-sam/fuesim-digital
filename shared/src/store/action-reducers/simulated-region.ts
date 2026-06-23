@@ -20,7 +20,6 @@ import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-av
 import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
 import { simulatedRegionSchema } from '../../models/simulated-region.js';
 import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
-import { sizeSchema } from '../../models/utils/size.js';
 import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
@@ -65,7 +64,7 @@ const resizeSimulatedRegionActionSchema = z.strictObject({
     type: z.literal('[SimulatedRegion] Resize simulated region'),
     simulatedRegionId: simulatedRegionSchema.shape.id,
     targetPosition: mapCoordinatesSchema,
-    newSize: sizeSchema,
+    newSize: simulatedRegionSchema.shape.size,
 });
 export type ResizeSimulatedRegionAction = Immutable<
     z.infer<typeof resizeSimulatedRegionActionSchema>
@@ -74,7 +73,7 @@ export type ResizeSimulatedRegionAction = Immutable<
 const renameSimulatedRegionActionSchema = z.strictObject({
     type: z.literal('[SimulatedRegion] Rename simulated region'),
     simulatedRegionId: simulatedRegionSchema.shape.id,
-    newName: z.string(),
+    newName: simulatedRegionSchema.shape.name,
 });
 export type RenameSimulatedRegionAction = Immutable<
     z.infer<typeof renameSimulatedRegionActionSchema>

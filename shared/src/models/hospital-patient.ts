@@ -58,7 +58,7 @@ export function newHospitalPatientFromPatient(
     vehicleType: string,
     startTime: number,
     arrivalTime: number
-): WritableDraft<HospitalPatient> {
+): HospitalPatient {
     return {
         patientId: patient.id,
         type: 'hospitalPatient',

@@ -51,7 +51,7 @@ export type RemoveMeasureTemplateAction = Immutable<
 >;
 export namespace MeasureTemplateActionReducers {
     export const addMeasureTemplate: ActionReducer<AddMeasureTemplateAction> = {
-        type: '[MeasureTemplate] Add MeasureTemplate',
+        type: addMeasureTemplateActionSchema.shape.type.value,
         actionSchema: addMeasureTemplateActionSchema,
         reducer: (draftState, { measureTemplate, categoryName }) => {
             const templateAlreadyExists = Object.values(
@@ -72,7 +72,7 @@ export namespace MeasureTemplateActionReducers {
 
     export const editMeasureTemplate: ActionReducer<EditMeasureTemplateAction> =
         {
-            type: '[MeasureTemplate] Edit MeasureTemplate',
+            type: editMeasureTemplateActionSchema.shape.type.value,
             actionSchema: editMeasureTemplateActionSchema,
             reducer: (
                 draftState,
@@ -89,7 +89,7 @@ export namespace MeasureTemplateActionReducers {
 
     export const changeCategoryOfMeasureTemplate: ActionReducer<ChangeCategoryOfMeasureTemplateAction> =
         {
-            type: '[MeasureTemplate] Change Category of MeasureTemplate',
+            type: changeCategoryOfMeasureTemplateActionSchema.shape.type.value,
             actionSchema: changeCategoryOfMeasureTemplateActionSchema,
             reducer: (draftState, { id, categoryName: category }) => {
                 const previousCategory = getCategoryForMeasureTemplateId(
@@ -113,7 +113,7 @@ export namespace MeasureTemplateActionReducers {
 
     export const removeMeasureTemplate: ActionReducer<RemoveMeasureTemplateAction> =
         {
-            type: '[MeasureTemplate] Remove MeasureTemplate',
+            type: removeMeasureTemplateActionSchema.shape.type.value,
             actionSchema: removeMeasureTemplateActionSchema,
             reducer: (draftState, { id }) => {
                 const category = getCategoryForMeasureTemplateId(

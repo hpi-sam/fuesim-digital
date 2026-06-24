@@ -1,5 +1,5 @@
 import { groupBy } from 'lodash-es';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { z } from 'zod';
 import {
     getActivityById,
@@ -35,8 +35,8 @@ export const assignLeaderBehaviorStateSchema = z.strictObject({
     leaderId: uuidSchema.optional(),
 });
 
-export type AssignLeaderBehaviorState = z.infer<
-    typeof assignLeaderBehaviorStateSchema
+export type AssignLeaderBehaviorState = Immutable<
+    z.infer<typeof assignLeaderBehaviorStateSchema>
 >;
 
 export function newAssignLeaderBehaviorState(): AssignLeaderBehaviorState {

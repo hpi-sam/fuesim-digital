@@ -93,6 +93,7 @@ export class VehicleTemplateFormComponent implements OnChanges {
                     aspectRatio,
                     height: valuesOnSubmit.height,
                     patientCapacity: valuesOnSubmit.patientCapacity,
+                    patientLoadMinutes: valuesOnSubmit.patientLoadMinutes,
                     materialTemplateIds: valuesOnSubmit.materialTemplates.map(
                         (template) => template.id
                     ),
@@ -145,6 +146,7 @@ export interface EditableVehicleTemplateValues {
     url: string | null;
     height: number;
     patientCapacity: number;
+    patientLoadMinutes: number;
     materialTemplates: MaterialTemplate[];
     personnelTemplates: PersonnelTemplate[];
 }
@@ -156,6 +158,7 @@ export interface ChangedVehicleTemplateValues {
     aspectRatio: number;
     height: number;
     patientCapacity: number;
+    patientLoadMinutes: number;
     materialTemplateIds: UUID[];
     personnelTemplateIds: UUID[];
 }

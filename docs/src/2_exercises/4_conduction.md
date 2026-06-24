@@ -58,11 +58,11 @@ Jeder Teilnehmer muss nach der Anmeldung einzeln freigeschaltet werden, um an de
 > [!NOTE]
 > Die Transferübersicht kann von Übungsleitenden im [Hauptmenü](2_user_interfaces.md#hauptmenü) über <kbd>Durchführung</kbd> → <kbd>Transferübersicht</kbd> geöffnet werden.
 
-Fahrzeuge und Personal, die Teil einer Übung sind, können zu einem [Transferpunkt](3_exercise_elements.md#transferpunkte) transferiert werden. Ein Transfer kann von einem anderen Transferpunkt oder einer [Alarmierungsgruppe](3_exercise_elements.md#alarmierungsgruppen) ausgehen.
+Fahrzeuge und Personal, die Teil einer Übung sind, können zu einem [Transferpunkt](3_exercise_elements.md#transferpunkte) transferiert werden. Ein Transfer kann von einem anderen Transferpunkt oder einer [Alarmgruppe](3_exercise_elements.md#alarmgruppen) ausgehen.
 
 Fahrzeuge und Personal in diesem Zustand sind auf der Karte _nicht_ sichtbar. Stattdessen läuft für sie ein versteckter Countdown bis zur Ankunft am Zieltransferpunkt. Übungsleitende haben in einem Übersichtsfenster die Möglichkeit, alle laufenden Transfers einzusehen und anzupassen.
 
-Im Fenster <kbd>Transferübersicht</kbd> wird in einer Tabelle die Liste aller Fahrzeuge und des Personals angezeigt, die sich aktuell im Transfer befinden. Die Einträge sind nach der Reihenfolge der Transferstarts sortiert. Nach einer Spalte für den Namen des Fahrzeuges oder Personals und einer für den Startpunkt ([Transferpunkt](3_exercise_elements.md#transferpunkte) oder [Alarmierungsgruppe](3_exercise_elements.md#alarmierungsgruppen)) wird in einer weiteren Spalte der Zieltransferpunkt angezeigt. Durch Klick auf den aktuellen Zieltransferpunkt öffnet sich eine Auswahl, in der ein beliebiger anderer Transferpunkt als Ziel ausgewählt werden kann.
+Im Fenster <kbd>Transferübersicht</kbd> wird in einer Tabelle die Liste aller Fahrzeuge und des Personals angezeigt, die sich aktuell im Transfer befinden. Die Einträge sind nach der Reihenfolge der Transferstarts sortiert. Nach einer Spalte für den Namen des Fahrzeuges oder Personals und einer für den Startpunkt ([Transferpunkt](3_exercise_elements.md#transferpunkte) oder [Alarmgruppe](3_exercise_elements.md#alarmgruppen)) wird in einer weiteren Spalte der Zieltransferpunkt angezeigt. Durch Klick auf den aktuellen Zieltransferpunkt öffnet sich eine Auswahl, in der ein beliebiger anderer Transferpunkt als Ziel ausgewählt werden kann.
 
 In der letzten Spalte wird mittig ein Countdown für die Zeit bis zur Ankunft am Zieltransferpunkt angezeigt. Durch einen Klick auf diesen Countdown-Timer wird der Transfer pausiert oder wieder gestartet. Mit den links und rechts angrenzenden Buttons <kbd>-5 min</kbd>, <kbd>-1 min</kbd>, <kbd>+1 min</kbd> und <kbd>+5 min</kbd> kann die Eintreffzeit in 1- bzw. 5-Minuten-Schritten angepasst werden.
 
@@ -83,7 +83,7 @@ Der Bereich <kbd>Alarmierungen</kbd> kann auf zwei Arten betrachtet werden, zwis
 
 Im vereinfachten Layout gibt es ein Dropdown-Menü <kbd>Ziel auswählen</kbd>, mit dem ein Transferpunkt ausgewählt werden kann. In Szenarien mit vielen [Transferpunkten](3_exercise_elements.md#transferpunkte) kann über eine Textsuche nach dem gewünschten Punkt gesucht werden.
 
-Unterhalb der Zielauswahl befinden sich Buttons für alle in der Übung verfügbaren [Alarmierungsgruppen](3_exercise_elements.md#alarmierungsgruppen). Bei Alarmierungsgruppen mit begrenzter Anzahl an Auslösungen wird die Anzahl der verbleibenden Auslösungen hinter dem Namen der Alarmgruppe angezeigt. Unabhängig von eventuellen Begrenzungen wird bei jeder Gruppe, die bereits mindestens einmal alarmiert wurde, der Hinweis <kbd>bereits alarmiert</kbd> hinter ihrem Namen angezeigt. Wenn kein Ziel gewählt ist oder eine Auslösung aufgrund der Begrenzung nicht mehr möglich ist, wird der jeweilige Button ausgegraut.
+Unterhalb der Zielauswahl befinden sich Buttons für alle in der Übung verfügbaren [Alarmgruppen](3_exercise_elements.md#alarmgruppen). Bei Alarmgruppen mit begrenzter Anzahl an Auslösungen wird die Anzahl der verbleibenden Auslösungen hinter dem Namen der Alarmgruppe angezeigt. Unabhängig von eventuellen Begrenzungen wird bei jeder Gruppe, die bereits mindestens einmal alarmiert wurde, der Hinweis <kbd>bereits alarmiert</kbd> hinter ihrem Namen angezeigt. Wenn kein Ziel gewählt ist oder eine Auslösung aufgrund der Begrenzung nicht mehr möglich ist, wird der jeweilige Button ausgegraut.
 
 Mit einem Klick auf den jeweiligen Button wird die entsprechende Alarmgruppe ausgelöst, was bedeutet, dass die jeweiligen [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) mit den hinterlegten Zeiten in den Transfer zum ausgewählten Transferpunkt gehen.
 
@@ -91,7 +91,7 @@ Mit einem Klick auf den jeweiligen Button wird die entsprechende Alarmgruppe aus
 
 ![Alarmierungen mit komplexem Layout](./conduction_eco_complex.png)
 
-Im komplexen Layout wird zunächst die [Alarmierungsgruppe](3_exercise_elements.md#alarmierungsgruppen) über ein Dropdown-Menü ausgewählt und anschließend im zweiten Dropdown-Menü der [Zieltransferpunkt](3_exercise_elements.md#transferpunkte).
+Im komplexen Layout wird zunächst die [Alarmgruppe](3_exercise_elements.md#alarmgruppen) über ein Dropdown-Menü ausgewählt und anschließend im zweiten Dropdown-Menü der [Zieltransferpunkt](3_exercise_elements.md#transferpunkte).
 
 Zusätzlich kann unter der Überschrift <kbd>Abweichendes Ziel für die ersten Fahrzeuge</kbd> eine Anzahl von Fahrzeugen ausgewählt werden, die an einem abweichenden Transferpunkt eintreffen. Sobald ein Wert größer oder gleich 1 eingegeben wurde, muss auch ein zusätzlicher [Zieltransferpunkt](3_exercise_elements.md#transferpunkte) im entsprechenden Dropdown-Menü ausgewählt werden. An dieses Ziel werden dann die ersten X Fahrzeuge der Alarmgruppe geschickt.
 

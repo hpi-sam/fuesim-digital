@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { positionSchema } from './utils/position/position.js';
 import { type Size, sizeSchema } from './utils/size.js';
@@ -17,7 +18,7 @@ export const viewportSchema = z.strictObject({
     size: sizeSchema,
     name: z.string(),
 });
-export type Viewport = z.infer<typeof viewportSchema>;
+export type Viewport = Immutable<z.infer<typeof viewportSchema>>;
 
 export const viewportImage: ImageProperties = {
     url: 'assets/viewport.svg',

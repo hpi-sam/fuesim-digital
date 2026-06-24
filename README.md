@@ -6,7 +6,7 @@ This is the codebase for the "FüSim Digital", a simulation system for training 
 
 It originally was a digital implementation of the "FüSim MANV" (Führungssimulation Massenanfall von Verletzen), a German simulation system for training emergency medical services leadership personnel on how to manage [Mass Casualty Incidents](https://en.wikipedia.org/wiki/Mass-casualty_incident).
 
-**You can try it out at [https://fuesim-manv.de/](https://fuesim-manv.de/)**.
+**You can try it out at [https://fuesim.digital/](https://fuesim.digital/)**.
 
 ![image](https://user-images.githubusercontent.com/18506183/172071147-24b9aabe-51ee-4105-a5a4-6cbf8063eece.png)
 _A screenshot of a part of an MCI exercise with initially ca. 50 patients at the Brandenburg Gate._

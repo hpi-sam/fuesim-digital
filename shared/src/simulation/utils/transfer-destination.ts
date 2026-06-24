@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const transferDestinationTypeAllowedValues = [
     'hospital',
@@ -8,4 +9,6 @@ export const transferDestinationTypeAllowedValues = [
 export const transferDestinationTypeSchema = z.literal(
     transferDestinationTypeAllowedValues
 );
-export type TransferDestination = z.infer<typeof transferDestinationTypeSchema>;
+export type TransferDestination = Immutable<
+    z.infer<typeof transferDestinationTypeSchema>
+>;

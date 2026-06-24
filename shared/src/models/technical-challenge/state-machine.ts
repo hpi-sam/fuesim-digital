@@ -258,7 +258,7 @@ function isTimerGuardFulfilled(
     return progressPercentage >= timerGuard.minProgress;
 }
 
-export type Transition = z.infer<typeof transitionSchema>;
+export type Transition = Immutable<z.infer<typeof transitionSchema>>;
 
 export const stateMachineDefinitionSchema = z.strictObject({
     id: uuidSchema.brand<'StateMachineId'>(),

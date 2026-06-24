@@ -1,11 +1,10 @@
-import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../state.js';
 import type { UUID } from '../../utils/uuid.js';
 import { getElement } from '../../store/action-reducers/utils/get-element.js';
 import { isInSpecificVehicle } from './position/position-helpers.js';
 
 export function amountOfResourcesInVehicle(
-    state: WritableDraft<ExerciseState>,
+    state: ExerciseState,
     vehicleId: UUID
 ) {
     const vehicle = getElement(state, 'vehicle', vehicleId);

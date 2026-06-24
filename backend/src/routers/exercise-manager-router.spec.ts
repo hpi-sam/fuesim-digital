@@ -3,6 +3,7 @@ import type {
     OrganisationMembershipRole,
     PatchExerciseTemplateRequestData,
     PostExerciseTemplateRequestData,
+    StateExport,
 } from 'fuesim-digital-shared';
 import {
     exerciseKeysSchema,
@@ -10,7 +11,6 @@ import {
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     newViewport,
-    StateExport,
 } from 'fuesim-digital-shared';
 import {
     alternativeTestUserSessionData,
@@ -278,9 +278,13 @@ describe('exercise manager router', () => {
                 null
             );
 
-            const exportData = new StateExport(
-                exercise.exercise.currentStateString
-            );
+            const exportData: StateExport = {
+                type: 'complete',
+                currentState: exercise.exercise.currentStateString,
+                history: undefined,
+                fileVersion: 1,
+                dataVersion: exercise.exercise.stateVersion,
+            };
             const response = await environment
                 .httpRequest('post', '/api/exercise_templates/', session)
                 .send({

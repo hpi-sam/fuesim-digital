@@ -1,3 +1,4 @@
+import { ZodError } from 'zod';
 import type { MapCoordinates } from '../models/utils/position/map-coordinates.js';
 import { newViewport } from '../models/viewport.js';
 import { validateExerciseAction } from './validate-exercise-action.js';
@@ -10,7 +11,7 @@ describe('validateExerciseAction', () => {
                 type: '[Viewport] Remove viewport',
                 viewportId: 'b02c7756-ea52-427f-9fc3-0e163799544d',
             })
-        ).toEqual([]);
+        ).toBeDefined();
         expect(
             validateExerciseAction({
                 type: '[Viewport] Add viewport',
@@ -22,47 +23,39 @@ describe('validateExerciseAction', () => {
                     ''
                 ),
             })
-        ).toEqual([]);
+        ).toBeDefined();
     });
 
     it("should reject everything that isn't an action object", () => {
-        expect(validateExerciseAction(2 as any)).not.toEqual([]);
-        expect(validateExerciseAction(true as any)).not.toEqual([]);
-        expect(validateExerciseAction(Error('anything') as any)).not.toEqual(
-            []
-        );
-        expect(validateExerciseAction({} as any)).not.toEqual([]);
-        expect(validateExerciseAction([] as any)).not.toEqual([]);
+        expect(() => validateExerciseAction(2 as any)).toThrow();
+        expect(() => validateExerciseAction(true as any)).toThrow();
+        expect(() =>
+            validateExerciseAction(Error('anything') as any)
+        ).toThrow();
+        expect(() => validateExerciseAction({} as any)).toThrow();
+        expect(() => validateExerciseAction([] as any)).toThrow();
     });
 
     it('should reject an action object with an invalid type', () => {
-        expect(validateExerciseAction({ type: 'a' } as any)).not.toEqual([]);
+        expect(() => validateExerciseAction({ type: 'a' } as any)).toThrow();
         expect(
             // there is a typo in the type
-            validateExerciseAction({ type: '[Viewport] AddViewport' } as any)
-        ).not.toEqual([]);
+            () =>
+                validateExerciseAction({
+                    type: '[Viewport] AddViewport',
+                } as any)
+        ).toThrow(ZodError);
     });
 
     it('should reject an invalid action object', () => {
-        expect(
+        expect(() =>
             validateExerciseAction({
                 type: '[Viewport] Remove viewport',
                 // missing viewportId
             } as ExerciseAction)
-        ).toEqual([
-            {
-                target: {
-                    type: '[Viewport] Remove viewport',
-                    viewportId: undefined,
-                },
-                value: undefined,
-                property: 'viewportId',
-                children: [],
-                constraints: { isUuid: "Got malformed id: 'undefined'." },
-            },
-        ]);
+        ).toThrow();
 
-        expect(
+        expect(() =>
             validateExerciseAction({
                 type: '[Viewport] Add viewport',
                 viewport: {
@@ -83,12 +76,12 @@ describe('validateExerciseAction', () => {
                     },
                 },
             })
-        ).not.toEqual([]);
+        ).toThrow();
     });
 
     it('should reject an otherwise valid action object with additional fields', () => {
         // on the top level
-        expect(
+        expect(() =>
             validateExerciseAction({
                 type: '[Viewport] Add viewport',
                 viewport: {
@@ -105,9 +98,9 @@ describe('validateExerciseAction', () => {
                 },
                 someKey: 'someValue',
             } as unknown as ExerciseAction)
-        ).not.toEqual([]);
+        ).toThrow();
         // down in the structure
-        expect(
+        expect(() =>
             validateExerciseAction({
                 type: '[Viewport] Add viewport',
                 viewport: {
@@ -128,6 +121,6 @@ describe('validateExerciseAction', () => {
                     },
                 },
             })
-        ).not.toEqual([]);
+        ).toThrow();
     });
 });

@@ -8,7 +8,7 @@ import { Component, input } from '@angular/core';
     styleUrls: ['./patient-status-tags-field.component.scss'],
 })
 export class PatientStatusTagsFieldComponent implements OnChanges {
-    readonly patientStatusTagsField = input.required<PatientTag[]>();
+    readonly patientStatusTagsField = input.required<readonly PatientTag[]>();
     isPregnant!: boolean;
 
     ngOnChanges(): void {

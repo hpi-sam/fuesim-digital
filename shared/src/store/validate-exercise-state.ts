@@ -1,19 +1,10 @@
-import { plainToInstance } from 'class-transformer';
-import type { ValidationError } from 'class-validator';
-import { validateSync } from 'class-validator';
-import { ExerciseState } from '../state.js';
-import { defaultValidateOptions } from './validation-options.js';
+import { type ExerciseState, exerciseStateSchema } from '../state.js';
 
 /**
  *
- * @param state An json object that should be checked for validity.
+ * @param state An JSON object that should be checked for validity.
  * @returns An array of errors validating {@link action}. An empty array indicates a valid action object.
  */
-export function validateExerciseState(
-    state: ExerciseState
-): (ValidationError | string)[] {
-    return validateSync(
-        plainToInstance(ExerciseState, state),
-        defaultValidateOptions
-    );
+export function validateExerciseState(state: unknown): ExerciseState {
+    return exerciseStateSchema.parse(state);
 }

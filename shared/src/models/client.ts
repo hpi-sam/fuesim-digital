@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import type { ClientRole } from './client-role.js';
 import { clientRoleSchema } from './client-role.js';
@@ -12,7 +13,7 @@ export const clientSchema = z.strictObject({
     isInWaitingRoom: z.boolean(),
     isActive: z.boolean(),
 });
-export type Client = z.infer<typeof clientSchema>;
+export type Client = Immutable<z.infer<typeof clientSchema>>;
 
 export function newClient(
     name: string,

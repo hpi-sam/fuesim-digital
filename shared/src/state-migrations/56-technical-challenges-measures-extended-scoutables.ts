@@ -5,7 +5,8 @@ interface Scoutable {
     name?: string;
     viewedByParticipants?: boolean;
 }
-export const extendScoutables56: Migration = {
+
+export const technicalChallengesMeasuresExtendedScoutables56: Migration = {
     action: (intermediateState, action) => {
         const typedAction = action as { type: string };
         if (typedAction.type === '[Scoutable] Make scoutable') {
@@ -17,10 +18,16 @@ export const extendScoutables56: Migration = {
         }
         return true;
     },
-    state: (state) => {
+    state: (state: any) => {
         const typedState = state as {
             scoutables: { [key in UUID]: Scoutable };
         };
+
+        state.technicalChallenges = {};
+        state.taskTypes = {};
+        state.measures = {};
+        state.measureTemplates = {};
+        state.drawings = {};
 
         Object.values(typedState.scoutables).forEach((scoutable) => {
             scoutable.name = '';

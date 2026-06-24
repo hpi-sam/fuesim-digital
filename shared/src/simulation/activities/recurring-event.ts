@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { ExerciseSimulationEvent } from '../events/exercise-simulation-event.js';
 import { exerciseSimulationEventSchema } from '../events/exercise-simulation-event.js';
 import { sendSimulationEvent } from '../events/utils.js';
@@ -13,8 +14,8 @@ export const recurringEventActivityStateSchema = z.strictObject({
     lastOccurrenceTime: z.int().nonnegative(),
     recurrenceIntervalTime: z.int().nonnegative(),
 });
-export type RecurringEventActivityState = z.infer<
-    typeof recurringEventActivityStateSchema
+export type RecurringEventActivityState = Immutable<
+    z.infer<typeof recurringEventActivityStateSchema>
 >;
 
 export function newRecurringEventActivityState(

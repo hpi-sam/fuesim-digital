@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { RequestTarget } from '../../models/utils/request-target/request-target.js';
 import type { ExerciseRequestTargetConfiguration } from '../../models/utils/request-target/exercise-request-target.js';
 import {
@@ -18,8 +19,8 @@ export const createRequestActivityStateSchema = z.strictObject({
     requestedResource: vehicleResourceSchema,
     key: z.string(),
 });
-export type CreateRequestActivityState = z.infer<
-    typeof createRequestActivityStateSchema
+export type CreateRequestActivityState = Immutable<
+    z.infer<typeof createRequestActivityStateSchema>
 >;
 
 export function newCreateRequestActivityState(

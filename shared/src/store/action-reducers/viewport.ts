@@ -1,70 +1,65 @@
-import { IsString, IsUUID } from 'class-validator';
+import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { type Viewport, viewportSchema } from '../../models/viewport.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
-import {
-    type MapCoordinates,
-    mapCoordinatesSchema,
-} from '../../models/utils/position/map-coordinates.js';
-import { type Size, sizeSchema } from '../../models/utils/size.js';
+import type { ActionReducer } from '../action-reducer.js';
+import { viewportSchema } from '../../models/viewport.js';
+import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { getElement } from './utils/get-element.js';
 
-export class AddViewportAction implements Action {
-    @IsValue('[Viewport] Add viewport' as const)
-    readonly type = '[Viewport] Add viewport';
-    @IsZodSchema(viewportSchema)
-    public viewport!: Viewport;
-}
+const addViewportActionSchema = z.strictObject({
+    type: z.literal('[Viewport] Add viewport'),
+    viewport: viewportSchema,
+});
+export type AddViewportAction = Immutable<
+    z.infer<typeof addViewportActionSchema>
+>;
 
-export class RemoveViewportAction implements Action {
-    @IsValue('[Viewport] Remove viewport' as const)
-    public readonly type = '[Viewport] Remove viewport';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly viewportId!: UUID;
-}
+const removeViewportActionSchema = z.strictObject({
+    type: z.literal('[Viewport] Remove viewport'),
+    viewportId: viewportSchema.shape.id,
+});
+export type RemoveViewportAction = Immutable<
+    z.infer<typeof removeViewportActionSchema>
+>;
 
-export class MoveViewportAction implements Action {
-    @IsValue('[Viewport] Move viewport' as const)
-    public readonly type = '[Viewport] Move viewport';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly viewportId!: UUID;
-    @IsZodSchema(mapCoordinatesSchema)
-    public readonly targetPosition!: MapCoordinates;
-}
+const moveViewportActionSchema = z.strictObject({
+    type: z.literal('[Viewport] Move viewport'),
+    viewportId: viewportSchema.shape.id,
+    targetPosition: mapCoordinatesSchema,
+});
 
-export class ResizeViewportAction implements Action {
-    @IsValue('[Viewport] Resize viewport' as const)
-    public readonly type = '[Viewport] Resize viewport';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly viewportId!: UUID;
-    @IsZodSchema(mapCoordinatesSchema)
-    public readonly targetPosition!: MapCoordinates;
-    @IsZodSchema(sizeSchema)
-    public readonly newSize!: Size;
-}
+export type MoveViewportAction = Immutable<
+    z.infer<typeof moveViewportActionSchema>
+>;
 
-export class RenameViewportAction implements Action {
-    @IsValue('[Viewport] Rename viewport' as const)
-    public readonly type = '[Viewport] Rename viewport';
+const resizeViewportActionSchema = z.strictObject({
+    type: z.literal('[Viewport] Resize viewport'),
+    viewportId: viewportSchema.shape.id,
+    targetPosition: mapCoordinatesSchema,
+    newSize: viewportSchema.shape.size,
+});
+export type ResizeViewportAction = Immutable<
+    z.infer<typeof resizeViewportActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly viewportId!: UUID;
-
-    @IsString()
-    public readonly newName!: string;
-}
+const renameViewportActionSchema = z.strictObject({
+    type: z.literal('[Viewport] Rename viewport'),
+    viewportId: viewportSchema.shape.id,
+    newName: viewportSchema.shape.name,
+});
+export type RenameViewportAction = Immutable<
+    z.infer<typeof renameViewportActionSchema>
+>;
 
 export namespace ViewportActionReducers {
     export const addViewport: ActionReducer<AddViewportAction> = {
-        action: AddViewportAction,
+        type: addViewportActionSchema.shape.type.value,
+        actionSchema: addViewportActionSchema,
         reducer: (draftState, { viewport }) => {
             draftState.viewports[viewport.id] = cloneDeepMutable(viewport);
             return draftState;
@@ -73,7 +68,8 @@ export namespace ViewportActionReducers {
     };
 
     export const removeViewport: ActionReducer<RemoveViewportAction> = {
-        action: RemoveViewportAction,
+        type: removeViewportActionSchema.shape.type.value,
+        actionSchema: removeViewportActionSchema,
         reducer: (draftState, { viewportId }) => {
             getElement(draftState, 'viewport', viewportId);
             delete draftState.viewports[viewportId];
@@ -83,7 +79,8 @@ export namespace ViewportActionReducers {
     };
 
     export const moveViewport: ActionReducer<MoveViewportAction> = {
-        action: MoveViewportAction,
+        type: moveViewportActionSchema.shape.type.value,
+        actionSchema: moveViewportActionSchema,
         reducer: (draftState, { viewportId, targetPosition }) => {
             changePositionWithId(
                 viewportId,
@@ -97,7 +94,8 @@ export namespace ViewportActionReducers {
     };
 
     export const resizeViewport: ActionReducer<ResizeViewportAction> = {
-        action: ResizeViewportAction,
+        type: resizeViewportActionSchema.shape.type.value,
+        actionSchema: resizeViewportActionSchema,
         reducer: (draftState, { viewportId, targetPosition, newSize }) => {
             const viewport = getElement(draftState, 'viewport', viewportId);
             changePosition(
@@ -112,7 +110,8 @@ export namespace ViewportActionReducers {
     };
 
     export const renameViewport: ActionReducer<RenameViewportAction> = {
-        action: RenameViewportAction,
+        type: renameViewportActionSchema.shape.type.value,
+        actionSchema: renameViewportActionSchema,
         reducer: (draftState, { viewportId, newName }) => {
             const viewport = getElement(draftState, 'viewport', viewportId);
             viewport.name = newName;

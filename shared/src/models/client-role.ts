@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { Role, SpecificRole } from './utils/role.js';
 import { roleSchema, specificRoleSchema } from './utils/role.js';
 
@@ -7,7 +8,7 @@ export const clientRoleSchema = z.strictObject({
     mainRole: roleSchema,
     specificRole: specificRoleSchema,
 });
-export type ClientRole = z.infer<typeof clientRoleSchema>;
+export type ClientRole = Immutable<z.infer<typeof clientRoleSchema>>;
 
 export function newClientRole(
     mainRole: Role,

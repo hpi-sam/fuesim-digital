@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { patientStatusSchema } from '../utils/patient-status.js';
 import type { UUID } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
@@ -18,8 +19,8 @@ export const transferCountsRadiogramSchema = z.strictObject({
     ),
     scope: transferProgressScopeSchema,
 });
-export type TransferCountsRadiogram = z.infer<
-    typeof transferCountsRadiogramSchema
+export type TransferCountsRadiogram = Immutable<
+    z.infer<typeof transferCountsRadiogramSchema>
 >;
 
 export function newTransferCountsRadiogram(

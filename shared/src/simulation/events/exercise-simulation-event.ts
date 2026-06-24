@@ -1,5 +1,6 @@
 import type { ZodType } from 'zod';
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { materialAvailableEventSchema } from './material-available.js';
 import { newPatientEventSchema } from './new-patient.js';
 import { personnelAvailableEventSchema } from './personnel-available.js';
@@ -68,8 +69,8 @@ export const exerciseSimulationEventSchema = z.discriminatedUnion('type', [
     patientsCountedEventSchema,
 ]);
 
-export type ExerciseSimulationEvent = z.infer<
-    typeof exerciseSimulationEventSchema
+export type ExerciseSimulationEvent = Immutable<
+    z.infer<typeof exerciseSimulationEventSchema>
 >;
 
 type ExerciseSimulationEventDictionary = {

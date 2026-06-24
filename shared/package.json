@@ -1,6 +1,6 @@
 {
     "name": "fuesim-digital-shared",
-    "version": "0.14.0",
+    "version": "0.16.0",
     "type": "module",
     "main": "./dist/index.js",
     "esnext": "./dist/index.js",
@@ -34,15 +34,12 @@
     },
     "dependencies": {
         "@noble/hashes": "^1.7.1",
-        "class-transformer": "^0.5.1",
-        "class-validator": "^0.14.1",
         "immer": "^10.1.1",
         "lodash-es": "^4.17.23",
         "ol": "^10.6.1",
         "papaparse": "^5.5.3",
         "rbush": "^4.0.1",
         "rbush-knn": "^4.0.0",
-        "reflect-metadata": "^0.2.2",
         "uuid": "^14.0.0",
         "zod": "^4.1.13"
     },

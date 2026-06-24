@@ -92,8 +92,9 @@ Note however that this results in a) all history being saved in memory instead o
 
 ### Note on long term storage
 
-The current setup when using a database is that no exercises get deleted unless anyone deletes them from the UI (or, more precisely, using the HTTP request `DELETE /api/exercises/:exerciseId`).
 An average exercise with four sections being actively played and about 45 minutes of exercise time seems to take up about 10 MB of storage in the database.
 This is not much in itself, but if many exercises of this size are run each day, it can scale quickly.
 Also, note that there can never be more than 10,000 exercises because then the id generator fails.
-Finally, note that it may be an issue of data protection laws like the [GDPR](https://gdpr.eu/) when user data never gets deleted, even after years of not using it.
+
+Therefore, anonynmous, unused exercises automatically get deleted after a certain amount of time (per default 30 days, configurable via `DFM_AUTO_DELETE_DAYS`).
+Exercises that are templates, part of a parallel exercise, or stored in a user account won't get deleted automatically.

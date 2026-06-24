@@ -47,8 +47,8 @@ export class AlarmModalComponent {
     );
 
     public readonly templateName = signal('Nachalarmierung');
-    private readonly inputAlarmGroupIds = signal<UUID[]>([]);
-    private readonly inputTransferPointIds = signal<UUID[]>([]);
+    private readonly inputAlarmGroupIds = signal<readonly UUID[]>([]);
+    private readonly inputTransferPointIds = signal<readonly UUID[]>([]);
 
     public readonly allowedAlarmGroupIds = computed(() =>
         this.inputAlarmGroupIds().length === 0
@@ -79,8 +79,8 @@ export class AlarmModalComponent {
     });
 
     public initialize(
-        alarmGroupIds: UUID[],
-        transferPointIds: UUID[],
+        alarmGroupIds: readonly UUID[],
+        transferPointIds: readonly UUID[],
         templateName?: string
     ) {
         this.inputAlarmGroupIds.set(alarmGroupIds);

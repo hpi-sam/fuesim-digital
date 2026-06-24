@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
@@ -7,8 +8,8 @@ export const materialAvailableEventSchema = z.strictObject({
     type: z.literal('materialAvailableEvent'),
     materialId: uuidSchema,
 });
-export type MaterialAvailableEvent = z.infer<
-    typeof materialAvailableEventSchema
+export type MaterialAvailableEvent = Immutable<
+    z.infer<typeof materialAvailableEventSchema>
 >;
 
 export function newMaterialAvailableEvent(

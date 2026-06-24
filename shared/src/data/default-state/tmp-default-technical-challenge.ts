@@ -476,6 +476,9 @@ export namespace StateMachineTesting {
                 '<p>Im Keller des Gebäudes wird eine Person vermisst. Letzte bekannte Position: Heizungsraum.</p>',
         }
     );
+
+    export const defaultStateMachineId =
+        'd4c67365-0195-48ac-8514-c343353ffeb7' as StateMachine['id'];
 }
 
 function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
@@ -500,6 +503,7 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     const burnedOutAndPatientDead = StateMachineTesting.burnedOutAndPatientDead;
     const burnedOutButRescued = StateMachineTesting.burnedOutButRescued;
     const initialState = StateMachineTesting.initialState;
+    const stateMachineId = StateMachineTesting.defaultStateMachineId;
 
     const tasks: StateMachine['tasks'] = {
         [extinguishFireTask.id]: {
@@ -540,8 +544,6 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
         )
     ) as { [key: StateMachineState['id']]: StateMachineState };
 
-    const stateMachineId =
-        'd4c67365-0195-48ac-8514-c343353ffeb7' as StateMachine['id'];
     return {
         stateMachines: {
             [stateMachineId]: {

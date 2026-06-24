@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { radiogramStatusSchema } from './radiogram-status.js';
 
 export const radiogramUnreadStatus = z.strictObject({
@@ -6,7 +7,9 @@ export const radiogramUnreadStatus = z.strictObject({
     type: z.literal('unreadRadiogramStatus'),
     publishTime: z.int().nonnegative(),
 });
-export type RadiogramUnreadStatus = z.infer<typeof radiogramUnreadStatus>;
+export type RadiogramUnreadStatus = Immutable<
+    z.infer<typeof radiogramUnreadStatus>
+>;
 
 export function newRadiogramUnreadStatus(
     publishTime: number

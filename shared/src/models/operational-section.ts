@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import type { Immutable } from 'immer';
 import { uuidSchema } from '../utils/uuid.js';
 
 export const operationalSectionSchema = z.object({
@@ -7,7 +8,9 @@ export const operationalSectionSchema = z.object({
     title: z.string().optional(),
 });
 
-export type OperationalSection = z.infer<typeof operationalSectionSchema>;
+export type OperationalSection = Immutable<
+    z.infer<typeof operationalSectionSchema>
+>;
 
 export const localOperationsCommandAssignmentSchema = z.strictObject({
     type: z.literal('localOperationsCommand'),
@@ -34,8 +37,8 @@ export const operationalSectionAssignmentSchema = z.union([
     operationalSectionMemberAssignmentSchema,
 ]);
 
-export type OperationalSectionAssignment = z.infer<
-    typeof operationalSectionAssignmentSchema
+export type OperationalSectionAssignment = Immutable<
+    z.infer<typeof operationalSectionAssignmentSchema>
 >;
 
 export const operationalAssignmentSchema = z.union([
@@ -43,4 +46,6 @@ export const operationalAssignmentSchema = z.union([
     operationalSectionAssignmentSchema,
 ]);
 
-export type OperationalAssignment = z.infer<typeof operationalAssignmentSchema>;
+export type OperationalAssignment = Immutable<
+    z.infer<typeof operationalAssignmentSchema>
+>;

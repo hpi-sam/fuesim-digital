@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     type VehicleResource,
     vehicleResourceSchema,
@@ -10,7 +11,7 @@ export const resourcePromiseSchema = z.strictObject({
     resource: vehicleResourceSchema,
 });
 
-export type ResourcePromise = z.infer<typeof resourcePromiseSchema>;
+export type ResourcePromise = Immutable<z.infer<typeof resourcePromiseSchema>>;
 
 export function newResourcePromise(
     promisedTime: number,

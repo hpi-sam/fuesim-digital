@@ -1,26 +1,18 @@
-import { Type } from 'class-transformer';
-import {
-    IsArray,
-    ValidateNested,
-    IsBoolean,
-    IsInt,
-    IsPositive,
-    IsUUID,
-    IsString,
-} from 'class-validator';
-import { WritableDraft } from 'immer';
+import type { WritableDraft, Immutable } from 'immer';
+import { z } from 'zod';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
 import { simulateAllRegions } from '../../simulation/utils/simulation.js';
 import type { ExerciseState } from '../../state.js';
 import type { ElementTypePluralMap } from '../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../utils/element-type-plural-map.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
 import { createPersonnelTypeTag } from '../../models/utils/tag-helpers.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
-import { PartialExport } from '../../export-import/file-format/partial-export.js';
+import {
+    type MigratedPartialExport,
+    migratedPartialExportSchema,
+} from '../../export-import/file-format/partial-export.js';
 import { getStatus } from '../../models/utils/health-points.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import type { Personnel } from '../../models/personnel.js';
@@ -29,12 +21,13 @@ import {
     currentTransferOf,
     isInTransfer,
 } from '../../models/utils/position/position-helpers.js';
-import { type UUID, uuid, uuidValidationOptions } from '../../utils/uuid.js';
+import { type UUID, uuid } from '../../utils/uuid.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import { ParticipantKey } from '../../exercise-keys.js';
+import type { ParticipantKey } from '../../exercise-keys.js';
 import { simulateAllTechnicalChallenges } from '../../models/technical-challenge/state-machine.js';
-import { PatientUpdate } from './utils/patient-updates.js';
+import { viewportSchema } from '../../models/viewport.js';
+import { patientUpdateSchema } from './utils/patient-updates.js';
 import {
     logPatientVisibleStatusChanged,
     logActive,
@@ -44,61 +37,55 @@ import { updateTreatments } from './utils/calculate-treatments.js';
 import { letElementArrive } from './transfer.js';
 import type { TransferableElementType } from './transfer.js';
 
-export class PauseExerciseAction implements Action {
-    @IsValue('[Exercise] Pause' as const)
-    public readonly type = '[Exercise] Pause';
-}
+export const pauseExerciseActionSchema = z.strictObject({
+    type: z.literal('[Exercise] Pause'),
+});
+export type PauseExerciseAction = Immutable<
+    z.infer<typeof pauseExerciseActionSchema>
+>;
 
-export class StartExerciseAction implements Action {
-    @IsValue('[Exercise] Start' as const)
-    public readonly type = '[Exercise] Start';
-}
+export const startExerciseActionSchema = z.strictObject({
+    type: z.literal('[Exercise] Start'),
+});
+export type StartExerciseAction = Immutable<
+    z.infer<typeof startExerciseActionSchema>
+>;
 
-export class SetAutojoinViewportAction implements Action {
-    @IsValue('[Exercise] Set autojoin viewport' as const)
-    public readonly type = '[Exercise] Set autojoin viewport';
+export const setAutojoinViewportActionSchema = z.strictObject({
+    type: z.literal('[Exercise] Set autojoin viewport'),
+    viewportId: viewportSchema.shape.id,
+});
+export type SetAutojoinViewportAction = Immutable<
+    z.infer<typeof setAutojoinViewportActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly viewportId!: UUID;
-}
-
-export class ExerciseTickAction implements Action {
-    @IsValue('[Exercise] Tick' as const)
-    public readonly type = '[Exercise] Tick';
-
-    @IsArray()
-    @ValidateNested()
-    @Type(() => PatientUpdate)
-    public readonly patientUpdates!: readonly PatientUpdate[];
-
+export const exerciseTickActionSchema = z.strictObject({
+    type: z.literal('[Exercise] Tick'),
+    patientUpdates: z.array(patientUpdateSchema),
     /**
      * If true, it is updated which personnel and material treats which patient.
      * This shouldn't be done every tick, because else it could happen that personnel and material "jumps" too fast
      * between two patients. Keep in mind that the treatments are also updated e.g. if a patient/material/personnel etc.
-     * is e.g. moved - completely independent from the ticks.
+     * is e.g. moved - completely independent of the ticks.
      * The performance optimization resulting from not refreshing the treatments every tick is probably very small in comparison
      * to skipping all patients that didn't change their status since the last treatment calculation
      * (via {@link Patient.visibleStatusChanged}).
      */
-    @IsBoolean()
-    public readonly refreshTreatments!: boolean;
+    refreshTreatments: z.boolean(),
+    tickInterval: z.int().positive(),
+});
+export type ExerciseTickAction = Immutable<
+    z.infer<typeof exerciseTickActionSchema>
+>;
 
-    @IsInt()
-    @IsPositive()
-    public readonly tickInterval!: number;
-}
-
-export class ImportTemplatesAction implements Action {
-    @IsValue('[Exercise] Import Templates' as const)
-    public readonly type = '[Exercise] Import Templates';
-
-    @IsLiteralUnion({ append: true, overwrite: true })
-    public readonly mode!: 'append' | 'overwrite';
-
-    @ValidateNested()
-    @Type(() => PartialExport)
-    public readonly partialExport!: PartialExport;
-}
+export const importTemplatesActionSchema = z.strictObject({
+    type: z.literal('[Exercise] Import Templates'),
+    mode: z.literal(['append', 'overwrite']),
+    partialExport: migratedPartialExportSchema,
+});
+export type ImportTemplatesAction = Immutable<
+    z.infer<typeof importTemplatesActionSchema>
+>;
 
 /**
  * WARNING: THIS IS ABSOLUTELY LEGACY
@@ -108,16 +95,19 @@ export class ImportTemplatesAction implements Action {
  *
  * @deprecated
  */
-export class SetParticipantIdAction implements Action {
-    @IsString()
-    public readonly type = `[Exercise] Set Participant Id`;
-    @IsString()
-    public readonly participantId!: string;
-}
+export const setParticipantIdActionSchema = z.strictObject({
+    type: z.literal('[Exercise] Set Participant Id'),
+    participantId: z.string(),
+});
+/* @deprecated */
+export type SetParticipantIdAction = Immutable<
+    z.infer<typeof setParticipantIdActionSchema>
+>;
 
 export namespace ExerciseActionReducers {
     export const pauseExercise: ActionReducer<PauseExerciseAction> = {
-        action: PauseExerciseAction,
+        type: pauseExerciseActionSchema.shape.type.value,
+        actionSchema: pauseExerciseActionSchema,
         reducer: (draftState) => {
             if (draftState.currentStatus !== 'running') {
                 throw new ReducerError('Cannot pause not running exercise');
@@ -129,7 +119,8 @@ export namespace ExerciseActionReducers {
     };
 
     export const startExercise: ActionReducer<StartExerciseAction> = {
-        action: StartExerciseAction,
+        type: startExerciseActionSchema.shape.type.value,
+        actionSchema: startExerciseActionSchema,
         reducer: (draftState) => {
             if (draftState.currentStatus === 'running') {
                 throw new ReducerError('Cannot start already running exercise');
@@ -142,7 +133,8 @@ export namespace ExerciseActionReducers {
 
     export const setAutojoinViewport: ActionReducer<SetAutojoinViewportAction> =
         {
-            action: SetAutojoinViewportAction,
+            type: setAutojoinViewportActionSchema.shape.type.value,
+            actionSchema: setAutojoinViewportActionSchema,
             reducer: (draftState, { viewportId }) => {
                 draftState.autojoinViewportId = viewportId;
                 return draftState;
@@ -151,7 +143,8 @@ export namespace ExerciseActionReducers {
         };
 
     export const exerciseTick: ActionReducer<ExerciseTickAction> = {
-        action: ExerciseTickAction,
+        type: exerciseTickActionSchema.shape.type.value,
+        actionSchema: exerciseTickActionSchema,
         reducer: (draftState, { patientUpdates, tickInterval }) => {
             // Refresh the current time
             draftState.currentTime += tickInterval;
@@ -216,7 +209,8 @@ export namespace ExerciseActionReducers {
     };
 
     export const templateImport: ActionReducer<ImportTemplatesAction> = {
-        action: ImportTemplatesAction,
+        type: importTemplatesActionSchema.shape.type.value,
+        actionSchema: importTemplatesActionSchema,
         reducer: (draftState, { mode, partialExport }) => {
             const mutablePartialExport = cloneDeepMutable(partialExport);
             if (mutablePartialExport.mapImageTemplates !== undefined) {
@@ -266,7 +260,8 @@ export namespace ExerciseActionReducers {
      * @deprecated
      */
     export const setParticipantId: ActionReducer<SetParticipantIdAction> = {
-        action: SetParticipantIdAction,
+        type: '[Exercise] Set Participant Id',
+        actionSchema: setParticipantIdActionSchema,
         reducer: (draftState, { participantId }) => {
             draftState.participantKey = participantId as ParticipantKey;
             return draftState;
@@ -321,8 +316,8 @@ function refreshTransfer(
  * @param partialExport The {@link PartialExport} to prepare.
  */
 export function preparePartialExportForImport(
-    partialExport: PartialExport
-): PartialExport {
+    partialExport: MigratedPartialExport
+): MigratedPartialExport {
     const copy = cloneDeepMutable(partialExport);
     // `patientCategories` don't have an `id`...
     const templateTypes = ['mapImageTemplates', 'vehicleTemplates'] as const;

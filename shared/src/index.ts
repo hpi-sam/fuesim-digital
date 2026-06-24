@@ -1,6 +1,3 @@
-// this import is needed for `import { Type } from 'class-transformer';` to work
-import 'reflect-metadata';
-
 export * from './export-import/file-format/index.js';
 export * from './models/index.js';
 export * from './models/utils/index.js';

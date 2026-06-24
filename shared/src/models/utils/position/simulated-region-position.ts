@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { type UUID, uuidSchema } from '../../../utils/uuid.js';
 
 export const simulatedRegionPositionSchema = z.strictObject({
@@ -9,8 +10,8 @@ export const simulatedRegionPositionSchema = z.strictObject({
     simulatedRegionId: uuidSchema,
 });
 
-export type SimulatedRegionPosition = z.infer<
-    typeof simulatedRegionPositionSchema
+export type SimulatedRegionPosition = Immutable<
+    z.infer<typeof simulatedRegionPositionSchema>
 >;
 
 export function newSimulatedRegionPositionIn(

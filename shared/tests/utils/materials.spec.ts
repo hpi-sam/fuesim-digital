@@ -1,4 +1,4 @@
-import type { WritableDraft } from 'immer';
+import { castDraft, type WritableDraft } from 'immer';
 import { defaultMaterialTemplates } from '../../src/data/default-state/material-templates.js';
 import type { ExerciseState } from '../../src/state.js';
 import type { Position } from '../../src/models/utils/position/position.js';
@@ -14,11 +14,13 @@ export function addMaterial(
     state: WritableDraft<ExerciseState>,
     position: Position
 ) {
-    const material = newMaterialFromTemplate(
-        defaultMaterialTemplates.standard,
-        uuid(),
-        'RTW 3/83/1',
-        position
+    const material = castDraft(
+        newMaterialFromTemplate(
+            defaultMaterialTemplates.standard,
+            uuid(),
+            'RTW 3/83/1',
+            position
+        )
     );
 
     material.canCaterFor = {

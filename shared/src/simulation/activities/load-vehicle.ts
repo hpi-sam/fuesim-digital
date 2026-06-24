@@ -1,5 +1,6 @@
 import { difference } from 'lodash-es';
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
 import { sendSimulationEvent } from '../events/utils.js';
@@ -46,8 +47,8 @@ export const loadVehicleActivityStateSchema = z.strictObject({
     startTime: z.int().nonnegative(),
     successorOccupation: exerciseOccupationSchema.optional(),
 });
-export type LoadVehicleActivityState = z.infer<
-    typeof loadVehicleActivityStateSchema
+export type LoadVehicleActivityState = Immutable<
+    z.infer<typeof loadVehicleActivityStateSchema>
 >;
 
 export function newLoadVehicleActivityState(

@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { IsValue } from '../../utils/validators/is-value.js';
+import type { Immutable } from 'immer';
 import {
     type PatientCategory,
     patientCategorySchema,
@@ -13,29 +12,48 @@ import {
     type MapImageTemplate,
     mapImageTemplateSchema,
 } from '../../models/map-image-template.js';
-import { BaseExportImportFile } from './base-file.js';
+import { exportImportFileSchema } from './export-import-file.js';
 
-export class PartialExport extends BaseExportImportFile {
-    @IsValue('partial' as const)
-    public readonly type: 'partial' = 'partial';
+export const partialExportSchema = z.strictObject({
+    ...exportImportFileSchema.shape,
+    type: z.literal('partial'),
+    patientCategories: z
+        .array(
+            z.object({
+                patientTemplates: z.array(
+                    z.object({ id: z.string().optional() })
+                ),
+            })
+        )
+        .optional(),
+    vehicleTemplates: z
+        .array(z.object({ id: z.string().optional() }))
+        .optional(),
+    mapImageTemplates: z
+        .array(z.object({ id: z.string().optional() }))
+        .optional(),
+});
+export type PartialExport = Immutable<z.infer<typeof partialExportSchema>>;
 
-    @IsZodSchema(z.array(patientCategorySchema).optional())
-    public readonly patientCategories?: PatientCategory[];
+export const migratedPartialExportSchema = z.strictObject({
+    type: z.literal('partial'),
+    patientCategories: z.array(patientCategorySchema).optional(),
+    vehicleTemplates: z.array(vehicleTemplateSchema).optional(),
+    mapImageTemplates: z.array(mapImageTemplateSchema).optional(),
+});
+export type MigratedPartialExport = Immutable<
+    z.infer<typeof migratedPartialExportSchema>
+>;
 
-    @IsZodSchema(z.array(vehicleTemplateSchema).optional())
-    public readonly vehicleTemplates?: VehicleTemplate[];
-
-    @IsZodSchema(z.array(mapImageTemplateSchema).optional())
-    public readonly mapImageTemplates?: MapImageTemplate[];
-
-    public constructor(
-        patientCategories?: PatientCategory[],
-        vehicleTemplates?: VehicleTemplate[],
-        mapImageTemplates?: MapImageTemplate[]
-    ) {
-        super();
-        this.patientCategories = patientCategories;
-        this.vehicleTemplates = vehicleTemplates;
-        this.mapImageTemplates = mapImageTemplates;
-    }
+export function newMigratedPartialExport(
+    patientCategories?: readonly PatientCategory[],
+    vehicleTemplates?: readonly VehicleTemplate[],
+    mapImageTemplates?: readonly MapImageTemplate[]
+): MigratedPartialExport {
+    return {
+        type: 'partial',
+        patientCategories,
+        vehicleTemplates,
+        mapImageTemplates,
+    };
 }

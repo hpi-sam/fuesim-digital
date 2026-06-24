@@ -6,7 +6,7 @@ import {
 
 export interface MeasureTemplateValues {
     name: string;
-    properties: MeasureProperty[];
+    properties: readonly MeasureProperty[];
     categoryName: string;
     replacePrevious: boolean;
 }

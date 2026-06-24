@@ -1,16 +1,15 @@
-import { IsString, IsUUID } from 'class-validator';
-import { WritableDraft } from 'immer';
+import type { WritableDraft, Immutable } from 'immer';
+import { z } from 'zod';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
+import type { ActionReducer } from '../action-reducer.js';
+import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { newNoPosition } from '../../models/utils/position/no-position.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import {
     currentCoordinatesOf,
     currentSimulatedRegionIdOf,
@@ -21,20 +20,9 @@ import {
     isInVehicle,
     isOnMap,
 } from '../../models/utils/position/position-helpers.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import {
-    type VehicleParameters,
-    vehicleParametersSchema,
-} from '../../models/utils/vehicle-parameters.js';
-import {
-    type MapCoordinates,
-    mapCoordinatesSchema,
-} from '../../models/utils/position/map-coordinates.js';
-import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
-import {
-    type ExerciseOccupation,
-    exerciseOccupationSchema,
-} from '../../models/utils/occupations/exercise-occupation.js';
+import { vehicleParametersSchema } from '../../models/utils/vehicle-parameters.js';
+import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
+import { exerciseOccupationSchema } from '../../models/utils/occupations/exercise-occupation.js';
 import { newVehiclePositionIn } from '../../models/utils/position/vehicle-position.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { imageSizeToPosition } from '../../state-helpers/image-size-to-position.js';
@@ -47,6 +35,9 @@ import { newNewPatientEvent } from '../../simulation/events/new-patient.js';
 import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
 import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { vehicleSchema } from '../../models/vehicle.js';
+import type { Vehicle } from '../../models/vehicle.js';
+import type { ExerciseConfiguration } from '../../models/exercise-configuration.js';
 import { getElement } from './utils/get-element.js';
 import { deletePatient } from './patient.js';
 import { completelyLoadVehicle as completelyLoadVehicleHelper } from './utils/completely-load-vehicle.js';
@@ -54,6 +45,44 @@ import { removeElementPosition } from './utils/spatial-elements.js';
 import { logVehicleAdded, logVehicleRemoved } from './utils/log.js';
 import { checkRestrictedVehicleMovementOrThrow } from './utils/restricted-vehicle-movement.js';
 import { fillPositionAt } from './utils/operational-assignment-positions.js';
+
+/**
+ * Gets the remaining load time for a vehicle
+ * @param vehicle The vehicle to get the remaining load time for
+ * @param time The time to check the loading state at. Should typically be the current time
+ * @param config The current {@link ExerciseConfiguration}, to check whether load times are enabled
+ * @returns The remaining load time of the vehicle in seconds
+ */
+export function getRemainingVehicleLoadSeconds(
+    vehicle: Vehicle,
+    time: number,
+    config: ExerciseConfiguration
+) {
+    if (!config.vehicleLoadTimesEnabled) return 0;
+
+    const patientLoadTime = vehicle.patientLoadMinutes * 60 * 1000;
+    return Object.values(vehicle.patientLoadTimes)
+        .map((loadTime) =>
+            Math.ceil((patientLoadTime - (time - loadTime)) / 1000)
+        )
+        .filter((remainingSeconds) => remainingSeconds > 0)
+        .reduce((a, b) => Math.max(a, b), 0);
+}
+
+/**
+ * Checks whether a vehicle is being loaded at the given time
+ * @param vehicle The vehicle to check whether it is being loaded
+ * @param time The time to check the loading state at. Should typically be the current time
+ * @param config The current {@link ExerciseConfiguration}, to check whether load times are enabled
+ * @returns `true`, is the vehicle is currently being loaded, `false` otherwise
+ */
+export function isVehicleLoading(
+    vehicle: Vehicle,
+    time: number,
+    config: ExerciseConfiguration
+) {
+    return getRemainingVehicleLoadSeconds(vehicle, time, config) > 0;
+}
 
 /**
  * Performs all necessary actions to remove a vehicle from the state.
@@ -128,102 +157,88 @@ export function deleteVehicle(
     delete draftState.vehicles[vehicleId];
 }
 
-export class AddVehicleAction implements Action {
-    @IsValue('[Vehicle] Add vehicle' as const)
-    public readonly type = '[Vehicle] Add vehicle';
+const addVehicleActionSchema = z.strictObject({
+    type: z.literal('[Vehicle] Add vehicle'),
+    vehicleParameters: vehicleParametersSchema,
+});
+export type AddVehicleAction = Immutable<
+    z.infer<typeof addVehicleActionSchema>
+>;
 
-    @IsZodSchema(vehicleParametersSchema)
-    public readonly vehicleParameters!: VehicleParameters;
-}
+const renameVehicleActionSchema = z.strictObject({
+    type: z.literal('[Vehicle] Rename vehicle'),
+    vehicleId: vehicleSchema.shape.id,
+    name: vehicleSchema.shape.name,
+});
+export type RenameVehicleAction = Immutable<
+    z.infer<typeof renameVehicleActionSchema>
+>;
 
-export class RenameVehicleAction implements Action {
-    @IsValue('[Vehicle] Rename vehicle' as const)
-    public readonly type = '[Vehicle] Rename vehicle';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId!: UUID;
+const moveVehicleActionSchema = z.strictObject({
+    type: z.literal('[Vehicle] Move vehicle'),
+    vehicleId: vehicleSchema.shape.id,
+    targetPosition: mapCoordinatesSchema,
+});
+export type MoveVehicleAction = Immutable<
+    z.infer<typeof moveVehicleActionSchema>
+>;
 
-    @IsString()
-    public readonly name!: string;
-}
+const removeVehicleActionSchema = z.strictObject({
+    type: z.literal('[Vehicle] Remove vehicle'),
+    vehicleId: vehicleSchema.shape.id,
+});
+export type RemoveVehicleAction = Immutable<
+    z.infer<typeof removeVehicleActionSchema>
+>;
 
-export class MoveVehicleAction implements Action {
-    @IsValue('[Vehicle] Move vehicle' as const)
-    public readonly type = '[Vehicle] Move vehicle';
+const unloadVehicleActionSchema = z.strictObject({
+    type: z.literal('[Vehicle] Unload vehicle'),
+    vehicleId: vehicleSchema.shape.id,
+});
+export type UnloadVehicleAction = Immutable<
+    z.infer<typeof unloadVehicleActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId!: UUID;
+const loadVehicleActionSchema = z.strictObject({
+    type: z.literal('[Vehicle] Load vehicle'),
+    vehicleId: vehicleSchema.shape.id,
+    elementToBeLoadedType: z.enum(['material', 'patient', 'personnel']),
+    elementToBeLoadedId: uuidSchema,
+});
+export type LoadVehicleAction = Immutable<
+    z.infer<typeof loadVehicleActionSchema>
+>;
 
-    @IsZodSchema(mapCoordinatesSchema)
-    public readonly targetPosition!: MapCoordinates;
-}
+const completelyLoadVehicleActionSchema = z.strictObject({
+    type: z.literal('[Vehicle] Completely load vehicle'),
+    vehicleId: vehicleSchema.shape.id,
+});
+export type CompletelyLoadVehicleAction = Immutable<
+    z.infer<typeof completelyLoadVehicleActionSchema>
+>;
 
-export class RemoveVehicleAction implements Action {
-    @IsValue('[Vehicle] Remove vehicle' as const)
-    public readonly type = '[Vehicle] Remove vehicle';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId!: UUID;
-}
+const removeVehicleFromSimulatedRegionActionSchema = z.strictObject({
+    type: z.literal('[Vehicle] Remove from simulated region'),
+    vehicleId: vehicleSchema.shape.id,
+    simulatedRegionId: uuidSchema,
+});
+export type RemoveVehicleFromSimulatedRegionAction = Immutable<
+    z.infer<typeof removeVehicleFromSimulatedRegionActionSchema>
+>;
 
-export class UnloadVehicleAction implements Action {
-    @IsValue('[Vehicle] Unload vehicle' as const)
-    public readonly type = '[Vehicle] Unload vehicle';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId!: UUID;
-}
-
-export class LoadVehicleAction implements Action {
-    @IsValue('[Vehicle] Load vehicle' as const)
-    public readonly type = '[Vehicle] Load vehicle';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId!: UUID;
-
-    @IsLiteralUnion({
-        material: true,
-        patient: true,
-        personnel: true,
-    })
-    public readonly elementToBeLoadedType!:
-        | 'material'
-        | 'patient'
-        | 'personnel';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly elementToBeLoadedId!: UUID;
-}
-
-export class CompletelyLoadVehicleAction implements Action {
-    @IsValue('[Vehicle] Completely load vehicle' as const)
-    public readonly type = '[Vehicle] Completely load vehicle';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId!: UUID;
-}
-
-export class RemoveVehicleFromSimulatedRegionAction implements Action {
-    @IsValue('[Vehicle] Remove from simulated region' as const)
-    public readonly type = '[Vehicle] Remove from simulated region';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-}
-
-export class SetVehicleOccupationAction implements Action {
-    @IsValue('[Vehicle] Set occupation' as const)
-    public readonly type = '[Vehicle] Set occupation';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId!: UUID;
-
-    @IsZodSchema(exerciseOccupationSchema)
-    public readonly occupation!: ExerciseOccupation;
-}
+const setVehicleOccupationActionSchema = z.strictObject({
+    type: z.literal('[Vehicle] Set occupation'),
+    vehicleId: vehicleSchema.shape.id,
+    occupation: exerciseOccupationSchema,
+});
+export type SetVehicleOccupationAction = Immutable<
+    z.infer<typeof setVehicleOccupationActionSchema>
+>;
 
 export namespace VehicleActionReducers {
     export const addVehicle: ActionReducer<AddVehicleAction> = {
-        action: AddVehicleAction,
+        type: addVehicleActionSchema.shape.type.value,
+        actionSchema: addVehicleActionSchema,
         reducer: (draftState, { vehicleParameters }) => {
             const { vehicle, materials, personnel } = vehicleParameters;
             if (
@@ -284,8 +299,21 @@ export namespace VehicleActionReducers {
     };
 
     export const moveVehicle: ActionReducer<MoveVehicleAction> = {
-        action: MoveVehicleAction,
+        type: moveVehicleActionSchema.shape.type.value,
+        actionSchema: moveVehicleActionSchema,
         reducer: (draftState, { vehicleId, targetPosition }) => {
+            const vehicle = getElement(draftState, 'vehicle', vehicleId);
+            if (
+                isVehicleLoading(
+                    vehicle,
+                    draftState.currentTime,
+                    draftState.configuration
+                )
+            )
+                throw new ExpectedReducerError(
+                    'Das Fahrzeug wird gerade beladen und kann daher nicht bewegt werden'
+                );
+
             changePositionWithId(
                 vehicleId,
                 newMapPositionAt(targetPosition),
@@ -298,7 +326,8 @@ export namespace VehicleActionReducers {
     };
 
     export const renameVehicle: ActionReducer<RenameVehicleAction> = {
-        action: RenameVehicleAction,
+        type: renameVehicleActionSchema.shape.type.value,
+        actionSchema: renameVehicleActionSchema,
         reducer: (draftState, { vehicleId, name }) => {
             const vehicle = getElement(draftState, 'vehicle', vehicleId);
             vehicle.name = name;
@@ -314,7 +343,8 @@ export namespace VehicleActionReducers {
     };
 
     export const removeVehicle: ActionReducer<RemoveVehicleAction> = {
-        action: RemoveVehicleAction,
+        type: removeVehicleActionSchema.shape.type.value,
+        actionSchema: removeVehicleActionSchema,
         reducer: (draftState, { vehicleId }) => {
             deleteVehicle(draftState, vehicleId);
             return draftState;
@@ -323,7 +353,8 @@ export namespace VehicleActionReducers {
     };
 
     export const unloadVehicle: ActionReducer<UnloadVehicleAction> = {
-        action: UnloadVehicleAction,
+        type: unloadVehicleActionSchema.shape.type.value,
+        actionSchema: unloadVehicleActionSchema,
         reducer: (draftState, { vehicleId }) => {
             const vehicle = getElement(draftState, 'vehicle', vehicleId);
 
@@ -362,6 +393,7 @@ export namespace VehicleActionReducers {
                         draftState
                     );
                     delete vehicle.patientIds[patientId];
+                    delete vehicle.patientLoadTimes[patientId];
                 }
 
                 for (const personnelId of personnelIds) {
@@ -467,7 +499,8 @@ export namespace VehicleActionReducers {
     };
 
     export const loadVehicle: ActionReducer<LoadVehicleAction> = {
-        action: LoadVehicleAction,
+        type: loadVehicleActionSchema.shape.type.value,
+        actionSchema: loadVehicleActionSchema,
         reducer: (
             draftState,
             { vehicleId, elementToBeLoadedId, elementToBeLoadedType }
@@ -521,6 +554,7 @@ export namespace VehicleActionReducers {
                         'patient',
                         elementToBeLoadedId
                     );
+
                     if (
                         Object.keys(vehicle.patientIds).length >=
                         vehicle.patientCapacity
@@ -529,7 +563,20 @@ export namespace VehicleActionReducers {
                             `Vehicle with id ${vehicle.id} is already full`
                         );
                     }
+                    if (
+                        isVehicleLoading(
+                            vehicle,
+                            draftState.currentTime,
+                            draftState.configuration
+                        )
+                    )
+                        throw new ExpectedReducerError(
+                            'Es kann nur ein Patient gleichzeitig eingeladen werden'
+                        );
+
                     vehicle.patientIds[elementToBeLoadedId] = true;
+                    vehicle.patientLoadTimes[elementToBeLoadedId] =
+                        draftState.currentTime;
                     changePosition(
                         patient,
                         newVehiclePositionIn(vehicleId),
@@ -546,7 +593,8 @@ export namespace VehicleActionReducers {
 
     export const completelyLoadVehicle: ActionReducer<CompletelyLoadVehicleAction> =
         {
-            action: CompletelyLoadVehicleAction,
+            type: completelyLoadVehicleActionSchema.shape.type.value,
+            actionSchema: completelyLoadVehicleActionSchema,
             reducer: (draftState, { vehicleId }) => {
                 const vehicle = getElement(draftState, 'vehicle', vehicleId);
                 completelyLoadVehicleHelper(draftState, vehicle);
@@ -561,7 +609,8 @@ export namespace VehicleActionReducers {
 
     export const removeVehicleFromSimulatedRegion: ActionReducer<RemoveVehicleFromSimulatedRegionAction> =
         {
-            action: RemoveVehicleFromSimulatedRegionAction,
+            type: removeVehicleFromSimulatedRegionActionSchema.shape.type.value,
+            actionSchema: removeVehicleFromSimulatedRegionActionSchema,
             reducer: (draftState, { vehicleId, simulatedRegionId }) => {
                 const vehicle = getElement(draftState, 'vehicle', vehicleId);
 
@@ -604,7 +653,8 @@ export namespace VehicleActionReducers {
 
     export const setVehicleOccupation: ActionReducer<SetVehicleOccupationAction> =
         {
-            action: SetVehicleOccupationAction,
+            type: setVehicleOccupationActionSchema.shape.type.value,
+            actionSchema: setVehicleOccupationActionSchema,
             reducer: (draftState, { vehicleId, occupation }) => {
                 const vehicle = getElement(draftState, 'vehicle', vehicleId);
                 changeOccupation(draftState, vehicle, occupation);

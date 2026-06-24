@@ -1,9 +1,9 @@
+import { currentStateVersion } from 'fuesim-digital-shared';
 import type {
     ExerciseId,
     ExerciseTemplateId,
     TrainerKey,
 } from 'fuesim-digital-shared';
-import { ExerciseState } from 'fuesim-digital-shared';
 import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import {
     type ExerciseEntry,
@@ -16,6 +16,7 @@ import {
     actionTable,
 } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
+import { Config } from '../../config.js';
 import { BaseRepository } from './base-repository.js';
 
 export interface ExerciseTemplateDetailsEntry extends ExerciseTemplateEntry {
@@ -175,12 +176,7 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .select()
             .from(exerciseTable)
-            .where(
-                lt(
-                    exerciseTable.stateVersion,
-                    ExerciseState.currentStateVersion
-                )
-            );
+            .where(lt(exerciseTable.stateVersion, currentStateVersion));
     }
 
     public async saveExerciseState(
@@ -217,5 +213,21 @@ export class ExerciseRepository extends BaseRepository {
                 .values(exercise)
                 .returning()
         );
+    }
+
+    public getUnusedExercises() {
+        const deadline = new Date();
+        deadline.setDate(deadline.getDate() - Config.autoDeleteDays);
+        return this.databaseConnection
+            .select()
+            .from(exerciseTable)
+            .where(
+                and(
+                    lt(exerciseTable.lastUsedAt, deadline),
+                    isNull(exerciseTable.user),
+                    isNull(exerciseTable.parallelExerciseId),
+                    isNull(exerciseTable.templateId)
+                )
+            );
     }
 }

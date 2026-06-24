@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import { uuid } from 'fuesim-digital-shared';
+import { eq } from 'drizzle-orm';
 import { ActiveExercise } from '../../exercise/active-exercise.js';
 import {
     createExercise,
@@ -8,6 +9,9 @@ import {
     createTestUserSession,
     defaultTestUserSessionData,
 } from '../../test/utils.js';
+import { exerciseTable, type OrganisationEntry } from '../schema.js';
+import { createParallelExercise } from '../../test/parallel-exercise-utils.js';
+import { Config } from '../../config.js';
 
 describe('Exercise-Service', () => {
     const environment = createTestEnvironment();
@@ -147,5 +151,133 @@ describe('Exercise-Service', () => {
         expect(exerciseTemplateEntry!.lastUpdatedAt.getTime()).toBeLessThan(
             Date.now()
         );
+    });
+
+    describe('delete unused exercises', () => {
+        let session: string;
+        let personalOrganisation: OrganisationEntry;
+        beforeEach(async () => {
+            session = await createTestUserSession(environment);
+            personalOrganisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+        });
+
+        describe.each([
+            [
+                'not anonymous',
+                async () =>
+                    (await createExercise(environment, session)).trainerKey,
+            ],
+            [
+                'template',
+                async () =>
+                    (
+                        await createExerciseTemplate(
+                            environment,
+                            session,
+                            personalOrganisation.id
+                        )
+                    ).trainerKey,
+            ],
+            [
+                'part of parallel exercise',
+                async () => {
+                    const parallelExercise = await createParallelExercise(
+                        environment,
+                        session
+                    );
+                    const exercise =
+                        await environment.services.parallelExerciseService.joinParallelExerciseByParticipantKey(
+                            parallelExercise.participantKey
+                        );
+                    return exercise.trainerKey;
+                },
+            ],
+        ])('an outdated exercise if %s', (_, getTrainerKey) => {
+            it('should not be deleted', async () => {
+                const trainerKey = await getTrainerKey();
+                const oldDate = new Date();
+                oldDate.setDate(
+                    oldDate.getDate() - (Config.autoDeleteDays + 1)
+                );
+                await environment.services.databaseService.databaseConnection
+                    .update(exerciseTable)
+                    .set({ lastUsedAt: oldDate })
+                    .where(eq(exerciseTable.trainerKey, trainerKey))
+                    .returning();
+
+                await environment.services.exerciseService.deleteUnusedExercises();
+
+                const result =
+                    await environment.services.databaseService.databaseConnection
+                        .select()
+                        .from(exerciseTable)
+                        .where(eq(exerciseTable.trainerKey, trainerKey));
+
+                expect(result.length).toBe(1);
+                expect(
+                    environment.services.exerciseService
+                        .TESTING_getExerciseMap()
+                        .get(trainerKey)
+                ).toBeDefined();
+            });
+        });
+
+        it('should delete outdated exercises', async () => {
+            const exerciseNotToDelete = await createExercise(environment);
+            const newDate = new Date();
+            newDate.setDate(newDate.getDate() - Config.autoDeleteDays);
+            console.log(newDate);
+            newDate.setMinutes(newDate.getMinutes() + 1);
+            console.log(newDate);
+            await environment.services.databaseService.databaseConnection
+                .update(exerciseTable)
+                .set({ lastUsedAt: newDate })
+                .where(
+                    eq(
+                        exerciseTable.participantKey,
+                        exerciseNotToDelete.participantKey
+                    )
+                )
+                .returning();
+
+            const exerciseToDelete = await createExercise(environment);
+            const oldDate = new Date();
+            oldDate.setDate(oldDate.getDate() - (Config.autoDeleteDays + 1));
+            await environment.services.databaseService.databaseConnection
+                .update(exerciseTable)
+                .set({ lastUsedAt: oldDate })
+                .where(
+                    eq(
+                        exerciseTable.participantKey,
+                        exerciseToDelete.participantKey
+                    )
+                )
+                .returning();
+
+            await environment.services.exerciseService.deleteUnusedExercises();
+
+            const result =
+                await environment.services.databaseService.databaseConnection
+                    .select({ trainerKey: exerciseTable.trainerKey })
+                    .from(exerciseTable);
+
+            expect(result.length).toEqual(1);
+            expect(result[0]!.trainerKey).toEqual(
+                exerciseNotToDelete.trainerKey
+            );
+            expect(
+                environment.services.exerciseService
+                    .TESTING_getExerciseMap()
+                    .get(exerciseNotToDelete.trainerKey)
+            ).toBeDefined();
+            expect(
+                environment.services.exerciseService
+                    .TESTING_getExerciseMap()
+                    .get(exerciseToDelete.trainerKey)
+            ).toBeUndefined();
+        });
     });
 });

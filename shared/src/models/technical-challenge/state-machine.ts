@@ -42,7 +42,7 @@ const taskGuardSchema = z.object({
     minProgress: z.number().min(0).max(1),
     taskId: taskSchema.shape.taskTypeId,
 });
-export type TaskGuard = z.infer<typeof taskGuardSchema>;
+export type TaskGuard = Immutable<z.infer<typeof taskGuardSchema>>;
 
 const timerGuardSchema = z.object({
     type: z.literal('timerGuard'),
@@ -50,7 +50,7 @@ const timerGuardSchema = z.object({
     minProgress: z.number().min(0).max(1),
     timerId: timerSchema.shape.id,
 });
-export type TimerGuard = z.infer<typeof timerGuardSchema>;
+export type TimerGuard = Immutable<z.infer<typeof timerGuardSchema>>;
 
 const andGuardSchema = z.object({
     type: z.literal('andGuard'),
@@ -60,7 +60,7 @@ const andGuardSchema = z.object({
 });
 export interface AndGuard {
     type: 'andGuard';
-    guards: _Guard[];
+    guards: Immutable<_Guard[]>;
 }
 
 const notGuardSchema = z.strictObject({
@@ -74,7 +74,8 @@ export interface NotGuard {
     guard: _Guard;
 }
 
-type _Guard = Immutable<AndGuard | NotGuard | TaskGuard | TimerGuard>;
+// TODO@Julius: making this immutable breaks TypeScript?
+type _Guard = AndGuard | NotGuard | TaskGuard | TimerGuard;
 export const guardSchema: z.ZodType<_Guard> = z.lazy(() =>
     z.discriminatedUnion('type', [
         taskGuardSchema,
@@ -83,6 +84,7 @@ export const guardSchema: z.ZodType<_Guard> = z.lazy(() =>
         notGuardSchema,
     ])
 );
+export type Guard = Immutable<z.infer<typeof guardSchema>>;
 
 const stateMachineStateIdSchema = uuidSchema.brand<'StateMachineStateId'>();
 export const transitionSchema = z.object({
@@ -178,7 +180,7 @@ export function getTimerProgress(
 }
 
 export function getGuardProgress(
-    guard: _Guard,
+    guard: Guard,
     stateMachine: StateMachine,
     currentTime: ExerciseState['currentTime']
 ): GuardProgress {
@@ -326,7 +328,7 @@ function unassignFromNonexistentTasks(
 }
 
 function isGuardFulfilled(
-    guard: _Guard,
+    guard: Guard,
     stateMachine: StateMachine,
     currentTime: number
 ): boolean {

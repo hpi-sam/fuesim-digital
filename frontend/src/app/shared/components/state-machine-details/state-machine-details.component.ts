@@ -3,8 +3,8 @@ import type {
     StateMachine,
     Personnel,
     TaskType,
+    Guard,
     StateMachineState,
-    Transition,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import {
@@ -118,10 +118,7 @@ export class StateMachineDetailsComponent {
         }))
     );
 
-    private getGuardName(
-        guard: Transition['guard'],
-        stateMachine: StateMachine
-    ): string {
+    private getGuardName(guard: Guard, stateMachine: StateMachine): string {
         switch (guard.type) {
             case 'taskGuard':
                 return selectStateSnapshot(

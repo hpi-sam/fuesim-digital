@@ -155,7 +155,7 @@ export function addTransitionTo(
     newTransition: Transition,
     priority?: number
 ): StateMachineState {
-    const newTransitions = {...state.outgoingTransitions};
+    const newTransitions = { ...state.outgoingTransitions };
     newTransitions[newTransition.id] = newTransition;
 
     return {
@@ -405,6 +405,79 @@ function simulateStateMachine(
     updateEventQueue(stateMachine, exerciseState);
 }
 
+function getGuardTimestamp(
+    stateMachine: WritableDraft<StateMachine>,
+    exerciseState: WritableDraft<ExerciseState>,
+    state: WritableDraft<StateMachineState>,
+    guard: WritableDraft<_Guard>
+): {
+    current: boolean;
+    nextChange: number;
+} {
+    switch (guard.type) {
+        case 'notGuard': {
+            const subGuard = getGuardTimestamp(
+                stateMachine,
+                exerciseState,
+                state,
+                guard.guard
+            );
+            return {
+                current: !subGuard.current,
+                nextChange: subGuard.nextChange,
+            };
+        }
+        case 'andGuard': {
+            const subGuards = guard.guards.map((g) =>
+                getGuardTimestamp(stateMachine, exerciseState, state, g)
+            );
+            const current = subGuards.reduce((v, g) => v && g.current, true);
+            const nextChange = current
+                ? subGuards.reduce(
+                      (v, g) => (g.nextChange < v ? g.nextChange : v),
+                      Infinity
+                  )
+                : subGuards.reduce(
+                      (v, g) => (g.nextChange > v ? g.nextChange : v),
+                      0
+                  );
+            return {
+                current,
+                nextChange,
+            };
+        }
+        case 'taskGuard': {
+            const nAssignedPersonnel = Object.values(
+                stateMachine.assignedPersonnel
+            ).filter((taskId) => taskId === guard.taskId).length;
+
+            if (nAssignedPersonnel === 0)
+                return {
+                    current: false,
+                    nextChange: Infinity,
+                };
+
+            const taskProgress = stateMachine.taskTimeSpent[guard.taskId]!;
+
+            return {
+                current: false,
+                nextChange:
+                    (guard.minProgress - taskProgress.timeSpent) /
+                    (nAssignedPersonnel * state.possibleTasks[guard.taskId]!),
+            };
+        }
+        case 'timerGuard': {
+            return {
+                current:
+                    stateMachine.simulationStartTime + guard.minProgress >=
+                    exerciseState.currentTime,
+                nextChange:
+                    stateMachine.simulationStartTime + guard.minProgress,
+            };
+        }
+    }
+}
+
 export function updateEventQueue(
     stateMachine: WritableDraft<StateMachine>,
     exerciseState: WritableDraft<ExerciseState>
@@ -416,31 +489,19 @@ export function updateEventQueue(
     const queue = exerciseState.technicalChallengeEventQueue;
     for (const transition of potentialTransitions) {
         const guard = transition.guard;
-        const event = newStateMachineEvent(0, stateMachine.id, transition.id);
-        switch (guard.type) {
-            case 'taskGuard': {
-                const nAssignedPersonnel = Object.values(
-                    stateMachine.assignedPersonnel
-                ).filter((taskId) => taskId === guard.taskId).length;
-
-                if (nAssignedPersonnel === 0) continue;
-
-                const taskProgress = stateMachine.taskTimeSpent[guard.taskId]!;
-                event.timestamp =
-                    (guard.minProgress - taskProgress.timeSpent) /
-                    (nAssignedPersonnel * state.possibleTasks[guard.taskId]!);
-                break;
-            }
-            case 'timerGuard': {
-                event.timestamp =
-                    stateMachine.simulationStartTime + guard.minProgress;
-                break;
-            }
-            case 'andGuard':
-            case 'notGuard':
-                console.error("Not Implemented");
-                // throw new Error('Not Implemented');
-        }
+        const guardTimestamp = getGuardTimestamp(
+            stateMachine,
+            exerciseState,
+            state,
+            guard
+        );
+        if (guardTimestamp.current) continue;
+        console.log(guardTimestamp)
+        const event = newStateMachineEvent(
+            guardTimestamp.nextChange,
+            stateMachine.id,
+            transition.id
+        );
         insert(queue, event);
     }
 }

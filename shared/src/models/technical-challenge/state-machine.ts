@@ -52,6 +52,15 @@ const timerGuardSchema = z.object({
 });
 export type TimerGuard = Immutable<z.infer<typeof timerGuardSchema>>;
 
+/* Because AndGuard's and NotGuard's are recursive types, their type is not
+ * directly inferred from their schema.
+ *
+ * They also can not be defined using `Immutable<>`, presumably because they
+ * there is some interaction with the recursive nature of it.
+ *
+ * The current workaround is to define them using interfaces.
+ */
+
 const andGuardSchema = z.object({
     type: z.literal('andGuard'),
     get guards() {
@@ -71,10 +80,10 @@ const notGuardSchema = z.strictObject({
 });
 export interface NotGuard {
     type: 'notGuard';
-    guard: _Guard;
+    guard: Immutable<_Guard>;
 }
 
-// TODO@Julius: making this immutable breaks TypeScript?
+// eslint-disable-next-line @typescript-eslint/naming-convention
 type _Guard = AndGuard | NotGuard | TaskGuard | TimerGuard;
 export const guardSchema: z.ZodType<_Guard> = z.lazy(() =>
     z.discriminatedUnion('type', [

@@ -24,7 +24,7 @@ import {
     logTechnicalChallengePersonnelAssigned,
 } from './utils/log.js';
 import { PersonnelActionReducers } from './personnel.js';
-import { technicalChallengeIdSchema } from '../../models/technical-challenge/technical-challenge-id.js';
+import { technicalChallengeIdSchema } from '../../models/technical-challenge/ids.js';
 
 const createTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Create technical challenge'),

@@ -1,12 +1,12 @@
 import type {
-    TechnicalChallengeEvent,
+    StateMachineEvent,
     TechnicalChallengeEventQueue,
 } from '../models/technical-challenge/event.js';
 import type { UUID } from '../utils/uuid.js';
 
 export function insert(
     queue: TechnicalChallengeEventQueue,
-    event: TechnicalChallengeEvent
+    event: StateMachineEvent
 ) {
     queue.events.push(event);
     queue.indices[event.id] = queue.events.length - 1;
@@ -15,13 +15,13 @@ export function insert(
 
 export function peek(
     queue: TechnicalChallengeEventQueue
-): TechnicalChallengeEvent | null {
+): StateMachineEvent | null {
     return queue.events[0] ?? null;
 }
 
 export function pop(
     queue: TechnicalChallengeEventQueue
-): TechnicalChallengeEvent | null {
+): StateMachineEvent | null {
     if (queue.events.length === 0) return null;
     if (queue.events.length === 1) {
         delete queue.indices[queue.events[0]!.id];
@@ -63,7 +63,7 @@ export function remove(queue: TechnicalChallengeEventQueue, id: UUID): boolean {
 export function modify(
     queue: TechnicalChallengeEventQueue,
     id: UUID,
-    updates: Partial<TechnicalChallengeEvent>
+    updates: Partial<StateMachineEvent>
 ) {
     const index = queue.indices[id];
     if (index === undefined) return false;

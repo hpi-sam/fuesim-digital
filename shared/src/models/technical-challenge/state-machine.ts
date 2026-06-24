@@ -25,7 +25,8 @@ import {
 } from '../../store/action-reducers/utils/log.js';
 import type { TechnicalChallenge } from './technical-challenge.js';
 import { insert, peek, pop } from '../../state-helpers/events.js';
-import { newTechnicalChallengeEvent as newStateMachineEvent } from './event.js';
+import { newStateMachineEvent } from './event.js';
+import { stateMachineIdSchema } from './ids.js';
 
 const taskSchema = z.object({
     /**
@@ -154,12 +155,8 @@ export function addTransitionTo(
     newTransition: Transition,
     priority?: number
 ): StateMachineState {
-    const newTransitions = [...state.outgoingTransitions];
-    newTransitions.splice(
-        priority ?? state.outgoingTransitions.length,
-        0,
-        newTransition
-    );
+    const newTransitions = {...state.outgoingTransitions};
+    newTransitions[newTransition.id] = newTransition;
 
     return {
         ...state,
@@ -269,7 +266,7 @@ function isTimerGuardFulfilled(
 export type Transition = Immutable<z.infer<typeof transitionSchema>>;
 
 export const stateMachineDefinitionSchema = z.strictObject({
-    id: uuidSchema.brand<'StateMachineId'>(),
+    id: stateMachineIdSchema,
     name: z.string(),
     states: z.record(stateMachineStateSchema.shape.id, stateMachineStateSchema),
     initialStateId: stateMachineStateSchema.shape.id,
@@ -441,7 +438,8 @@ export function updateEventQueue(
             }
             case 'andGuard':
             case 'notGuard':
-                throw new Error('Not Implemented');
+                console.error("Not Implemented");
+                // throw new Error('Not Implemented');
         }
         insert(queue, event);
     }
@@ -491,9 +489,12 @@ export function simulateAllTechnicalChallenges(
     );
 
     while ((peek(queue)?.timestamp ?? Infinity) <= draftState.currentTime) {
-        const event = pop(queue);
+        const event = pop(queue)!;
+        const technicalChallenge =
+            draftState.technicalChallenges[event.stateMachineId];
+        if (!technicalChallenge) continue;
         simulateTechnicalChallenge(
-            draftState.technicalChallenges[event.technicalChallengeId],
+            technicalChallenge,
             event.transitionId,
             draftState,
             tickInterval

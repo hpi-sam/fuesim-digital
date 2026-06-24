@@ -71,7 +71,7 @@ export class StateMachineDetailsComponent {
             guardName: string;
         }[]
     > = computed(() =>
-        this.currentState().outgoingTransitions.map((transition) => {
+        Object.values(this.currentState().outgoingTransitions).map((transition) => {
             // TODO@Felix: refactor into helper function(s)
 
             const currentProgress = getGuardProgress(

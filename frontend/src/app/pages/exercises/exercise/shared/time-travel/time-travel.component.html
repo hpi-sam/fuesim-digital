@@ -1,7 +1,26 @@
 <div class="container-fluid d-flex flex-column h-100">
-    <div class="rounded overflow-hidden flex-fill">
-        <app-exercise-map></app-exercise-map>
+    <div class="flex-fill row">
+        <div class="col p-0 rounded-start overflow-hidden">
+            <app-exercise-map></app-exercise-map>
+        </div>
+        @if (this.showDidacticOverview()) {
+            <div
+                class="card col-3 p-0 rounded-0 rounded-end"
+                style="min-width: 450px"
+            >
+                <div class="card-header text-center">
+                    <h5>Didaktische Übersicht</h5>
+                </div>
+                <div>
+                    <app-didactic-overview
+                        [tableWidth]="450"
+                        [enableCriterionCreation]="false"
+                    />
+                </div>
+            </div>
+        }
     </div>
+
     @if (timeConstraints$ | async; as timeConstraints) {
         <div class="pt-2">
             <div class="d-inline-block">
@@ -75,6 +94,12 @@
                     class="btn btn-primary btn-sm ms-3"
                 >
                     Statistiken
+                </button>
+                <button
+                    (click)="toggleDidacticOverview()"
+                    class="btn btn-primary btn-sm ms-3"
+                >
+                    Didaktische Übersicht
                 </button>
                 <button
                     (click)="createNewExerciseFromTheCurrentState()"

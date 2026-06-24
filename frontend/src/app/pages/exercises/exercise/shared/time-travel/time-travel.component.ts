@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { cloneDeepMutable, StateExport } from 'fuesim-digital-shared';
@@ -20,6 +20,7 @@ import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { FormatDurationPipe } from '../../../../../shared/pipes/format-duration.pipe';
 import { HelpButtonComponent } from '../../../../../help-button/help-button.component.js';
+import { DidacticOverviewComponent } from '../didactic-overview/didactic-overview.component';
 
 @Component({
     selector: 'app-time-travel',
@@ -31,6 +32,7 @@ import { HelpButtonComponent } from '../../../../../help-button/help-button.comp
         AsyncPipe,
         FormatDurationPipe,
         HelpButtonComponent,
+        DidacticOverviewComponent,
     ],
 })
 export class TimeTravelComponent implements OnDestroy {
@@ -41,6 +43,12 @@ export class TimeTravelComponent implements OnDestroy {
     private readonly messageService = inject(MessageService);
 
     public timeConstraints$ = this.store.select(selectTimeConstraints);
+
+    public readonly showDidacticOverview = signal<boolean>(false);
+
+    public toggleDidacticOverview() {
+        this.showDidacticOverview.set(!this.showDidacticOverview());
+    }
 
     public openClientsModal() {
         openClientsModal(this.modalService);

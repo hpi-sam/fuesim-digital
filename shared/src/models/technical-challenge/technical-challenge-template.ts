@@ -11,6 +11,8 @@ import type {
 } from './technical-challenge.js';
 import {
     stateMachineSchema,
+    technicalChallengeEventTemplateSchema,
+    technicalChallengeEventTemplateToEventMap,
     technicalChallengeStateIdSchema,
 } from './state-machine.js';
 
@@ -20,6 +22,7 @@ export const technicalChallengeTemplateSchema = z.strictObject({
     image: imagePropertiesSchema,
     name: z.string(),
     initialStateId: technicalChallengeStateIdSchema,
+    events: z.array(technicalChallengeEventTemplateSchema),
 });
 
 export type TechnicalChallengeTemplate = z.infer<
@@ -50,5 +53,15 @@ export function newTechnicalChallengeFromTemplate(
         name,
         image,
         simulationStartTime: creationTime,
+        events: Object.fromEntries(
+            template.events
+                .map((event) => [
+                    event.id,
+                    technicalChallengeEventTemplateToEventMap[event.type](
+                        event
+                    ),
+                ])
+                .filter(([_, event]) => event !== null)
+        ),
     };
 }

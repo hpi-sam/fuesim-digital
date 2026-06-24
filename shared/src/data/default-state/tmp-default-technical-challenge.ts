@@ -1,4 +1,5 @@
 import {
+    type CreatePatientTechnicalChallengeEventTemplate,
     type Guard,
     newTechnicalChallengeState,
     type Transition,
@@ -180,6 +181,22 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
         ].map((state) => [state.id, state])
     );
 
+    const createInjuredPatientEvent: CreatePatientTechnicalChallengeEventTemplate =
+        {
+            type: 'createPatientEvent',
+            id: 'ed97c7d2-8c20-4228-9430-ad836374144b',
+            patientCategory: 8,
+            side: 'right',
+        };
+
+    const createDeadPatientEvent: CreatePatientTechnicalChallengeEventTemplate =
+        {
+            type: 'createPatientEvent',
+            id: '6a5e15b5-92b2-41e7-b813-c71580106d59',
+            patientCategory: 15,
+            side: 'left',
+        };
+
     // --- Transitions ---
     const transitions: Transition[] = [
         // From initial state
@@ -187,17 +204,25 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
             from: initialState.id,
             to: onlyExtinguished.id,
             guard: isFireExtinguished,
+            events: [],
         },
-        { from: initialState.id, to: onlyDead.id, guard: isPatientDead },
+        {
+            from: initialState.id,
+            to: onlyDead.id,
+            guard: isPatientDead,
+            events: [],
+        },
         {
             from: initialState.id,
             to: onlyTreated.id,
             guard: isPatientRescued,
+            events: ['ed97c7d2-8c20-4228-9430-ad836374144b'],
         },
         {
             from: initialState.id,
             to: onlyBurnedOut.id,
             guard: isVehicleBurnedOut,
+            events: [],
         },
 
         // From onlyExtinguished
@@ -205,11 +230,13 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
             from: onlyExtinguished.id,
             to: patientDeadButExtinguished.id,
             guard: isPatientDead,
+            events: [],
         },
         {
             from: onlyExtinguished.id,
             to: treatedAndExtinguished.id,
             guard: isPatientRescued,
+            events: ['ed97c7d2-8c20-4228-9430-ad836374144b'],
         },
 
         // From onlyDead
@@ -217,11 +244,13 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
             from: onlyDead.id,
             to: patientDeadButExtinguished.id,
             guard: isFireExtinguished,
+            events: [],
         },
         {
             from: onlyDead.id,
             to: burnedOutAndPatientDead.id,
             guard: isVehicleBurnedOut,
+            events: [],
         },
 
         // From onlyTreated
@@ -229,11 +258,13 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
             from: onlyTreated.id,
             to: treatedAndExtinguished.id,
             guard: isFireExtinguished,
+            events: [],
         },
         {
             from: onlyTreated.id,
             to: burnedOutAndPatientDead.id,
             guard: isVehicleBurnedOut,
+            events: [],
         },
 
         // From onlyBurnedOut
@@ -241,11 +272,13 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
             from: onlyBurnedOut.id,
             to: burnedOutAndPatientDead.id,
             guard: isPatientDead,
+            events: [],
         },
         {
             from: onlyBurnedOut.id,
             to: burnedOutButRescued.id,
             guard: isPatientRescued,
+            events: ['6a5e15b5-92b2-41e7-b813-c71580106d59'],
         },
     ];
 
@@ -262,6 +295,7 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
         relevantTasks,
         transitions,
         simulationStartTime: 0,
+        events: [createInjuredPatientEvent, createDeadPatientEvent],
     };
 }
 

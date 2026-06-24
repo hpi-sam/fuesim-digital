@@ -16,12 +16,13 @@ import { HttpResourceRef } from '@angular/common/http';
 import { ParallelExerciseService } from '../../../../core/parallel-exercise.service';
 import { ApiService } from '../../../../core/api.service';
 import { EvalResultStatusBadgeComponent } from '../../exercise/shared/didactic-overview/result-status-badge/eval-result-status-badge.component';
+import { NgStyle } from '@angular/common';
 
 @Component({
     selector: 'app-parallel-exercise-evaluation',
     templateUrl: './parallel-exercise-evaluation.component.html',
     styleUrls: ['parallel-exercise-evaluation.component.scss'],
-    imports: [RouterLink, EvalResultStatusBadgeComponent],
+    imports: [RouterLink, EvalResultStatusBadgeComponent, NgStyle],
 })
 export class ParallelExerciseEvaluationComponent {
     public readonly parallelExerciseService = inject(ParallelExerciseService);
@@ -37,6 +38,13 @@ export class ParallelExerciseEvaluationComponent {
     }>({});
     public readonly exerciseInstances =
         this.parallelExerciseService.exerciseInstances;
+
+    public readonly atLeastOneInstanceIsActive = computed(() =>
+        this.exerciseInstances().filter((instance) => instance.isActive)
+            .length > 0
+            ? true
+            : false
+    );
 
     public readonly resultsMap = computed(() =>
         this.exerciseInstances().reduce<{

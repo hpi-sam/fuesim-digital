@@ -53,6 +53,9 @@ export class EvalResultStatusBadgeComponent {
                 ? 'green'
                 : 'red';
         }
-        return 'grey';
+        return 'black';
     });
+    public readonly bgOpacity = computed(() =>
+        this.color() === 'black' ? 50 : 100
+    );
 }

@@ -54,6 +54,7 @@ import { addIsActiveToClient53 } from './53-add-is-active-to-client.js';
 import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loading-and-highlighting.js';
 import { vehicleLoadTimes55 } from './55-vehicle-load-times.js';
 import { technicalChallengesMeasuresExtendedScoutables56 } from './56-technical-challenges-measures-extended-scoutables.js';
+import { addAlarmGroupVehicleType57 } from './57-add-alarm-group-vehicle-type.js';
 
 /**
  * Migrate a single action
@@ -76,6 +77,7 @@ type MigrateStateFunction = (state: object) => void;
 export interface Migration {
     action: MigrateActionFunction | null;
     state: MigrateStateFunction | null;
+    unmigratableActions?: true;
 }
 
 export const migrations: {
@@ -136,4 +138,5 @@ export const migrations: {
     54: configVehicleLoadingAndHighlighting54,
     55: vehicleLoadTimes55,
     56: technicalChallengesMeasuresExtendedScoutables56,
+    57: addAlarmGroupVehicleType57,
 };

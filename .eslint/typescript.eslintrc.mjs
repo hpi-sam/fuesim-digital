@@ -391,7 +391,6 @@ export default {
         '@typescript-eslint/no-invalid-this': 'warn',
         '@typescript-eslint/no-loop-func': 'warn',
         '@typescript-eslint/no-loss-of-precision': 'warn',
-        '@typescript-eslint/no-redeclare': 'warn',
         '@typescript-eslint/no-shadow': [
             'warn',
             {

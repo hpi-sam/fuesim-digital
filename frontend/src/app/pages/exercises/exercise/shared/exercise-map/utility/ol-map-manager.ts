@@ -417,11 +417,11 @@ export class OlMapManager {
 
         this.featureManagers = [
             deleteFeatureManager,
-            drawingFeatureManager,
             restrictedZoneFeatureManager,
             transferLinesFeatureManager,
             simulatedRegionFeatureManager,
             mapImageFeatureManager,
+            drawingFeatureManager,
             technicalChallengeFeatureManager,
             transferPointFeatureManager,
             vehicleFeatureManager,

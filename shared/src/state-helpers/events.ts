@@ -1,44 +1,41 @@
 import type {
     StateMachineEvent,
-    TechnicalChallengeEventQueue,
+    StateMachineEventQueue,
 } from '../models/technical-challenge/event.js';
+import { StateMachineId } from '../models/technical-challenge/ids.js';
 import type { UUID } from '../utils/uuid.js';
 
 export function insert(
-    queue: TechnicalChallengeEventQueue,
+    queue: StateMachineEventQueue,
     event: StateMachineEvent
 ) {
     queue.events.push(event);
-    queue.indices[event.id] = queue.events.length - 1;
+    queue.indices[event.stateMachineId] = queue.events.length - 1;
     bubbleUp(queue, queue.events.length - 1);
 }
 
-export function peek(
-    queue: TechnicalChallengeEventQueue
-): StateMachineEvent | null {
+export function peek(queue: StateMachineEventQueue): StateMachineEvent | null {
     return queue.events[0] ?? null;
 }
 
-export function pop(
-    queue: TechnicalChallengeEventQueue
-): StateMachineEvent | null {
+export function pop(queue: StateMachineEventQueue): StateMachineEvent | null {
     if (queue.events.length === 0) return null;
     if (queue.events.length === 1) {
-        delete queue.indices[queue.events[0]!.id];
+        delete queue.indices[queue.events[0]!.stateMachineId];
         return queue.events.pop()!;
     }
 
     const min = queue.events[0]!;
-    delete queue.indices[min.id];
+    delete queue.indices[min.stateMachineId];
 
     queue.events[0] = queue.events.pop()!;
-    queue.indices[queue.events[0].id] = 0;
+    queue.indices[queue.events[0].stateMachineId] = 0;
     bubbleDown(queue, 0);
 
     return min;
 }
 
-export function remove(queue: TechnicalChallengeEventQueue, id: UUID): boolean {
+export function remove(queue: StateMachineEventQueue, id: StateMachineId): boolean {
     const index = queue.indices[id];
     if (index === undefined) return false;
 
@@ -61,8 +58,8 @@ export function remove(queue: TechnicalChallengeEventQueue, id: UUID): boolean {
 }
 
 export function modify(
-    queue: TechnicalChallengeEventQueue,
-    id: UUID,
+    queue: StateMachineEventQueue,
+    id: StateMachineId,
     updates: Partial<StateMachineEvent>
 ) {
     const index = queue.indices[id];
@@ -76,16 +73,16 @@ export function modify(
     return true;
 }
 
-function swap(queue: TechnicalChallengeEventQueue, i: number, j: number) {
+function swap(queue: StateMachineEventQueue, i: number, j: number) {
     const tmp = queue.events[i]!;
     queue.events[i] = queue.events[j]!;
     queue.events[j] = tmp;
 
-    queue.indices[queue.events[i].id] = i;
-    queue.indices[queue.events[j].id] = j;
+    queue.indices[queue.events[i].stateMachineId] = i;
+    queue.indices[queue.events[j].stateMachineId] = j;
 }
 
-function bubbleUp(queue: TechnicalChallengeEventQueue, index: number) {
+function bubbleUp(queue: StateMachineEventQueue, index: number) {
     let current = index;
     while (current > 0) {
         const parent = Math.floor((current - 1) / 2);
@@ -97,7 +94,7 @@ function bubbleUp(queue: TechnicalChallengeEventQueue, index: number) {
     }
 }
 
-function bubbleDown(queue: TechnicalChallengeEventQueue, index: number) {
+function bubbleDown(queue: StateMachineEventQueue, index: number) {
     let current = index;
     const length = queue.events.length;
 

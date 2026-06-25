@@ -24,9 +24,19 @@ import {
     logTechnicalChallengeStateTransition,
 } from '../../store/action-reducers/utils/log.js';
 import type { TechnicalChallenge } from './technical-challenge.js';
-import { insert, peek, pop } from '../../state-helpers/events.js';
-import { newStateMachineEvent } from './event.js';
-import { stateMachineIdSchema } from './ids.js';
+import {
+    insert,
+    modify,
+    peek,
+    pop,
+    remove,
+} from '../../state-helpers/events.js';
+import { newStateMachineEvent, StateMachineEvent } from './event.js';
+import {
+    StateMachineId,
+    stateMachineIdSchema,
+    TechnicalChallengeId,
+} from './ids.js';
 
 const taskSchema = z.object({
     /**
@@ -357,52 +367,79 @@ function isGuardFulfilled(
     }
 }
 
-function simulateStateMachine(
-    stateMachine: WritableDraft<StateMachine>,
-    transitionId: WritableDraft<UUID>,
+export function updateTaskProgress(
     exerciseState: WritableDraft<ExerciseState>,
-    tickInterval: number,
-    logStateTransition?: (targetStateId: StateMachineState['id']) => void,
-    logPersonnelUnassigned?: (
-        personnelId: Personnel['id'],
-        taskTypeId: TaskType['id']
-    ) => void
-): void {
-    const state = currentStateOf(stateMachine);
+    stateMachine: WritableDraft<StateMachine>,
+    taskId: TaskType['id'],
+    state: StateMachineState | null = null
+) {
+    // eslint-disable-next-line no-param-reassign
+    state ??= currentStateOf(stateMachine);
 
-    // for (const taskId of Object.values(stateMachine.assignedPersonnel)) {
-    //     if (state.possibleTasks[taskId]) {
-    //         stateMachine.taskTimeSpent[taskId] ??= newTaskTimeSpent();
-    //         stateMachine.taskTimeSpent[taskId].timeSpent = 0;
-    //         stateMachine.taskTimeSpent[taskId].timeSpent +=
-    //             tickInterval * state.possibleTasks[taskId];
-    //     }
-    // }
+    if (!state.possibleTasks[taskId]) return;
 
-    // const guardFulfilled = (t: Transition) =>
-    //     isGuardFulfilled(t.guard, stateMachine, currentTime);
+    const taskProgress = stateMachine.taskTimeSpent[taskId];
 
-    // // the next transition is not necessarily the first one to have its guard
-    // // fulfilled
-    // const nextTransition = state.outgoingTransitions.find(guardFulfilled);
-
-    const nextTransition = state.outgoingTransitions[transitionId];
-
-    if (!nextTransition) return;
-
-    logStateTransition?.(nextTransition.targetState);
-
-    stateMachine.currentStateId = nextTransition.targetState;
-
-    const unassignedPersonnel = unassignFromNonexistentTasks(stateMachine);
-
-    if (unassignedPersonnel.length > 0 && logPersonnelUnassigned) {
-        for (const { personnelId, taskTypeId } of unassignedPersonnel) {
-            logPersonnelUnassigned(personnelId, taskTypeId);
-        }
+    if (!taskProgress) {
+        stateMachine.taskTimeSpent[taskId] = {
+            timeSpent: 0,
+            lastUpdatedAt: exerciseState.currentTime,
+        };
+        return;
     }
 
-    updateEventQueue(stateMachine, exerciseState);
+    const nAssignedPersonnel = Object.values(
+        stateMachine.assignedPersonnel
+    ).filter((_taskId) => _taskId === taskId).length;
+
+    taskProgress.timeSpent =
+        taskProgress.timeSpent +
+        (exerciseState.currentTime - taskProgress.lastUpdatedAt) *
+            nAssignedPersonnel *
+            state.possibleTasks[taskId];
+    taskProgress.lastUpdatedAt = exerciseState.currentTime;
+}
+
+export function updateAllTasksProgress(
+    exerciseState: WritableDraft<ExerciseState>,
+    stateMachine: WritableDraft<StateMachine>
+) {
+    const state = currentStateOf(stateMachine);
+
+    for (const taskId of TypeAssertedObject.keys(state.possibleTasks))
+        updateTaskProgress(exerciseState, stateMachine, taskId);
+}
+
+function computeEarliestEvent(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallengeId: TechnicalChallengeId,
+    stateMachine: WritableDraft<StateMachine>,
+    transitions: WritableDraft<Transition>[]
+): StateMachineEvent | null {
+    const state = currentStateOf(stateMachine);
+    let earliestTimestamp = Infinity;
+    let earliestEvent: StateMachineEvent | null = null;
+
+    for (const transition of transitions) {
+        const guard = transition.guard;
+        const eventTimestamp = getGuardTimestamp(
+            stateMachine,
+            exerciseState,
+            state,
+            guard
+        );
+
+        if (eventTimestamp.nextChange >= earliestTimestamp) continue;
+        earliestTimestamp = eventTimestamp.nextChange;
+        earliestEvent = newStateMachineEvent(
+            eventTimestamp.nextChange,
+            technicalChallengeId,
+            stateMachine.id,
+            transition.id
+        );
+    }
+
+    return earliestEvent;
 }
 
 function getGuardTimestamp(
@@ -433,117 +470,215 @@ function getGuardTimestamp(
             );
             const current = subGuards.reduce((v, g) => v && g.current, true);
             const nextChange = current
-                ? subGuards.reduce(
-                      (v, g) => (g.nextChange < v ? g.nextChange : v),
-                      Infinity
-                  )
-                : subGuards.reduce(
-                      (v, g) => (g.nextChange > v ? g.nextChange : v),
-                      0
+                ? Math.min(...subGuards.map((g) => g.nextChange))
+                : Math.max(
+                      ...subGuards
+                          .filter((g) => !g.current)
+                          .map((g) => g.nextChange)
                   );
+
             return {
                 current,
                 nextChange,
             };
         }
         case 'taskGuard': {
+            const taskProgress = getTaskProgress(guard.taskId, stateMachine);
+
+            if (isTaskGuardFulfilled(guard, stateMachine))
+                return { current: true, nextChange: Infinity };
+
             const nAssignedPersonnel = Object.values(
                 stateMachine.assignedPersonnel
             ).filter((taskId) => taskId === guard.taskId).length;
 
-            if (nAssignedPersonnel === 0)
-                return {
-                    current: false,
-                    nextChange: Infinity,
-                };
-
-            const taskProgress = stateMachine.taskTimeSpent[guard.taskId]!;
+            const totalDuration =
+                stateMachine.tasks[guard.taskId]!.totalDuration;
+            const rate =
+                nAssignedPersonnel * state.possibleTasks[guard.taskId]!;
+            const remainingDuration =
+                guard.minProgress * totalDuration - taskProgress.timeSpent;
 
             return {
                 current: false,
                 nextChange:
-                    (guard.minProgress - taskProgress.timeSpent) /
-                    (nAssignedPersonnel * state.possibleTasks[guard.taskId]!),
+                    exerciseState.currentTime + remainingDuration / rate,
             };
         }
         case 'timerGuard': {
+            if (
+                isTimerGuardFulfilled(
+                    guard,
+                    stateMachine,
+                    exerciseState.currentTime
+                )
+            )
+                return { current: true, nextChange: Infinity };
+
+            const timer = stateMachine.timers[guard.timerId]!;
             return {
-                current:
-                    stateMachine.simulationStartTime + guard.minProgress >=
-                    exerciseState.currentTime,
+                current: false,
                 nextChange:
-                    stateMachine.simulationStartTime + guard.minProgress,
+                    stateMachine.simulationStartTime +
+                    guard.minProgress * timer.totalDuration,
             };
         }
     }
 }
 
+function applyEventToQueue(
+    exerciseState: WritableDraft<ExerciseState>,
+    stateMachineId: StateMachineId,
+    earliestEvent: StateMachineEvent | null
+): void {
+    const queue = exerciseState.stateMachineEventQueue;
+
+    if (earliestEvent === null) {
+        remove(queue, stateMachineId);
+        return;
+    }
+    if (queue.indices[stateMachineId] === undefined) {
+        insert(queue, earliestEvent);
+        return;
+    }
+    const current = queue.events[queue.indices[stateMachineId]]!;
+    if (
+        current.transitionId === earliestEvent.transitionId &&
+        current.timestamp === earliestEvent.timestamp
+    )
+        return;
+    modify(queue, stateMachineId, earliestEvent);
+}
+
+/** Full recomputation across all transitions — use after state transitions and on initial creation. */
 export function updateEventQueue(
-    stateMachine: WritableDraft<StateMachine>,
-    exerciseState: WritableDraft<ExerciseState>
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallengeId: TechnicalChallengeId,
+    stateMachine: WritableDraft<StateMachine>
 ) {
     const state = currentStateOf(stateMachine);
 
     const potentialTransitions = Object.values(state.outgoingTransitions);
 
-    const queue = exerciseState.technicalChallengeEventQueue;
-    for (const transition of potentialTransitions) {
-        const guard = transition.guard;
-        const guardTimestamp = getGuardTimestamp(
-            stateMachine,
-            exerciseState,
-            state,
-            guard
-        );
-        if (guardTimestamp.current) continue;
-        console.log(guardTimestamp)
-        const event = newStateMachineEvent(
-            guardTimestamp.nextChange,
-            stateMachine.id,
-            transition.id
-        );
-        insert(queue, event);
+    if (potentialTransitions.length === 0) {
+        remove(exerciseState.stateMachineEventQueue, stateMachine.id);
+    }
+
+    const earliestEvent = computeEarliestEvent(
+        exerciseState,
+        technicalChallengeId,
+        stateMachine,
+        potentialTransitions
+    );
+
+    applyEventToQueue(exerciseState, stateMachine.id, earliestEvent);
+}
+
+/**
+ * Targeted update after a personnel is assigned to taskId.
+ * Only recomputes transitions for taskId; only updates the queue if the new
+ * event fires earlier than the current one.
+ */
+export function updateEventQueueAfterAssignment(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallengeId: TechnicalChallengeId,
+    stateMachine: WritableDraft<StateMachine>,
+    taskId: UUID
+): void {
+    const state = currentStateOf(stateMachine);
+    const affectedTransitions = Object.values(state.outgoingTransitions).filter(
+        (t) => t.guard.type === 'taskGuard' && t.guard.taskId === taskId
+    );
+
+    if (affectedTransitions.length === 0) return;
+
+    const newEvent = computeEarliestEvent(
+        exerciseState,
+        technicalChallengeId,
+        stateMachine,
+        affectedTransitions
+    );
+    if (newEvent === null) return;
+
+    const queue = exerciseState.stateMachineEventQueue;
+    if (queue.indices[stateMachine.id] === undefined) {
+        insert(queue, newEvent);
+        return;
+    }
+    const current = queue.events[queue.indices[stateMachine.id]!]!;
+    if (newEvent.timestamp < current.timestamp) {
+        modify(queue, stateMachine.id, newEvent);
     }
 }
 
-export function simulateTechnicalChallenge(
-    technicalChallenge: WritableDraft<TechnicalChallenge>,
+/**
+ * Targeted update after a personnel is removed from taskId.
+ * If the current queue event is not for taskId, no recomputation is needed
+ * (non-affected transitions are unchanged, and affected ones only got slower).
+ * If it is for taskId, falls back to a full recomputation.
+ */
+export function updateEventQueueAfterUnassignment(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallengeId: TechnicalChallengeId,
+    stateMachine: WritableDraft<StateMachine>,
+    taskId: UUID
+): void {
+    const queue = exerciseState.stateMachineEventQueue;
+    const idx = queue.indices[stateMachine.id];
+    if (idx === undefined) return;
+
+    const state = currentStateOf(stateMachine);
+    const currentTransition =
+        state.outgoingTransitions[queue.events[idx]!.transitionId];
+    if (
+        currentTransition?.guard.type !== 'taskGuard' ||
+        currentTransition.guard.taskId !== taskId
+    )
+        return;
+
+    updateEventQueue(exerciseState, technicalChallengeId, stateMachine);
+}
+
+function simulateStateMachine(
+    technicalChallengeId: TechnicalChallengeId,
+    stateMachine: WritableDraft<StateMachine>,
     transitionId: WritableDraft<UUID>,
     exerciseState: WritableDraft<ExerciseState>,
-    tickInterval: number
-) {
-    for (const stateMachine of Object.values(
-        technicalChallenge.stateMachines
-    )) {
-        const currentStateId = stateMachine.currentStateId;
-        simulateStateMachine(
-            stateMachine,
-            transitionId,
-            exerciseState,
-            tickInterval,
-            (targetStateId) =>
-                logTechnicalChallengeStateTransition(
-                    exerciseState,
-                    technicalChallenge.id,
-                    currentStateId,
-                    targetStateId
-                ),
-            (personnelId, taskTypeId) =>
-                logTechnicalChallengePersonnelUnassigned(
-                    exerciseState,
-                    technicalChallenge.id,
-                    personnelId,
-                    taskTypeId
-                )
-        );
+    tickInterval: number,
+    logStateTransition?: (targetStateId: StateMachineState['id']) => void,
+    logPersonnelUnassigned?: (
+        personnelId: Personnel['id'],
+        taskTypeId: TaskType['id']
+    ) => void
+): void {
+    const state = currentStateOf(stateMachine);
+
+    const nextTransition = state.outgoingTransitions[transitionId];
+
+    if (!nextTransition) return;
+
+    logStateTransition?.(nextTransition.targetState);
+
+    updateAllTasksProgress(exerciseState, stateMachine);
+
+    stateMachine.currentStateId = nextTransition.targetState;
+
+    const unassignedPersonnel = unassignFromNonexistentTasks(stateMachine);
+
+    if (unassignedPersonnel.length > 0 && logPersonnelUnassigned) {
+        for (const { personnelId, taskTypeId } of unassignedPersonnel) {
+            logPersonnelUnassigned(personnelId, taskTypeId);
+        }
     }
+
+    updateEventQueue(exerciseState, technicalChallengeId, stateMachine);
 }
 
 export function simulateAllTechnicalChallenges(
     draftState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {
-    const queue = draftState.technicalChallengeEventQueue;
+    const queue = draftState.stateMachineEventQueue;
     console.log(JSON.stringify(queue, null, 2));
     console.log(
         `Comparing ${peek(queue)?.timestamp} with ${draftState.currentTime}`
@@ -551,14 +686,29 @@ export function simulateAllTechnicalChallenges(
 
     while ((peek(queue)?.timestamp ?? Infinity) <= draftState.currentTime) {
         const event = pop(queue)!;
-        const technicalChallenge =
-            draftState.technicalChallenges[event.stateMachineId];
-        if (!technicalChallenge) continue;
-        simulateTechnicalChallenge(
-            technicalChallenge,
+        const stateMachine =
+            draftState.technicalChallenges[event.technicalChallengeId]!
+                .stateMachines[event.stateMachineId]!;
+        simulateStateMachine(
+            event.technicalChallengeId,
+            stateMachine,
             event.transitionId,
             draftState,
-            tickInterval
+            tickInterval,
+            (targetStateId) =>
+                logTechnicalChallengeStateTransition(
+                    draftState,
+                    event.technicalChallengeId,
+                    stateMachine.currentStateId,
+                    targetStateId
+                ),
+            (personnelId, taskTypeId) =>
+                logTechnicalChallengePersonnelUnassigned(
+                    draftState,
+                    event.technicalChallengeId,
+                    personnelId,
+                    taskTypeId
+                )
         );
     }
 }

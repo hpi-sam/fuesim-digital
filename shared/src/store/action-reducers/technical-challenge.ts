@@ -92,7 +92,11 @@ export namespace TechnicalChallengeActionReducers {
                         action.technicalChallenge.id
                     ]!.stateMachines
                 ))
-                    updateEventQueue(stateMachine, draftState);
+                    updateEventQueue(
+                        draftState,
+                        action.technicalChallenge.id,
+                        stateMachine
+                    );
                 return draftState;
             },
             rights: 'trainer',
@@ -148,6 +152,8 @@ export namespace TechnicalChallengeActionReducers {
             }
 
             stateMachine.assignedPersonnel[personnelId] = taskId;
+
+            updateEventQueue(draftState, technicalChallengeId, stateMachine);
 
             logTechnicalChallengePersonnelAssigned(
                 draftState,

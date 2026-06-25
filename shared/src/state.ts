@@ -56,8 +56,9 @@ import { resourceDescriptionSchema } from './models/utils/resource-description.j
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
 import {  exerciseTimeSchema } from './models/time.js';
 import {
-    newTechnicalChallengeEventQueue,
-    technicalChallengeEventQueueSchema,
+    newStateMachineEventQueue,
+    type StateMachineEventQueue,
+    stateMachineEventQueueSchema,
 } from './models/technical-challenge/event.js';
 
 /**
@@ -124,7 +125,7 @@ export const exerciseStateSchema = z.strictObject({
 
     scoutables: z.record(scoutableSchema.shape.id, scoutableSchema),
 
-    technicalChallengeEventQueue: technicalChallengeEventQueueSchema,
+    stateMachineEventQueue: stateMachineEventQueueSchema,
 
     eocLog: z.array(eocLogEntrySchema),
 
@@ -182,7 +183,7 @@ export function newExerciseState(
         measureTemplates: defaultMeasureTemplateCategories,
         mapImageTemplates: defaultMapImagesTemplatesById,
         scoutables: {},
-        technicalChallengeEventQueue: newTechnicalChallengeEventQueue(),
+        stateMachineEventQueue: newStateMachineEventQueue(),
         eocLog: [],
         participantKey,
         spatialTrees: {

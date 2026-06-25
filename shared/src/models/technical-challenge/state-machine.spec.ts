@@ -17,6 +17,7 @@ import { newMapCoordinatesAt } from '../utils/position/map-coordinates.js';
 import { uuid } from '../../utils/uuid.js';
 import { isPersonnelAssigned } from '../../state-helpers/technical-challenge-assignment.js';
 import { newTechnicalChallengeFromTemplate } from './technical-challenge-template.js';
+import { getTaskProgress } from './state-machine.js';
 
 const tickInterval = 1000;
 const simulateOneTick = produce((draftState: WritableDraft<ExerciseState>) => {
@@ -46,6 +47,7 @@ const challenge = {
     ...newTechnicalChallengeFromTemplate(challengeTemplate, 0),
     position: newMapPositionAt(newMapCoordinatesAt(0, 0)),
 };
+const stateMachine = Object.values(challenge.stateMachines).at(0)!;
 const personnelA = newPersonnelFromTemplate(
     defaultPersonnelTemplates.san,
     uuid(),
@@ -70,6 +72,7 @@ const stateWithAssignedPersonnel: ExerciseState = assignPersonnel(
     {
         type: '[TechnicalChallenge] Assign a personnel to technical challenge',
         technicalChallengeId: challenge.id,
+        stateMachineId: stateMachine.id,
         personnelId: personnelA.id,
         taskId: StateMachineTesting.extinguishFireTask.id,
         targetPosition: currentCoordinatesOf(challenge),
@@ -78,7 +81,7 @@ const stateWithAssignedPersonnel: ExerciseState = assignPersonnel(
 
 // for easy debugging of failing tests:
 let stateDict = '<state uuid>                        \t<state title>';
-for (const state of Object.values(challenge.states)) {
+for (const state of Object.values(stateMachine.states)) {
     stateDict += `\n${state.id}\t${state.title}`;
 }
 console.log(stateDict);
@@ -86,68 +89,86 @@ console.log(stateDict);
 describe('TechnicalChallenges', () => {
     it('should not progress unassigned tasks', () => {
         const state = simulateOneTick(initialState);
-        const resultingTechnicalChallenge =
-            state.technicalChallenges[challenge.id];
+        const resultingStateMachine =
+            state.technicalChallenges[challenge.id]!.stateMachines[
+                stateMachine.id
+            ]!;
 
         expect(
-            resultingTechnicalChallenge!.taskProgress[
-                StateMachineTesting.rescuePatientTask.id
-            ]
-        ).toBe(0);
+            getTaskProgress(
+                StateMachineTesting.rescuePatientTask.id,
+                resultingStateMachine
+            )
+        ).toStrictEqual({ timeSpent: 0, progressPercentage: 0 });
         expect(
-            resultingTechnicalChallenge!.taskProgress[
-                StateMachineTesting.extinguishFireTask.id
-            ]
-        ).toBe(0);
+            getTaskProgress(
+                StateMachineTesting.extinguishFireTask.id,
+                resultingStateMachine
+            )
+        ).toStrictEqual({ timeSpent: 0, progressPercentage: 0 });
     });
 
     it('should progress assigned tasks', () => {
         const oneTickState = simulateOneTick(stateWithAssignedPersonnel);
-        const oneTickChallenge = oneTickState.technicalChallenges[challenge.id];
+        const oneTickSM =
+            oneTickState.technicalChallenges[challenge.id]?.stateMachines[
+                stateMachine.id
+            ];
         expect(
-            oneTickChallenge?.taskProgress[
-                StateMachineTesting.extinguishFireTask.id
-            ]
+            getTaskProgress(
+                StateMachineTesting.extinguishFireTask.id,
+                oneTickSM!
+            ).timeSpent
         ).toBe(tickInterval);
         expect(
-            oneTickChallenge?.taskProgress[
-                StateMachineTesting.rescuePatientTask.id
-            ]
+            getTaskProgress(
+                StateMachineTesting.rescuePatientTask.id,
+                oneTickSM!
+            ).timeSpent
         ).toBe(0);
-        expect(oneTickChallenge?.currentStateId).toBe(
+        expect(oneTickSM?.currentStateId).toBe(
             StateMachineTesting.initialState.id
         );
 
         const tenTickState = simulateNTicks(oneTickState, 9);
-        const tenTickChallenge = tenTickState.technicalChallenges[challenge.id];
-        expect(tenTickChallenge?.currentStateId).toBe(
+        const tenTickSM =
+            tenTickState.technicalChallenges[challenge.id]?.stateMachines[
+                stateMachine.id
+            ];
+        expect(tenTickSM?.currentStateId).toBe(
             StateMachineTesting.onlyExtinguished.id
         );
         expect(
-            tenTickChallenge?.taskProgress[
-                StateMachineTesting.extinguishFireTask.id
-            ]
+            getTaskProgress(
+                StateMachineTesting.extinguishFireTask.id,
+                tenTickSM!
+            ).timeSpent
         ).toBe(tickInterval * 10);
         expect(
-            tenTickChallenge?.taskProgress[
-                StateMachineTesting.rescuePatientTask.id
-            ]
+            getTaskProgress(
+                StateMachineTesting.rescuePatientTask.id,
+                tenTickSM!
+            ).timeSpent
         ).toBe(0);
     });
 
     it('should transition on fulfilled timer guards', () => {
         const patientDeadState = simulateNTicks(initialState, 30);
-        const patientDeadChallenge =
-            patientDeadState.technicalChallenges[challenge.id];
+        const patientDeadSM =
+            patientDeadState.technicalChallenges[challenge.id]!.stateMachines[
+                stateMachine.id
+            ]!;
 
-        expect(patientDeadChallenge?.currentStateId).toBe(
+        expect(patientDeadSM.currentStateId).toBe(
             StateMachineTesting.onlyDead.id
         );
 
         const bothFailedState = simulateNTicks(patientDeadState, 30);
-        const bothFailedChallenge =
-            bothFailedState.technicalChallenges[challenge.id];
-        expect(bothFailedChallenge?.currentStateId).toBe(
+        const bothFailedSM =
+            bothFailedState.technicalChallenges[challenge.id]!.stateMachines[
+                stateMachine.id
+            ]!;
+        expect(bothFailedSM.currentStateId).toBe(
             StateMachineTesting.burnedOutAndPatientDead.id
         );
     });
@@ -169,9 +190,14 @@ describe('TechnicalChallenges', () => {
                 technicalChallenge: newChallenge,
             });
         });
+        const newStateMachine = Object.values(newChallenge.stateMachines).at(
+            0
+        )!;
 
         const currentState = (state: ExerciseState) =>
-            state.technicalChallenges[newChallenge.id]?.currentStateId;
+            state.technicalChallenges[newChallenge.id]?.stateMachines[
+                newStateMachine.id
+            ]?.currentStateId;
 
         expect(currentState(withNewChallenge)).toBe(
             StateMachineTesting.initialState.id
@@ -198,6 +224,7 @@ describe('TechnicalChallenges', () => {
         const multipleAssignmentsState = assignPersonnel(oneTickState, {
             type: '[TechnicalChallenge] Assign a personnel to technical challenge',
             technicalChallengeId: challenge.id,
+            stateMachineId: stateMachine.id,
             targetPosition: currentCoordinatesOf(challenge),
             taskId: StateMachineTesting.rescuePatientTask.id,
             personnelId: personnelB.id,
@@ -227,7 +254,7 @@ describe('TechnicalChallenges', () => {
 
     it('should unassign personnel, if the assigned task is no more available', () => {
         const secondsBeforeStateChange =
-            StateMachineTesting.isPatientDead.minTimePassed / 1_000;
+            StateMachineTesting.patientDeadTimerDuration / 1_000;
         const nearlyStateChangedState = simulateNTicks(
             initialState,
             secondsBeforeStateChange - 1
@@ -236,6 +263,7 @@ describe('TechnicalChallenges', () => {
         const tooLateAssignedState = assignPersonnel(nearlyStateChangedState, {
             type: '[TechnicalChallenge] Assign a personnel to technical challenge',
             technicalChallengeId: challenge.id,
+            stateMachineId: stateMachine.id,
             personnelId: personnelA.id,
             taskId: StateMachineTesting.rescuePatientTask.id,
             targetPosition: currentCoordinatesOf(challenge),

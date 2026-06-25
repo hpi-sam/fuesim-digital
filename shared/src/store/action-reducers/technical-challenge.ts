@@ -13,18 +13,19 @@ import { sizeSchema } from '../../models/utils/size.js';
 import { ReducerError } from '../reducer-error.js';
 import {
     currentStateOf,
-    technicalChallengeStateIdSchema,
+    stateMachineSchema,
+    stateMachineStateSchema,
 } from '../../models/technical-challenge/state-machine.js';
-import { taskSchema } from '../../models/task.js';
+import { taskTypeSchema } from '../../models/task-type.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { createScoutableTag } from '../../models/utils/tag-helpers.js';
 import { getElement } from './utils/get-element.js';
-import { lookupReducerFor } from './action-reducers.js';
 import {
     logTechnicalChallenge,
     logTechnicalChallengePersonnelAssigned,
 } from './utils/log.js';
+import { PersonnelActionReducers } from './personnel.js';
 
 const createTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Create technical challenge'),
@@ -53,7 +54,8 @@ const assignTechnicalChallengeActionSchema = z.strictObject({
      * assigned personnel is also moved to specified position
      */
     targetPosition: mapCoordinatesSchema,
-    taskId: taskSchema.shape.id,
+    stateMachineId: stateMachineSchema.shape.id,
+    taskId: taskTypeSchema.shape.id,
 });
 
 const resizeTechnicalChallengeActionSchema = z.strictObject({
@@ -66,14 +68,16 @@ const resizeTechnicalChallengeActionSchema = z.strictObject({
 const updateTechnicalChallengeStateContentActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Update state content'),
     technicalChallengeId: technicalChallengeIdSchema,
-    stateId: technicalChallengeStateIdSchema,
+    stateMachineId: stateMachineSchema.shape.id,
+    stateId: stateMachineStateSchema.shape.id,
     userGeneratedContent: userGeneratedContentSchema,
 });
 
 const markTechnicalChallengeStateAsViewedActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Mark state as viewed'),
     technicalChallengeId: technicalChallengeIdSchema,
-    stateId: technicalChallengeStateIdSchema,
+    stateMachineId: stateMachineSchema.shape.id,
+    stateId: stateMachineStateSchema.shape.id,
 });
 
 export namespace TechnicalChallengeActionReducers {
@@ -111,20 +115,34 @@ export namespace TechnicalChallengeActionReducers {
         actionSchema: assignTechnicalChallengeActionSchema,
         reducer: (
             draftState,
-            { technicalChallengeId, personnelId, taskId, targetPosition }
+            {
+                technicalChallengeId,
+                personnelId,
+                taskId,
+                targetPosition,
+                stateMachineId,
+            }
         ) => {
             const technicalChallenge = getElement(
                 draftState,
                 'technicalChallenge',
                 technicalChallengeId
             );
-
-            if (!(taskId in currentStateOf(technicalChallenge).possibleTasks)) {
+            const stateMachine =
+                technicalChallenge.stateMachines[stateMachineId];
+            if (!stateMachine) {
                 throw new ReducerError(
-                    `Task ${taskId} is not possible in current state ${technicalChallenge.currentStateId}`
+                    `StateMachine ${stateMachineId} not found in technical challenge ${technicalChallenge.id}.`
                 );
             }
-            technicalChallenge.assignedPersonnel[personnelId] = taskId;
+
+            if (!(taskId in currentStateOf(stateMachine).possibleTasks)) {
+                throw new ReducerError(
+                    `Task ${taskId} is not possible in current state ${stateMachine.currentStateId}`
+                );
+            }
+
+            stateMachine.assignedPersonnel[personnelId] = taskId;
 
             logTechnicalChallengePersonnelAssigned(
                 draftState,
@@ -133,7 +151,7 @@ export namespace TechnicalChallengeActionReducers {
                 taskId
             );
 
-            lookupReducerFor('[Personnel] Move personnel').reducer(draftState, {
+            PersonnelActionReducers.movePersonnel.reducer(draftState, {
                 type: '[Personnel] Move personnel',
                 personnelId,
                 targetPosition,
@@ -173,7 +191,15 @@ export namespace TechnicalChallengeActionReducers {
                 'technicalChallenge',
                 action.technicalChallengeId
             );
-            const state = currentStateOf(technicalChallenge);
+            const stateMachine =
+                technicalChallenge.stateMachines[action.stateMachineId];
+            if (!stateMachine) {
+                throw new ReducerError(
+                    `StateMachine ${action.stateMachineId} not found in technical challenge ${technicalChallenge.id}.`
+                );
+            }
+
+            const state = currentStateOf(stateMachine);
 
             state.userGeneratedContent = cloneDeepMutable(
                 action.userGeneratedContent
@@ -193,7 +219,13 @@ export namespace TechnicalChallengeActionReducers {
                 'technicalChallenge',
                 action.technicalChallengeId
             );
-            const state = challenge.states[action.stateId];
+            const stateMachine = challenge.stateMachines[action.stateMachineId];
+            if (!stateMachine) {
+                throw new ReducerError(
+                    `StateMachine ${action.stateMachineId} not found in technical challenge ${challenge.id}.`
+                );
+            }
+            const state = stateMachine.states[action.stateId];
             if (!state)
                 throw new ReducerError(
                     `Unknown StateId ${action.stateId} in TechnicalChallenge ${action.technicalChallengeId}`
@@ -202,7 +234,7 @@ export namespace TechnicalChallengeActionReducers {
 
             logTechnicalChallenge(
                 draftState,
-                [createScoutableTag(challenge.name, state.id)],
+                [createScoutableTag(stateMachine.name, state.id)],
                 `Es wurde "${state.title}" erkundet.`,
                 challenge.id
             );

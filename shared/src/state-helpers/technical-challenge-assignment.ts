@@ -8,12 +8,53 @@ import {
 } from '../models/utils/position/position-helpers.js';
 import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
+import type { TaskType } from '../models/task-type.js';
+import { TypeAssertedObject } from '../utils/type-asserted-object.js';
+import type { StateMachine } from '../models/technical-challenge/state-machine.js';
+
+// TODO: maybe only remove personnelId
+export function getAssignmentsOnTechnicalChallenge(
+    technicalChallenge: TechnicalChallenge
+): {
+    personnelId: Personnel['id'];
+    stateMachineId: StateMachine['id'];
+    taskTypeId: TaskType['id'];
+}[] {
+    return Object.values(technicalChallenge.stateMachines).flatMap(
+        (stateMachine) =>
+            TypeAssertedObject.entries(stateMachine.assignedPersonnel).map(
+                ([personnelId, taskTypeId]) => ({
+                    personnelId,
+                    taskTypeId,
+                    stateMachineId: stateMachine.id,
+                })
+            )
+    );
+}
+
+export function unassignPersonnelFromTechnicalChallenge(
+    personnelId: Personnel['id'],
+    technicalChallenge: WritableDraft<TechnicalChallenge>
+): void {
+    const result = getAssignmentsOnTechnicalChallenge(technicalChallenge).find(
+        (assignment) => assignment.personnelId === personnelId
+    );
+
+    if (!result) {
+        return;
+    }
+
+    delete technicalChallenge.stateMachines[result.stateMachineId]!
+        .assignedPersonnel[personnelId];
+}
 
 export function isPersonnelAssigned(
-    personnelId: UUID,
+    personnelId: Personnel['id'],
     technicalChallenge: TechnicalChallenge
 ): boolean {
-    return Object.hasOwn(technicalChallenge.assignedPersonnel, personnelId);
+    return Object.values(technicalChallenge.stateMachines)
+        .flatMap((stateMachine) => Object.keys(stateMachine.assignedPersonnel))
+        .includes(personnelId);
 }
 
 function isPersonnelAssignedFilter(personnelId: UUID) {
@@ -48,16 +89,14 @@ function isValidAssignment(
 export function removeInvalidAssignments(
     personnelId: UUID,
     draftState: WritableDraft<ExerciseState>
-): WritableDraft<ExerciseState> {
+): void {
     const challenges = getAssignmentsOfPersonnel(personnelId, draftState);
     const personnel = getElement(draftState, 'personnel', personnelId);
 
     const invalidChallenges = challenges.filter(
         (c) => !isValidAssignment(personnel, c)
     );
-    invalidChallenges.forEach(
-        (challenge) => delete challenge.assignedPersonnel[personnelId]
-    );
-
-    return draftState;
+    invalidChallenges.forEach((challenge) => {
+        unassignPersonnelFromTechnicalChallenge(personnelId, challenge);
+    });
 }

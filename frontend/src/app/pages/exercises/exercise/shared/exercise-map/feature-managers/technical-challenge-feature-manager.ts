@@ -60,6 +60,7 @@ export class TechnicalChallengeFeatureManager
     }
 
     private currentStateOfFeature(feature: Feature): StateMachineState {
+        // TODO@Felix: handle which state(s) are displayed on map
         return currentStateOf(
             Object.values(
                 (this.getElementFromFeature(feature) as TechnicalChallenge)

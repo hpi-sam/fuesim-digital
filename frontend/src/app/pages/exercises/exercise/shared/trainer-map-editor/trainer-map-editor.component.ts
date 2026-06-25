@@ -16,7 +16,7 @@ import {
     validateExerciseExport,
     viewportImage,
     getDefaultTechnicalChallengeTemplate,
-    getKellerexplosionTechnicalChallengeTemplate,
+    getBasementExplosionTechnicalChallenge,
     bystanderCategories,
     scoutableMapImageTemplate,
 } from 'fuesim-digital-shared';
@@ -130,7 +130,7 @@ export class TrainerMapEditorComponent implements OnInit {
         TechnicalChallengeTemplate[]
     > = signal([
         getDefaultTechnicalChallengeTemplate(),
-        getKellerexplosionTechnicalChallengeTemplate(),
+        getBasementExplosionTechnicalChallenge(),
     ]);
 
     public patientCategories$?: Observable<{

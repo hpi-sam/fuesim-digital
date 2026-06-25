@@ -12,7 +12,9 @@ import type {
 import { type StateMachine, stateMachineSchema } from './state-machine.js';
 
 export const technicalChallengeTemplateSchema = z.strictObject({
-    stateMachines: z.record(stateMachineSchema.shape.id, stateMachineSchema),
+    stateMachines: z
+        .record(stateMachineSchema.shape.id, stateMachineSchema)
+        .refine((obj) => Object.keys(obj).length > 0),
     id: uuidSchema,
     image: imagePropertiesSchema,
     name: z.string(),

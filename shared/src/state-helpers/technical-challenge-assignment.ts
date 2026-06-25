@@ -96,7 +96,7 @@ export function removeInvalidAssignments(
     const invalidChallenges = challenges.filter(
         (c) => !isValidAssignment(personnel, c)
     );
-    invalidChallenges.forEach(
-        unassignPersonnelFromTechnicalChallenge.bind(null, personnelId)
-    );
+    invalidChallenges.forEach((challenge) => {
+        unassignPersonnelFromTechnicalChallenge(personnelId, challenge);
+    });
 }

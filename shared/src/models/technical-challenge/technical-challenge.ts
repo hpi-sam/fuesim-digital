@@ -6,9 +6,8 @@ import { positionSchema } from '../utils/position/position.js';
 import { sizeSchema } from '../utils/size.js';
 import { stateMachineSchema, type StateMachineState } from './state-machine.js';
 
-export const technicalChallengeIdSchema = uuidSchema.brand(
-    'TechnicalChallengeId'
-);
+export const technicalChallengeIdSchema =
+    uuidSchema.brand<'TechnicalChallengeId'>();
 export type TechnicalChallengeId = z.infer<typeof technicalChallengeIdSchema>;
 
 export const technicalChallengeSchema = z.strictObject({

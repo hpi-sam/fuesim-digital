@@ -114,7 +114,7 @@ function buildKellerexplosionTemplate(): TechnicalChallengeTemplate {
 
 let _cachedTemplate: TechnicalChallengeTemplate | undefined;
 
-export function getKellerexplosionTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
+export function getBasementExplosionTechnicalChallenge(): TechnicalChallengeTemplate {
     _cachedTemplate ??= buildKellerexplosionTemplate();
     return _cachedTemplate;
 }

@@ -24,6 +24,7 @@ export class ChooseTaskPopupComponent implements OnInit {
         taskTypeId: TaskType['id']
     ) => void;
 
+    /** Available tasks, grouped by their containing state machine */
     public readonly availableTasks!: Signal<
         { stateMachine: StateMachine; tasks: TaskType[] }[]
     >;

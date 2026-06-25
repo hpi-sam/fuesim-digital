@@ -55,7 +55,7 @@ export type TimerGuard = Immutable<z.infer<typeof timerGuardSchema>>;
 /* Because AndGuard's and NotGuard's are recursive types, their type is not
  * directly inferred from their schema.
  *
- * They also can not be defined using `Immutable<>`, presumably because they
+ * They also can not be defined using `Immutable<>`, presumably because
  * there is some interaction with the recursive nature of it.
  *
  * The current workaround is to define them using interfaces.
@@ -432,6 +432,7 @@ export function simulateAllTechnicalChallenges(
     draftState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {
+    // TODO@Julius: this is a naïve implementation, somebody should improve it
     for (const challenge of Object.values(draftState.technicalChallenges)) {
         simulateTechnicalChallenge(challenge, draftState, tickInterval);
     }

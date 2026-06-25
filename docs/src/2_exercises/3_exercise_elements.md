@@ -4,7 +4,7 @@ Mit Übungselementen sind all jene Objekte gemeint, die im Laufe einer Übung du
 
 ## Ansichten
 
-Bei Ansichten handelt es sich um Bereiche einer Übung, die mit einem weißen REchteck markiert sind.
+Bei Ansichten handelt es sich um Bereiche einer Übung, die mit einem weißen Rechteck markiert sind.
 
 ![Ansichten auf der Übungskarte, mit Einstellungs-Popup](./exercise_elements_viewports_on_map.png)
 

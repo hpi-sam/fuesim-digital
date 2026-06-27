@@ -14,6 +14,7 @@ import {
     NgbDropdownMenu,
     NgbDropdownButtonItem,
     NgbDropdownItem,
+    NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AsyncPipe } from '@angular/common';
 import { MessageService } from '../../../../../../core/messages/message.service';
@@ -49,6 +50,7 @@ import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
         MapEditorCardComponent,
         AsyncPipe,
         ValuesPipe,
+        NgbTooltip,
     ],
 })
 export class VehicleTemplateFormComponent implements OnChanges {

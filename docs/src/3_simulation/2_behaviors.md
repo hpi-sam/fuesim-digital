@@ -54,11 +54,8 @@ Während die Zeit abläuft, ist das Fahrzeug blockiert. Nach Ablauf der Zeit ste
 
 Zeigt eine Tabelle aller Fahrzeuge an, aus denen gerade ausgestiegen wird, sowie die verbleibende Zeit zum Aussteigen.
 
-XXX
-Add Link to cancel Occupation
-
 > [!TIP]
-> Im Reiter Fahrzuge kann das Ausladen abgebrochen werden.
+> Im [Reiter Fahrzuge](1_general.md#fahrzeuge) kann das Ausladen abgebrochen werden.
 
 ## Berichte erstellen
 

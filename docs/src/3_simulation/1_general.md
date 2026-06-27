@@ -41,7 +41,47 @@ Der Schnittstellenfunker muss sich selbst keine Informationen zum Übungsablauf 
 
 ## Aufbau des Simulierte-Bereich-Fensters
 
-XXX
+Bei Klick auf einen simulierten Bereich öffnet sich ein Popup, über welches dieser Bereich konfiguriert werden kann, analog zu anderen Übungselemente auf der Karte. Da die Einstellungsmöglichkeiten von simulierten Bereichen sehr komplex sind, empfiehlt es sich aber, in die großen Simulationseinstellungen zu wechseln. Diese ist über <kbd>**Durchführung > Simulationseinstellungen (Übungsleitung)**</kbd> erreichbar.
+
+![Screenshot der Simulationseinstellungen](./simulation-settings-overview.png)
+
+Auf der linken Seite der Simulationseinstellungen werden [Funksprüche](#funkspruch--schnittstellenfunker) angezeigt, sodass diese Ansicht theoretisch auch von Schnittstellenfunkern genutzt werden kann. Für diese gibt es aber auch [eine eigene Ansicht](3_ifs.md).
+
+Auf der rechten Seite können alle simulierten Bereiche der Übung verwaltet werden. Jeder simulierte Bereich besitzt einen eigenen Reiter, im oben gezeigten Beispiel gibt es also vier Bereiche, drei Patientenablagen "Kreuzung", "See" und "Stadion", sowie einen Bereitstellungsraum. Darunter gibt es eine zweite Reihe von Reitern, mit denen zwischen verschiedenen Optionen des ausgewählten simulierten Bereichs gewechselt werden kann.
+
+### Übersicht
+
+In der Übersicht kann der Name des simulierten Bereichs festgelegt werden. Zudem zeigt eine Liste die Anzahl an Patienten, Fahrzeugen, Personal und Material im Bereich an.
+
+### Patienten
+
+![Screenshot des Reiters _Patienten_ in den Simulationseinstellungen](./simulation-settings-patients.png)
+
+Im Reiter Patienten können die Details zu allen Patienten eingesehen werden. Auf der linken Seite gibt es eine Übersicht aller Patienten, auf der rechten Seite werden die Details des ausgewählten Patienten angezeigt.
+
+Diese Patienten-Details sind größtenteils identisch zum [Patienten-Popup auf der Karte](../2_exercises/3_exercise_elements.html#patienten), allerdings gibt es zusätzlich noch die Möglichkeiten, den Patienten zu transferieren (abzutransportieren), auf die Karte zu holen oder zu löschen.
+
+### Fahrzeuge
+
+![Screenshot des Reiters _Fahrzeuge_ in den Simulationseinstellungen](./simulation-settings-vehicles.png)
+
+Dieser Reiter ist vergleichbar zum Reiter Patienten aufgebaut. Es gibt eine Liste aller Fahrzeuge sowie eine Detail-Ansicht.
+
+Die Detailansicht zeigt neben den bekannten Einstellungsmöglichkeiten aus dem [Fahrzeug-Popup](../2_exercises/3_exercise_elements.md#fahrzeuge-mit-personal-und-material) die aktuelle Tätigkeit (Nutzung) des Fahrzeugs an. Im oben gezeigten Beispiel wird das Fahrzeug gerade für einen Transfer beladen. Außerdem gibt es eine Liste der im Fahrzeug befindlichen Patienten und wie zuvor die Möglichkeiten zum Transfer, auf die Karte schieben und löschen des Fahrzeugs.
+
+### Transfer
+
+![Screenshot des Reiters _Transfer_ in den Simulationseinstellungen](./simulation-settings-transfer.png)
+
+Über diesen Reiter können Transferverbindungen zu anderen simulierten Bereichen oder Transferpunkten angelegt werden. Die Bedienung ist identisch zum [Transferpunkt-Popup](../2_exercises/3_exercise_elements.md#transferpunkte).
+
+### Verhaltensweisen
+
+![Screenshot des Reiters _Verhaltensweisen_ in den Simulationseinstellungen](./simulation-settings-behaviors.png)
+
+Über diesen Reiter können die Verhaltensweisen des simulierten Bereichs konfiguriert werden. Die linke Seite zeigt alle Verhaltensweisen, die dem simulierten Bereich hinzugefügt wurden. Wird eine Verhaltensweise ausgewählt, kann sie auf der rechten Seite konfiguriert werden. Die einzelnen Optionen der Verhaltensweisen sind unter [Verhaltensweisen](2_behaviors.md) beschrieben.
+
+Zudem können über die Buttons <kbd>**Hinzufügen**</kbd> und <kbd>**Entfernen**</kbd> am unteren Rand weitere Verhaltensweisen hinzugefügt oder die aktuell ausgewählte Verhaltensweise gelöscht werden.
 
 ## Vordefinierte Bereichstypen
 

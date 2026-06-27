@@ -3,7 +3,6 @@ import type { Immutable, WritableDraft } from 'immer';
 import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 import type { ExerciseState } from '../../state.js';
 import {
-    newTaskTimeSpent,
     taskTimeSpentSchema,
     type TaskType,
     taskTypeSchema,
@@ -23,7 +22,6 @@ import {
     logTechnicalChallengePersonnelUnassigned,
     logTechnicalChallengeStateTransition,
 } from '../../store/action-reducers/utils/log.js';
-import type { TechnicalChallenge } from './technical-challenge.js';
 import {
     insert,
     modify,
@@ -31,12 +29,10 @@ import {
     pop,
     remove,
 } from '../../state-helpers/events.js';
-import { newStateMachineEvent, StateMachineEvent } from './event.js';
-import {
-    StateMachineId,
-    stateMachineIdSchema,
-    TechnicalChallengeId,
-} from './ids.js';
+import type { StateMachineEvent } from './event.js';
+import { newStateMachineEvent } from './event.js';
+import type { StateMachineId, TechnicalChallengeId } from './ids.js';
+import { stateMachineIdSchema } from './ids.js';
 
 const taskSchema = z.object({
     /**
@@ -176,17 +172,29 @@ export function addTransitionTo(
 
 export function getTaskProgress(
     taskId: TaskType['id'],
-    stateMachine: StateMachine
+    stateMachine: StateMachine,
+    currentTime: ExerciseState['currentTime']
 ): TaskProgress {
     console.assert(
         stateMachine.tasks[taskId],
         `Task ${taskId} does not exist on stateMachine.`,
         stateMachine
     );
-    const timeSpent = stateMachine.taskTimeSpent[taskId]?.timeSpent ?? 0;
+    const taskTimeSpent = stateMachine.taskTimeSpent[taskId];
+    const state = currentStateOf(stateMachine);
+    const nAssignedPersonnel = Object.values(
+        stateMachine.assignedPersonnel
+    ).filter((_taskId) => _taskId === taskId).length;
+    const rate = nAssignedPersonnel * (state.possibleTasks[taskId] ?? 0);
+
+    const timeSpent =
+        (taskTimeSpent?.timeSpent ?? 0) +
+        (taskTimeSpent
+            ? (currentTime - taskTimeSpent.lastUpdatedAt) * rate
+            : 0);
     const totalTaskDuration = stateMachine.tasks[taskId]!.totalDuration;
     const progressPercentage = timeSpent / totalTaskDuration;
-    return { timeSpent, progressPercentage };
+    return { timeSpent, progressPercentage, rate };
 }
 
 export function getTimerProgress(
@@ -210,7 +218,7 @@ export function getGuardProgress(
 ): GuardProgress {
     switch (guard.type) {
         case 'taskGuard':
-            return getTaskProgress(guard.taskId, stateMachine);
+            return getTaskProgress(guard.taskId, stateMachine, currentTime);
         case 'timerGuard':
             return getTimerProgress(guard.timerId, stateMachine, currentTime);
         case 'andGuard': {
@@ -242,6 +250,7 @@ export interface GuardProgress {
 
 export interface TaskProgress extends GuardProgress {
     timeSpent: number;
+    rate: number;
 }
 
 export interface TimerProgress extends GuardProgress {
@@ -250,11 +259,13 @@ export interface TimerProgress extends GuardProgress {
 
 function isTaskGuardFulfilled(
     taskGuard: TaskGuard,
-    stateMachine: StateMachine
+    stateMachine: StateMachine,
+    currentTime: number
 ): boolean {
     const { progressPercentage } = getTaskProgress(
         taskGuard.taskId,
-        stateMachine
+        stateMachine,
+        currentTime
     );
     return progressPercentage >= taskGuard.minProgress;
 }
@@ -355,7 +366,7 @@ function isGuardFulfilled(
 ): boolean {
     switch (guard.type) {
         case 'taskGuard':
-            return isTaskGuardFulfilled(guard, stateMachine);
+            return isTaskGuardFulfilled(guard, stateMachine, currentTime);
         case 'timerGuard':
             return isTimerGuardFulfilled(guard, stateMachine, currentTime);
         case 'andGuard':
@@ -368,8 +379,8 @@ function isGuardFulfilled(
 }
 
 export function updateTaskProgress(
-    exerciseState: WritableDraft<ExerciseState>,
     stateMachine: WritableDraft<StateMachine>,
+    currentTime: ExerciseState['currentTime'],
     taskId: TaskType['id'],
     state: StateMachineState | null = null
 ) {
@@ -383,7 +394,7 @@ export function updateTaskProgress(
     if (!taskProgress) {
         stateMachine.taskTimeSpent[taskId] = {
             timeSpent: 0,
-            lastUpdatedAt: exerciseState.currentTime,
+            lastUpdatedAt: currentTime,
         };
         return;
     }
@@ -394,10 +405,10 @@ export function updateTaskProgress(
 
     taskProgress.timeSpent =
         taskProgress.timeSpent +
-        (exerciseState.currentTime - taskProgress.lastUpdatedAt) *
+        (currentTime - taskProgress.lastUpdatedAt) *
             nAssignedPersonnel *
             state.possibleTasks[taskId];
-    taskProgress.lastUpdatedAt = exerciseState.currentTime;
+    taskProgress.lastUpdatedAt = currentTime;
 }
 
 export function updateAllTasksProgress(
@@ -407,7 +418,7 @@ export function updateAllTasksProgress(
     const state = currentStateOf(stateMachine);
 
     for (const taskId of TypeAssertedObject.keys(state.possibleTasks))
-        updateTaskProgress(exerciseState, stateMachine, taskId);
+        updateTaskProgress(stateMachine, exerciseState.currentTime, taskId);
 }
 
 function computeEarliestEvent(
@@ -483,26 +494,31 @@ function getGuardTimestamp(
             };
         }
         case 'taskGuard': {
-            const taskProgress = getTaskProgress(guard.taskId, stateMachine);
+            const taskProgress = getTaskProgress(
+                guard.taskId,
+                stateMachine,
+                exerciseState.currentTime
+            );
 
-            if (isTaskGuardFulfilled(guard, stateMachine))
+            if (
+                isTaskGuardFulfilled(
+                    guard,
+                    stateMachine,
+                    exerciseState.currentTime
+                )
+            )
                 return { current: true, nextChange: Infinity };
-
-            const nAssignedPersonnel = Object.values(
-                stateMachine.assignedPersonnel
-            ).filter((taskId) => taskId === guard.taskId).length;
 
             const totalDuration =
                 stateMachine.tasks[guard.taskId]!.totalDuration;
-            const rate =
-                nAssignedPersonnel * state.possibleTasks[guard.taskId]!;
             const remainingDuration =
                 guard.minProgress * totalDuration - taskProgress.timeSpent;
 
             return {
                 current: false,
                 nextChange:
-                    exerciseState.currentTime + remainingDuration / rate,
+                    exerciseState.currentTime +
+                    remainingDuration / taskProgress.rate,
             };
         }
         case 'timerGuard': {

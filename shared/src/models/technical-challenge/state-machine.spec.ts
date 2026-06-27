@@ -97,15 +97,17 @@ describe('TechnicalChallenges', () => {
         expect(
             getTaskProgress(
                 StateMachineTesting.rescuePatientTask.id,
-                resultingStateMachine
+                resultingStateMachine,
+                state.currentTime
             )
-        ).toStrictEqual({ timeSpent: 0, progressPercentage: 0 });
+        ).toStrictEqual({ timeSpent: 0, progressPercentage: 0, rate: 0 });
         expect(
             getTaskProgress(
                 StateMachineTesting.extinguishFireTask.id,
-                resultingStateMachine
+                resultingStateMachine,
+                state.currentTime
             )
-        ).toStrictEqual({ timeSpent: 0, progressPercentage: 0 });
+        ).toStrictEqual({ timeSpent: 0, progressPercentage: 0, rate: 0 });
     });
 
     it('should progress assigned tasks', () => {
@@ -117,13 +119,15 @@ describe('TechnicalChallenges', () => {
         expect(
             getTaskProgress(
                 StateMachineTesting.extinguishFireTask.id,
-                oneTickSM!
+                oneTickSM!,
+                oneTickState.currentTime
             ).timeSpent
         ).toBe(tickInterval);
         expect(
             getTaskProgress(
                 StateMachineTesting.rescuePatientTask.id,
-                oneTickSM!
+                oneTickSM!,
+                oneTickState.currentTime
             ).timeSpent
         ).toBe(0);
         expect(oneTickSM?.currentStateId).toBe(
@@ -141,13 +145,15 @@ describe('TechnicalChallenges', () => {
         expect(
             getTaskProgress(
                 StateMachineTesting.extinguishFireTask.id,
-                tenTickSM!
+                tenTickSM!,
+                tenTickState.currentTime
             ).timeSpent
         ).toBe(tickInterval * 10);
         expect(
             getTaskProgress(
                 StateMachineTesting.rescuePatientTask.id,
-                tenTickSM!
+                tenTickSM!,
+                tenTickState.currentTime
             ).timeSpent
         ).toBe(0);
     });

@@ -13,18 +13,19 @@ import {
     stateMachineSchema,
     stateMachineStateSchema,
     updateEventQueue,
+    updateTaskProgress,
 } from '../../models/technical-challenge/state-machine.js';
 import { taskTypeSchema } from '../../models/task-type.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { createScoutableTag } from '../../models/utils/tag-helpers.js';
+import { technicalChallengeIdSchema } from '../../models/technical-challenge/ids.js';
 import { getElement } from './utils/get-element.js';
 import {
     logTechnicalChallenge,
     logTechnicalChallengePersonnelAssigned,
 } from './utils/log.js';
 import { PersonnelActionReducers } from './personnel.js';
-import { technicalChallengeIdSchema } from '../../models/technical-challenge/ids.js';
 
 const createTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Create technical challenge'),
@@ -150,6 +151,8 @@ export namespace TechnicalChallengeActionReducers {
                     `Task ${taskId} is not possible in current state ${stateMachine.currentStateId}`
                 );
             }
+
+            updateTaskProgress(stateMachine, draftState.currentTime, taskId);
 
             stateMachine.assignedPersonnel[personnelId] = taskId;
 

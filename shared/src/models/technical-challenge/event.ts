@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { exerciseTimeSchema } from '../time.js';
 import type { UUID } from '../../utils/uuid.js';
-import { uuid, uuidSchema } from '../../utils/uuid.js';
+import { uuidSchema } from '../../utils/uuid.js';
 import type { StateMachineId, TechnicalChallengeId } from './ids.js';
 import { stateMachineIdSchema, technicalChallengeIdSchema } from './ids.js';
 

@@ -71,33 +71,36 @@ export class StateMachineDetailsComponent {
             guardName: string;
         }[]
     > = computed(() =>
-        Object.values(this.currentState().outgoingTransitions).map((transition) => {
-            // TODO@Felix: refactor into helper function(s)
+        Object.values(this.currentState().outgoingTransitions).map(
+            (transition) => {
+                // TODO@Felix: refactor into helper function(s)
 
-            const currentProgress = getGuardProgress(
-                transition.guard,
-                this.stateMachine(),
-                this.currentTime()
-            );
+                const currentProgress = getGuardProgress(
+                    transition.guard,
+                    this.stateMachine(),
+                    this.currentTime()
+                );
 
-            const guardName = this.getGuardName(
-                transition.guard,
-                this.stateMachine()
-            );
+                const guardName = this.getGuardName(
+                    transition.guard,
+                    this.stateMachine()
+                );
 
-            return {
-                id: transition.targetState,
-                targetStateName:
-                    this.stateMachine().states[transition.targetState]!.title,
-                requiredProgress:
-                    (transition.guard.type === 'taskGuard' ||
-                    transition.guard.type === 'timerGuard'
-                        ? transition.guard.minProgress
-                        : 1) * 100,
-                currentProgress: currentProgress.progressPercentage * 100,
-                guardName,
-            };
-        })
+                return {
+                    id: transition.targetState,
+                    targetStateName:
+                        this.stateMachine().states[transition.targetState]!
+                            .title,
+                    requiredProgress:
+                        (transition.guard.type === 'taskGuard' ||
+                        transition.guard.type === 'timerGuard'
+                            ? transition.guard.minProgress
+                            : 1) * 100,
+                    currentProgress: currentProgress.progressPercentage * 100,
+                    guardName,
+                };
+            }
+        )
     );
     public readonly taskTypes = this.store.selectSignal(selectTaskTypes);
     public readonly tasks = computed(() =>
@@ -106,8 +109,11 @@ export class StateMachineDetailsComponent {
             totalDuration: task.totalDuration / 1000,
             name: this.taskTypes()[task.taskTypeId]!.taskName,
             current:
-                getTaskProgress(task.taskTypeId, this.stateMachine())
-                    .timeSpent / 1000,
+                getTaskProgress(
+                    task.taskTypeId,
+                    this.stateMachine(),
+                    this.currentTime()
+                ).timeSpent / 1000,
         }))
     );
 

@@ -54,10 +54,9 @@ import { getDefaultTasks } from './data/default-state/tmp-default-technical-chal
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
-import {  exerciseTimeSchema } from './models/time.js';
+import { exerciseTimeSchema } from './models/time.js';
 import {
     newStateMachineEventQueue,
-    type StateMachineEventQueue,
     stateMachineEventQueueSchema,
 } from './models/technical-challenge/event.js';
 

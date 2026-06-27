@@ -2,8 +2,7 @@ import type {
     StateMachineEvent,
     StateMachineEventQueue,
 } from '../models/technical-challenge/event.js';
-import { StateMachineId } from '../models/technical-challenge/ids.js';
-import type { UUID } from '../utils/uuid.js';
+import type { StateMachineId } from '../models/technical-challenge/ids.js';
 
 export function insert(
     queue: StateMachineEventQueue,
@@ -35,7 +34,10 @@ export function pop(queue: StateMachineEventQueue): StateMachineEvent | null {
     return min;
 }
 
-export function remove(queue: StateMachineEventQueue, id: StateMachineId): boolean {
+export function remove(
+    queue: StateMachineEventQueue,
+    id: StateMachineId
+): boolean {
     const index = queue.indices[id];
     if (index === undefined) return false;
 

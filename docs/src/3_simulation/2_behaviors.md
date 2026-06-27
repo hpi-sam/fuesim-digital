@@ -21,7 +21,7 @@ Die simulierte Führungskraft beantwortet Anfragen per Funk.
 > [!WARNING]
 > Ohne Führungskraft kann ein simulierter Bereich nur eingeschränkt handeln. Viele Funktionen, insbesondere die Erreichbarkeit per Funk, sind ohne Führungskraft nicht gegeben.
 
-### Einstellungen
+### Informationen und Einstellungen
 
 Diese Verhaltensweise hat keine Einstellungsmöglichkeiten. In der Ansicht dieser Verhaltensweise wird der Typ des aktuell führenden Personals angezeigt.
 
@@ -37,7 +37,9 @@ Lässt Personal aus allen Fahrzeugen aussteigen, die diesen Bereich erreichen.
 
 Personal, das sich in Fahrzeugen befindet, kann keine Aufgaben übernehmen. Umgekehrt können unbesetzte Fahrzeuge nicht sofort losfahren. Daher ist diese Verhaltensweise zum Beispiel für Patientenablagen essentiell, für Bereitstellungsräume allerdings störend.
 
-### Einstellungen
+### Informationen und Einstellungen
+
+![Screenshot der Einstellungen der Verhaltensweise _Fahrzeuge entladen_](unload-arrived-vehicles.png)
 
 #### Aussteigedauer
 
@@ -48,6 +50,16 @@ Während die Zeit abläuft, ist das Fahrzeug blockiert. Nach Ablauf der Zeit ste
 > [!TIP]
 > Über längere Ausstiegszeiten können zum Beispiel unwegsames Gelände, große Bereiche oder unübersichtliche Situationen abgebildet werden, bei denen das Personal nicht sofort nach Ankunft im Bereich verfügbar ist.
 
+#### Gerade aussteigend
+
+Zeigt eine Tabelle aller Fahrzeuge an, aus denen gerade ausgestiegen wird, sowie die verbleibende Zeit zum Aussteigen.
+
+XXX
+Add Link to cancel Occupation
+
+> [!TIP]
+> Im Reiter Fahrzuge kann das Ausladen abgebrochen werden.
+
 ## Berichte erstellen
 
 ### Auf einen Blick
@@ -56,14 +68,27 @@ Dient dem Austausch von Informationen (zum Beispiel die Anzahl verfügbarer Fahr
 
 Teilnehmende können Informationen einmalig abrufen oder regelmäßige Aktualisierungen anfordern. Zudem werden bestimmte Ereignisse automatisch per Funk mitgeteilt.
 
-### Einstellungen
+### Informationen und Einstellungen
+
+![Screenshot der Einstellungen der Verhaltensweise _Berichte erstellen_](report.png)
 
 #### Bericht erstellen
 
-Ermöglicht das Abrufen einer Information der Wahl.
+Ermöglicht das Abrufen einer Information der Wahl. Hierzu muss die gewünschte Information ausgewählt werden, sowie, ob der Bericht einmalig oder regelmäßig erfolgen soll. Für regelmäßige Berichte kann zudem das Intervall festgelegt werden.
 
 > [!TIP]
 > Für eine laufende Übung empfiehlt sich die Verwendung der Benutzeroberfläche für [Schnittstellenfunker](3_ifs.md). Diese ist speziell für den Austausch per Funk gestaltet.
+
+#### Ereignisbasierte Berichte
+
+Hier kann ausgewählt werden, welche Ereignisse innerhalb des simulierten Bereichs automatisch gemeldet werden sollen.
+
+> [!NOTE]
+> Lässt sich ein Bericht hier nicht aktivieren oder deaktivieren, kann das Ereignis in diesem simulierten Bereich nicht auftreten. In der Abbildung oben ist beispielsweise die letzte Option ("alle Patienten dieser Transportorganisation") nicht verfügbar, weil der Bereich keine Verhaltensweise [Transportorganisation](#transportorganisation) besitzt.
+
+#### Regelmäßige Berichte
+
+Wurden regelmäßige Berichte für bestimmte Informationen angefordert, werden diese hier aufgelistet. Die Häufigkeit des Berichts kann hier nachträglich verändert und über das Mülleimer-Symbol der regelmäßige Bericht gestoppt und gelöscht werden.
 
 ### Abhängigkeiten
 
@@ -102,7 +127,17 @@ Zudem können automatisch Funksprüche bei folgenden Ereignissen erzeugt werden 
 
 Verwaltet die Behandlung aller Patienten im jeweiligen simulierten Bereich. Alle Patienten werden vorgesichtet und anschließend Personal zur Behandlung zugeteilt. Reicht das vor Ort verfügbare Personal nicht aus, wird zusätzliches Personal angefordert.
 
-### Einstellungen
+### Informationen und Einstellungen
+
+![Screenshot der Informationen über die Verhaltensweise _Patienten behandeln_](treat-patients-information.png)
+![Screenshot der Einstellungen der Verhaltensweise _Patienten behandeln_](treat-patients-settings.png)
+
+#### Informationen
+
+In der oberen Hälfte wird der aktuelle Zustand der Behandlung angezeigt. Dies umfasst die aktuelle [Phase der Behandlung](#details-1) sowie eine Übersicht, welches Personal welchem Patienten zugeteilt wurde.
+
+> [!TIP]
+> Per Klick auf einen Patienten in der Liste öffnen sich dessen Details.
 
 #### Häufigkeit der Zuteilungs-Berechnung
 
@@ -155,9 +190,13 @@ Diese Verhaltensweise "übersetzt" fehlendes Personal in Fahrzeuganfragen, die d
 
 So benötigt beispielsweise die Verhaltensweise [Patienten behandeln](#patienten-behandeln) Personal, während der Bereitstellungsraum nur Fahrzeuge zur Verfügung stellen kann. [Personal nachfordern](#personal-nachfordern) ermittelt, wie viele Fahrzeuge welchen Typs benötigt werden, um das gewünschte Personal zu erhalten.
 
-### Einstellungen
+### Informationen und Einstellungen
 
-Es ist möglich, die verfügbaren Fahrzeugtypen nach Priorität zu ordnen oder einzelne Typen komplett auszuschließen. Wird zum Beispiel ein Notfallsanitäter benötigt, den es sowohl im RTW als auch im NEF gibt, wird das Fahrzeug mit der höheren Priorität ausgewählt und angefordert.
+![Screenshot der Einstellungen der Verhaltensweise _Personal nachfordern_](provide-personnel.png)
+
+Es ist möglich, die verfügbaren Fahrzeugtypen nach Priorität zu ordnen oder einzelne Typen komplett auszuschließen.
+
+Über den Button <kbd>**Anderes Fahrzeug anfordern**</kbd> können zusätzliche Fahrzeuge in die Liste aufgenommen und über <kbd>**Nicht anfordern**</kbd> wieder ausgeschlossen werden. Innerhalb der Liste können die Fahrzeuge durch Klicken und Ziehen in die gewünschte Reihenfolge gebracht werden. Dabei hat das oberste Fahrzeug in der Liste die höchste Priorität. Wird zum Beispiel ein Notfallsanitäter benötigt, den es sowohl im RTW als auch im NEF gibt, würde im Beispiel oben ein RTW angefordert werden.
 
 Da die meisten Fahrzeuge über mehrere Typen von Personal verfügen, kann es vorkommen, dass nicht das Fahrzeug mit der höchsten Priorität gewählt wird. Dazu ein Beispiel:
 
@@ -180,7 +219,9 @@ Da Anfragen nur von Personal zu Fahrzeugen übersetzt werden, ist zusätzlich di
 
 Sammelt Fahrzeuganfragen von allen Verhaltensweisen im simulierten Bereich an und gibt diese gesammelt weiter, um die gewünschten Fahrzeuge zu erhalten.
 
-### Einstellungen
+### Informationen und Einstellungen
+
+![Screenshot der Einstellungen der Verhaltensweise _Fahrzeuge anfordern_](request.png)
 
 #### Anfrageziel
 
@@ -206,7 +247,15 @@ Lässt Fahrzeuge zu anderen Orten (verbundene Transferpunkte, simulierte Bereich
 
 Der Auftrag zum Versenden kann von den Übungsteilnehmenden oder anderen Verhaltensweisen kommen.
 
-### Einstellungen
+### Informationen und Einstellungen
+
+![Screenshot der Informationen über die Verhaltensweise _Fahrzeuge versenden_](transfer-vehicles-information.png)
+![Screenshot der Einstellungen der Verhaltensweise _Fahrzeuge versenden_](transfer-vehicles-settings.png)
+![Screenshot zum Starten eines Transfers mit der Verhaltensweise _Fahrzeuge versenden_](transfer-vehicles-initiate.png)
+
+#### Informationen
+
+Alle Fahrzeuge, die aktuell von dieser Verhaltenweise beladen werden oder auf Ausfahrt warten, werden im Abschnitt Informationen aufgelistet.
 
 #### Ladezeit pro Patient
 
@@ -219,6 +268,10 @@ Gibt die Zeit an, die benötigt wird, das Personal eines Fahrzeugs einsteigen zu
 #### Zeit zwischen zwei Ausfahrten
 
 Gibt an, wie lange ein Fahrzeug warten muss, wenn vorher schon ein anderes Fahrzeug abgefahren ist. Diese Option kann zum Beispiel enge Straßen oder unebenes Gelände simulieren.
+
+#### Transfer initiieren
+
+Über dieses Menu kann ein Fahrzeug-Transfer manuell ausgelöst werden. Muss ein Fahrzeug und ein Zielort ausgewählt werden. Optional können Patienten zum Transport im Fahrzeug aus der Liste ausgewählt werden.
 
 ### Abhängigkeiten
 
@@ -257,15 +310,21 @@ Diese Verhaltensweise kann beispielsweise genutzt werden, damit alle Patientenab
 
 Es können nur Fahrzeuge verteilt werden, die bereits vor Ort im Bereich sind. Sind nicht genügend Fahrzeuge vorhanden, pausiert die Verteilung.
 
-### Einstellungen
+### Informationen und Einstellungen
+
+![Screenshot der Einstellungen der Verhaltensweise _Fahrzeuge verteilen_](automatically-distribute-vehicles.png)
 
 #### Zu Verteilende Fahrzeuge
 
 Welche Fahrzeugtypen verteilt werden sollen. Pro Typ kann anschließend festgelegt werden, wie viele Fahrzeuge von diesem Typ insgesamt (d.h., im Summe über alle Ziel-Bereiche) verteilt werden sollen, bevor die automatische Verteilung stoppt.
 
+Im oben gezeigten Beispiel würden die ersten 8 RTWs und die ersten 4 KTWs verteilt werden, weitere Fahrzeuge würden warten.
+
 #### Fahrzeuge erhaltende Bereiche
 
 Welche Fahrzeuge die Bereiche erhalten sollen.
+
+Im oben gezeigten Beispiel würden die Fahrzeuge gleichmäßig zwischen den Patientenablagen "See" und "Stadion" aufgeteilt werden.
 
 ### Abhängigkeiten
 
@@ -279,7 +338,7 @@ Stellt Fahrzeuge für andere Bereiche zur Verfügung, wenn diese nach Fahrzeugen
 
 Durch diese Verhaltensweise kann ein simulierter Bereich als Bereitstellungsraum genutzt werden. Anfragen können zum Beispiel von der Verhaltensweise [Fahrzeuge anfordern](#fahrzeuge-anfordern) einer Patientenablage kommen.
 
-### Einstellungen
+### Informationen und Einstellungen
 
 Diese Verhaltensweise bietet keine Einstellungen. Es werden die angefragten Fahrzeuge, falls vor Ort verfügbar, dem anfragenden Bereich zur Verfügung gestellt.
 
@@ -293,7 +352,9 @@ Diese Verhaltensweise benötigt die Verhaltensweise [Fahrzeuge versenden](#fahrz
 
 Die Transportorganisation verwaltet den Abtransport von Patienten über mehrere simulierte Patientenablagen hinweg. Dazu werden die Patientenzahlen abgefragt und Fahrzeuge zum Transport der Patienten bei einem anderen simulierten Bereich angefragt.
 
-### Einstellungen
+### Informationen und Einstellungen
+
+![Screenshot der Einstellungen der Verhaltensweise _Transportorganisation_](manage-patient-transport-to-hospital.png)
 
 #### Status
 
@@ -313,6 +374,8 @@ Bis zu welcher Sichtungskategorie Patienten abtransportiert werden sollen. Der T
 #### Verwaltete simulierte Bereiche
 
 Für welche simulierten Bereiche diese Transportorganisation den Abtransport verwalten soll. Nur diese Bereiche erhalten Fahrzeuge zum Transport, andere Bereiche werden von dieser Transportorganisation ignoriert. In großen Szenarien können mehrere unterschiedliche Transportorganisationen für verschiedene Gruppen simulierter Patientenablagen eingesetzt werden.
+
+Für jeden von ihr verwalteten Bereich zeigt die Transportorganisation die Zahlen an Patienten an, die ihr bekannt sind. Diese sind nicht notwendigerweise korrekt oder aktuell, falls fehlerhafte Zahlen weitergegeben wurden.
 
 #### Fahrzeuge für den Patiententransport
 
@@ -347,7 +410,7 @@ Es ist aktuell nicht möglich, einzustellen, in welches Krankenhaus die Patiente
 
 Transportiert Patienten im eigenen Bereich ab, wenn die Transportorganisation dies vorgibt.
 
-### Einstellungen
+### Informationen und Einstellungen
 
 Diese Verhaltensweise bietet keine Einstellungen.
 

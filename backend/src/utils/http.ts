@@ -13,3 +13,9 @@ export class PermissionDeniedError extends ApiError {
         super('Sie haben keine Berechtigung für diese Operation.');
     }
 }
+export class ExerciseAlreadyStartedError extends ApiError {
+    public override statusCode = 409;
+    public constructor() {
+        super('Diese Übung läuft bereits zu lange, um noch beizutreten.');
+    }
+}

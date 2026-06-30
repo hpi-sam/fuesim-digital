@@ -582,6 +582,7 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
                 simulationStartTime: 0,
                 taskTimeSpent: {},
                 assignedPersonnel: {},
+                taskGuards: {},
             },
         },
         id: '9d629cfb-440e-4fe1-9155-ffdb6f97248f',

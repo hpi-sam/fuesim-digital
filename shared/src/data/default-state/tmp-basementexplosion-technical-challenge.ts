@@ -95,6 +95,7 @@ function buildKellerexplosionTemplate(): TechnicalChallengeTemplate {
                 simulationStartTime: 0,
                 taskTimeSpent: {},
                 assignedPersonnel: {},
+                taskGuards: {},
             },
             [sm2Id]: {
                 id: sm2Id,
@@ -107,6 +108,7 @@ function buildKellerexplosionTemplate(): TechnicalChallengeTemplate {
                 simulationStartTime: 0,
                 taskTimeSpent: {},
                 assignedPersonnel: {},
+                taskGuards: {},
             },
         },
     };

@@ -51,8 +51,8 @@ const timerSchema = z.object({
 type Timer = z.infer<typeof timerSchema>;
 
 const baseGuardSchema = z.strictObject({
-    nextTrueAt: z.int().nonnegative().optional(),
-})
+    nextChange: z.int().nonnegative().optional(),
+});
 
 const taskGuardSchema = z.object({
     ...baseGuardSchema.shape,
@@ -91,7 +91,7 @@ const andGuardSchema = z.object({
 export interface AndGuard {
     type: 'andGuard';
     guards: Immutable<_Guard[]>;
-    nextTrueAt?: number;
+    nextChange?: number;
 }
 
 const notGuardSchema = z.strictObject({
@@ -104,7 +104,7 @@ const notGuardSchema = z.strictObject({
 export interface NotGuard {
     type: 'notGuard';
     guard: Immutable<_Guard>;
-    nextTrueAt?: number;
+    nextChange?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -124,12 +124,14 @@ export type TimerTreeGuard = TimerGuard & { readonly parent: TreeGuard | null };
 export interface AndTreeGuard {
     type: 'andGuard';
     guards: TreeGuard[];
+    nextChange?: number;
     parent: TreeGuard | null;
 }
 
 export interface NotTreeGuard {
     type: 'notGuard';
     guard: TreeGuard;
+    nextChange?: number;
     parent: TreeGuard | null;
 }
 
@@ -313,12 +315,12 @@ export function getGuardProgress(
         case 'notGuard':
             return {
                 progressPercentage: isGuardFulfilled(
-                    guard.guard,
+                    guard,
                     stateMachine,
                     currentTime
                 )
-                    ? 0
-                    : 1,
+                    ? 1
+                    : 0,
             };
     }
 }
@@ -395,7 +397,85 @@ export const stateMachineSchema = z
             });
         }
     });
-export type StateMachine = Immutable<z.infer<typeof stateMachineSchema>>;
+
+export const runtimeStateMachineSchema = stateMachineSchema.safeExtend({
+    taskGuards: z.record(
+        taskTypeSchema.shape.id,
+        z.record(
+            stateMachineStateIdSchema,
+            z.record(
+                transitionSchema.shape.id,
+                z.array(transitionSchema.shape.guard)
+            )
+        )
+    ),
+});
+
+function addTaskGuards(
+    stateId: StateMachineState['id'],
+    transitionId: Transition['id'],
+    guard: TreeGuard,
+    taskGuards: {
+        [key: TaskType['id']]: {
+            [key: StateMachineState['id']]: {
+                [key: Transition['id']]: TaskTreeGuard[];
+            };
+        };
+    }
+): void {
+    switch (guard.type) {
+        case 'taskGuard':
+            (((taskGuards[guard.taskId] ??= {})[stateId] ??= {})[
+                transitionId
+            ] ??= []).push(guard);
+            return;
+        case 'timerGuard':
+            return;
+        case 'andGuard':
+            for (const g of guard.guards)
+                addTaskGuards(stateId, transitionId, g, taskGuards);
+            return;
+        case 'notGuard':
+            addTaskGuards(stateId, transitionId, guard.guard, taskGuards);
+    }
+}
+
+export const stateMachineCodec = z.codec(
+    stateMachineSchema,
+    runtimeStateMachineSchema,
+    {
+        encode(stateMachine) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { taskGuards, ...rest } = stateMachine;
+            return rest as z.infer<typeof stateMachineSchema>;
+        },
+        decode(stateMachine) {
+            const taskGuards: {
+                [key: TaskType['id']]: {
+                    [key: StateMachineState['id']]: {
+                        [key: Transition['id']]: TaskTreeGuard[];
+                    };
+                };
+            } = {};
+            for (const state of Object.values(stateMachine.states)) {
+                for (const transition of Object.values(
+                    state.outgoingTransitions
+                )) {
+                    addTaskGuards(
+                        state.id,
+                        transition.id,
+                        transition.guard,
+                        taskGuards
+                    );
+                }
+            }
+            return { ...stateMachine, taskGuards } satisfies z.infer<
+                typeof runtimeStateMachineSchema
+            >;
+        },
+    }
+);
+export type StateMachine = Immutable<z.infer<typeof stateMachineCodec>>;
 
 export function currentStateOf(
     stateMachine: WritableDraft<StateMachine>
@@ -532,11 +612,119 @@ function computeEarliestEvent(
     return earliestEvent;
 }
 
+function propagateTaskChange(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallengeId: TechnicalChallengeId,
+    stateMachine: WritableDraft<StateMachine>,
+    state: WritableDraft<StateMachineState>,
+    transitionId: Transition['id'],
+    guard: WritableDraft<TreeGuard> | null,
+    oldTimestamp?: number,
+    newTimestamp?: number
+): StateMachineEvent | null {
+    if (guard === null) {
+        if (oldTimestamp === newTimestamp) return null;
+        return newStateMachineEvent(
+            newTimestamp!,
+            technicalChallengeId,
+            stateMachine.id,
+            transitionId
+        );
+    }
+    switch (guard.type) {
+        case 'taskGuard': {
+            const taskProgress = getTaskProgress(
+                guard.taskId,
+                stateMachine,
+                exerciseState.currentTime
+            );
+
+            const totalDuration =
+                stateMachine.tasks[guard.taskId]!.totalDuration;
+            const remainingDuration =
+                guard.minProgress * totalDuration - taskProgress.timeSpent;
+            const nextChange =
+                exerciseState.currentTime +
+                remainingDuration / taskProgress.rate;
+
+            const thisOldTimestamp = guard.nextChange!;
+            guard.nextChange = nextChange;
+
+            return propagateTaskChange(
+                exerciseState,
+                technicalChallengeId,
+                stateMachine,
+                state,
+                transitionId,
+                guard.parent,
+                thisOldTimestamp,
+                nextChange
+            );
+        }
+        case 'notGuard': {
+            return propagateTaskChange(
+                exerciseState,
+                technicalChallengeId,
+                stateMachine,
+                state,
+                transitionId,
+                guard.parent,
+                oldTimestamp,
+                newTimestamp
+            );
+        }
+        case 'andGuard': {
+            if (guard.nextChange! !== oldTimestamp) {
+                // This guard did not define this trees next event
+                if (newTimestamp! <= guard.nextChange!) {
+                    // The new timestamp is before or equal to the nextChange timestamp, so it doesn't change the next event of this tree
+                    return null;
+                }
+                // The new timestamp is after the nextChange timestamp, so this is the new nextChange timestamp
+                const thisOldTimestamp = guard.nextChange!;
+                guard.nextChange = newTimestamp;
+                return propagateTaskChange(
+                    exerciseState,
+                    technicalChallengeId,
+                    stateMachine,
+                    state,
+                    transitionId,
+                    guard.parent,
+                    thisOldTimestamp,
+                    newTimestamp
+                );
+            }
+
+            // This guard might have defined this trees next event
+            const subGuards = guard.guards.map((g) => g.nextChange!);
+
+            const nextChange = Math.max(...subGuards);
+            if (nextChange !== guard.nextChange) {
+                const thisOldTimestamp = guard.nextChange;
+                guard.nextChange = nextChange;
+                return propagateTaskChange(
+                    exerciseState,
+                    technicalChallengeId,
+                    stateMachine,
+                    state,
+                    transitionId,
+                    guard.parent,
+                    thisOldTimestamp,
+                    nextChange
+                );
+            }
+            return null;
+        }
+        case 'timerGuard':
+            throw new Error('This should be unreachable.');
+    }
+}
+
 function getGuardTimestamp(
     stateMachine: WritableDraft<StateMachine>,
     exerciseState: WritableDraft<ExerciseState>,
     state: WritableDraft<StateMachineState>,
-    guard: WritableDraft<_Guard>
+    guard: WritableDraft<TreeGuard>
 ): {
     current: boolean;
     nextChange: number;
@@ -549,6 +737,7 @@ function getGuardTimestamp(
                 state,
                 guard.guard
             );
+            guard.nextChange ??= subGuard.nextChange;
             return {
                 current: !subGuard.current,
                 nextChange: subGuard.nextChange,
@@ -567,6 +756,7 @@ function getGuardTimestamp(
                           .map((g) => g.nextChange)
                   );
 
+            guard.nextChange ??= nextChange;
             return {
                 current,
                 nextChange,
@@ -592,12 +782,15 @@ function getGuardTimestamp(
                 stateMachine.tasks[guard.taskId]!.totalDuration;
             const remainingDuration =
                 guard.minProgress * totalDuration - taskProgress.timeSpent;
+            const nextChange =
+                exerciseState.currentTime +
+                remainingDuration / taskProgress.rate;
+
+            guard.nextChange ??= nextChange;
 
             return {
                 current: false,
-                nextChange:
-                    exerciseState.currentTime +
-                    remainingDuration / taskProgress.rate,
+                nextChange,
             };
         }
         case 'timerGuard': {
@@ -611,11 +804,15 @@ function getGuardTimestamp(
                 return { current: true, nextChange: Infinity };
 
             const timer = stateMachine.timers[guard.timerId]!;
+            const nextChange =
+                stateMachine.simulationStartTime +
+                guard.minProgress * timer.totalDuration;
+
+            guard.nextChange ??= nextChange;
+
             return {
                 current: false,
-                nextChange:
-                    stateMachine.simulationStartTime +
-                    guard.minProgress * timer.totalDuration,
+                nextChange,
             };
         }
     }
@@ -670,30 +867,41 @@ export function updateEventQueue(
 }
 
 /**
- * Targeted update after a personnel is assigned to taskId.
- * Only recomputes transitions for taskId; only updates the queue if the new
- * event fires earlier than the current one.
+ * Targeted update after a personnel assignment changes.
  */
-export function updateEventQueueAfterAssignment(
+export function updateEventQueueAfterTaskChange(
     exerciseState: WritableDraft<ExerciseState>,
     technicalChallengeId: TechnicalChallengeId,
     stateMachine: WritableDraft<StateMachine>,
-    taskId: UUID
+    taskId: TaskType['id']
 ): void {
     const state = currentStateOf(stateMachine);
-    const affectedTransitions = Object.values(state.outgoingTransitions).filter(
-        (t) => t.guard.type === 'taskGuard' && t.guard.taskId === taskId
-    );
+    const affectedGuards = stateMachine.taskGuards[taskId]?.[
+        state.id
+    ] as WritableDraft<{ [key: Transition['id']]: TreeGuard[] }>;
 
-    if (affectedTransitions.length === 0) return;
+    let newEvent: StateMachineEvent | undefined;
+    for (const [transitionId, guards] of Object.entries(affectedGuards)) {
+        const events = guards
+            .map((guard) =>
+                propagateTaskChange(
+                    exerciseState,
+                    technicalChallengeId,
+                    stateMachine,
+                    state,
+                    transitionId,
+                    guard
+                )
+            )
+            .filter((e) => e !== null);
+        for (const event of events) {
+            if (event.timestamp < (newEvent?.timestamp ?? Infinity)) {
+                newEvent = event;
+            }
+        }
+    }
 
-    const newEvent = computeEarliestEvent(
-        exerciseState,
-        technicalChallengeId,
-        stateMachine,
-        affectedTransitions
-    );
-    if (newEvent === null) return;
+    if (newEvent === undefined) return;
 
     const queue = exerciseState.stateMachineEventQueue;
     if (queue.indices[stateMachine.id] === undefined) {
@@ -704,34 +912,6 @@ export function updateEventQueueAfterAssignment(
     if (newEvent.timestamp < current.timestamp) {
         modify(queue, stateMachine.id, newEvent);
     }
-}
-
-/**
- * Targeted update after a personnel is removed from taskId.
- * If the current queue event is not for taskId, no recomputation is needed
- * (non-affected transitions are unchanged, and affected ones only got slower).
- * If it is for taskId, falls back to a full recomputation.
- */
-export function updateEventQueueAfterUnassignment(
-    exerciseState: WritableDraft<ExerciseState>,
-    technicalChallengeId: TechnicalChallengeId,
-    stateMachine: WritableDraft<StateMachine>,
-    taskId: UUID
-): void {
-    const queue = exerciseState.stateMachineEventQueue;
-    const idx = queue.indices[stateMachine.id];
-    if (idx === undefined) return;
-
-    const state = currentStateOf(stateMachine);
-    const currentTransition =
-        state.outgoingTransitions[queue.events[idx]!.transitionId];
-    if (
-        currentTransition?.guard.type !== 'taskGuard' ||
-        currentTransition.guard.taskId !== taskId
-    )
-        return;
-
-    updateEventQueue(exerciseState, technicalChallengeId, stateMachine);
 }
 
 function simulateStateMachine(

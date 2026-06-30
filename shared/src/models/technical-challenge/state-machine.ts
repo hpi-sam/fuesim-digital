@@ -50,7 +50,12 @@ const timerSchema = z.object({
 });
 type Timer = z.infer<typeof timerSchema>;
 
+const baseGuardSchema = z.strictObject({
+    nextTrueAt: z.int().nonnegative().optional(),
+})
+
 const taskGuardSchema = z.object({
+    ...baseGuardSchema.shape,
     type: z.literal('taskGuard'),
     /** Percentage of Task.totalDuration */
     minProgress: z.number().min(0).max(1),
@@ -59,6 +64,7 @@ const taskGuardSchema = z.object({
 export type TaskGuard = Immutable<z.infer<typeof taskGuardSchema>>;
 
 const timerGuardSchema = z.object({
+    ...baseGuardSchema.shape,
     type: z.literal('timerGuard'),
     /** Percentage of Timer.totalDuration past */
     minProgress: z.number().min(0).max(1),
@@ -76,6 +82,7 @@ export type TimerGuard = Immutable<z.infer<typeof timerGuardSchema>>;
  */
 
 const andGuardSchema = z.object({
+    ...baseGuardSchema.shape,
     type: z.literal('andGuard'),
     get guards() {
         return z.array(guardSchema);
@@ -84,9 +91,11 @@ const andGuardSchema = z.object({
 export interface AndGuard {
     type: 'andGuard';
     guards: Immutable<_Guard[]>;
+    nextTrueAt?: number;
 }
 
 const notGuardSchema = z.strictObject({
+    ...baseGuardSchema.shape,
     type: z.literal('notGuard'),
     get guard() {
         return guardSchema;
@@ -95,6 +104,7 @@ const notGuardSchema = z.strictObject({
 export interface NotGuard {
     type: 'notGuard';
     guard: Immutable<_Guard>;
+    nextTrueAt?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -109,11 +119,80 @@ export const guardSchema: z.ZodType<_Guard> = z.lazy(() =>
 );
 export type Guard = Immutable<z.infer<typeof guardSchema>>;
 
+export type TaskTreeGuard = TaskGuard & { readonly parent: TreeGuard | null };
+export type TimerTreeGuard = TimerGuard & { readonly parent: TreeGuard | null };
+export interface AndTreeGuard {
+    type: 'andGuard';
+    guards: TreeGuard[];
+    parent: TreeGuard | null;
+}
+
+export interface NotTreeGuard {
+    type: 'notGuard';
+    guard: TreeGuard;
+    parent: TreeGuard | null;
+}
+
+export type TreeGuard =
+    | AndTreeGuard
+    | NotTreeGuard
+    | TaskTreeGuard
+    | TimerTreeGuard;
+
+export function decodeTreeGuard(
+    wire: Guard,
+    parent: TreeGuard | null
+): TreeGuard {
+    switch (wire.type) {
+        case 'andGuard': {
+            const node: AndTreeGuard = {
+                type: 'andGuard' as const,
+                guards: [] as TreeGuard[],
+                parent,
+            };
+            node.guards = wire.guards.map((g) => decodeTreeGuard(g, node));
+            return node;
+        }
+        case 'notGuard': {
+            const node: any = {
+                type: 'notGuard' as const,
+                guard: null,
+                parent,
+            };
+            node.guard = decodeTreeGuard(wire.guard, node);
+            return node as NotTreeGuard;
+        }
+        case 'taskGuard':
+        case 'timerGuard':
+            return { ...wire, parent };
+    }
+}
+
+export function encodeTreeGuard(g: TreeGuard): Guard {
+    switch (g.type) {
+        case 'andGuard':
+            return { type: 'andGuard', guards: g.guards.map(encodeTreeGuard) };
+        case 'notGuard':
+            return { type: 'notGuard', guard: encodeTreeGuard(g.guard) };
+        case 'taskGuard':
+        case 'timerGuard': {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { parent: _, ...rest } = g;
+            return rest;
+        }
+    }
+}
+
+export const treeGuardCodec = z.codec(guardSchema, z.custom<TreeGuard>(), {
+    decode: (wire) => decodeTreeGuard(wire, null),
+    encode: (g) => encodeTreeGuard(g),
+});
+
 const stateMachineStateIdSchema = uuidSchema.brand<'StateMachineStateId'>();
 export const transitionSchema = z.object({
     id: uuidSchema,
     targetState: stateMachineStateIdSchema,
-    guard: guardSchema,
+    guard: treeGuardCodec,
 });
 
 export const stateMachineStateSchema = z.object({

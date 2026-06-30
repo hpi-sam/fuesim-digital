@@ -64,32 +64,38 @@ export const collectionElementsSchema = z.strictObject({
 
 export type CollectionElements = z.infer<typeof collectionElementsSchema>;
 
-export function gatherCollectionElements(elements: CollectionElements) {
-    return {
-        allDirectElements(): TemplateVersion[] {
-            return elements.direct;
-        },
-        allReferenceElements(): TemplateVersion[] {
-            return elements.references.flatMap(
-                (reference) => reference.elements
-            );
-        },
-        allImportedElements(): TemplateVersion[] {
-            return elements.imported.flatMap((imported) => imported.elements);
-        },
-        allVisibleElements(): TemplateVersion[] {
-            return [
-                ...elements.direct,
-                ...elements.imported.flatMap((imported) => imported.elements),
-            ];
-        },
-        allElements(): TemplateVersion[] {
-            return [
-                ...this.allVisibleElements(),
-                ...elements.references.flatMap(
-                    (reference) => reference.elements
-                ),
-            ];
-        },
-    };
+export function gatherAllDirectCollectionElements(
+    elements: CollectionElements
+): TemplateVersion[] {
+    return elements.direct;
+}
+
+export function gatherAllReferencedCollectionElements(
+    elements: CollectionElements
+): TemplateVersion[] {
+    return elements.references.flatMap((reference) => reference.elements);
+}
+
+export function gatherAllImportedCollectionElements(
+    elements: CollectionElements
+): TemplateVersion[] {
+    return elements.imported.flatMap((imported) => imported.elements);
+}
+
+export function gatherAllVisibleCollectionElements(
+    elements: CollectionElements
+): TemplateVersion[] {
+    return [
+        ...elements.direct,
+        ...elements.imported.flatMap((imported) => imported.elements),
+    ];
+}
+
+export function gatherAllCollectionElements(
+    elements: CollectionElements
+): TemplateVersion[] {
+    return [
+        ...gatherAllVisibleCollectionElements(elements),
+        ...elements.references.flatMap((reference) => reference.elements),
+    ];
 }

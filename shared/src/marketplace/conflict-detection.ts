@@ -7,8 +7,12 @@ import type {
 import { elementVersionIdSchema } from './models/versioned-id-schema.js';
 import { templateVersionSchema } from './models/versioned-elements.js';
 import type { TemplateVersion } from './models/versioned-elements.js';
-import type { CollectionElements } from './models/collection-elements.js';
-import { gatherCollectionElements } from './models/collection-elements.js';
+import {
+    gatherAllDirectCollectionElements,
+    gatherAllImportedCollectionElements,
+    gatherAllReferencedCollectionElements,
+    type CollectionElements,
+} from './models/collection-elements.js';
 
 const deletedTemplateVersionSchema = z.object({
     id: elementVersionIdSchema,
@@ -91,8 +95,6 @@ export function getCollectionElementDiff(
         currentElementEntityIds.has(element.entityId)
     );
 
-    // TODO: @Quixelation -> we should also do a content diff, to see if the content was actually significantly changed
-    // But this is something for a later point (ba-thesis?)
     overlappingNew
         .map((newElement) => {
             const matchingCurrentElement = currentElements.find(
@@ -148,26 +150,16 @@ export function getCollectionElementsDiff(
 
     return {
         direct: getCollectionElementDiff(
-            gatherCollectionElements(
-                combinedElements(prev)
-            ).allDirectElements(),
-            gatherCollectionElements(combinedElements(next)).allDirectElements()
+            gatherAllDirectCollectionElements(combinedElements(prev)),
+            gatherAllDirectCollectionElements(combinedElements(next))
         ),
         imported: getCollectionElementDiff(
-            gatherCollectionElements(
-                combinedElements(prev)
-            ).allImportedElements(),
-            gatherCollectionElements(
-                combinedElements(next)
-            ).allImportedElements()
+            gatherAllImportedCollectionElements(combinedElements(prev)),
+            gatherAllImportedCollectionElements(combinedElements(next))
         ),
         references: getCollectionElementDiff(
-            gatherCollectionElements(
-                combinedElements(prev)
-            ).allReferenceElements(),
-            gatherCollectionElements(
-                combinedElements(next)
-            ).allReferenceElements()
+            gatherAllReferencedCollectionElements(combinedElements(prev)),
+            gatherAllReferencedCollectionElements(combinedElements(next))
         ),
     };
 }

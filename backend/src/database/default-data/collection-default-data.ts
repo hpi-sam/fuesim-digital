@@ -26,14 +26,14 @@ function newElementEntityId(uuid: string) {
 // OTHERWISE YOU MIGHT BREAK EXISTING EXERCISES THAT RELY ON THESE DEFAULT ELEMENTS.
 // IF YOU WANT TO CHANGE THESE ELEMENTS,
 // PLEASE CREATE A NEW SET OF DEFAULT ELEMENTS (e.g.  FüSim Digital {YEAR} Übungselemente)
-const fuesimManvDefaultCollectionData: DefaultCollection = {
+const fuesimDigital20250629DefaultCollectionData: DefaultCollection = {
     entityId: collectionEntityIdSchema.parse(
         'set_entity_76dcdff5-9dd5-4430-b7a7-f680479977ae'
     ),
     versionId: collectionVersionIdSchema.parse(
         'set_version_7743eb0c-dee1-4d7a-9159-911c7a2e9253'
     ),
-    title: 'FüSim MANV 2025 Übungselemente',
+    title: 'FüSim Digital 2025 Übungselemente',
     description: '',
     archived: false,
     createdAt: new Date(2022, 6, 27), // 27.07.2022 (date where, notsan was added e.g.)
@@ -54,5 +54,5 @@ const fuesimManvDefaultCollectionData: DefaultCollection = {
 };
 
 export const defaultCollectionData: DefaultCollection[] = [
-    fuesimManvDefaultCollectionData,
+    fuesimDigital20250629DefaultCollectionData,
 ];

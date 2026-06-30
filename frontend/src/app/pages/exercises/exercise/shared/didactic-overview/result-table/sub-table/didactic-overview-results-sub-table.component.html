@@ -1,0 +1,30 @@
+@for (result of this.results(); track result.id) {
+    @let criterion = result.criterion;
+    <tr>
+        @for (ind of this.indent(); track $index) {
+            <td></td>
+        }
+        <td>
+            <app-didactic-overview-criterion-entry [criterion]="criterion" />
+        </td>
+        @for (offset of this.badgeOffset(); track $index) {
+            <td>hey</td>
+        }
+        <td>
+            <app-eval-result-status-badge
+                [result]="result"
+                [resultsMap]="this.resultsMap()"
+            />
+        </td>
+    </tr>
+    @let subResults = this.childResultsMap()[result.id];
+    @if (isCombinedEvalCriterion(criterion) && subResults) {
+        <app-didactic-overview-results-sub-table
+            [results]="subResults"
+            [resultsMap]="this.resultsMap()"
+            [criteria]="this.criteria()"
+            [localDepth]="this.localDepth() + 1"
+            [globalDepth]="this.globalDepth()"
+        />
+    }
+}

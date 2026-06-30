@@ -39,6 +39,63 @@
             </h5>
         </div>
         <div class="card-body" p-4>
+            @if (criterionCreationCategory() === 'combinedEvalCriterion') {
+                <form class="ms-2">
+                    <label>Art: Kombiniertes Kriterium</label>
+                    <label
+                        >name:
+                        <input
+                            [ngModel]="nameInput"
+                            [formField]="criterionForm.name"
+                            (appSaveOnTyping)="
+                                criterionForm.name().value.set($event)
+                            "
+                        />
+                    </label>
+                    <label>
+                        <button
+                            class="ms-1"
+                            (click)="
+                                this.criterionForm
+                                    .subCriteria()
+                                    .value.set([
+                                        ...this.criterionForm
+                                            .subCriteria()
+                                            .value(),
+                                        null,
+                                    ])
+                            "
+                        >
+                            Unterkriterium hinzufügen
+                        </button>
+                    </label>
+                    @for (
+                        criterion of criterionForm.subCriteria().value();
+                        track $index
+                    ) {
+                        <label class="mt-1">
+                            Unterkriterium {{ $index + 1 }} :
+
+                            @for (
+                                criterion of this.evalCriteria();
+                                track criterion.id
+                            ) {
+                                <button
+                                    class="me-1"
+                                    (click)="
+                                        this.updateSelectedSubCriteria(
+                                            criterion,
+                                            $index
+                                        )
+                                    "
+                                >
+                                    {{ criterion.name }}
+                                </button>
+                            }
+                        </label>
+                    }
+                </form>
+            }
             @switch (criterionCreationType()) {
                 @case (null) {
                     <span class="text-muted"
@@ -261,10 +318,14 @@
                 }
             }
         </div>
-        @if (criterionCreationType()) {
+        @if (
+            criterionCreationType() ||
+            criterionCreationCategory() === 'combinedEvalCriterion'
+        ) {
+            <!-- TODO @JohannesPotzi: implement disable logic -->
             <button
                 class="btn btn-outline-success mt-1 ms-2 me-2 mb-1"
-                (click)="submitCriterion(criterionCreationType()!)"
+                (click)="submitCriterion()"
                 [disabled]=""
             >
                 Bestätigen

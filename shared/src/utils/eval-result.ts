@@ -8,6 +8,7 @@ import type {
 import {
     boolEvalCriterionSchema,
     evalCriterionIdSchema,
+    getChildrenOfEvalCriterion,
     isNumberEvalCriterion,
     isTemporalEvalCriterionType,
     numberEvalCriterionSchema,
@@ -351,4 +352,19 @@ export function updateEvalResultsMap(
                 {}
             )
     );
+}
+export function getChildResultsOfResult(
+    result: EvalResult,
+    resultsMap: { [criterionId: EvalCriterionId]: EvalResult },
+    evalCriteria: { [criterionId: EvalCriterionId]: EvalCriterion }
+) {
+    return getChildrenOfEvalCriterion(result.criterion, evalCriteria).reduce<
+        EvalResult[]
+    >((obj, crit) => {
+        const critRes = resultsMap[crit.id];
+        if (critRes) {
+            obj = [...obj, critRes];
+        }
+        return obj;
+    }, []);
 }

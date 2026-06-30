@@ -7,6 +7,7 @@ import type { TechnicalChallengeId } from './technical-challenge/technical-chall
 import { technicalChallengeIdSchema } from './technical-challenge/technical-challenge.js';
 import type { PatientStatus } from './utils/patient-status.js';
 import { patientStatusSchema } from './utils/patient-status.js';
+import { EvalResult } from '../utils/eval-result.js';
 
 export const boolEvalCriterionIdSchema = uuidSchema.brand(
     'BoolEvalCriterionId'
@@ -469,6 +470,12 @@ export function isNumberEvalCriterion(
         criterion.criterionType
     );
 }
+export function isBoolEvalCriterion(
+    criterion: EvalCriterion
+): criterion is BoolEvalCriterion {
+    //@ts-expect-error: not assignable
+    return boolEvalCritrionTypes.includes(criterion.criterionType);
+}
 /* TypeScript and Angular don't understand, that isNumberEvalCriterion(criterion)===true also means that criterion.num exists.*/
 export function getNumFromEvalCriterion(
     criterion: EvalCriterion
@@ -485,18 +492,21 @@ export function getNumFromEvalCriterion(
  * @returns a the modified input map, without the children criteria of the specified criterion
  */
 export function removeChildren(
-    criteriaMap: { [key: EvalCriterionId]: EvalCriterion },
+    criteriaMapIn: { [key: EvalCriterionId]: EvalCriterion | null },
     currentCriterion?: EvalCriterion
-): { [key: EvalCriterionId]: EvalCriterion } {
+): { [key: EvalCriterionId]: EvalCriterion | null } {
     if (!currentCriterion) {
-        return criteriaMap;
+        return criteriaMapIn;
     }
-    if (!criteriaMap[currentCriterion.id]) {
+    if (!criteriaMapIn[currentCriterion.id]) {
         console.log(
             '[logic Error] When filtering root criteria, the current criterion was not in the criteria.'
         );
-        return criteriaMap;
+        return criteriaMapIn;
     }
+    let criteriaMap = criteriaMapIn as {
+        [key: EvalCriterionId]: EvalCriterion | null;
+    };
     const type = currentCriterion.criterionType;
     if (
         type === 'andEvalCriterion' ||
@@ -504,22 +514,31 @@ export function removeChildren(
         type === 'countCompletedEvalCriterion'
     ) {
         for (let i = 0; i < currentCriterion.children.length; i += 1) {
-            removeChildren(
-                criteriaMap,
-                criteriaMap[currentCriterion.children.at(i)!]
-            );
-            delete criteriaMap[currentCriterion.children.at(i)!];
+            let criterion = criteriaMap[currentCriterion.children.at(i)!];
+            if (criterion) {
+                removeChildren(criteriaMap, criterion);
+                criterion = null;
+            }
         }
     }
     if (type === 'firstTrueAtEvalCriterion' || type === 'notEvalCriterion') {
-        removeChildren(criteriaMap, criteriaMap[currentCriterion.child]);
-        delete criteriaMap[currentCriterion.child];
+        let criterion = criteriaMap[currentCriterion.child];
+        if (criterion) {
+            removeChildren(criteriaMap, criterion);
+            criterion = null;
+        }
     }
     if (type === 'greaterThanEvalCriterion') {
-        removeChildren(criteriaMap, criteriaMap[currentCriterion.leftChild]);
-        delete criteriaMap[currentCriterion.leftChild];
-        removeChildren(criteriaMap, criteriaMap[currentCriterion.rightChild]);
-        delete criteriaMap[currentCriterion.rightChild];
+        let leftCriterion = criteriaMap[currentCriterion.leftChild];
+        let rightCriterion = criteriaMap[currentCriterion.rightChild];
+        if (leftCriterion) {
+            removeChildren(criteriaMap, leftCriterion);
+            leftCriterion = null;
+        }
+        if (rightCriterion) {
+            removeChildren(criteriaMap, rightCriterion);
+            rightCriterion = null;
+        }
     }
     return criteriaMap;
 }
@@ -532,7 +551,14 @@ export function getRootCriteriaMap(criteriaMap: {
     let tmpMap = criteriaMap;
     for (const criterion of criteria) {
         if (isCombinedEvalCriterion(criterion)) {
-            tmpMap = removeChildren(criteriaMap, criterion);
+            tmpMap = Object.values(
+                removeChildren(criteriaMap, criterion)
+            ).reduce<{ [key: EvalCriterionId]: EvalCriterion }>((obj, crit) => {
+                if (crit) {
+                    obj[crit.id] = crit;
+                }
+                return obj;
+            }, {});
         }
     }
     return tmpMap;
@@ -543,4 +569,49 @@ export function isCombinedEvalCriterion(evalCriterion: EvalCriterion) {
         //@ts-expect-error: not assignable
         evalCriterion.criterionType
     );
+}
+
+/* TODO @JohannesPotzi @Jogius : refactor this after all criteria have their files and all the mappings are done. */
+export function getChildrenOfEvalCriterion(
+    criterion: EvalCriterion,
+    criteriaMap: { [citerionId: EvalCriterionId]: EvalCriterion }
+): EvalCriterion[] {
+    if (isCombinedEvalCriterion(criterion)) {
+        const type = criterion.criterionType;
+        if (
+            type === 'andEvalCriterion' ||
+            type === 'orEvalCriterion' ||
+            type === 'countCompletedEvalCriterion'
+        ) {
+            return criterion.children
+                .filter((id) => criteriaMap[id])
+                .map((id) => criteriaMap[id]!);
+        }
+        if (
+            type === 'firstTrueAtEvalCriterion' ||
+            type === 'notEvalCriterion'
+        ) {
+            return [criteriaMap[criterion.child]!];
+        }
+        if (type === 'greaterThanEvalCriterion') {
+            return [
+                criteriaMap[criterion.leftChild]!,
+                criteriaMap[criterion.rightChild]!,
+            ];
+        }
+    }
+    return [] as EvalCriterion[];
+}
+export function getEvalCriterionTreeDepth(
+    criterion: EvalCriterion,
+    criteriaMap: { [citerionId: EvalCriterionId]: EvalCriterion }
+): number {
+    const children = getChildrenOfEvalCriterion(criterion, criteriaMap);
+    if (children.length === 0) {
+        return 1;
+    }
+    const childDepths = children.map((child) =>
+        getEvalCriterionTreeDepth(child, criteriaMap)
+    );
+    return Math.max(...childDepths) + 1;
 }

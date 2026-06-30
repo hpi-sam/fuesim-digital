@@ -31,7 +31,7 @@ import {
 import { AppState } from '../../../../../state/app.state';
 import { EvalCriterionCreationFormComponent } from './eval-criterion-creation-form/eval-criterion-creation-form.component';
 import { ExerciseService } from '../../../../../core/exercise.service';
-import { EvalResultStatusBadgeComponent } from './result-status-badge/eval-result-status-badge.component';
+import { DidacticOverViewResultsTableComponent } from './result-table/didactic-overview-results-table.component';
 
 @Component({
     selector: 'app-didactic-overview',
@@ -44,7 +44,7 @@ import { EvalResultStatusBadgeComponent } from './result-status-badge/eval-resul
         NgbDropdownMenu,
         NgbDropdownButtonItem,
         NgbDropdownItem,
-        EvalResultStatusBadgeComponent,
+        DidacticOverViewResultsTableComponent,
     ],
 })
 export class DidacticOverviewComponent {

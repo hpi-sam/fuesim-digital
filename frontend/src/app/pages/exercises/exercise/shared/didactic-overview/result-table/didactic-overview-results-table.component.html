@@ -1,0 +1,47 @@
+@if (tableContext() === 'baseTable') {}
+<div
+    class="container-fluid d-flex flex-column h-100"
+    [style.overflow]="this.overflow()"
+>
+    <div class="flex-fill row">
+        <div
+            class="col-1 flex-grow-1"
+            [style.max-witdh.px]="this.maxIndent()"
+            [style.min-width.px]="this.minIndent()"
+        ></div>
+        <div
+            [class]="this.getTableClass()"
+            [style.min-width.px]="this.getTableMinWidth()"
+        >
+            <table class="table table-striped mb-0" ;>
+                @if (tableContext() === 'baseTable') {
+                    <thead>
+                        <tr>
+                            <th>Auswertungskriterium</th>
+                            @for (col of this.extraCols(); track $index) {
+                                <th></th>
+                            }
+                            <th style="max-width: 100px">Ergebnis</th>
+                        </tr>
+                    </thead>
+                }
+                <tbody>
+                    <app-didactic-overview-results-sub-table
+                        [results]="this.results()"
+                        [resultsMap]="this.resultsMap()"
+                        [criteria]="this.evalCriteria()"
+                        [globalDepth]="this.globalDepth()"
+                        [localDepth]="1"
+                    />
+                    @if (this.results().length === 0) {
+                        <tr>
+                            <td colspan="2" class="text-muted">
+                                Die Übung beinhaltet keine Ausertungskriterien
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

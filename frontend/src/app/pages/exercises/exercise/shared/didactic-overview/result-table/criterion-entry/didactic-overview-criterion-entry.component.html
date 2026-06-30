@@ -1,0 +1,48 @@
+<!-- TODO @JohannesPotzi @Jogius : add the criterion long name.
+                            Idea : add the description as a tooltip?-->
+
+<!--
+
+    {{ criterion.name }}
+    @if (
+        criterion.criterionType ===
+        'xPatientsAtStatusEvalCriterion'
+    ) {
+        {{ statusNames[criterion.targetStatus] }}
+    }
+    @if (
+        criterion.criterionType ===
+        'reachTechnicalChallengeStateEvalCriterion'
+    ) {
+        {{
+            ' - ' +
+                getTechnicalChallengeNamebyId(
+                    criterion.targetTechnicalChallengeId
+                ) +
+                ' - ' +
+                getTechnicalChallengeStateTitlebyId(
+                    criterion.targetTechnicalChallengeId,
+                    criterion.targetTechnicalChallengeStateId
+                )
+        }}
+    }
+    @if (
+        criterion.criterionType ===
+            'doMeasureXTimesEvalCriterion' ||
+        criterion.criterionType ===
+            'xPatientsAtStatusEvalCriterion'
+    ) {
+        {{
+            ': (' +
+                (getNumFromEvalResult(result) ?? '') +
+                '/' +
+                (getNumFromEvalCriterion(criterion) ??
+                    '') +
+                ')'
+        }}
+    }
+-->
+@let criterion = this.criterion();
+<span>
+    {{ criterion.name }}
+</span>

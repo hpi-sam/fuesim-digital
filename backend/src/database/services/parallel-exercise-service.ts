@@ -9,14 +9,10 @@ import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ParallelExercise, ParallelExerciseInsert } from '../schema.js';
 import {
     ApiError,
-    ExerciseAlreadyStartedError,
     NotFoundError,
     PermissionDeniedError,
 } from '../../utils/http.js';
-import {
-    fastForwardExercise,
-    MAX_FAST_FORWARD_DURATION_MS,
-} from '../../exercise/fast-forward-exercise.js';
+import { fastForwardExercise } from '../../exercise/fast-forward-exercise.js';
 import type { ParallelExerciseRepository } from '../repositories/parallel-exercise-repository.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
@@ -77,13 +73,13 @@ export class ParallelExerciseService {
             parallelExercise.id
         );
 
-        if (
-            referenceInstance &&
-            referenceInstance.exercise.currentStateString.currentTime >
-                MAX_FAST_FORWARD_DURATION_MS
-        ) {
-            throw new ExerciseAlreadyStartedError();
-        }
+        // if (
+        //     referenceInstance &&
+        //     referenceInstance.exercise.currentStateString.currentTime >
+        //         MAX_FAST_FORWARD_DURATION_MS
+        // ) {
+        //     throw new ExerciseAlreadyStartedError();
+        // }
 
         const exercise =
             await this.exerciseManagerService.createExerciseFromTemplate(

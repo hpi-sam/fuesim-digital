@@ -1,6 +1,5 @@
 import type { ExerciseStatus } from 'fuesim-digital-shared';
 import type { ActiveExercise } from './active-exercise.js';
-import { buildTickAction } from './tick-action.js';
 
 /**
  * Untested, higher values may be possible, but 30min seems like
@@ -28,17 +27,17 @@ export function fastForwardExercise(
         activeExercise.applyAction({ type: '[Exercise] Start' }, null);
     }
 
-    while (
-        activeExercise.exercise.currentStateString.currentTime < targetTime
-    ) {
-        const tickAction = buildTickAction(
-            activeExercise.getStateSnapshot(),
-            tickInterval,
-            activeExercise.exercise.tickCounter
-        );
-        activeExercise.applyAction(tickAction, null);
-        activeExercise.exercise.tickCounter++;
-    }
+    // while (
+    //     activeExercise.exercise.currentStateString.currentTime < targetTime
+    // ) {
+    //     const tickAction = buildTickAction(
+    //         activeExercise.getStateSnapshot(),
+    //         tickInterval,
+    //         activeExercise.exercise.tickCounter
+    //     );
+    //     activeExercise.applyAction(tickAction, null);
+    //     activeExercise.exercise.tickCounter++;
+    // }
 
     if (targetStatus === 'paused') {
         activeExercise.applyAction({ type: '[Exercise] Pause' }, null);

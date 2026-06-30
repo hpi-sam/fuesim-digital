@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { type UUIDSet, uuidSetSchema } from '../utils/uuid-set.js';
 import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
-import { hybridIdSchema } from '../utils/hybrid-id.js';
 import { type Position, positionSchema } from './utils/position/position.js';
 import {
     type ImageProperties,
@@ -21,7 +20,7 @@ export const vehicleSchema = z.strictObject({
     type: z.literal('vehicle'),
     vehicleType: z.string(),
     name: z.string(),
-    templateId: hybridIdSchema,
+    templateId: uuidSchema,
     materialIds: uuidSetSchema,
     patientCapacity: z.int().nonnegative(),
     patientLoadMinutes: z.number().nonnegative(),

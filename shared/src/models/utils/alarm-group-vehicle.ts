@@ -1,12 +1,11 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import { uuid, uuidSchema } from '../../utils/uuid.js';
-import { hybridIdSchema, type HybridId } from '../../utils/hybrid-id.js';
+import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 
 export const alarmGroupVehicleSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('alarmGroupVehicle'),
-    vehicleTemplateId: hybridIdSchema,
+    vehicleTemplateId: uuidSchema,
     /**
      * The time in ms until the vehicle arrives
      */
@@ -18,7 +17,7 @@ export type AlarmGroupVehicle = Immutable<
 >;
 
 export function newAlarmGroupVehicle(
-    vehicleTemplateId: HybridId,
+    vehicleTemplateId: UUID,
     time: number,
     name: string,
     id?: string

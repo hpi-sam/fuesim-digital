@@ -148,18 +148,21 @@ export function getCollectionElementsDiff(
         references: elements.flatMap((e) => e.elements.references),
     });
 
+    const combinedPreviousElements = combinedElements(prev);
+    const combinedNextElements = combinedElements(next);
+
     return {
         direct: getCollectionElementDiff(
-            gatherAllDirectCollectionElements(combinedElements(prev)),
-            gatherAllDirectCollectionElements(combinedElements(next))
+            gatherAllDirectCollectionElements(combinedPreviousElements),
+            gatherAllDirectCollectionElements(combinedNextElements)
         ),
         imported: getCollectionElementDiff(
-            gatherAllImportedCollectionElements(combinedElements(prev)),
-            gatherAllImportedCollectionElements(combinedElements(next))
+            gatherAllImportedCollectionElements(combinedPreviousElements),
+            gatherAllImportedCollectionElements(combinedNextElements)
         ),
         references: getCollectionElementDiff(
-            gatherAllReferencedCollectionElements(combinedElements(prev)),
-            gatherAllReferencedCollectionElements(combinedElements(next))
+            gatherAllReferencedCollectionElements(combinedPreviousElements),
+            gatherAllReferencedCollectionElements(combinedNextElements)
         ),
     };
 }

@@ -4,7 +4,6 @@ export * from './versioned-elements.js';
 export * from './versioned-id-schema.js';
 export * from './versioned-element-model.js';
 export * from './versioned-element-content.js';
-export * from './versioned-element-names.js';
 export * from './collection-elements.js';
 export * from './state-versioned-entity.js';
 export * from './collection-relationship.js';

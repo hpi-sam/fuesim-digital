@@ -5,7 +5,6 @@ import type { TemplateVersion } from './versioned-elements.js';
 import { templateVersionSchema } from './versioned-elements.js';
 import type { CollectionElementType } from './collection-element-type.js';
 
-// TODO: Improve this naming
 export const collectionElementsSingleSchema = z.strictObject({
     collection: collectionVersionSchema,
     elements: z.array(templateVersionSchema),

@@ -19,7 +19,7 @@ import type {
 import {
     checkCollectionOrganisationRole,
     cloneDeepMutable,
-    gatherCollectionElements,
+    gatherAllDirectCollectionElements,
     getCollectionElementDiff,
     getElementDependencies,
     replaceDependencies,
@@ -509,9 +509,9 @@ export class CollectionService {
                         existingCollectionDependency.versionId,
                         { allowDraftState: false }
                     );
-                const oldDirectElements = gatherCollectionElements(
+                const oldDirectElements = gatherAllDirectCollectionElements(
                     oldCollectionVersionElements
-                ).allDirectElements();
+                );
 
                 const newCollectionVersionElements =
                     await tx.getElementsOfCollectionVersion(
@@ -520,9 +520,9 @@ export class CollectionService {
                             allowDraftState: false,
                         }
                     );
-                const newDirectElements = gatherCollectionElements(
+                const newDirectElements = gatherAllDirectCollectionElements(
                     newCollectionVersionElements
-                ).allDirectElements();
+                );
 
                 const changesBetweenVersions = getCollectionElementDiff(
                     oldDirectElements,

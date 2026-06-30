@@ -85,6 +85,13 @@
             "when": 1781254712421,
             "tag": "0011_organisations",
             "breakpoints": true
+        },
+        {
+            "idx": 12,
+            "version": "7",
+            "when": 1782200992989,
+            "tag": "0012_exercises_parallel_exercises_orgs",
+            "breakpoints": true
         }
     ]
 }

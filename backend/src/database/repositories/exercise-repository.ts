@@ -25,6 +25,11 @@ export interface ExerciseTemplateDetailsEntry extends ExerciseTemplateEntry {
     organisation: OrganisationEntry;
 }
 
+export interface ExerciseDetailsEntry extends ExerciseEntry {
+    organisation?: OrganisationEntry;
+    actionsCount?: number | undefined;
+}
+
 export class ExerciseRepository extends BaseRepository {
     private get exerciseTemplateQuery() {
         return this.databaseConnection
@@ -68,7 +73,9 @@ export class ExerciseRepository extends BaseRepository {
             );
     }
 
-    public async getExerciseById(id: ExerciseId) {
+    public async getExerciseById(
+        id: ExerciseId
+    ): Promise<ExerciseDetailsEntry | null> {
         return this.onlySingle(
             await this.getExerciseQuery().where(eq(exerciseTable.id, id))
         );
@@ -78,7 +85,12 @@ export class ExerciseRepository extends BaseRepository {
         return this.getExerciseQuery(true);
     }
 
-    public getAllExercisesOfOwner(userId: string) {
+    public getAllExercisesForUser(userId: string) {
+        const subquery = this.databaseConnection
+            .select()
+            .from(organisationMembershipTable)
+            .where(eq(organisationMembershipTable.userId, userId))
+            .as('memberships');
         return this.databaseConnection
             .select({
                 ...getTableColumns(exerciseTable),
@@ -86,18 +98,22 @@ export class ExerciseRepository extends BaseRepository {
                     id: exerciseTemplateTable.id,
                     name: exerciseTemplateTable.name,
                 },
+                organisation: getTableColumns(organisationTable),
             })
             .from(exerciseTable)
+            .innerJoin(
+                subquery,
+                eq(subquery.organisationId, exerciseTable.organisationId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(organisationTable.id, exerciseTable.organisationId)
+            )
             .leftJoin(
                 exerciseTemplateTable,
                 eq(exerciseTemplateTable.id, exerciseTable.baseTemplateId)
             )
-            .where(
-                and(
-                    isNull(exerciseTable.templateId),
-                    eq(exerciseTable.user, userId)
-                )
-            )
+            .where(isNull(exerciseTable.templateId))
             .orderBy(desc(exerciseTable.lastUsedAt));
     }
 
@@ -224,7 +240,7 @@ export class ExerciseRepository extends BaseRepository {
             .where(
                 and(
                     lt(exerciseTable.lastUsedAt, deadline),
-                    isNull(exerciseTable.user),
+                    isNull(exerciseTable.organisationId),
                     isNull(exerciseTable.parallelExerciseId),
                     isNull(exerciseTable.templateId)
                 )

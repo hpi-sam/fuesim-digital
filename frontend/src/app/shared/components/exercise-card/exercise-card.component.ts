@@ -6,12 +6,18 @@ import { ConfirmationModalService } from '../../../core/confirmation-modal/confi
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
 import { CopyButtonComponent } from '../copy-button/copy-button.component';
+import { OrganisationBadgeComponent } from '../../../pages/organisations/shared/organisation-badge/organisation-badge.component.js';
 
 @Component({
     selector: 'app-exercise-card',
     templateUrl: './exercise-card.component.html',
     styleUrls: ['./exercise-card.component.scss'],
-    imports: [CopyButtonComponent, RouterLink, DatePipe],
+    imports: [
+        CopyButtonComponent,
+        RouterLink,
+        DatePipe,
+        OrganisationBadgeComponent,
+    ],
 })
 export class ExerciseCardComponent {
     private readonly apiService = inject(ApiService);

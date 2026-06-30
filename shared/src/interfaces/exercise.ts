@@ -1,8 +1,13 @@
 import { z } from 'zod';
-import { exerciseTemplateIdSchema, parallelExerciseIdSchema } from '../ids.js';
+import {
+    exerciseTemplateIdSchema,
+    organisationIdSchema,
+    parallelExerciseIdSchema,
+} from '../ids.js';
 import { participantKeySchema, trainerKeySchema } from '../exercise-keys.js';
 import { stringToDate } from './utils.js';
 import { getExerciseTemplateDetailsResponseDataSchema } from './exercise-template.js';
+import { getOrganisationResponseDataSchema } from './organisation.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -26,6 +31,7 @@ export const getExerciseResponseDataSchema = z.object({
     baseTemplate: z
         .object({ id: exerciseTemplateIdSchema, name: z.string() })
         .nullable(),
+    organisation: getOrganisationResponseDataSchema,
 });
 export type GetExerciseResponseData = z.infer<
     typeof getExerciseResponseDataSchema
@@ -48,6 +54,14 @@ export const exerciseExistsResponseDataSchema = z.object({
 
 export type ExerciseExistsResponseDataInput = z.input<
     typeof exerciseExistsResponseDataSchema
+>;
+
+export const postExerciseRequestDataSchema = z.object({
+    organisationId: organisationIdSchema.nullable(),
+    importObject: z.any(),
+});
+export type PostExerciseRequestData = z.infer<
+    typeof postExerciseRequestDataSchema
 >;
 
 export const joinExerciseResponseDataSchema = z.object({

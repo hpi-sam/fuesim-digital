@@ -20,6 +20,7 @@ import {
 import type { ParallelExerciseRepository } from '../repositories/parallel-exercise-repository.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
+import type { OrganisationRepository } from '../repositories/organisation-repository.js';
 import type { ExerciseManagerService } from './exercise-manager-service.js';
 import type { ExerciseService } from './exercise-service.js';
 
@@ -32,11 +33,12 @@ export class ParallelExerciseService {
     public constructor(
         private readonly parallelExerciseRepository: ParallelExerciseRepository,
         private readonly exerciseManagerService: ExerciseManagerService,
-        private readonly exerciseService: ExerciseService
+        private readonly exerciseService: ExerciseService,
+        private readonly organisationRepository: OrganisationRepository
     ) {}
 
-    public async getParallelExercisesOfOwner(session: SessionInformation) {
-        return this.parallelExerciseRepository.getParallelExercisesOfOwner(
+    public async getParallelExercisesForUser(session: SessionInformation) {
+        return this.parallelExerciseRepository.getParallelExercisesForUser(
             session.user.id
         );
     }
@@ -50,7 +52,12 @@ export class ParallelExerciseService {
         if (!parallelExercise) {
             throw new NotFoundError();
         }
-        if (parallelExercise.user !== session.user.id) {
+        const isMember =
+            await this.organisationRepository.isMemberOfOrganisationById(
+                parallelExercise.organisationId,
+                session.user.id
+            );
+        if (!isMember) {
             throw new PermissionDeniedError();
         }
         return parallelExercise;
@@ -156,13 +163,18 @@ export class ParallelExerciseService {
         >,
         session: SessionInformation
     ): Promise<ParallelExercise> {
+        const template =
+            await this.exerciseManagerService.getExerciseTemplateById(
+                data.templateId,
+                session
+            );
         return this.parallelExerciseRepository.transaction(async (tx) => {
             const created = await tx.createParallelExercise({
                 ...data,
                 participantKey: await new AccessKeyRepository(tx).generateKey(
                     7
                 ),
-                user: session.user.id,
+                organisationId: template.organisation.id,
             });
             if (!created) {
                 throw new ApiError();
@@ -184,7 +196,13 @@ export class ParallelExerciseService {
         if (!parallelExercise) {
             throw new NotFoundError();
         }
-        if (parallelExercise.user !== session.user.id) {
+        const isEditorOrAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                parallelExercise.organisationId,
+                session.user.id,
+                ['editor', 'admin']
+            );
+        if (!isEditorOrAdmin) {
             throw new PermissionDeniedError();
         }
         await this.parallelExerciseRepository.updateParallelExercise(
@@ -210,7 +228,13 @@ export class ParallelExerciseService {
         if (!parallelExercise) {
             throw new NotFoundError();
         }
-        if (parallelExercise.user !== session.user.id) {
+        const isEditorOrAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                parallelExercise.organisationId,
+                session.user.id,
+                ['editor', 'admin']
+            );
+        if (!isEditorOrAdmin) {
             throw new PermissionDeniedError();
         }
 
@@ -248,17 +272,6 @@ export class ParallelExerciseService {
             )
         );
         return activeExercises;
-    }
-
-    public async getParallelExerciseInstanceSummariesById(
-        id: ParallelExerciseId,
-        session: SessionInformation
-    ) {
-        const activeExercises = await this.getParallelExerciseInstancesById(
-            id,
-            session
-        );
-        return this.getParallelExerciseInstanceSummaries(activeExercises);
     }
 
     public getParallelExerciseInstanceSummaries(exercises: ActiveExercise[]) {

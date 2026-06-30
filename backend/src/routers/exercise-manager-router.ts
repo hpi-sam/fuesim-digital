@@ -1,5 +1,4 @@
 import {
-    getExercisesResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     postExerciseTemplateRequestDataSchema,
     getExerciseTemplateViewportsResponseDataSchema,
@@ -15,14 +14,6 @@ export function createExerciseManagerRouter(
     exerciseManagerService: ExerciseManagerService
 ): Router {
     const router = Router();
-
-    router.get('/exercises/', isAuthenticatedMiddleware, async (req, res) => {
-        const exercises = await exerciseManagerService.getAllExercisesOfOwner(
-            req.session!
-        );
-
-        res.send(getExercisesResponseDataSchema.encode(exercises));
-    });
 
     router
         .route('/exercise_templates/')

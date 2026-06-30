@@ -25,14 +25,30 @@ export class ExerciseManagerService {
         private readonly organisationRepository: OrganisationRepository
     ) {}
 
-    public async getAllExercisesOfOwner(session: SessionInformation) {
-        return this.exerciseRepository.getAllExercisesOfOwner(session.user.id);
-    }
-
     public async getAllExerciseTemplatesForUser(session: SessionInformation) {
         return this.exerciseRepository.getAllExerciseTemplatesForUser(
             session.user.id
         );
+    }
+
+    public async getExerciseTemplateById(
+        id: ExerciseTemplateId,
+        session: SessionInformation
+    ) {
+        const exerciseTemplate =
+            await this.exerciseRepository.getExerciseTemplateById(id);
+        if (!exerciseTemplate) {
+            throw new NotFoundError();
+        }
+        const isMember =
+            await this.organisationRepository.isMemberOfOrganisationById(
+                exerciseTemplate.organisation.id,
+                session.user.id
+            );
+        if (!isMember) {
+            throw new PermissionDeniedError();
+        }
+        return exerciseTemplate;
     }
 
     public async createExerciseTemplateFromBlank(
@@ -85,10 +101,10 @@ export class ExerciseManagerService {
             throw new ApiError();
         }
         const newExercise = await this.exerciseService.createExerciseFromFile(
-            importObject,
             {
                 templateId: exerciseTemplate.id,
-            }
+            },
+            importObject
         );
         newExercise.template = exerciseTemplate;
         return {
@@ -168,7 +184,9 @@ export class ExerciseManagerService {
             };
             const exerciseInsert = {
                 ...optionalData,
-                user: session ? session.user.id : null,
+                organisationId: session
+                    ? exerciseTemplate.organisationId
+                    : null,
                 trainerKey,
                 participantKey,
                 stateVersion: exerciseTemplate.exercise.stateVersion,

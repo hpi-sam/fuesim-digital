@@ -1,10 +1,10 @@
 import { Component, inject, resource, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
+    ExerciseKeys,
     isAccessKey,
     isExerciseKey,
     isParallelExerciseKey,
-    validateExerciseExport,
 } from 'fuesim-digital-shared';
 import { escapeRegExp } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +14,7 @@ import {
     validate,
     validateAsync,
 } from '@angular/forms/signals';
-import { ZodError } from 'zod';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../../core/auth.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
@@ -24,6 +24,7 @@ import { FileInputDirective } from '../../../shared/directives/file-input.direct
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { DisplayModelValidationComponent } from '../../../shared/validation/display-model-validation/display-model-validation.component';
 import { HelpButtonComponent } from '../../../help-button/help-button.component.js';
+import { ExerciseService } from '../../../core/exercise.service.js';
 
 @Component({
     selector: 'app-landing-page',
@@ -46,6 +47,8 @@ export class LandingPageComponent {
     private readonly router = inject(Router);
     private readonly messageService = inject(MessageService);
     readonly auth = inject(AuthService);
+    private readonly ngbModalService = inject(NgbModal);
+    private readonly exerciseService = inject(ExerciseService);
 
     protected readonly exerciseConfig = this.apiService.exerciseConfig.value;
 
@@ -103,74 +106,28 @@ export class LandingPageComponent {
         });
     });
 
-    public async createExercise() {
-        this.apiService.createExercise().then((exerciseKeys) => {
-            this.trainerKey = exerciseKeys.trainerKey;
-            this.model.set({ joinKey: this.trainerKey });
-            this.participantKey = exerciseKeys.participantKey;
-            this.exerciseHasBeenCreated = true;
+    public readonly importingExercise = signal<boolean>(false);
 
-            this.messageService.postMessage({
-                title: 'Übung erstellt',
-                body: 'Sie können nun der Übung beitreten.',
-                color: 'success',
-            });
-        });
-    }
-
-    public importingExercise = false;
-    public async importExerciseState(fileList: FileList) {
-        this.importingExercise = true;
-        try {
-            const importString = await fileList.item(0)?.text();
-            if (importString === undefined) {
-                // The file dialog has been aborted.
-                return;
-            }
-            const importJSON = JSON.parse(importString);
-            const importObject = validateExerciseExport(importJSON);
-
-            switch (importObject.type) {
-                case 'complete': {
-                    const exerciseKeys =
-                        await this.apiService.importExercise(importObject);
-                    this.trainerKey = exerciseKeys.trainerKey;
-                    this.model.set({ joinKey: this.trainerKey });
-                    this.participantKey = exerciseKeys.participantKey;
-                    this.exerciseHasBeenCreated = true;
-
-                    this.messageService.postMessage({
-                        color: 'success',
-                        title: 'Übung importiert',
-                        body: 'Sie können nun der Übung beitreten',
-                    });
-                    break;
-                }
-                case 'partial': {
-                    this.messageService.postMessage({
-                        color: 'danger',
-                        title: 'Unerlaubter Importtyp',
-                        body: 'Dieser Typ kann nur innerhalb einer Übung importiert werden.',
-                    });
-                    break;
-                }
-            }
-        } catch (error: unknown) {
-            if (error instanceof ZodError) {
-                this.messageService.postMessage({
-                    color: 'danger',
-                    title: 'Fehlerhafte Datei',
-                    body: 'Die Datei hat das falsche Format.',
-                });
-            } else {
-                this.messageService.postError({
-                    title: 'Fehler beim Importieren der Übung',
-                    error,
-                });
-            }
-        } finally {
-            this.importingExercise = false;
+    public async createExercise(fileList?: FileList) {
+        if (fileList) {
+            this.importingExercise.set(true);
         }
+        await this.exerciseService.createExercise(
+            fileList,
+            (exerciseKeys: ExerciseKeys) => {
+                this.trainerKey = exerciseKeys.trainerKey;
+                this.model.set({ joinKey: this.trainerKey });
+                this.participantKey = exerciseKeys.participantKey;
+                this.exerciseHasBeenCreated = true;
+
+                this.messageService.postMessage({
+                    title: 'Übung erstellt',
+                    body: 'Sie können nun der Übung beitreten.',
+                    color: 'success',
+                });
+            }
+        );
+        this.importingExercise.set(false);
     }
 
     public pasteExerciseKey(event: ClipboardEvent) {

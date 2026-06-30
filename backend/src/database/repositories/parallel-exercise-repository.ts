@@ -3,7 +3,11 @@ import type {
     ParallelExerciseKey,
     ParallelExerciseId,
 } from 'fuesim-digital-shared';
-import type { ParallelExercise, ParallelExerciseInsert } from '../schema.js';
+import {
+    organisationMembershipTable,
+    type ParallelExercise,
+    type ParallelExerciseInsert,
+} from '../schema.js';
 import {
     exerciseTable,
     parallelExerciseTable,
@@ -49,11 +53,22 @@ export class ParallelExerciseRepository extends BaseRepository {
         );
     }
 
-    public async getParallelExercisesOfOwner(
+    public async getParallelExercisesForUser(
         userId: string
     ): Promise<ParallelExercise[]> {
+        const subquery = this.databaseConnection
+            .select()
+            .from(organisationMembershipTable)
+            .where(eq(organisationMembershipTable.userId, userId))
+            .as('memberships');
         return this.parallelExerciseQuery
-            .where(eq(parallelExerciseTable.user, userId))
+            .innerJoin(
+                subquery,
+                eq(
+                    subquery.organisationId,
+                    parallelExerciseTable.organisationId
+                )
+            )
             .orderBy(desc(parallelExerciseTable.createdAt));
     }
 

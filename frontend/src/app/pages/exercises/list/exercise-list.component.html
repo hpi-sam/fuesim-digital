@@ -1,12 +1,22 @@
 <app-header />
 <main class="container">
-    <div class="d-flex align-items-center mb-3">
-        <h1>Meine Übungen</h1>
+    <div class="d-flex align-items-center mb-3 gap-2">
+        <h1>Übungen</h1>
         <app-help-button url="4_editing/index.html#übungen-verwalten" />
         <div class="flex-grow-1"></div>
         <button class="btn btn-primary" (click)="createExercise()">
             Neue Übung erstellen
         </button>
+        <label class="btn btn-outline-primary my-2">
+            <i class="bi-cloud-upload me-2"> </i>
+            Übung importieren
+            <input
+                (appFileInput)="createExercise($event)"
+                type="file"
+                accept="application/json"
+                class="d-none"
+            />
+        </label>
     </div>
     @if (exercises.hasValue()) {
         <div class="row row-cols-3">

@@ -90,21 +90,21 @@
                     </button>
                     <label
                         class="btn btn-outline-primary btn-lg"
-                        [class.disabled]="importingExercise"
+                        [class.disabled]="importingExercise()"
                     >
                         <i class="bi-cloud-upload me-2"> </i>
                         Übung importieren
-                        @if (importingExercise) {
+                        @if (importingExercise()) {
                             <span
                                 class="spinner-border spinner-border-sm"
                             ></span>
                         }
                         <input
-                            (appFileInput)="importExerciseState($event)"
+                            (appFileInput)="createExercise($event)"
                             type="file"
                             accept="application/json"
                             class="d-none"
-                            [disabled]="importingExercise"
+                            [disabled]="importingExercise()"
                         />
                     </label>
                 </div>

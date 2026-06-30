@@ -191,7 +191,9 @@ export const exerciseTable = pgTable('exercise_entity', {
     trainerKey: char({ length: 8 }).$type<TrainerKey>().notNull().unique(),
     currentStateString: json().$type<ExerciseState>().notNull(),
     stateVersion: integer().notNull(),
-    user: varchar().references(() => userTable.id, { onDelete: 'cascade' }),
+    organisationId: uuid()
+        .$type<OrganisationId>()
+        .references(() => organisationTable.id, { onDelete: 'cascade' }),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
         .defaultNow(),
@@ -254,8 +256,9 @@ export const exerciseEntityRelations = relations(exerciseTable, ({ many }) => ({
 
 export const parallelExerciseTable = pgTable('parallel_exercise', {
     ...baseTable<ParallelExerciseId>(),
-    user: varchar()
-        .references(() => userTable.id, { onDelete: 'cascade' })
+    organisationId: uuid()
+        .$type<OrganisationId>()
+        .references(() => organisationTable.id, { onDelete: 'cascade' })
         .notNull(),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
@@ -263,6 +266,7 @@ export const parallelExerciseTable = pgTable('parallel_exercise', {
     name: varchar().notNull(),
     templateId: uuid()
         // TODO Cascade dangerous?
+        .$type<ExerciseTemplateId>()
         .references(() => exerciseTemplateTable.id, { onDelete: 'cascade' })
         .notNull(),
     participantKey: char({ length: 7 })

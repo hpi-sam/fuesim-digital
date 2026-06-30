@@ -35,7 +35,7 @@ export function createParallelExerciseRouter(
         .all(areParallelExercisesEnabled, isAuthenticatedMiddleware)
         .get(async (req, res) => {
             const parallelExercies =
-                await parallelExerciseService.getParallelExercisesOfOwner(
+                await parallelExerciseService.getParallelExercisesForUser(
                     req.session!
                 );
             res.send(

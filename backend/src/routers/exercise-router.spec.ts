@@ -1,6 +1,7 @@
 import {
     exerciseKeysSchema,
     exerciseExistsResponseDataSchema,
+    getExercisesResponseDataSchema,
 } from 'fuesim-digital-shared';
 import type {
     GetExerciseTemplateResponseData,
@@ -22,6 +23,107 @@ describe('exercise router', () => {
     beforeEach(async () => {
         environment.services.exerciseService.TESTING_getExerciseMap().clear();
     });
+
+    describe('GET /api/exercises', () => {
+        let session: string;
+        let personalOrganisation: OrganisationEntry;
+        beforeEach(async () => {
+            environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .clear();
+            session = await createTestUserSession(environment);
+            personalOrganisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+        });
+        it('fails with 403 if not authenticated', async () => {
+            await environment.httpRequest('get', '/api/exercises').expect(403);
+        });
+
+        it('returns an empty list for no exercises', async () => {
+            const response = await environment
+                .httpRequest('get', '/api/exercises', session)
+                .expect(200);
+
+            const parsed = getExercisesResponseDataSchema.parse(response.body);
+            expect(parsed).toEqual([]);
+        });
+
+        it('returns only own exercises', async () => {
+            const ownExercise = await createExercise(environment, session);
+
+            // Create other exercises not to be shown for this user
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            await createExercise(environment, session2);
+            await createExercise(environment);
+
+            const response = await environment
+                .httpRequest('get', '/api/exercises', session)
+                .expect(200);
+            const parsed = getExercisesResponseDataSchema.parse(response.body);
+
+            expect(parsed).toHaveLength(1);
+            expect(parsed[0]!.trainerKey).toBe(ownExercise.trainerKey);
+        });
+
+        it('returns correct data', async () => {
+            const beforeCreation = new Date();
+            const exercise = await createExercise(environment, session);
+
+            const response = await environment
+                .httpRequest('get', '/api/exercises', session)
+                .expect(200);
+            const parsed = getExercisesResponseDataSchema.parse(
+                response.body
+            )[0]!;
+
+            expect(parsed.participantKey).toBe(exercise.participantKey);
+            expect(parsed.trainerKey).toBe(exercise.trainerKey);
+            expect(parsed.baseTemplate).toBe(null);
+            expect(parsed.createdAt.getTime()).toBeGreaterThan(
+                beforeCreation.getTime()
+            );
+            expect(parsed.createdAt.getTime()).toBeLessThan(Date.now());
+            expect(parsed.lastUsedAt.getTime()).toBeGreaterThan(
+                beforeCreation.getTime()
+            );
+            expect(parsed.lastUsedAt.getTime()).toBeLessThan(Date.now());
+        });
+        it('works with deleted base templates', async () => {
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session,
+                personalOrganisation.id
+            );
+            await environment
+                .httpRequest(
+                    'post',
+                    `/api/exercise_templates/${exerciseTemplate.id}/new`,
+                    session
+                )
+                .expect(201);
+            await environment
+                .httpRequest(
+                    'delete',
+                    `/api/exercise_templates/${exerciseTemplate.id}`,
+                    session
+                )
+                .expect(204);
+
+            const response = await environment
+                .httpRequest('get', '/api/exercises', session)
+                .expect(200);
+            const parsed = getExercisesResponseDataSchema.parse(
+                response.body
+            )[0]!;
+
+            expect(parsed.baseTemplate).toBe(null);
+        });
+    });
+
     describe('POST /api/exercise', () => {
         it('returns an exercise key', async () => {
             const response = await environment

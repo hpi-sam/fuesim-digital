@@ -1,14 +1,16 @@
 import {
     exerciseExistsResponseDataSchema,
     getExerciseConfigResponseDataSchema,
+    getExercisesResponseDataSchema,
     isExerciseKey,
     isTrainerKey,
+    postExerciseRequestDataSchema,
 } from 'fuesim-digital-shared';
-import { isEmpty } from 'lodash-es';
 import { Router } from 'express';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ApiError, NotFoundError } from '../utils/http.js';
 import { Config } from '../config.js';
+import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 
 export function createExerciseRouter(exerciseService: ExerciseService): Router {
     const router = Router();
@@ -22,16 +24,20 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
         );
     });
 
+    router.get('/exercises/', isAuthenticatedMiddleware, async (req, res) => {
+        const exercises = await exerciseService.getAllExercisesForUser(
+            req.session!
+        );
+
+        res.send(getExercisesResponseDataSchema.encode(exercises));
+    });
+
     router.post('/exercise', async (req, res) => {
-        const optionalData = req.session
-            ? { user: req.session.user.id }
-            : undefined;
-        const exercise = isEmpty(req.body)
-            ? await exerciseService.createExerciseFromBlank(optionalData)
-            : await exerciseService.createExerciseFromFile(
-                  req.body,
-                  optionalData
-              );
+        const data = postExerciseRequestDataSchema.parse(req.body);
+        const exercise = await exerciseService.createExercise(
+            data,
+            req.session
+        );
 
         res.status(201).send({
             participantKey: exercise.participantKey,

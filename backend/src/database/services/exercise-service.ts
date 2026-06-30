@@ -6,6 +6,7 @@ import type {
     ParticipantKey,
     TrainerKey,
     ExerciseState,
+    PostExerciseRequestData,
 } from 'fuesim-digital-shared';
 import {
     isTrainerKey,
@@ -72,6 +73,10 @@ export class ExerciseService {
         return new Set(this.exerciseMap.values());
     }
 
+    public async getAllExercisesForUser(session: SessionInformation) {
+        return this.exerciseRepository.getAllExercisesForUser(session.user.id);
+    }
+
     public loadExercise(activeExercise: ActiveExercise) {
         this.exerciseMap.set(activeExercise.participantKey, activeExercise);
         this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
@@ -89,8 +94,46 @@ export class ExerciseService {
         this.exerciseMap.delete(exercise.exercise.id);
     }
 
+    public async createExercise(
+        data: PostExerciseRequestData,
+        session?: SessionInformation
+    ) {
+        const { importObject, ...parsedData } = data;
+
+        if (session) {
+            // Logged in user
+            if (!data.organisationId) {
+                throw new ApiError();
+            }
+            const isEditorOrAdmin =
+                await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                    data.organisationId,
+                    session.user.id,
+                    ['editor', 'admin']
+                );
+            if (!isEditorOrAdmin) {
+                throw new PermissionDeniedError();
+            }
+        } else {
+            // Anonymous exercise
+            parsedData.organisationId = null;
+        }
+
+        let exercise;
+        if (!importObject) {
+            exercise = await this.createExerciseFromBlank(parsedData);
+        } else {
+            exercise = await this.createExerciseFromFile(
+                parsedData,
+                importObject
+            );
+        }
+
+        return exercise;
+    }
+
     public async createExerciseFromBlank(
-        optionalData: Partial<ExerciseInsert> = {}
+        data: Partial<ExerciseInsert>
     ): Promise<ActiveExercise> {
         return this.exerciseRepository.transaction(
             async (exerciseRepository) => {
@@ -105,10 +148,10 @@ export class ExerciseService {
 
                 const initialState: ExerciseState = {
                     ...newExerciseState(participantKey),
-                    type: optionalData.templateId ? 'template' : 'standalone',
+                    type: data.templateId ? 'template' : 'standalone',
                 };
                 const exerciseInsert = {
-                    ...optionalData,
+                    ...data,
                     participantKey,
                     trainerKey,
                     initialStateString: initialState,
@@ -128,8 +171,8 @@ export class ExerciseService {
     }
 
     public async createExerciseFromFile(
-        file: StateExport,
-        optionalData: Partial<ExerciseInsert> = {}
+        data: Partial<ExerciseInsert>,
+        file: StateExport
     ): Promise<ActiveExercise> {
         return this.exerciseRepository.transaction(
             async (exerciseRepository) => {
@@ -158,14 +201,14 @@ export class ExerciseService {
                         participantKey,
                     };
 
-                    const exerciseType = optionalData.templateId
+                    const exerciseType = data.templateId
                         ? 'template'
                         : 'standalone';
                     newInitialState.type = exerciseType;
                     newCurrentState.type = exerciseType;
 
                     const exerciseInsert = {
-                        ...optionalData,
+                        ...data,
                         participantKey,
                         trainerKey,
                         initialStateString: newInitialState,

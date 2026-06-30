@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import { uuid, uuidSchema } from '../utils/uuid.js';
+import { getIdMapSchema, uuid, uuidSchema } from '../utils/uuid.js';
 import { isElementVersionId } from '../marketplace/models/versioned-id-schema.js';
 import { cloneDeepMutable } from '../utils/clone-deep.js';
 import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
@@ -12,7 +12,7 @@ export const alarmGroupSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('alarmGroup'),
     name: z.string(),
-    alarmGroupVehicles: z.record(uuidSchema, alarmGroupVehicleSchema),
+    alarmGroupVehicles: getIdMapSchema(alarmGroupVehicleSchema),
     triggerCount: z.number().nonnegative(),
     triggerLimit: z.number().nonnegative().nullable(),
 });

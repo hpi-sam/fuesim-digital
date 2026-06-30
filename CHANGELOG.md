@@ -11,6 +11,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Names of new vehicle are automatically numbered using a counter per vehicle template. This can be en-/disabled using the '#' placeholder in the default name.
 
+### Fixed
+
+- Complete exports (including history) of exercise templates are now permitted.
+
 ## [0.16.0] - 2026-06-23
 
 ### Changed

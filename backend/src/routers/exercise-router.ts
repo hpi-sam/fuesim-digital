@@ -84,7 +84,8 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
             throw new ApiError();
         }
         const timeline = await exerciseService.getTimeline(
-            req.params.exerciseKey
+            req.params.exerciseKey,
+            req.session
         );
         res.send(timeline);
     });

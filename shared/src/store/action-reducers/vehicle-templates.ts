@@ -98,6 +98,9 @@ export namespace VehicleTemplateActionReducers {
             reducer: (draftState, { id }) => {
                 getVehicleTemplate(draftState, id);
                 delete draftState.vehicleTemplates[id];
+
+                delete draftState.vehicleCounters[id];
+
                 // Delete this template from every alarm group
                 for (const alarmGroup of Object.values(
                     draftState.alarmGroups

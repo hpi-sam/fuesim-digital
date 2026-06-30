@@ -20,23 +20,7 @@ import { collectionVisibilitySchema } from '../marketplace/models/collection-vis
 import { templateVersionSchema } from '../marketplace/models/versioned-elements.js';
 import { versionedElementContentSchema } from '../marketplace/models/versioned-element-content.js';
 import { organisationIdSchema } from '../ids.js';
-import { stringToDate } from './utils.js';
-
-class Route<TRequest = never, TResponse = never> {
-    constructor(opts: { request?: TRequest; response?: TResponse }) {
-        this.requestSchema = opts.request as TRequest;
-        this.responseSchema = opts.response as TResponse;
-    }
-
-    public readonly requestSchema: TRequest;
-    public readonly responseSchema: TResponse;
-    public readonly Request!: TRequest extends z.ZodType
-        ? Immutable<z.infer<TRequest>>
-        : never;
-    public readonly Response!: TResponse extends z.ZodType
-        ? Immutable<z.infer<TResponse>>
-        : never;
-}
+import { Route, stringToDate } from './utils.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export namespace Marketplace {

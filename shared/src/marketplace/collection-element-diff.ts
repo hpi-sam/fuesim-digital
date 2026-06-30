@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { ImmutableInfer } from '../utils/infer.js';
+import type { Immutable } from 'immer';
 import { elementVersionIdSchema } from './models/versioned-id-schema.js';
 import { templateVersionSchema } from './models/versioned-elements.js';
 
@@ -30,8 +30,8 @@ export const changedElementSchema = z.union([
     addedElementSchema,
 ]);
 
-export type ChangeElementType = ImmutableInfer<
-    typeof changedElementSchema
+export type ChangeElementType = Immutable<
+    z.infer<typeof changedElementSchema>
 >['type'];
 
-export type ChangedElementDto = ImmutableInfer<typeof changedElementSchema>;
+export type ChangedElementDto = Immutable<z.infer<typeof changedElementSchema>>;

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { ImmutableInfer } from '../../utils/infer.js';
+import type { Immutable } from 'immer';
 import { collectionVersionSchema } from './collection.js';
 import type { TemplateVersion } from './versioned-elements.js';
 import { templateVersionSchema } from './versioned-elements.js';
@@ -10,8 +10,8 @@ export const collectionElementsSingleSchema = z.strictObject({
     collection: collectionVersionSchema,
     elements: z.array(templateVersionSchema),
 });
-export type CollectionElementsSingle = ImmutableInfer<
-    typeof collectionElementsSingleSchema
+export type CollectionElementsSingle = Immutable<
+    z.infer<typeof collectionElementsSingleSchema>
 >;
 
 /**

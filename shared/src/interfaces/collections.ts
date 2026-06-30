@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import type { ImmutableInfer } from '../utils/infer.js';
 import type { CollectionEntityId } from '../marketplace/models/versioned-id-schema.js';
 import {
     collectionEntityIdSchema,
@@ -32,10 +31,10 @@ class Route<TRequest = never, TResponse = never> {
     public readonly requestSchema: TRequest;
     public readonly responseSchema: TResponse;
     public readonly Request!: TRequest extends z.ZodType
-        ? ImmutableInfer<TRequest>
+        ? Immutable<z.infer<TRequest>>
         : never;
     public readonly Response!: TResponse extends z.ZodType
-        ? ImmutableInfer<TResponse>
+        ? Immutable<z.infer<TResponse>>
         : never;
 }
 
@@ -214,8 +213,8 @@ export namespace Marketplace {
             description: z.string().trim().nonempty().optional(),
         });
 
-        export type EditableCollectionProperties = ImmutableInfer<
-            typeof editableCollectionPropertiesSchema
+        export type EditableCollectionProperties = Immutable<
+            z.infer<typeof editableCollectionPropertiesSchema>
         >;
 
         export const Edit = new Route({
@@ -329,7 +328,7 @@ export namespace Marketplace {
             public readonly Type!: T extends z.ZodType
                 ? // if D is defined (override type), use D, otherwise infer from T
                   D extends unknown
-                    ? ImmutableInfer<T>
+                    ? Immutable<z.infer<T>>
                     : D
                 : never;
 
@@ -353,7 +352,7 @@ export namespace Marketplace {
                     {
                         event: TName;
                         collectionEntityId: CollectionEntityId;
-                        data: ImmutableInfer<TData>;
+                        data: Immutable<z.infer<TData>>;
                     },
                     typeof schema
                 >(schema);

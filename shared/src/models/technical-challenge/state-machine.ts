@@ -275,6 +275,7 @@ export function getTaskProgress(
             : 0);
     const totalTaskDuration = stateMachine.tasks[taskId]!.totalDuration;
     const progressPercentage = timeSpent / totalTaskDuration;
+    console.log(`[getTaskProgress] taskId=${taskId} t=${currentTime} nAssigned=${nAssignedPersonnel} rate=${rate} timeSpent=${timeSpent} progress=${(progressPercentage * 100).toFixed(2)}%`);
     return { timeSpent, progressPercentage, rate };
 }
 
@@ -551,6 +552,7 @@ export function updateTaskProgress(
     const taskProgress = stateMachine.taskTimeSpent[taskId];
 
     if (!taskProgress) {
+        console.log(`[updateTaskProgress] taskId=${taskId} t=${currentTime} INIT (first seen)`);
         stateMachine.taskTimeSpent[taskId] = {
             timeSpent: 0,
             lastUpdatedAt: currentTime,
@@ -562,12 +564,12 @@ export function updateTaskProgress(
         stateMachine.assignedPersonnel
     ).filter((_taskId) => _taskId === taskId).length;
 
-    taskProgress.timeSpent =
-        taskProgress.timeSpent +
-        (currentTime - taskProgress.lastUpdatedAt) *
-            nAssignedPersonnel *
-            state.possibleTasks[taskId];
+    const rate = nAssignedPersonnel * state.possibleTasks[taskId];
+    const delta = (currentTime - taskProgress.lastUpdatedAt) * rate;
+    const oldTimeSpent = taskProgress.timeSpent;
+    taskProgress.timeSpent = oldTimeSpent + delta;
     taskProgress.lastUpdatedAt = currentTime;
+    console.log(`[updateTaskProgress] taskId=${taskId} t=${currentTime} nAssigned=${nAssignedPersonnel} rate=${rate} delta=${delta.toFixed(3)} timeSpent: ${oldTimeSpent.toFixed(3)}→${taskProgress.timeSpent.toFixed(3)}`);
 }
 
 export function updateAllTasksProgress(
@@ -599,6 +601,8 @@ function computeEarliestEvent(
             guard
         );
 
+        console.log(`[computeEarliestEvent] transitionId=${transition.id} current=${eventTimestamp.current} nextChange=${eventTimestamp.nextChange}`);
+
         if (eventTimestamp.nextChange >= earliestTimestamp) continue;
         earliestTimestamp = eventTimestamp.nextChange;
         earliestEvent = newStateMachineEvent(
@@ -609,6 +613,7 @@ function computeEarliestEvent(
         );
     }
 
+    console.log(`[computeEarliestEvent] → earliest: transitionId=${earliestEvent?.transitionId ?? 'none'} t=${earliestEvent?.timestamp ?? 'null'}`);
     return earliestEvent;
 }
 
@@ -650,6 +655,8 @@ function propagateTaskChange(
             const thisOldTimestamp = guard.nextChange!;
             guard.nextChange = nextChange;
 
+            console.log(`[propagate:task] taskId=${guard.taskId} transitionId=${transitionId} nextChange: ${thisOldTimestamp}→${nextChange} parentType=${guard.parent?.type ?? 'null(root)'}`);
+
             return propagateTaskChange(
                 exerciseState,
                 technicalChallengeId,
@@ -662,6 +669,7 @@ function propagateTaskChange(
             );
         }
         case 'notGuard': {
+            console.log(`[propagate:not] transitionId=${transitionId} passthrough old=${oldTimestamp} new=${newTimestamp} parentType=${guard.parent?.type ?? 'null(root)'}`);
             return propagateTaskChange(
                 exerciseState,
                 technicalChallengeId,
@@ -677,12 +685,13 @@ function propagateTaskChange(
             if (guard.nextChange! !== oldTimestamp) {
                 // This guard did not define this trees next event
                 if (newTimestamp! <= guard.nextChange!) {
-                    // The new timestamp is before or equal to the nextChange timestamp, so it doesn't change the next event of this tree
+                    console.log(`[propagate:and] transitionId=${transitionId} NOT the defining child (guard.nextChange=${guard.nextChange} !== old=${oldTimestamp}), new=${newTimestamp} ≤ guard.nextChange → STOP`);
                     return null;
                 }
                 // The new timestamp is after the nextChange timestamp, so this is the new nextChange timestamp
                 const thisOldTimestamp = guard.nextChange!;
                 guard.nextChange = newTimestamp;
+                console.log(`[propagate:and] transitionId=${transitionId} NOT the defining child but new=${newTimestamp} > guard.nextChange=${thisOldTimestamp} → nextChange: ${thisOldTimestamp}→${newTimestamp} parentType=${guard.parent?.type ?? 'null(root)'}`);
                 return propagateTaskChange(
                     exerciseState,
                     technicalChallengeId,
@@ -702,6 +711,7 @@ function propagateTaskChange(
             if (nextChange !== guard.nextChange) {
                 const thisOldTimestamp = guard.nextChange;
                 guard.nextChange = nextChange;
+                console.log(`[propagate:and] transitionId=${transitionId} WAS the defining child, subGuards=[${subGuards.join(',')}] nextChange: ${thisOldTimestamp}→${nextChange} parentType=${guard.parent?.type ?? 'null(root)'}`);
                 return propagateTaskChange(
                     exerciseState,
                     technicalChallengeId,
@@ -713,6 +723,7 @@ function propagateTaskChange(
                     nextChange
                 );
             }
+            console.log(`[propagate:and] transitionId=${transitionId} WAS the defining child, subGuards=[${subGuards.join(',')}] nextChange unchanged=${guard.nextChange} → STOP`);
             return null;
         }
         case 'timerGuard':
@@ -737,7 +748,9 @@ function getGuardTimestamp(
                 state,
                 guard.guard
             );
+            const cached = guard.nextChange === undefined;
             guard.nextChange ??= subGuard.nextChange;
+            console.log(`[guardTs:not] child.current=${subGuard.current} child.nextChange=${subGuard.nextChange} → current=${!subGuard.current}${cached ? ' [cached]' : ''}`);
             return {
                 current: !subGuard.current,
                 nextChange: subGuard.nextChange,
@@ -756,7 +769,9 @@ function getGuardTimestamp(
                           .map((g) => g.nextChange)
                   );
 
+            const cached = guard.nextChange === undefined;
             guard.nextChange ??= nextChange;
+            console.log(`[guardTs:and] children=[${subGuards.map((g) => `{cur:${g.current},nc:${g.nextChange}}`).join(',')}] allFulfilled=${current} nextChange=${nextChange}${cached ? ' [cached]' : ''}`);
             return {
                 current,
                 nextChange,
@@ -775,8 +790,10 @@ function getGuardTimestamp(
                     stateMachine,
                     exerciseState.currentTime
                 )
-            )
+            ) {
+                console.log(`[guardTs:task] taskId=${guard.taskId} progress=${(taskProgress.progressPercentage * 100).toFixed(2)}% FULFILLED → nextChange=Infinity`);
                 return { current: true, nextChange: Infinity };
+            }
 
             const totalDuration =
                 stateMachine.tasks[guard.taskId]!.totalDuration;
@@ -786,8 +803,10 @@ function getGuardTimestamp(
                 exerciseState.currentTime +
                 remainingDuration / taskProgress.rate;
 
+            const cached = guard.nextChange === undefined;
             guard.nextChange ??= nextChange;
 
+            console.log(`[guardTs:task] taskId=${guard.taskId} progress=${(taskProgress.progressPercentage * 100).toFixed(2)}% rate=${taskProgress.rate} remaining=${remainingDuration.toFixed(3)} nextChange=${nextChange}${cached ? ' [cached]' : ''}`);
             return {
                 current: false,
                 nextChange,
@@ -800,16 +819,20 @@ function getGuardTimestamp(
                     stateMachine,
                     exerciseState.currentTime
                 )
-            )
+            ) {
+                console.log(`[guardTs:timer] timerId=${guard.timerId} FULFILLED → nextChange=Infinity`);
                 return { current: true, nextChange: Infinity };
+            }
 
             const timer = stateMachine.timers[guard.timerId]!;
             const nextChange =
                 stateMachine.simulationStartTime +
                 guard.minProgress * timer.totalDuration;
 
+            const cached = guard.nextChange === undefined;
             guard.nextChange ??= nextChange;
 
+            console.log(`[guardTs:timer] timerId=${guard.timerId} simulationStartTime=${stateMachine.simulationStartTime} minProgress=${guard.minProgress} totalDuration=${timer.totalDuration} nextChange=${nextChange}${cached ? ' [cached]' : ''}`);
             return {
                 current: false,
                 nextChange,
@@ -826,10 +849,12 @@ function applyEventToQueue(
     const queue = exerciseState.stateMachineEventQueue;
 
     if (earliestEvent === null) {
+        console.log(`[applyEvent:remove] smId=${stateMachineId} no event to schedule`);
         remove(queue, stateMachineId);
         return;
     }
     if (queue.indices[stateMachineId] === undefined) {
+        console.log(`[applyEvent:insert] smId=${stateMachineId} transitionId=${earliestEvent.transitionId} t=${earliestEvent.timestamp}`);
         insert(queue, earliestEvent);
         return;
     }
@@ -837,8 +862,11 @@ function applyEventToQueue(
     if (
         current.transitionId === earliestEvent.transitionId &&
         current.timestamp === earliestEvent.timestamp
-    )
+    ) {
+        console.log(`[applyEvent:noOp] smId=${stateMachineId} transitionId=${earliestEvent.transitionId} t=${earliestEvent.timestamp} unchanged`);
         return;
+    }
+    console.log(`[applyEvent:update] smId=${stateMachineId} transitionId: ${current.transitionId}→${earliestEvent.transitionId} t: ${current.timestamp}→${earliestEvent.timestamp}`);
     modify(queue, stateMachineId, earliestEvent);
 }
 
@@ -852,7 +880,10 @@ export function updateEventQueue(
 
     const potentialTransitions = Object.values(state.outgoingTransitions);
 
+    console.log(`[updateQueue:full] smId=${stateMachine.id} currentStateId=${state.id} nTransitions=${potentialTransitions.length} t=${exerciseState.currentTime}`);
+
     if (potentialTransitions.length === 0) {
+        console.log(`[updateQueue:full] smId=${stateMachine.id} no outgoing transitions → removing from queue`);
         remove(exerciseState.stateMachineEventQueue, stateMachine.id);
     }
 
@@ -863,6 +894,7 @@ export function updateEventQueue(
         potentialTransitions
     );
 
+    console.log(`[updateQueue:done] smId=${stateMachine.id} → event t=${earliestEvent?.timestamp ?? 'null'} transitionId=${earliestEvent?.transitionId ?? 'null'}`);
     applyEventToQueue(exerciseState, stateMachine.id, earliestEvent);
 }
 
@@ -880,8 +912,12 @@ export function updateEventQueueAfterTaskChange(
         state.id
     ] as WritableDraft<{ [key: Transition['id']]: TreeGuard[] }>;
 
+    const nAffectedTransitions = Object.keys(affectedGuards).length;
+    console.log(`[updateQueueTask] taskId=${taskId} smId=${stateMachine.id} stateId=${state.id} nAffectedTransitions=${nAffectedTransitions} t=${exerciseState.currentTime}`);
+
     let newEvent: StateMachineEvent | undefined;
     for (const [transitionId, guards] of Object.entries(affectedGuards)) {
+        console.log(`[updateQueueTask:transition] transitionId=${transitionId} nGuardLeaves=${guards.length}`);
         const events = guards
             .map((guard) =>
                 propagateTaskChange(
@@ -894,6 +930,7 @@ export function updateEventQueueAfterTaskChange(
                 )
             )
             .filter((e) => e !== null);
+        console.log(`[updateQueueTask:transition] transitionId=${transitionId} propagation produced ${events.length} event(s): [${events.map((e) => e.timestamp).join(',')}]`);
         for (const event of events) {
             if (event.timestamp < (newEvent?.timestamp ?? Infinity)) {
                 newEvent = event;
@@ -901,16 +938,23 @@ export function updateEventQueueAfterTaskChange(
         }
     }
 
-    if (newEvent === undefined) return;
+    if (newEvent === undefined) {
+        console.log(`[updateQueueTask] taskId=${taskId} → no event change`);
+        return;
+    }
 
     const queue = exerciseState.stateMachineEventQueue;
     if (queue.indices[stateMachine.id] === undefined) {
+        console.log(`[updateQueueTask:insert] smId=${stateMachine.id} transitionId=${newEvent.transitionId} t=${newEvent.timestamp}`);
         insert(queue, newEvent);
         return;
     }
     const current = queue.events[queue.indices[stateMachine.id]!]!;
     if (newEvent.timestamp < current.timestamp) {
+        console.log(`[updateQueueTask:update] smId=${stateMachine.id} transitionId: ${current.transitionId}→${newEvent.transitionId} t: ${current.timestamp}→${newEvent.timestamp}`);
         modify(queue, stateMachine.id, newEvent);
+    } else {
+        console.log(`[updateQueueTask:noOp] smId=${stateMachine.id} new t=${newEvent.timestamp} ≥ current t=${current.timestamp} → unchanged`);
     }
 }
 
@@ -932,6 +976,11 @@ function simulateStateMachine(
 
     if (!nextTransition) return;
 
+    console.log(`[simulate] smId=${stateMachine.id} transitionId=${transitionId} state: ${stateMachine.currentStateId}→${nextTransition.targetState} t=${exerciseState.currentTime}`);
+    for (const [taskId, taskTimeSpent] of Object.entries(stateMachine.taskTimeSpent)) {
+        console.log(`[simulate:taskProgress] taskId=${taskId} timeSpent=${taskTimeSpent.timeSpent.toFixed(3)} lastUpdatedAt=${taskTimeSpent.lastUpdatedAt}`);
+    }
+
     logStateTransition?.(nextTransition.targetState);
 
     updateAllTasksProgress(exerciseState, stateMachine);
@@ -940,9 +989,12 @@ function simulateStateMachine(
 
     const unassignedPersonnel = unassignFromNonexistentTasks(stateMachine);
 
-    if (unassignedPersonnel.length > 0 && logPersonnelUnassigned) {
-        for (const { personnelId, taskTypeId } of unassignedPersonnel) {
-            logPersonnelUnassigned(personnelId, taskTypeId);
+    if (unassignedPersonnel.length > 0) {
+        console.log(`[simulate:unassign] smId=${stateMachine.id} unassigned ${unassignedPersonnel.map((p) => `${p.personnelId}(task:${p.taskTypeId})`).join(', ')}`);
+        if (logPersonnelUnassigned) {
+            for (const { personnelId, taskTypeId } of unassignedPersonnel) {
+                logPersonnelUnassigned(personnelId, taskTypeId);
+            }
         }
     }
 
@@ -954,13 +1006,14 @@ export function simulateAllTechnicalChallenges(
     tickInterval: number
 ) {
     const queue = draftState.stateMachineEventQueue;
-    console.log(JSON.stringify(queue, null, 2));
-    console.log(
-        `Comparing ${peek(queue)?.timestamp} with ${draftState.currentTime}`
-    );
+    const nextEvent = peek(queue);
+    console.log(`[tick] currentTime=${draftState.currentTime} nextEventTime=${nextEvent?.timestamp ?? 'none'} smId=${nextEvent?.stateMachineId ?? '-'} transitionId=${nextEvent?.transitionId ?? '-'}`);
 
+    let nProcessed = 0;
     while ((peek(queue)?.timestamp ?? Infinity) <= draftState.currentTime) {
         const event = pop(queue)!;
+        console.log(`[tick:fire] #${nProcessed} smId=${event.stateMachineId} transitionId=${event.transitionId} eventTime=${event.timestamp} currentTime=${draftState.currentTime}`);
+        nProcessed++;
         const stateMachine =
             draftState.technicalChallenges[event.technicalChallengeId]!
                 .stateMachines[event.stateMachineId]!;
@@ -986,4 +1039,5 @@ export function simulateAllTechnicalChallenges(
                 )
         );
     }
+    console.log(`[tick:done] processed ${nProcessed} event(s) this tick`);
 }

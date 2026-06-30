@@ -3,6 +3,18 @@
 Auf dieser Seite informieren wir über aktuelle Änderungen in der FüSim Digital. Zudem gibt es einen [Mailverteiler](https://lists.myhpi.de/8NGBl7FhFMPbVxPK7Pa0cRMfCezUkjHksbD9HxOM),
 der auch über die Änderungen informiert.
 
+## Version 0.17.0 -- 30.06.2026
+
+[Release 0.17.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.17.0)
+
+### Neue Features
+
+- Die Namen neuer Fahrzeuge werden automatisch pro Fahrzeugvorlage durchnummeriert. Diese Funktion kann über das Einfügen des Platzhalters „#“ im Namen der Vorlage aktiviert werden.
+
+### Fehlerbehebungen
+
+- Der vollständige Export (einschließlich Verlauf) von Übungsvorlagen ist nun möglich.
+
 ## Version 0.16.0 -- 23.06.2026
 
 [Release 0.16.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.16.0)

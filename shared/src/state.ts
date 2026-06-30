@@ -81,6 +81,10 @@ import {
     exerciseRadiogramSchema,
 } from './models/radiogram/exercise-radiogram.js';
 import { type Scoutable, scoutableSchema } from './models/scoutable.js';
+import {
+    type ResourceDescription,
+    resourceDescriptionSchema,
+} from './models/utils/resource-description.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -212,6 +216,9 @@ export class ExerciseState {
     @IsZodSchema(z.int().nonnegative())
     public readonly patientCounter: number = 0;
 
+    @IsZodSchema(resourceDescriptionSchema)
+    public readonly vehicleCounters: ResourceDescription = {};
+
     /**
      * The log entries generated for the statistics.
      * This must not be defined on a normal state,
@@ -243,5 +250,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 55;
+    static readonly currentStateVersion = 56;
 }

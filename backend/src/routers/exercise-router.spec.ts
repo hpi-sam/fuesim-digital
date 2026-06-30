@@ -60,7 +60,7 @@ describe('exercise router', () => {
             expect(parsed.autojoin).toBe(false);
         });
 
-        it('fails  for non-existing keys', async () => {
+        it('fails for non-existing keys', async () => {
             await Promise.all(
                 ['123456', '12345678'].map(async (invalidKey) => {
                     const response = await environment
@@ -213,6 +213,173 @@ describe('exercise router', () => {
                 response.body
             );
             expect(parsed.exists).toBe(false);
+        });
+    });
+
+    describe('GET /api/exercise/:exerciseKey/history', () => {
+        it('succeeds with 200 with a valid participant key', async () => {
+            const participantKey = (await createExercise(environment))
+                .participantKey;
+            await environment
+                .httpRequest('get', `/api/exercise/${participantKey}/history`)
+                .expect(200);
+        });
+
+        it('succeeds with 200 with a valid trainer key', async () => {
+            const trainerKey = (await createExercise(environment)).trainerKey;
+            await environment
+                .httpRequest('get', `/api/exercise/${trainerKey}/history`)
+                .expect(200);
+        });
+
+        it('fails for non-existing keys', async () => {
+            await Promise.all(
+                ['123456', '12345678'].map(async (invalidKey) => {
+                    await environment
+                        .httpRequest(
+                            'get',
+                            `/api/exercise/${invalidKey}/history`
+                        )
+                        .expect(404);
+                })
+            );
+        });
+        it('fails for arbitrary keys', async () => {
+            await Promise.all(
+                ['12345', '1234567', '123456789'].map((invalidKey) =>
+                    environment
+                        .httpRequest(
+                            'get',
+                            `/api/exercise/${invalidKey}/history`
+                        )
+                        .expect(400)
+                )
+            );
+        });
+
+        describe('user-related exercise', () => {
+            let session: string;
+            let exercise: ExerciseKeys;
+            beforeEach(async () => {
+                session = await createTestUserSession(environment);
+                exercise = await createExercise(environment, session);
+            });
+
+            it('succeeds with 200 with a trainer key if not logged in', async () => {
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.trainerKey}/history`
+                    )
+                    .expect(200);
+            });
+
+            it('succeeds with 200 with a trainer key if logged in', async () => {
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.trainerKey}/history`,
+                        session
+                    )
+                    .expect(200);
+            });
+
+            it('succeeds with 200 with a participant key if not logged in', async () => {
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.participantKey}/history`
+                    )
+                    .expect(200);
+            });
+
+            it('succeeds with 200 with a participant key if logged in', async () => {
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.participantKey}/history`,
+                        session
+                    )
+                    .expect(200);
+            });
+        });
+
+        describe('exercise template', () => {
+            let session: string;
+            let exerciseTemplate: GetExerciseTemplateResponseData;
+            beforeEach(async () => {
+                session = await createTestUserSession(environment);
+                exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session
+                );
+            });
+
+            it('fails with trainer key if not logged in', async () => {
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exerciseTemplate.trainerKey}/history`
+                    )
+                    .expect(403);
+            });
+
+            it('succeeds with trainer key if logged in', async () => {
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exerciseTemplate.trainerKey}/history`,
+                        session
+                    )
+                    .expect(200);
+            });
+
+            it('fails with trainer key if logged in with wrong user', async () => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exerciseTemplate.trainerKey}/history`,
+                        session2
+                    )
+                    .expect(403);
+            });
+
+            it('fails with participant key if not logged in', async () => {
+                const exercise = environment.services.exerciseService
+                    .TESTING_getExerciseMap()
+                    .get(exerciseTemplate.trainerKey)!;
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.participantKey}/history`
+                    )
+                    .expect(403);
+            });
+
+            it('fails with participant key if logged in', async () => {
+                const exercise = environment.services.exerciseService
+                    .TESTING_getExerciseMap()
+                    .get(exerciseTemplate.trainerKey)!;
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.participantKey}/history`,
+                        session
+                    )
+                    .expect(403);
+            });
+        });
+
+        it('fails for non-existing key', async () => {
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercise/${await environment.repositories.accessKeyRepository.generateKey(6)}/history`
+                )
+                .expect(404);
         });
     });
 

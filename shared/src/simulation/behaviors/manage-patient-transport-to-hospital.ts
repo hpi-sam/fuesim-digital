@@ -43,6 +43,7 @@ import type { SimulatedRegion } from '../../models/simulated-region.js';
 import { newRecurringEventActivityState } from '../activities/recurring-event.js';
 import { newAskForPatientDataEvent } from '../events/ask-for-patient-data-event.js';
 import { newTryToSendToHospitalEvent } from '../events/try-to-send-to-hospital.js';
+import { uuidSetSchema } from '../../utils/uuid-set.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
 import type { SimulationBehavior } from './simulation-behavior.js';
 
@@ -79,7 +80,7 @@ export const managePatientTransportToHospitalBehaviorStateSchema =
         ...simulationBehaviorStateSchema.shape,
         type: z.literal('managePatientTransportToHospitalBehavior'),
         requestTargetId: uuidSchema.optional(),
-        simulatedRegionsToManage: z.record(uuidSchema, z.literal(true)),
+        simulatedRegionsToManage: uuidSetSchema,
         /**
          * Stores the amount of patients expected in some regions.
          * Regions are NOT removed from this, if they are not managed anymore,

@@ -16,6 +16,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Fixed
 
 - The deletion of alarm groups no longer breaks breaks measure templates that use them.
+- The measures toolbar no longer interferes with map interactions.
 
 ## [0.17.0] - 2026-06-30
 

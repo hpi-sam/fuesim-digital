@@ -33,169 +33,24 @@ import type { StateMachineEvent } from './event.js';
 import { newStateMachineEvent } from './event.js';
 import type { StateMachineId, TechnicalChallengeId } from './ids.js';
 import { stateMachineIdSchema } from './ids.js';
-
-const taskSchema = z.object({
-    /**
-     * As there are never more than a single task of a type per state machine,
-     * `taskTypeId` is also the primary key for tasks.
-     */
-    taskTypeId: taskTypeSchema.shape.id,
-    totalDuration: z.number().nonnegative(),
-});
-
-const timerSchema = z.object({
-    id: uuidSchema.brand<'TimerId'>(),
-    name: z.string(),
-    totalDuration: z.number().nonnegative(),
-});
-type Timer = z.infer<typeof timerSchema>;
-
-const baseGuardSchema = z.strictObject({
-    nextChange: z.int().nonnegative().optional(),
-});
-
-const taskGuardSchema = z.object({
-    ...baseGuardSchema.shape,
-    type: z.literal('taskGuard'),
-    /** Percentage of Task.totalDuration */
-    minProgress: z.number().min(0).max(1),
-    taskId: taskSchema.shape.taskTypeId,
-});
-export type TaskGuard = Immutable<z.infer<typeof taskGuardSchema>>;
-
-const timerGuardSchema = z.object({
-    ...baseGuardSchema.shape,
-    type: z.literal('timerGuard'),
-    /** Percentage of Timer.totalDuration past */
-    minProgress: z.number().min(0).max(1),
-    timerId: timerSchema.shape.id,
-});
-export type TimerGuard = Immutable<z.infer<typeof timerGuardSchema>>;
-
-/* Because AndGuard's and NotGuard's are recursive types, their type is not
- * directly inferred from their schema.
- *
- * They also can not be defined using `Immutable<>`, presumably because
- * there is some interaction with the recursive nature of it.
- *
- * The current workaround is to define them using interfaces.
- */
-
-const andGuardSchema = z.object({
-    ...baseGuardSchema.shape,
-    type: z.literal('andGuard'),
-    get guards() {
-        return z.array(guardSchema);
-    },
-});
-export interface AndGuard {
-    type: 'andGuard';
-    guards: Immutable<_Guard[]>;
-    nextChange?: number;
-}
-
-const notGuardSchema = z.strictObject({
-    ...baseGuardSchema.shape,
-    type: z.literal('notGuard'),
-    get guard() {
-        return guardSchema;
-    },
-});
-export interface NotGuard {
-    type: 'notGuard';
-    guard: Immutable<_Guard>;
-    nextChange?: number;
-}
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-type _Guard = AndGuard | NotGuard | TaskGuard | TimerGuard;
-export const guardSchema: z.ZodType<_Guard> = z.lazy(() =>
-    z.discriminatedUnion('type', [
-        taskGuardSchema,
-        timerGuardSchema,
-        andGuardSchema,
-        notGuardSchema,
-    ])
-);
-export type Guard = Immutable<z.infer<typeof guardSchema>>;
-
-export type TaskTreeGuard = TaskGuard & { readonly parent: TreeGuard | null };
-export type TimerTreeGuard = TimerGuard & { readonly parent: TreeGuard | null };
-export interface AndTreeGuard {
-    type: 'andGuard';
-    guards: TreeGuard[];
-    nextChange?: number;
-    parent: TreeGuard | null;
-}
-
-export interface NotTreeGuard {
-    type: 'notGuard';
-    guard: TreeGuard;
-    nextChange?: number;
-    parent: TreeGuard | null;
-}
-
-export type TreeGuard =
-    | AndTreeGuard
-    | NotTreeGuard
-    | TaskTreeGuard
-    | TimerTreeGuard;
-
-export function decodeTreeGuard(
-    wire: Guard,
-    parent: TreeGuard | null
-): TreeGuard {
-    switch (wire.type) {
-        case 'andGuard': {
-            const node: AndTreeGuard = {
-                type: 'andGuard' as const,
-                guards: [] as TreeGuard[],
-                parent,
-            };
-            node.guards = wire.guards.map((g) => decodeTreeGuard(g, node));
-            return node;
-        }
-        case 'notGuard': {
-            const node: any = {
-                type: 'notGuard' as const,
-                guard: null,
-                parent,
-            };
-            node.guard = decodeTreeGuard(wire.guard, node);
-            return node as NotTreeGuard;
-        }
-        case 'taskGuard':
-        case 'timerGuard':
-            return { ...wire, parent };
-    }
-}
-
-export function encodeTreeGuard(g: TreeGuard): Guard {
-    switch (g.type) {
-        case 'andGuard':
-            return { type: 'andGuard', guards: g.guards.map(encodeTreeGuard) };
-        case 'notGuard':
-            return { type: 'notGuard', guard: encodeTreeGuard(g.guard) };
-        case 'taskGuard':
-        case 'timerGuard': {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { parent: _, ...rest } = g;
-            return rest;
-        }
-    }
-}
-
-export const treeGuardCodec = z.codec(guardSchema, z.custom<TreeGuard>(), {
-    decode: (wire) => decodeTreeGuard(wire, null),
-    encode: (g) => encodeTreeGuard(g),
-});
+import type { Guard, TaskGuard, Timer, TimerGuard } from './guard.js';
+import { guardSchema, taskSchema, timerSchema } from './guard.js';
 
 const stateMachineStateIdSchema = uuidSchema.brand<'StateMachineStateId'>();
-export const transitionSchema = z.object({
+
+export const transitionWireSchema = z.strictObject({
     id: uuidSchema,
     targetState: stateMachineStateIdSchema,
-    guard: treeGuardCodec,
+    guard: guardSchema,
 });
+export type TransitionWire = Immutable<z.infer<typeof transitionWireSchema>>;
+
+export const transitionSchema = z.strictObject({
+    id: uuidSchema,
+    targetState: stateMachineStateIdSchema,
+    guard: guardSchema,
+});
+export type Transition = Immutable<z.infer<typeof transitionSchema>>;
 
 export const stateMachineStateSchema = z.object({
     id: stateMachineStateIdSchema,
@@ -218,7 +73,7 @@ export type StateMachineState = Immutable<
 export function newTechnicalChallengeState(
     title: string,
     image: ImageProperties,
-    outgoingTransitions: { [key: UUID]: Transition },
+    outgoingWireTransitions: { [key: UUID]: TransitionWire },
     possibleTasks: UUID[] | { [key: UUID]: number } = {},
     userGeneratedContent?: UserGeneratedContent
 ): StateMachineState {
@@ -226,6 +81,13 @@ export function newTechnicalChallengeState(
         // eslint-disable-next-line no-param-reassign
         possibleTasks = Object.fromEntries(possibleTasks.map((id) => [id, 1]));
     }
+    const outgoingTransitions = Object.fromEntries(
+        Object.entries(outgoingWireTransitions).map(([key, transition]) => [
+            key,
+            transitionSchema.parse(transition),
+        ])
+    );
+
     return {
         id: uuid() as StateMachineState['id'],
         title,
@@ -275,7 +137,9 @@ export function getTaskProgress(
             : 0);
     const totalTaskDuration = stateMachine.tasks[taskId]!.totalDuration;
     const progressPercentage = timeSpent / totalTaskDuration;
-    console.log(`[getTaskProgress] taskId=${taskId} t=${currentTime} nAssigned=${nAssignedPersonnel} rate=${rate} timeSpent=${timeSpent} progress=${(progressPercentage * 100).toFixed(2)}%`);
+    console.log(
+        `[getTaskProgress] taskId=${taskId} t=${currentTime} nAssigned=${nAssignedPersonnel} rate=${rate} timeSpent=${timeSpent} progress=${(progressPercentage * 100).toFixed(2)}%`
+    );
     return { timeSpent, progressPercentage, rate };
 }
 
@@ -366,8 +230,6 @@ function isTimerGuardFulfilled(
     return progressPercentage >= timerGuard.minProgress;
 }
 
-export type Transition = Immutable<z.infer<typeof transitionSchema>>;
-
 export const stateMachineDefinitionSchema = z.strictObject({
     id: stateMachineIdSchema,
     name: z.string(),
@@ -377,7 +239,7 @@ export const stateMachineDefinitionSchema = z.strictObject({
     timers: z.record(timerSchema.shape.id, timerSchema),
 });
 
-export const stateMachineSchema = z
+export const stateMachineWireSchema = z
     .strictObject({
         ...stateMachineDefinitionSchema.shape,
         // runtime values:
@@ -398,8 +260,11 @@ export const stateMachineSchema = z
             });
         }
     });
+export type StateMachineWire = Immutable<
+    z.infer<typeof stateMachineWireSchema>
+>;
 
-export const runtimeStateMachineSchema = stateMachineSchema.safeExtend({
+export const stateMachineSchema = stateMachineWireSchema.safeExtend({
     taskGuards: z.record(
         taskTypeSchema.shape.id,
         z.record(
@@ -411,15 +276,16 @@ export const runtimeStateMachineSchema = stateMachineSchema.safeExtend({
         )
     ),
 });
+export type StateMachine = Immutable<z.infer<typeof stateMachineSchema>>;
 
 function addTaskGuards(
     stateId: StateMachineState['id'],
     transitionId: Transition['id'],
-    guard: TreeGuard,
+    guard: Guard,
     taskGuards: {
         [key: TaskType['id']]: {
             [key: StateMachineState['id']]: {
-                [key: Transition['id']]: TaskTreeGuard[];
+                [key: Transition['id']]: TaskGuard[];
             };
         };
     }
@@ -442,19 +308,19 @@ function addTaskGuards(
 }
 
 export const stateMachineCodec = z.codec(
+    stateMachineWireSchema,
     stateMachineSchema,
-    runtimeStateMachineSchema,
     {
         encode(stateMachine) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { taskGuards, ...rest } = stateMachine;
-            return rest as z.infer<typeof stateMachineSchema>;
+            return rest as z.infer<typeof stateMachineWireSchema>;
         },
         decode(stateMachine) {
             const taskGuards: {
                 [key: TaskType['id']]: {
                     [key: StateMachineState['id']]: {
-                        [key: Transition['id']]: TaskTreeGuard[];
+                        [key: Transition['id']]: TaskGuard[];
                     };
                 };
             } = {};
@@ -471,12 +337,11 @@ export const stateMachineCodec = z.codec(
                 }
             }
             return { ...stateMachine, taskGuards } satisfies z.infer<
-                typeof runtimeStateMachineSchema
+                typeof stateMachineSchema
             >;
         },
     }
 );
-export type StateMachine = Immutable<z.infer<typeof stateMachineCodec>>;
 
 export function currentStateOf(
     stateMachine: WritableDraft<StateMachine>
@@ -552,7 +417,9 @@ export function updateTaskProgress(
     const taskProgress = stateMachine.taskTimeSpent[taskId];
 
     if (!taskProgress) {
-        console.log(`[updateTaskProgress] taskId=${taskId} t=${currentTime} INIT (first seen)`);
+        console.log(
+            `[updateTaskProgress] taskId=${taskId} t=${currentTime} INIT (first seen)`
+        );
         stateMachine.taskTimeSpent[taskId] = {
             timeSpent: 0,
             lastUpdatedAt: currentTime,
@@ -569,7 +436,9 @@ export function updateTaskProgress(
     const oldTimeSpent = taskProgress.timeSpent;
     taskProgress.timeSpent = oldTimeSpent + delta;
     taskProgress.lastUpdatedAt = currentTime;
-    console.log(`[updateTaskProgress] taskId=${taskId} t=${currentTime} nAssigned=${nAssignedPersonnel} rate=${rate} delta=${delta.toFixed(3)} timeSpent: ${oldTimeSpent.toFixed(3)}→${taskProgress.timeSpent.toFixed(3)}`);
+    console.log(
+        `[updateTaskProgress] taskId=${taskId} t=${currentTime} nAssigned=${nAssignedPersonnel} rate=${rate} delta=${delta.toFixed(3)} timeSpent: ${oldTimeSpent.toFixed(3)}→${taskProgress.timeSpent.toFixed(3)}`
+    );
 }
 
 export function updateAllTasksProgress(
@@ -601,7 +470,9 @@ function computeEarliestEvent(
             guard
         );
 
-        console.log(`[computeEarliestEvent] transitionId=${transition.id} current=${eventTimestamp.current} nextChange=${eventTimestamp.nextChange}`);
+        console.log(
+            `[computeEarliestEvent] transitionId=${transition.id} current=${eventTimestamp.current} nextChange=${eventTimestamp.nextChange}`
+        );
 
         if (eventTimestamp.nextChange >= earliestTimestamp) continue;
         earliestTimestamp = eventTimestamp.nextChange;
@@ -613,7 +484,9 @@ function computeEarliestEvent(
         );
     }
 
-    console.log(`[computeEarliestEvent] → earliest: transitionId=${earliestEvent?.transitionId ?? 'none'} t=${earliestEvent?.timestamp ?? 'null'}`);
+    console.log(
+        `[computeEarliestEvent] → earliest: transitionId=${earliestEvent?.transitionId ?? 'none'} t=${earliestEvent?.timestamp ?? 'null'}`
+    );
     return earliestEvent;
 }
 
@@ -623,11 +496,11 @@ function propagateTaskChange(
     stateMachine: WritableDraft<StateMachine>,
     state: WritableDraft<StateMachineState>,
     transitionId: Transition['id'],
-    guard: WritableDraft<TreeGuard> | null,
+    guard: WritableDraft<Guard> | undefined,
     oldTimestamp?: number,
     newTimestamp?: number
 ): StateMachineEvent | null {
-    if (guard === null) {
+    if (guard === undefined) {
         if (oldTimestamp === newTimestamp) return null;
         return newStateMachineEvent(
             newTimestamp!,
@@ -655,7 +528,9 @@ function propagateTaskChange(
             const thisOldTimestamp = guard.nextChange!;
             guard.nextChange = nextChange;
 
-            console.log(`[propagate:task] taskId=${guard.taskId} transitionId=${transitionId} nextChange: ${thisOldTimestamp}→${nextChange} parentType=${guard.parent?.type ?? 'null(root)'}`);
+            console.log(
+                `[propagate:task] taskId=${guard.taskId} transitionId=${transitionId} nextChange: ${thisOldTimestamp}→${nextChange} parentType=${guard.parent?.type ?? 'null(root)'}`
+            );
 
             return propagateTaskChange(
                 exerciseState,
@@ -669,7 +544,9 @@ function propagateTaskChange(
             );
         }
         case 'notGuard': {
-            console.log(`[propagate:not] transitionId=${transitionId} passthrough old=${oldTimestamp} new=${newTimestamp} parentType=${guard.parent?.type ?? 'null(root)'}`);
+            console.log(
+                `[propagate:not] transitionId=${transitionId} passthrough old=${oldTimestamp} new=${newTimestamp} parentType=${guard.parent?.type ?? 'null(root)'}`
+            );
             return propagateTaskChange(
                 exerciseState,
                 technicalChallengeId,
@@ -685,13 +562,17 @@ function propagateTaskChange(
             if (guard.nextChange! !== oldTimestamp) {
                 // This guard did not define this trees next event
                 if (newTimestamp! <= guard.nextChange!) {
-                    console.log(`[propagate:and] transitionId=${transitionId} NOT the defining child (guard.nextChange=${guard.nextChange} !== old=${oldTimestamp}), new=${newTimestamp} ≤ guard.nextChange → STOP`);
+                    console.log(
+                        `[propagate:and] transitionId=${transitionId} NOT the defining child (guard.nextChange=${guard.nextChange} !== old=${oldTimestamp}), new=${newTimestamp} ≤ guard.nextChange → STOP`
+                    );
                     return null;
                 }
                 // The new timestamp is after the nextChange timestamp, so this is the new nextChange timestamp
                 const thisOldTimestamp = guard.nextChange!;
                 guard.nextChange = newTimestamp;
-                console.log(`[propagate:and] transitionId=${transitionId} NOT the defining child but new=${newTimestamp} > guard.nextChange=${thisOldTimestamp} → nextChange: ${thisOldTimestamp}→${newTimestamp} parentType=${guard.parent?.type ?? 'null(root)'}`);
+                console.log(
+                    `[propagate:and] transitionId=${transitionId} NOT the defining child but new=${newTimestamp} > guard.nextChange=${thisOldTimestamp} → nextChange: ${thisOldTimestamp}→${newTimestamp} parentType=${guard.parent?.type ?? 'null(root)'}`
+                );
                 return propagateTaskChange(
                     exerciseState,
                     technicalChallengeId,
@@ -711,7 +592,9 @@ function propagateTaskChange(
             if (nextChange !== guard.nextChange) {
                 const thisOldTimestamp = guard.nextChange;
                 guard.nextChange = nextChange;
-                console.log(`[propagate:and] transitionId=${transitionId} WAS the defining child, subGuards=[${subGuards.join(',')}] nextChange: ${thisOldTimestamp}→${nextChange} parentType=${guard.parent?.type ?? 'null(root)'}`);
+                console.log(
+                    `[propagate:and] transitionId=${transitionId} WAS the defining child, subGuards=[${subGuards.join(',')}] nextChange: ${thisOldTimestamp}→${nextChange} parentType=${guard.parent?.type ?? 'null(root)'}`
+                );
                 return propagateTaskChange(
                     exerciseState,
                     technicalChallengeId,
@@ -723,7 +606,9 @@ function propagateTaskChange(
                     nextChange
                 );
             }
-            console.log(`[propagate:and] transitionId=${transitionId} WAS the defining child, subGuards=[${subGuards.join(',')}] nextChange unchanged=${guard.nextChange} → STOP`);
+            console.log(
+                `[propagate:and] transitionId=${transitionId} WAS the defining child, subGuards=[${subGuards.join(',')}] nextChange unchanged=${guard.nextChange} → STOP`
+            );
             return null;
         }
         case 'timerGuard':
@@ -735,7 +620,7 @@ function getGuardTimestamp(
     stateMachine: WritableDraft<StateMachine>,
     exerciseState: WritableDraft<ExerciseState>,
     state: WritableDraft<StateMachineState>,
-    guard: WritableDraft<TreeGuard>
+    guard: WritableDraft<Guard>
 ): {
     current: boolean;
     nextChange: number;
@@ -750,7 +635,9 @@ function getGuardTimestamp(
             );
             const cached = guard.nextChange === undefined;
             guard.nextChange ??= subGuard.nextChange;
-            console.log(`[guardTs:not] child.current=${subGuard.current} child.nextChange=${subGuard.nextChange} → current=${!subGuard.current}${cached ? ' [cached]' : ''}`);
+            console.log(
+                `[guardTs:not] child.current=${subGuard.current} child.nextChange=${subGuard.nextChange} → current=${!subGuard.current}${cached ? ' [cached]' : ''}`
+            );
             return {
                 current: !subGuard.current,
                 nextChange: subGuard.nextChange,
@@ -771,7 +658,9 @@ function getGuardTimestamp(
 
             const cached = guard.nextChange === undefined;
             guard.nextChange ??= nextChange;
-            console.log(`[guardTs:and] children=[${subGuards.map((g) => `{cur:${g.current},nc:${g.nextChange}}`).join(',')}] allFulfilled=${current} nextChange=${nextChange}${cached ? ' [cached]' : ''}`);
+            console.log(
+                `[guardTs:and] children=[${subGuards.map((g) => `{cur:${g.current},nc:${g.nextChange}}`).join(',')}] allFulfilled=${current} nextChange=${nextChange}${cached ? ' [cached]' : ''}`
+            );
             return {
                 current,
                 nextChange,
@@ -791,7 +680,9 @@ function getGuardTimestamp(
                     exerciseState.currentTime
                 )
             ) {
-                console.log(`[guardTs:task] taskId=${guard.taskId} progress=${(taskProgress.progressPercentage * 100).toFixed(2)}% FULFILLED → nextChange=Infinity`);
+                console.log(
+                    `[guardTs:task] taskId=${guard.taskId} progress=${(taskProgress.progressPercentage * 100).toFixed(2)}% FULFILLED → nextChange=Infinity`
+                );
                 return { current: true, nextChange: Infinity };
             }
 
@@ -806,7 +697,9 @@ function getGuardTimestamp(
             const cached = guard.nextChange === undefined;
             guard.nextChange ??= nextChange;
 
-            console.log(`[guardTs:task] taskId=${guard.taskId} progress=${(taskProgress.progressPercentage * 100).toFixed(2)}% rate=${taskProgress.rate} remaining=${remainingDuration.toFixed(3)} nextChange=${nextChange}${cached ? ' [cached]' : ''}`);
+            console.log(
+                `[guardTs:task] taskId=${guard.taskId} progress=${(taskProgress.progressPercentage * 100).toFixed(2)}% rate=${taskProgress.rate} remaining=${remainingDuration.toFixed(3)} nextChange=${nextChange}${cached ? ' [cached]' : ''}`
+            );
             return {
                 current: false,
                 nextChange,
@@ -820,7 +713,9 @@ function getGuardTimestamp(
                     exerciseState.currentTime
                 )
             ) {
-                console.log(`[guardTs:timer] timerId=${guard.timerId} FULFILLED → nextChange=Infinity`);
+                console.log(
+                    `[guardTs:timer] timerId=${guard.timerId} FULFILLED → nextChange=Infinity`
+                );
                 return { current: true, nextChange: Infinity };
             }
 
@@ -832,7 +727,9 @@ function getGuardTimestamp(
             const cached = guard.nextChange === undefined;
             guard.nextChange ??= nextChange;
 
-            console.log(`[guardTs:timer] timerId=${guard.timerId} simulationStartTime=${stateMachine.simulationStartTime} minProgress=${guard.minProgress} totalDuration=${timer.totalDuration} nextChange=${nextChange}${cached ? ' [cached]' : ''}`);
+            console.log(
+                `[guardTs:timer] timerId=${guard.timerId} simulationStartTime=${stateMachine.simulationStartTime} minProgress=${guard.minProgress} totalDuration=${timer.totalDuration} nextChange=${nextChange}${cached ? ' [cached]' : ''}`
+            );
             return {
                 current: false,
                 nextChange,
@@ -849,12 +746,16 @@ function applyEventToQueue(
     const queue = exerciseState.stateMachineEventQueue;
 
     if (earliestEvent === null) {
-        console.log(`[applyEvent:remove] smId=${stateMachineId} no event to schedule`);
+        console.log(
+            `[applyEvent:remove] smId=${stateMachineId} no event to schedule`
+        );
         remove(queue, stateMachineId);
         return;
     }
     if (queue.indices[stateMachineId] === undefined) {
-        console.log(`[applyEvent:insert] smId=${stateMachineId} transitionId=${earliestEvent.transitionId} t=${earliestEvent.timestamp}`);
+        console.log(
+            `[applyEvent:insert] smId=${stateMachineId} transitionId=${earliestEvent.transitionId} t=${earliestEvent.timestamp}`
+        );
         insert(queue, earliestEvent);
         return;
     }
@@ -863,10 +764,14 @@ function applyEventToQueue(
         current.transitionId === earliestEvent.transitionId &&
         current.timestamp === earliestEvent.timestamp
     ) {
-        console.log(`[applyEvent:noOp] smId=${stateMachineId} transitionId=${earliestEvent.transitionId} t=${earliestEvent.timestamp} unchanged`);
+        console.log(
+            `[applyEvent:noOp] smId=${stateMachineId} transitionId=${earliestEvent.transitionId} t=${earliestEvent.timestamp} unchanged`
+        );
         return;
     }
-    console.log(`[applyEvent:update] smId=${stateMachineId} transitionId: ${current.transitionId}→${earliestEvent.transitionId} t: ${current.timestamp}→${earliestEvent.timestamp}`);
+    console.log(
+        `[applyEvent:update] smId=${stateMachineId} transitionId: ${current.transitionId}→${earliestEvent.transitionId} t: ${current.timestamp}→${earliestEvent.timestamp}`
+    );
     modify(queue, stateMachineId, earliestEvent);
 }
 
@@ -880,10 +785,14 @@ export function updateEventQueue(
 
     const potentialTransitions = Object.values(state.outgoingTransitions);
 
-    console.log(`[updateQueue:full] smId=${stateMachine.id} currentStateId=${state.id} nTransitions=${potentialTransitions.length} t=${exerciseState.currentTime}`);
+    console.log(
+        `[updateQueue:full] smId=${stateMachine.id} currentStateId=${state.id} nTransitions=${potentialTransitions.length} t=${exerciseState.currentTime}`
+    );
 
     if (potentialTransitions.length === 0) {
-        console.log(`[updateQueue:full] smId=${stateMachine.id} no outgoing transitions → removing from queue`);
+        console.log(
+            `[updateQueue:full] smId=${stateMachine.id} no outgoing transitions → removing from queue`
+        );
         remove(exerciseState.stateMachineEventQueue, stateMachine.id);
     }
 
@@ -894,7 +803,9 @@ export function updateEventQueue(
         potentialTransitions
     );
 
-    console.log(`[updateQueue:done] smId=${stateMachine.id} → event t=${earliestEvent?.timestamp ?? 'null'} transitionId=${earliestEvent?.transitionId ?? 'null'}`);
+    console.log(
+        `[updateQueue:done] smId=${stateMachine.id} → event t=${earliestEvent?.timestamp ?? 'null'} transitionId=${earliestEvent?.transitionId ?? 'null'}`
+    );
     applyEventToQueue(exerciseState, stateMachine.id, earliestEvent);
 }
 
@@ -910,14 +821,18 @@ export function updateEventQueueAfterTaskChange(
     const state = currentStateOf(stateMachine);
     const affectedGuards = stateMachine.taskGuards[taskId]?.[
         state.id
-    ] as WritableDraft<{ [key: Transition['id']]: TreeGuard[] }>;
+    ] as WritableDraft<{ [key: Transition['id']]: Guard[] }>;
 
     const nAffectedTransitions = Object.keys(affectedGuards).length;
-    console.log(`[updateQueueTask] taskId=${taskId} smId=${stateMachine.id} stateId=${state.id} nAffectedTransitions=${nAffectedTransitions} t=${exerciseState.currentTime}`);
+    console.log(
+        `[updateQueueTask] taskId=${taskId} smId=${stateMachine.id} stateId=${state.id} nAffectedTransitions=${nAffectedTransitions} t=${exerciseState.currentTime}`
+    );
 
     let newEvent: StateMachineEvent | undefined;
     for (const [transitionId, guards] of Object.entries(affectedGuards)) {
-        console.log(`[updateQueueTask:transition] transitionId=${transitionId} nGuardLeaves=${guards.length}`);
+        console.log(
+            `[updateQueueTask:transition] transitionId=${transitionId} nGuardLeaves=${guards.length}`
+        );
         const events = guards
             .map((guard) =>
                 propagateTaskChange(
@@ -930,7 +845,9 @@ export function updateEventQueueAfterTaskChange(
                 )
             )
             .filter((e) => e !== null);
-        console.log(`[updateQueueTask:transition] transitionId=${transitionId} propagation produced ${events.length} event(s): [${events.map((e) => e.timestamp).join(',')}]`);
+        console.log(
+            `[updateQueueTask:transition] transitionId=${transitionId} propagation produced ${events.length} event(s): [${events.map((e) => e.timestamp).join(',')}]`
+        );
         for (const event of events) {
             if (event.timestamp < (newEvent?.timestamp ?? Infinity)) {
                 newEvent = event;
@@ -945,16 +862,22 @@ export function updateEventQueueAfterTaskChange(
 
     const queue = exerciseState.stateMachineEventQueue;
     if (queue.indices[stateMachine.id] === undefined) {
-        console.log(`[updateQueueTask:insert] smId=${stateMachine.id} transitionId=${newEvent.transitionId} t=${newEvent.timestamp}`);
+        console.log(
+            `[updateQueueTask:insert] smId=${stateMachine.id} transitionId=${newEvent.transitionId} t=${newEvent.timestamp}`
+        );
         insert(queue, newEvent);
         return;
     }
     const current = queue.events[queue.indices[stateMachine.id]!]!;
     if (newEvent.timestamp < current.timestamp) {
-        console.log(`[updateQueueTask:update] smId=${stateMachine.id} transitionId: ${current.transitionId}→${newEvent.transitionId} t: ${current.timestamp}→${newEvent.timestamp}`);
+        console.log(
+            `[updateQueueTask:update] smId=${stateMachine.id} transitionId: ${current.transitionId}→${newEvent.transitionId} t: ${current.timestamp}→${newEvent.timestamp}`
+        );
         modify(queue, stateMachine.id, newEvent);
     } else {
-        console.log(`[updateQueueTask:noOp] smId=${stateMachine.id} new t=${newEvent.timestamp} ≥ current t=${current.timestamp} → unchanged`);
+        console.log(
+            `[updateQueueTask:noOp] smId=${stateMachine.id} new t=${newEvent.timestamp} ≥ current t=${current.timestamp} → unchanged`
+        );
     }
 }
 
@@ -976,9 +899,15 @@ function simulateStateMachine(
 
     if (!nextTransition) return;
 
-    console.log(`[simulate] smId=${stateMachine.id} transitionId=${transitionId} state: ${stateMachine.currentStateId}→${nextTransition.targetState} t=${exerciseState.currentTime}`);
-    for (const [taskId, taskTimeSpent] of Object.entries(stateMachine.taskTimeSpent)) {
-        console.log(`[simulate:taskProgress] taskId=${taskId} timeSpent=${taskTimeSpent.timeSpent.toFixed(3)} lastUpdatedAt=${taskTimeSpent.lastUpdatedAt}`);
+    console.log(
+        `[simulate] smId=${stateMachine.id} transitionId=${transitionId} state: ${stateMachine.currentStateId}→${nextTransition.targetState} t=${exerciseState.currentTime}`
+    );
+    for (const [taskId, taskTimeSpent] of Object.entries(
+        stateMachine.taskTimeSpent
+    )) {
+        console.log(
+            `[simulate:taskProgress] taskId=${taskId} timeSpent=${taskTimeSpent.timeSpent.toFixed(3)} lastUpdatedAt=${taskTimeSpent.lastUpdatedAt}`
+        );
     }
 
     logStateTransition?.(nextTransition.targetState);
@@ -990,7 +919,9 @@ function simulateStateMachine(
     const unassignedPersonnel = unassignFromNonexistentTasks(stateMachine);
 
     if (unassignedPersonnel.length > 0) {
-        console.log(`[simulate:unassign] smId=${stateMachine.id} unassigned ${unassignedPersonnel.map((p) => `${p.personnelId}(task:${p.taskTypeId})`).join(', ')}`);
+        console.log(
+            `[simulate:unassign] smId=${stateMachine.id} unassigned ${unassignedPersonnel.map((p) => `${p.personnelId}(task:${p.taskTypeId})`).join(', ')}`
+        );
         if (logPersonnelUnassigned) {
             for (const { personnelId, taskTypeId } of unassignedPersonnel) {
                 logPersonnelUnassigned(personnelId, taskTypeId);
@@ -1007,12 +938,16 @@ export function simulateAllTechnicalChallenges(
 ) {
     const queue = draftState.stateMachineEventQueue;
     const nextEvent = peek(queue);
-    console.log(`[tick] currentTime=${draftState.currentTime} nextEventTime=${nextEvent?.timestamp ?? 'none'} smId=${nextEvent?.stateMachineId ?? '-'} transitionId=${nextEvent?.transitionId ?? '-'}`);
+    console.log(
+        `[tick] currentTime=${draftState.currentTime} nextEventTime=${nextEvent?.timestamp ?? 'none'} smId=${nextEvent?.stateMachineId ?? '-'} transitionId=${nextEvent?.transitionId ?? '-'}`
+    );
 
     let nProcessed = 0;
     while ((peek(queue)?.timestamp ?? Infinity) <= draftState.currentTime) {
         const event = pop(queue)!;
-        console.log(`[tick:fire] #${nProcessed} smId=${event.stateMachineId} transitionId=${event.transitionId} eventTime=${event.timestamp} currentTime=${draftState.currentTime}`);
+        console.log(
+            `[tick:fire] #${nProcessed} smId=${event.stateMachineId} transitionId=${event.transitionId} eventTime=${event.timestamp} currentTime=${draftState.currentTime}`
+        );
         nProcessed++;
         const stateMachine =
             draftState.technicalChallenges[event.technicalChallengeId]!

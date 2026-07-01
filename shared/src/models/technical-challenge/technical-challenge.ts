@@ -19,7 +19,7 @@ export const technicalChallengeSchema = z.strictObject({
     image: imagePropertiesSchema,
     position: positionSchema,
     size: sizeSchema,
-    stateMachines: z.record(stateMachineSchema.shape.id, stateMachineCodec),
+    stateMachines: z.record(stateMachineSchema.shape.id, stateMachineSchema),
 });
 
 export type TechnicalChallenge = Immutable<

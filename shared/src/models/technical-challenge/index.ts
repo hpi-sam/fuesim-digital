@@ -3,3 +3,4 @@ export * from './ids.js';
 export * from './technical-challenge.js';
 export * from './state-machine.js';
 export * from './event.js';
+export * from './guard.js'

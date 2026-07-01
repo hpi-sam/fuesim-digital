@@ -12,9 +12,10 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     joinExerciseResponseDataSchema,
+    lookupReducerFor,
     socketIoTransports,
 } from 'fuesim-digital-shared';
-import { freeze, WritableDraft } from 'immer';
+import { castDraft, freeze, WritableDraft } from 'immer';
 import {
     debounceTime,
     filter,
@@ -200,7 +201,9 @@ export class ExerciseService {
                     (resolve) => {
                         this.socket.emit(
                             'proposeAction',
-                            action as WritableDraft<ExerciseAction>,
+                            lookupReducerFor(action.type).actionSchema.encode(
+                                castDraft(action)
+                            ) as WritableDraft<ExerciseAction>,
                             resolve
                         );
                     }

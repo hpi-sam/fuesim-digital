@@ -71,8 +71,7 @@
     } @else {
         <!-- TODO @JohannesPotzi @Jogius : integrate the creation form into the list. -->
         <app-didactic-overview-results-table
-            [results]="this.rootResults()"
-            [resultsMap]="this.resultsMap()"
+            [rootResults]="this.rootResults()"
             [tableContext]="'baseTable'"
         />
     }

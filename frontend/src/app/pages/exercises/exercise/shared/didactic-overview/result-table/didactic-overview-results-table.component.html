@@ -26,17 +26,42 @@
                     </thead>
                 }
                 <tbody>
-                    <app-didactic-overview-results-sub-table
-                        [results]="this.results()"
-                        [resultsMap]="this.resultsMap()"
-                        [criteria]="this.evalCriteria()"
-                        [globalDepth]="this.globalDepth()"
-                        [localDepth]="1"
-                    />
-                    @if (this.results().length === 0) {
+                    @for (subTable of this.subTables(); track $index) {
+                        @if (subTable.result) {
+                            @let result = subTable.result;
+                            @let criterion = result.criterion;
+
+                            <tr>
+                                @for (
+                                    offset of subTable.indentOffset;
+                                    track $index
+                                ) {
+                                    <td></td>
+                                }
+                                <td>
+                                    <app-didactic-overview-criterion-entry
+                                        [criterion]="criterion"
+                                    />
+                                </td>
+                                @for (
+                                    offset of subTable.badgeOffset;
+                                    track $index
+                                ) {
+                                    <td></td>
+                                }
+                                <td>
+                                    <app-eval-result-status-badge
+                                        [result]="result"
+                                        [resultsMap]="this.results()"
+                                    />
+                                </td>
+                            </tr>
+                        }
+                    }
+                    @if (this.rootResults().length === 0) {
                         <tr>
                             <td colspan="2" class="text-muted">
-                                Die Übung beinhaltet keine Ausertungskriterien
+                                Die Übung beinhaltet keine Auswertungskriterien
                             </td>
                         </tr>
                     }

@@ -13,6 +13,7 @@ import {
     ReducerError,
     validateExerciseAction,
     cloneDeepMutable,
+    exerciseStateSchema,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type {
@@ -25,10 +26,13 @@ import { ActionWrapper } from './action-wrapper.js';
 import type { ExerciseClientWrapper } from './client-wrapper.js';
 import { patientTick } from './patient-ticking.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
+import { castDraft } from 'immer';
 
 export class ActiveExercise {
     public readonly actionApplied = new Subject<boolean>();
     public template: ExerciseTemplateEntry | null = null;
+    public initialStateString: ExerciseState;
+    public currentStateString: ExerciseState;
 
     public get exercise() {
         return this._exercise;
@@ -146,7 +150,14 @@ export class ActiveExercise {
     public constructor(
         private readonly _exercise: ExerciseEntry,
         public readonly temporaryActionHistory: ActionWrapper[] = []
-    ) {}
+    ) {
+        this.initialStateString = exerciseStateSchema.decode(
+            castDraft(_exercise.initialStateString)
+        );
+        this.currentStateString = exerciseStateSchema.decode(
+            castDraft(_exercise.currentStateString)
+        );
+    }
 
     /**
      * Select the role that is applied when using the given id.
@@ -168,7 +179,7 @@ export class ActiveExercise {
     }
 
     public getStateSnapshot(): ExerciseState {
-        return this.exercise.currentStateString;
+        return this.currentStateString;
     }
 
     // TODO: To more generic function
@@ -205,7 +216,7 @@ export class ActiveExercise {
         });
         if (
             this.clients.size === 0 &&
-            this.exercise.currentStateString.currentStatus === 'running' &&
+            this.currentStateString.currentStatus === 'running' &&
             this.exercise.parallelExerciseId === null
         ) {
             // Pause the exercise
@@ -232,7 +243,7 @@ export class ActiveExercise {
         });
         if (
             this.clients.size === 0 &&
-            this.exercise.currentStateString.currentStatus === 'running' &&
+            this.currentStateString.currentStatus === 'running' &&
             this.exercise.parallelExerciseId === null
         ) {
             this.applyAction({ type: '[Exercise] Pause' }, null);
@@ -282,10 +293,7 @@ export class ActiveExercise {
      * @throws Error if the action is not applicable on the current state
      */
     public reduce(action: ExerciseAction, emitterId: UUID | null): void {
-        const newState = reduceExerciseState(
-            this.exercise.currentStateString,
-            action
-        );
+        const newState = reduceExerciseState(this.currentStateString, action);
         this.setState(newState, action, emitterId);
         if (action.type === '[Exercise] Pause') {
             this.pause();
@@ -299,7 +307,7 @@ export class ActiveExercise {
         action: ExerciseAction,
         emitterId: UUID | null
     ): void {
-        this.exercise.currentStateString = newExerciseState;
+        this.currentStateString = newExerciseState;
         this.temporaryActionHistory.push(
             new ActionWrapper(action, emitterId, this)
         );
@@ -317,7 +325,7 @@ export class ActiveExercise {
      * as well as adding actions to the end to gracefully mark the end of the previous exercise session.
      */
     public restoreState() {
-        const currentState = cloneDeepMutable(this.exercise.initialStateString);
+        const currentState = cloneDeepMutable(this.initialStateString);
 
         this.temporaryActionHistory.forEach((actionWrapper) => {
             const action = validateExerciseAction(
@@ -338,7 +346,7 @@ export class ActiveExercise {
                 throw e;
             }
         });
-        this.exercise.currentStateString = currentState;
+        this.currentStateString = currentState;
         this.incrementIdGenerator.setCurrent(
             this.temporaryActionHistory.length
         );
@@ -348,7 +356,7 @@ export class ActiveExercise {
     /** Adds actions to the end to gracefully mark the end of the previous exercise session.**/
     public resetStopped() {
         // Pause exercise
-        if (this.exercise.currentStateString.currentStatus === 'running')
+        if (this.currentStateString.currentStatus === 'running')
             this.reduce(
                 {
                     type: '[Exercise] Pause',
@@ -357,18 +365,16 @@ export class ActiveExercise {
                 null
             );
         // Remove all clients from state
-        Object.values(this.exercise.currentStateString.clients).forEach(
-            (client) => {
-                const removeClientAction: ExerciseAction = {
-                    type: '[Client] Remove client',
-                    clientId: client.id,
-                };
-                this.reduce(
-                    removeClientAction,
-                    // Exercise emitterId is always null
-                    null
-                );
-            }
-        );
+        Object.values(this.currentStateString.clients).forEach((client) => {
+            const removeClientAction: ExerciseAction = {
+                type: '[Client] Remove client',
+                clientId: client.id,
+            };
+            this.reduce(
+                removeClientAction,
+                // Exercise emitterId is always null
+                null
+            );
+        });
     }
 }

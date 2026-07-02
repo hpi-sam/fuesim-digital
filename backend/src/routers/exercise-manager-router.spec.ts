@@ -280,7 +280,7 @@ describe('exercise manager router', () => {
 
             const exportData: StateExport = {
                 type: 'complete',
-                currentState: exercise.exercise.currentStateString,
+                currentState: exercise.currentStateString,
                 history: undefined,
                 fileVersion: 1,
                 dataVersion: exercise.exercise.stateVersion,
@@ -317,8 +317,8 @@ describe('exercise manager router', () => {
             const importedExercise = environment.services.exerciseService
                 .TESTING_getExerciseMap()
                 .get(exerciseId)!;
-            expect(importedExercise.exercise.currentStateString).toMatchObject({
-                ...exercise.exercise.currentStateString,
+            expect(importedExercise.currentStateString).toMatchObject({
+                ...exercise.currentStateString,
                 participantKey: importedExercise.participantKey,
                 type: 'template',
             });

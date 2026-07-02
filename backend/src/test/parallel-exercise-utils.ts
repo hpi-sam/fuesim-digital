@@ -26,7 +26,7 @@ export function createViewport(exercise: ActiveExercise): Viewport {
         ),
     };
     exercise.applyAction(addViewportAction, null);
-    return Object.values(exercise.exercise.currentStateString.viewports)[0]!;
+    return Object.values(exercise.currentStateString.viewports)[0]!;
 }
 
 export async function createParallelExercise(

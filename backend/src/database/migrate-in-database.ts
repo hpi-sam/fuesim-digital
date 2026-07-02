@@ -1,5 +1,6 @@
 import type { ExerciseId, ExerciseState } from 'fuesim-digital-shared';
-import { applyMigrations, currentStateVersion } from 'fuesim-digital-shared';
+import { applyMigrations, currentStateVersion, exerciseStateSchema } from 'fuesim-digital-shared';
+import { castDraft } from 'immer';
 import { RestoreError } from '../utils/restore-error.js';
 import type { ExerciseRepository } from './repositories/exercise-repository.js';
 import type { ActionRepository } from './repositories/action-repository.js';
@@ -18,8 +19,8 @@ export async function migrateInDatabase(
         );
     }
 
-    const loadedInitialState = exercise.initialStateString;
-    const loadedCurrentState = exercise.currentStateString;
+    const loadedInitialState: ExerciseState = exerciseStateSchema.parse(exercise.initialStateString);
+    const loadedCurrentState: ExerciseState = exerciseStateSchema.parse(exercise.currentStateString);
     const loadedActions =
         await actionRepository.getActionsForExerciseId(exerciseId);
     const { currentState, history } = applyMigrations(exercise.stateVersion, {
@@ -34,10 +35,10 @@ export async function migrateInDatabase(
     const actions = history?.actionHistory ?? [];
 
     exercise.stateVersion = currentStateVersion;
-    exercise.initialStateString = initialState;
-    exercise.currentStateString = currentState;
+    exercise.initialStateString = exerciseStateSchema.encode(castDraft(initialState));
+    exercise.currentStateString = exerciseStateSchema.encode(castDraft(currentState));
 
-    await exerciseRepository.saveExerciseState(exercise);
+    await exerciseRepository.saveExerciseState(exercise, initialState, currentState);
 
     // Delete all old actions
     await actionRepository.deleteAllForExercise(exerciseId);

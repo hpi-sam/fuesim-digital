@@ -7,7 +7,12 @@ import type {
     ParallelExerciseId,
     Client,
 } from 'fuesim-digital-shared';
-import { ReducerError, newClient, newClientRole } from 'fuesim-digital-shared';
+import {
+    ReducerError,
+    lookupReducerFor,
+    newClient,
+    newClientRole,
+} from 'fuesim-digital-shared';
 import { Subject, filter, throttleTime, type Subscription } from 'rxjs';
 import cookie from 'cookie';
 import type { ExerciseSocket } from '../exercise-server.js';
@@ -18,6 +23,7 @@ import { PermissionDeniedError } from '../utils/http.js';
 import type { Services } from '../database/services/index.js';
 import type { ActiveExercise } from './active-exercise.js';
 import { clientMap } from './client-map.js';
+import { castDraft } from 'immer';
 
 /**
  * Wraps a {@link ExerciseSocket} for different types of clients.
@@ -142,7 +148,12 @@ export class ExerciseClientWrapper extends ClientWrapper {
     }
 
     public emitAction(action: ExerciseAction) {
-        this.socket.emit('performAction', action);
+        this.socket.emit(
+            'performAction',
+            lookupReducerFor(action.type).actionSchema.encode(
+                castDraft(action)
+            ) as ExerciseAction
+        );
     }
 
     public override disconnect() {

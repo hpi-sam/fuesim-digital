@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { z } from 'zod';
 import {
     type ActionId,
     type ExerciseAction,
@@ -14,6 +15,7 @@ import {
     type OrganisationMembershipRole,
     type ParallelExerciseKey,
     type OrganisationInviteLinkId,
+    type WireExerciseState,
 } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
@@ -32,6 +34,7 @@ import {
     unique,
     index,
 } from 'drizzle-orm/pg-core';
+import { Immutable } from 'immer';
 
 function typedUUID<T>() {
     return uuid().$type<T>();
@@ -183,13 +186,15 @@ export type ExerciseTemplateInsert = InferInsertModel<
 export const exerciseTable = pgTable('exercise_entity', {
     ...baseTable<ExerciseId>(),
     tickCounter: integer().default(0).notNull(),
-    initialStateString: json().$type<ExerciseState>().notNull(),
+    initialStateString: json().$type<WireExerciseState>().notNull(),
     participantKey: char({ length: 6 })
         .$type<ParticipantKey>()
         .notNull()
         .unique(),
     trainerKey: char({ length: 8 }).$type<TrainerKey>().notNull().unique(),
-    currentStateString: json().$type<ExerciseState>().notNull(),
+    currentStateString: json()
+        .$type<WireExerciseState>()
+        .notNull(),
     stateVersion: integer().notNull(),
     user: varchar().references(() => userTable.id, { onDelete: 'cascade' }),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })

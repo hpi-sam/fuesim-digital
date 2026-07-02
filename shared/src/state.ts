@@ -143,6 +143,7 @@ export const exerciseStateSchema = z.strictObject({
         .optional(),
 });
 
+export type WireExerciseState = Immutable<z.input<typeof exerciseStateSchema>>;
 export type ExerciseState = Immutable<z.infer<typeof exerciseStateSchema>>;
 
 export function newExerciseState(

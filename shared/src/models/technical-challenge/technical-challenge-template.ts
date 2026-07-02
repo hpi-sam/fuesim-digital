@@ -8,14 +8,14 @@ import { newSize } from '../utils/size.js';
 import type { TechnicalChallenge } from './technical-challenge.js';
 import {
     type StateMachine,
-    stateMachineCodec,
+    stateMachineSchemaCodec,
     stateMachineSchema,
 } from './state-machine.js';
 import type { TechnicalChallengeId } from './ids.js';
 
 export const technicalChallengeTemplateSchema = z.strictObject({
     stateMachines: z
-        .record(stateMachineSchema.shape.id, stateMachineCodec)
+        .record(stateMachineSchema.shape.id, stateMachineSchemaCodec)
         .refine((obj) => Object.keys(obj).length > 0),
     id: uuidSchema,
     image: imagePropertiesSchema,

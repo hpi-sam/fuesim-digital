@@ -245,7 +245,7 @@ describe('join parallel exercise', () => {
                     ]) {
                         const state = environment.services.exerciseService
                             .TESTING_getExerciseMap()
-                            .get(joinedParticipant.participantKey)!.exercise
+                            .get(joinedParticipant.participantKey)!
                             .currentStateString;
 
                         expect(state.currentStatus).toBe('running');
@@ -259,7 +259,7 @@ describe('join parallel exercise', () => {
                     ]) {
                         const state = environment.services.exerciseService
                             .TESTING_getExerciseMap()
-                            .get(joinedParticipant.participantKey)!.exercise
+                            .get(joinedParticipant.participantKey)!
                             .currentStateString;
 
                         expect(state.currentStatus).toBe('paused');

@@ -60,7 +60,7 @@ describe('exercise manager service', () => {
 
         // Check correctness of state
         expect(
-            newActiveExercise.exercise.currentStateString.alarmGroups[
+            newActiveExercise.currentStateString.alarmGroups[
                 action.alarmGroup.id
             ]
         ).toMatchObject(action.alarmGroup);

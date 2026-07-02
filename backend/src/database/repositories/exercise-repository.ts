@@ -1,6 +1,10 @@
-import { currentStateVersion } from 'fuesim-digital-shared';
+import {
+    currentStateVersion,
+    exerciseStateSchema,
+} from 'fuesim-digital-shared';
 import type {
     ExerciseId,
+    ExerciseState,
     ExerciseTemplateId,
     TrainerKey,
 } from 'fuesim-digital-shared';
@@ -18,6 +22,7 @@ import {
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import { Config } from '../../config.js';
 import { BaseRepository } from './base-repository.js';
+import { castDraft } from 'immer';
 
 export interface ExerciseTemplateDetailsEntry extends ExerciseTemplateEntry {
     trainerKey: TrainerKey;
@@ -180,18 +185,18 @@ export class ExerciseRepository extends BaseRepository {
     }
 
     public async saveExerciseState(
-        exercise: ExerciseInsert & { id: ExerciseId }
+        exercise: ExerciseInsert & { id: ExerciseId },
+        initialStateString: ExerciseState,
+        currentStateString: ExerciseState
     ) {
-        const {
-            currentStateString,
-            initialStateString,
-            stateVersion,
-            id,
-            tickCounter,
-        } = exercise;
+        const { stateVersion, id, tickCounter } = exercise;
         const exercisePatch = {
-            currentStateString,
-            initialStateString,
+            currentStateString: exerciseStateSchema.encode(
+                castDraft(currentStateString)
+            ),
+            initialStateString: exerciseStateSchema.encode(
+                castDraft(initialStateString)
+            ),
             stateVersion,
             tickCounter,
             lastUsedAt: new Date(),

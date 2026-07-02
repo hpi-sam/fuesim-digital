@@ -415,15 +415,15 @@ describe('parallel exercise router', () => {
             );
 
             const expectedState: ExerciseState = {
-                ...templateExercise.exercise.currentStateString,
+                ...templateExercise.currentStateString,
                 type: 'parallel',
                 participantKey: parsed.participantKey,
             };
 
-            expect(newExercise.exercise.initialStateString).toMatchObject(
+            expect(newExercise.initialStateString).toMatchObject(
                 expectedState
             );
-            expect(newExercise.exercise.currentStateString).toMatchObject({
+            expect(newExercise.currentStateString).toMatchObject({
                 ...expectedState,
                 autojoinViewportId: parallelExercise.joinViewportId,
             });

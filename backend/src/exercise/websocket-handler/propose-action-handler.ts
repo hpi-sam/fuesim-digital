@@ -4,6 +4,7 @@ import {
     ExpectedReducerError,
     validateExerciseAction,
     validatePermissions,
+    lookupReducerFor,
 } from 'fuesim-digital-shared';
 import { ZodError } from 'zod';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
@@ -18,7 +19,7 @@ export function registerProposeActionHandler(
     secureOn(
         client,
         'proposeAction',
-        (action: ExerciseAction, callback): void => {
+        (wireAction: ExerciseAction, callback): void => {
             const clientWrapper = clientMap.get(client);
             if (!(clientWrapper instanceof ExerciseClientWrapper)) {
                 callback({
@@ -29,9 +30,11 @@ export function registerProposeActionHandler(
                 return;
             }
 
+            console.log(JSON.stringify(wireAction, null, 2))
+
             // 1. validate json
             try {
-                validateExerciseAction(action);
+                validateExerciseAction(wireAction);
             } catch (err) {
                 if (err instanceof ZodError) {
                     callback({
@@ -43,6 +46,10 @@ export function registerProposeActionHandler(
                 }
                 throw err;
             }
+
+            const action = lookupReducerFor(
+                wireAction.type
+            ).actionSchema.decode(wireAction);
 
             // 2. Get matching exercise wrapper & client wrapper
             const activeExercise = clientWrapper.exercise;

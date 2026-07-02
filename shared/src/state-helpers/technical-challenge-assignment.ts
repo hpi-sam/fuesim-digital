@@ -11,6 +11,7 @@ import type { TechnicalChallenge } from '../models/technical-challenge/technical
 import type { TaskType } from '../models/task-type.js';
 import { TypeAssertedObject } from '../utils/type-asserted-object.js';
 import {
+    updateEventQueueAfterTaskChange,
     updateTaskProgress,
     type StateMachine,
 } from '../models/technical-challenge/state-machine.js';
@@ -36,6 +37,7 @@ export function getAssignmentsOnTechnicalChallenge(
 }
 
 export function unassignPersonnelFromTechnicalChallenge(
+    exerciseState: WritableDraft<ExerciseState>,
     technicalChallenge: WritableDraft<TechnicalChallenge>,
     personnelId: Personnel['id'],
     currentTime: ExerciseState['currentTime']
@@ -56,6 +58,13 @@ export function unassignPersonnelFromTechnicalChallenge(
 
     delete technicalChallenge.stateMachines[result.stateMachineId]!
         .assignedPersonnel[personnelId];
+
+    updateEventQueueAfterTaskChange(
+        exerciseState,
+        technicalChallenge.id,
+        technicalChallenge.stateMachines[result.stateMachineId]!,
+        result.taskTypeId
+    );
 }
 
 export function isPersonnelAssigned(
@@ -108,6 +117,7 @@ export function removeInvalidAssignments(
     );
     invalidChallenges.forEach((challenge) => {
         unassignPersonnelFromTechnicalChallenge(
+            draftState,
             challenge,
             personnelId,
             draftState.currentTime

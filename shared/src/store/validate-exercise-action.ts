@@ -16,5 +16,5 @@ export function validateExerciseAction(maybeAction: object): ExerciseAction {
         .parse(maybeAction);
 
     const reducer = lookupReducerFor(maybeActionWithType.type);
-    return reducer.actionSchema.parse(maybeAction);
+    return reducer.actionSchema.decode(maybeAction);
 }

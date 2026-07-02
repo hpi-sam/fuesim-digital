@@ -6,6 +6,7 @@ import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinate
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { removeInvalidAssignments } from '../../state-helpers/technical-challenge-assignment.js';
 import { personnelSchema } from '../../models/personnel.js';
+import { updateEventQueueAfterTaskChange } from '../../models/technical-challenge/state-machine.js';
 
 const movePersonnelActionSchema = z.strictObject({
     type: z.literal('[Personnel] Move personnel'),

@@ -5,7 +5,7 @@ import type {
     ExerciseTimeline,
     ParticipantKey,
     TrainerKey,
-    ExerciseState,
+    WireExerciseState,
 } from 'fuesim-digital-shared';
 import {
     isTrainerKey,
@@ -14,6 +14,7 @@ import {
     ReducerError,
     newExerciseState,
     currentStateVersion,
+    exerciseStateSchema,
 } from 'fuesim-digital-shared';
 import { ZodError } from 'zod';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
@@ -31,6 +32,7 @@ import {
 } from '../../utils/http.js';
 import type { OrganisationRepository } from '../repositories/organisation-repository.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
+import { castDraft } from 'immer';
 
 export class ExerciseService {
     public constructor(
@@ -103,10 +105,10 @@ export class ExerciseService {
                 const trainerKey =
                     await accessKeyRepository.generateKey<TrainerKey>(8);
 
-                const initialState: ExerciseState = {
+                const initialState: WireExerciseState = exerciseStateSchema.encode(castDraft({
                     ...newExerciseState(participantKey),
                     type: optionalData.templateId ? 'template' : 'standalone',
-                };
+                }));
                 const exerciseInsert = {
                     ...optionalData,
                     participantKey,
@@ -168,8 +170,8 @@ export class ExerciseService {
                         ...optionalData,
                         participantKey,
                         trainerKey,
-                        initialStateString: newInitialState,
-                        currentStateString: newCurrentState,
+                        initialStateString: exerciseStateSchema.encode(castDraft(newInitialState)),
+                        currentStateString: exerciseStateSchema.encode(castDraft(newCurrentState)),
                         stateVersion: currentStateVersion,
                     } satisfies ExerciseInsert;
                     const exerciseEntry =
@@ -322,7 +324,9 @@ export class ExerciseService {
                     .map(async (activeExercise) => {
                         activeExercise.markAsAboutToBeSaved();
                         await repoTransaction.saveExerciseState(
-                            activeExercise.exercise
+                            activeExercise.exercise,
+                            activeExercise.initialStateString,
+                            activeExercise.currentStateString
                         );
                         if (activeExercise.template) {
                             await repoTransaction.updateExerciseTemplate(
@@ -390,7 +394,7 @@ export class ExerciseService {
             .sort((a, b) => a.time - b.time);
 
         return {
-            initialState: activeExercise.exercise.initialStateString,
+            initialState: activeExercise.initialStateString,
             actionsWrappers: completeHistory,
         };
     }
@@ -401,7 +405,7 @@ export class ExerciseService {
             throw new NotFoundError();
         }
         return Object.values(
-            activeExercise.exercise.currentStateString.viewports
+            activeExercise.currentStateString.viewports
         );
     }
 

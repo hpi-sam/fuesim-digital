@@ -41,9 +41,14 @@ export const measurePropertyTypeToDefaultHint: {
         'Jetzt eine Linie einzeichnen (einfacher Klick um neuen Punkt zu setzen, doppelter Klick für Schlusspunkt)',
 };
 
-const trimmedOptionalString = z.preprocess(
-    (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
-    z.string().trim().optional()
+const trimmedOptionalString = z.codec(
+    z.string().optional(),
+    z.string().optional(),
+    {
+        decode: (v) =>
+            typeof v === 'string' && v.trim() === '' ? undefined : v,
+        encode: (v) => v,
+    }
 );
 
 const requiresAnyOfSchema = z.strictObject({

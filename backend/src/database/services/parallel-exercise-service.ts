@@ -203,7 +203,7 @@ export class ParallelExerciseService {
 
     public getParallelExerciseInstanceSummaries(exercises: ActiveExercise[]) {
         return exercises.map((exercise) => {
-            const state = exercise.exercise.currentStateString;
+            const state = exercise.currentStateString;
             return parallelExerciseInstanceSummarySchema.parse({
                 participantKey: exercise.participantKey,
                 trainerKey: exercise.trainerKey,

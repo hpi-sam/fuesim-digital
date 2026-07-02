@@ -34,21 +34,19 @@ import { newStateMachineEvent } from './event.js';
 import type { StateMachineId, TechnicalChallengeId } from './ids.js';
 import { stateMachineIdSchema } from './ids.js';
 import type { Guard, TaskGuard, Timer, TimerGuard } from './guard.js';
-import { guardSchema, taskSchema, timerSchema } from './guard.js';
+import {
+    guardSchema,
+    guardSchemaCodec,
+    taskSchema,
+    timerSchema,
+} from './guard.js';
 
 const stateMachineStateIdSchema = uuidSchema.brand<'StateMachineStateId'>();
-
-export const transitionWireSchema = z.strictObject({
-    id: uuidSchema,
-    targetState: stateMachineStateIdSchema,
-    guard: guardSchema,
-});
-export type TransitionWire = Immutable<z.infer<typeof transitionWireSchema>>;
 
 export const transitionSchema = z.strictObject({
     id: uuidSchema,
     targetState: stateMachineStateIdSchema,
-    guard: guardSchema,
+    guard: guardSchemaCodec,
 });
 export type Transition = Immutable<z.infer<typeof transitionSchema>>;
 
@@ -73,7 +71,7 @@ export type StateMachineState = Immutable<
 export function newTechnicalChallengeState(
     title: string,
     image: ImageProperties,
-    outgoingWireTransitions: { [key: UUID]: TransitionWire },
+    outgoingTransitions: { [key: UUID]: Transition },
     possibleTasks: UUID[] | { [key: UUID]: number } = {},
     userGeneratedContent?: UserGeneratedContent
 ): StateMachineState {
@@ -81,12 +79,6 @@ export function newTechnicalChallengeState(
         // eslint-disable-next-line no-param-reassign
         possibleTasks = Object.fromEntries(possibleTasks.map((id) => [id, 1]));
     }
-    const outgoingTransitions = Object.fromEntries(
-        Object.entries(outgoingWireTransitions).map(([key, transition]) => [
-            key,
-            transitionSchema.parse(transition),
-        ])
-    );
 
     return {
         id: uuid() as StateMachineState['id'],
@@ -269,10 +261,7 @@ export const stateMachineSchema = stateMachineWireSchema.safeExtend({
         taskTypeSchema.shape.id,
         z.record(
             stateMachineStateIdSchema,
-            z.record(
-                transitionSchema.shape.id,
-                z.array(transitionSchema.shape.guard)
-            )
+            z.record(transitionSchema.shape.id, z.array(guardSchema))
         )
     ),
 });
@@ -307,7 +296,7 @@ function addTaskGuards(
     }
 }
 
-export const stateMachineCodec = z.codec(
+export const stateMachineSchemaCodec = z.codec(
     stateMachineWireSchema,
     stateMachineSchema,
     {

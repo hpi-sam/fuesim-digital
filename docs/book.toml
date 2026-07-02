@@ -1,6 +1,6 @@
 [book]
 title = "Anleitung für die FüSim Digital"
-authors = ["Jonathan Weth", "Christian Schäffer"]
+authors = ["Jonathan Weth", "Christian Schäffer", "Lukas Radermacher"]
 language = "de"
 
 [build]

@@ -6,16 +6,12 @@ import { imagePropertiesSchema } from '../utils/image-properties.js';
 import { newNoPosition } from '../utils/position/no-position.js';
 import { newSize } from '../utils/size.js';
 import type { TechnicalChallenge } from './technical-challenge.js';
-import {
-    type StateMachine,
-    stateMachineSchemaCodec,
-    stateMachineSchema,
-} from './state-machine.js';
+import { type StateMachine, stateMachineSchema } from './state-machine.js';
 import type { TechnicalChallengeId } from './ids.js';
 
 export const technicalChallengeTemplateSchema = z.strictObject({
     stateMachines: z
-        .record(stateMachineSchema.shape.id, stateMachineSchemaCodec)
+        .record(stateMachineSchema.shape.id, stateMachineSchema)
         .refine((obj) => Object.keys(obj).length > 0),
     id: uuidSchema,
     image: imagePropertiesSchema,

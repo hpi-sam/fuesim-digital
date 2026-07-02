@@ -4,11 +4,7 @@ import { uuidSchema } from '../../utils/uuid.js';
 import { imagePropertiesSchema } from '../utils/image-properties.js';
 import { positionSchema } from '../utils/position/position.js';
 import { sizeSchema } from '../utils/size.js';
-import {
-    stateMachineSchema,
-    stateMachineSchemaCodec,
-    type StateMachineState,
-} from './state-machine.js';
+import { stateMachineSchema, type StateMachineState } from './state-machine.js';
 import { technicalChallengeIdSchema } from './ids.js';
 
 export const technicalChallengeSchema = z.strictObject({
@@ -19,7 +15,7 @@ export const technicalChallengeSchema = z.strictObject({
     image: imagePropertiesSchema,
     position: positionSchema,
     size: sizeSchema,
-    stateMachines: z.record(stateMachineSchema.shape.id, stateMachineSchemaCodec),
+    stateMachines: z.record(stateMachineSchema.shape.id, stateMachineSchema),
 });
 
 export type TechnicalChallenge = Immutable<

@@ -27,107 +27,66 @@ export type Timer = z.infer<typeof timerSchema>;
  * there is some interaction with the recursive nature of it.
  *
  * The current workaround is to define them using interfaces.
+ *
+ * Every guard node has a stable `id`, used to key the runtime-only
+ * lookup/backreference structures built in `guard-index.ts` — it must be
+ * unique per guard *instance* (i.e. per position in a transition's guard
+ * tree). Do not reuse the same guard object/id across multiple transitions.
  */
 const baseGuardSchema = z.strictObject({
-    nextChange: z.int().nonnegative().optional(),
+    id: uuidSchema.brand<'GuardId'>(),
 });
-const guardParentSchema = z.strictObject({
-    parent: z.lazy(() => guardSchema.optional()),
-});
+export type GuardId = z.infer<typeof baseGuardSchema>['id'];
 
-export const taskGuardWireSchema = z.strictObject({
+export const taskGuardSchema = z.strictObject({
     ...baseGuardSchema.shape,
     type: z.literal('taskGuard'),
     /** Percentage of Task.totalDuration */
     minProgress: z.number().min(0).max(1),
     taskId: taskSchema.shape.taskTypeId,
 });
-export type TaskGuardWire = z.infer<typeof taskGuardWireSchema>;
-export const taskGuardSchema = z.strictObject({
-    ...taskGuardWireSchema.shape,
-    ...guardParentSchema.shape,
-});
 export interface TaskGuard {
+    id: GuardId;
     type: 'taskGuard';
     minProgress: number;
     taskId: TaskType['id'];
-    nextChange?: number;
-    parent?: Guard;
 }
 
-export const timerGuardWireSchema = z.object({
+export const timerGuardSchema = z.strictObject({
     ...baseGuardSchema.shape,
     type: z.literal('timerGuard'),
     /** Percentage of Timer.totalDuration past */
     minProgress: z.number().min(0).max(1),
     timerId: timerSchema.shape.id,
 });
-export type TimerGuardWire = z.infer<typeof timerGuardWireSchema>;
-export const timerGuardSchema = z.strictObject({
-    ...timerGuardWireSchema.shape,
-    ...guardParentSchema.shape,
-});
 export interface TimerGuard {
+    id: GuardId;
     type: 'timerGuard';
     minProgress: number;
     timerId: Timer['id'];
-    nextChange?: number;
-    parent?: Guard;
 }
 
-const andGuardWireSchema = z.object({
+export const andGuardSchema = z.strictObject({
     ...baseGuardSchema.shape,
     type: z.literal('andGuard'),
-    guards: z.lazy(() => z.array(guardWireSchema)),
-});
-export interface AndGuardWire {
-    type: 'andGuard';
-    guards: readonly _GuardWire[];
-    nextChange?: number;
-}
-export const andGuardSchema = z.strictObject({
-    ...andGuardWireSchema.shape,
-    ...guardParentSchema.shape,
+    guards: z.lazy(() => z.array(guardSchema)),
 });
 export interface AndGuard {
+    id: GuardId;
     type: 'andGuard';
     guards: Guard[];
-    nextChange?: number;
-    parent?: Guard;
 }
 
-const notGuardWireSchema = z.strictObject({
+export const notGuardSchema = z.strictObject({
     ...baseGuardSchema.shape,
     type: z.literal('notGuard'),
-    guard: z.lazy(() => guardWireSchema),
-});
-export interface NotGuardWire {
-    type: 'notGuard';
-    guard: _GuardWire;
-    nextChange?: number;
-}
-export const notGuardSchema = z.strictObject({
-    ...notGuardWireSchema.shape,
-    ...guardParentSchema.shape,
+    guard: z.lazy(() => guardSchema),
 });
 export interface NotGuard {
+    id: GuardId;
     type: 'notGuard';
     guard: Guard;
-    nextChange?: number;
-    parent?: Guard;
 }
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-type _GuardWire = AndGuardWire | NotGuardWire | TaskGuardWire | TimerGuardWire;
-export const guardWireSchema: z.ZodType<_GuardWire> = z.lazy(() =>
-    z.discriminatedUnion('type', [
-        taskGuardWireSchema,
-        timerGuardWireSchema,
-        andGuardWireSchema,
-        notGuardWireSchema,
-    ])
-);
-export type GuardWire = Immutable<z.infer<typeof guardWireSchema>>;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 type _Guard = AndGuard | NotGuard | TaskGuard | TimerGuard;
@@ -140,57 +99,3 @@ export const guardSchema: z.ZodType<_Guard> = z.lazy(() =>
     ])
 );
 export type Guard = Immutable<z.infer<typeof guardSchema>>;
-
-export function decodeGuard(wire: GuardWire, parent: Guard | undefined): Guard {
-    switch (wire.type) {
-        case 'andGuard': {
-            const node: AndGuard = {
-                type: 'andGuard' as const,
-                guards: [],
-                parent,
-            };
-            node.guards = wire.guards.map((g) => decodeGuard(g, node));
-            return node;
-        }
-        case 'notGuard': {
-            const node: any = {
-                type: 'notGuard' as const,
-                guard: null,
-                parent,
-            };
-            node.guard = decodeGuard(wire.guard, node);
-            return node as NotGuard;
-        }
-        case 'taskGuard':
-        case 'timerGuard':
-            return { ...wire, parent };
-    }
-}
-
-export function encodeGuard(g: Guard): GuardWire {
-    switch (g.type) {
-        case 'andGuard': {
-            return {
-                type: 'andGuard',
-                guards: (g.guards as Guard[]).map(encodeGuard),
-            };
-        }
-        case 'notGuard':
-            return { type: 'notGuard', guard: encodeGuard(g.guard) };
-        case 'taskGuard': {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { parent, ...rest } = g;
-            return rest as TaskGuardWire;
-        }
-        case 'timerGuard': {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { parent, ...rest } = g;
-            return rest as TimerGuardWire;
-        }
-    }
-}
-
-export const guardSchemaCodec = z.codec(guardWireSchema, guardSchema, {
-    decode: (guard) => decodeGuard(guard, undefined),
-    encode: (guardWire) => encodeGuard(guardWire as GuardWire),
-});

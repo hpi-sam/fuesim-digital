@@ -9,7 +9,12 @@ import { newImageProperties } from '../../models/utils/image-properties.js';
 import type { UUID } from '../../utils/uuid.js';
 import type { UserGeneratedContent } from '../../models/user-generated-content.js';
 import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
-import { TimerGuard } from '../../models/technical-challenge/guard.js';
+import type {
+    GuardId,
+    TaskGuard,
+    TimerGuard,
+} from '../../models/technical-challenge/guard.js';
+import { uuid } from '../../utils/uuid.js';
 
 // TODO@Felix: move into state-machine.spec.ts
 export namespace StateMachineTesting {
@@ -37,26 +42,40 @@ export namespace StateMachineTesting {
 
     // --- Guards ---
     // A guard is fulfilled when the task's progress exceeds minProgress.
-    export const isFireExtinguished = {
-        type: 'taskGuard',
-        minProgress: 1,
-        taskId: extinguishFireTask.id,
-    } as const;
-    export const isPatientRescued = {
-        type: 'taskGuard',
-        minProgress: 1,
-        taskId: rescuePatientTask.id,
-    } as const;
-    export const isPatientDead = {
-        type: 'timerGuard',
-        minProgress: 1,
-        timerId: patientDeadTimerId,
-    } as const;
-    export const isVehicleBurnedOut = {
-        type: 'timerGuard',
-        minProgress: 1,
-        timerId: vehicleBurnedOutTimerId,
-    } as const;
+    // These are factories rather than shared constants: each transition
+    // needs its own guard instance with a fresh, unique `id`.
+    export function isFireExtinguished(): TaskGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'taskGuard',
+            minProgress: 1,
+            taskId: extinguishFireTask.id,
+        };
+    }
+    export function isPatientRescued(): TaskGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'taskGuard',
+            minProgress: 1,
+            taskId: rescuePatientTask.id,
+        };
+    }
+    export function isPatientDead(): TimerGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'timerGuard',
+            minProgress: 1,
+            timerId: patientDeadTimerId,
+        };
+    }
+    export function isVehicleBurnedOut(): TimerGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'timerGuard',
+            minProgress: 1,
+            timerId: vehicleBurnedOutTimerId,
+        };
+    }
 
     // --- Contents ---
     const initialContent: UserGeneratedContent = {
@@ -138,12 +157,12 @@ export namespace StateMachineTesting {
                 '0e9f2d6c-203b-4e43-8a11-d68601d0fa6b': {
                     id: '0e9f2d6c-203b-4e43-8a11-d68601d0fa6b',
                     targetState: patientDeadButExtinguished.id,
-                    guard: isPatientDead,
+                    guard: isPatientDead(),
                 },
                 'd57ffc18-8207-42d9-aeb1-365507f0213b': {
                     id: 'd57ffc18-8207-42d9-aeb1-365507f0213b',
                     targetState: treatedAndExtinguished.id,
-                    guard: isPatientRescued,
+                    guard: isPatientRescued(),
                 },
             },
             [rescuePatientTask.id],
@@ -157,6 +176,7 @@ export namespace StateMachineTesting {
                 id: '233fc7e3-d31a-4d87-8c5f-b2a5aa8448c3',
                 targetState: patientDeadButExtinguished.id,
                 guard: {
+                    id: uuid() as GuardId,
                     type: 'taskGuard',
                     taskId: extinguishFireTask.id,
                     minProgress: 1,
@@ -166,6 +186,7 @@ export namespace StateMachineTesting {
                 id: 'b205f9c2-0f91-495a-8371-62e5c60ab766',
                 targetState: burnedOutAndPatientDead.id,
                 guard: {
+                    id: uuid() as GuardId,
                     type: 'timerGuard',
                     minProgress: 1,
                     timerId: vehicleBurnedOutTimerId,
@@ -182,12 +203,12 @@ export namespace StateMachineTesting {
             '8bd99da3-1ea4-46f4-a206-6e6552d758e8': {
                 id: '8bd99da3-1ea4-46f4-a206-6e6552d758e8',
                 targetState: treatedAndExtinguished.id,
-                guard: isFireExtinguished,
+                guard: isFireExtinguished(),
             },
             '4b56a9eb-2eb4-4033-bb4c-656953da0f83': {
                 id: '4b56a9eb-2eb4-4033-bb4c-656953da0f83',
                 targetState: burnedOutAndPatientDead.id,
-                guard: isVehicleBurnedOut,
+                guard: isVehicleBurnedOut(),
             },
         },
         [extinguishFireTask.id],
@@ -200,17 +221,17 @@ export namespace StateMachineTesting {
             'c10a2eaa-3c9a-444c-bd1d-12bdcb6ad512': {
                 id: 'c10a2eaa-3c9a-444c-bd1d-12bdcb6ad512',
                 targetState: onlyExtinguished.id,
-                guard: isFireExtinguished,
+                guard: isFireExtinguished(),
             },
             '96ddef08-e7e5-426a-bde5-ccf8f35a308a': {
                 id: '96ddef08-e7e5-426a-bde5-ccf8f35a308a',
                 targetState: onlyDead.id,
-                guard: isPatientDead,
+                guard: isPatientDead(),
             },
             '4becf84d-8a47-4d11-9705-014f2241c3cf': {
                 id: '4becf84d-8a47-4d11-9705-014f2241c3cf',
                 targetState: onlyTreated.id,
-                guard: isPatientRescued,
+                guard: isPatientRescued(),
             },
         },
         [extinguishFireTask.id, rescuePatientTask.id],
@@ -265,47 +286,73 @@ export namespace StateMachineTesting {
     export const lossOfConsciousnessTimerDuration = 100_000;
 
     // --- Guards ---
+    // Factories rather than shared constants: each transition needs its
+    // own guard instance with a fresh, unique `id`.
 
-    export const isShoringComplete = {
-        type: 'taskGuard',
-        minProgress: 1,
-        taskId: shoringTask.id,
-    } as const;
-    export const isDebrisCleared = {
-        type: 'taskGuard',
-        minProgress: 1,
-        taskId: debrisClearingTask.id,
-    } as const;
-    export const isSecondaryCollapse = {
-        type: 'timerGuard',
-        minProgress: 1,
-        timerId: secondaryCollapseTimerId,
-    } as const;
-    export const isSearchComplete = {
-        type: 'taskGuard',
-        minProgress: 1,
-        taskId: searchTask.id,
-    } as const;
-    export const isPersonExtricated = {
-        type: 'taskGuard',
-        minProgress: 1,
-        taskId: rescuePatientTask.id,
-    } as const;
-    export const isSurvivalTimerExpired = {
-        type: 'timerGuard',
-        minProgress: 1,
-        timerId: survivalTimerId,
-    } as const;
-    export const isPersonUnconscious = {
-        type: 'timerGuard',
-        minProgress: 1,
-        timerId: lossOfConsciousnessTimerId,
-    } as const;
-    export const isFirstAidComplete = {
-        type: 'taskGuard',
-        minProgress: 1,
-        taskId: firstAidTask.id,
-    } as const;
+    export function isShoringComplete(): TaskGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'taskGuard',
+            minProgress: 1,
+            taskId: shoringTask.id,
+        };
+    }
+    export function isDebrisCleared(): TaskGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'taskGuard',
+            minProgress: 1,
+            taskId: debrisClearingTask.id,
+        };
+    }
+    export function isSecondaryCollapse(): TimerGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'timerGuard',
+            minProgress: 1,
+            timerId: secondaryCollapseTimerId,
+        };
+    }
+    export function isSearchComplete(): TaskGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'taskGuard',
+            minProgress: 1,
+            taskId: searchTask.id,
+        };
+    }
+    export function isPersonExtricated(): TaskGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'taskGuard',
+            minProgress: 1,
+            taskId: rescuePatientTask.id,
+        };
+    }
+    export function isSurvivalTimerExpired(): TimerGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'timerGuard',
+            minProgress: 1,
+            timerId: survivalTimerId,
+        };
+    }
+    export function isPersonUnconscious(): TimerGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'timerGuard',
+            minProgress: 1,
+            timerId: lossOfConsciousnessTimerId,
+        };
+    }
+    export function isFirstAidComplete(): TaskGuard {
+        return {
+            id: uuid() as GuardId,
+            type: 'taskGuard',
+            minProgress: 1,
+            taskId: firstAidTask.id,
+        };
+    }
 
     // --- SM1 States (Struktursicherung) ---
 
@@ -350,14 +397,15 @@ export namespace StateMachineTesting {
                     id: '6b7eb0ec-b264-4a44-88d6-ec2189cb4ee1',
                     targetState: sm1AccessSecured.id,
                     guard: {
+                        id: uuid() as GuardId,
                         type: 'andGuard',
-                        guards: [isShoringComplete, isDebrisCleared],
+                        guards: [isShoringComplete(), isDebrisCleared()],
                     },
                 },
                 '46dcf246-3fe7-46ac-918a-7624608a2b19': {
                     id: '46dcf246-3fe7-46ac-918a-7624608a2b19',
                     targetState: sm1SecondaryCollapse.id,
-                    guard: isSecondaryCollapse,
+                    guard: isSecondaryCollapse(),
                 },
             },
             [shoringTask.id, debrisClearingTask.id],
@@ -418,7 +466,7 @@ export namespace StateMachineTesting {
                 'ce9c7493-1520-4077-a0dc-e008149346e4': {
                     id: 'ce9c7493-1520-4077-a0dc-e008149346e4',
                     targetState: sm2RescueSuccessful.id,
-                    guard: isFirstAidComplete,
+                    guard: isFirstAidComplete(),
                 },
             },
             [firstAidTask.id],
@@ -437,7 +485,7 @@ export namespace StateMachineTesting {
                 '5d2633d4-108e-42a0-8569-2dee6fa50d7d': {
                     id: '5d2633d4-108e-42a0-8569-2dee6fa50d7d',
                     targetState: sm2PersonCritical.id,
-                    guard: isFirstAidComplete,
+                    guard: isFirstAidComplete(),
                 },
             },
             [firstAidTask.id],
@@ -457,10 +505,15 @@ export namespace StateMachineTesting {
                     id: 'e5919d18-0115-4a67-8d50-96769a33a838',
                     targetState: sm2PersonExtricatedConscious.id,
                     guard: {
+                        id: uuid() as GuardId,
                         type: 'andGuard',
                         guards: [
-                            isPersonExtricated,
-                            { type: 'notGuard', guard: isPersonUnconscious },
+                            isPersonExtricated(),
+                            {
+                                id: uuid() as GuardId,
+                                type: 'notGuard',
+                                guard: isPersonUnconscious(),
+                            },
                         ],
                     },
                 },
@@ -468,14 +521,15 @@ export namespace StateMachineTesting {
                     id: 'a19e470c-d6c8-48ac-9e74-e349294ab11d',
                     targetState: sm2PersonExtricatedUnconscious.id,
                     guard: {
+                        id: uuid() as GuardId,
                         type: 'andGuard',
-                        guards: [isPersonExtricated, isPersonUnconscious],
+                        guards: [isPersonExtricated(), isPersonUnconscious()],
                     },
                 },
                 '0dd0b2bb-a4fc-493e-9d22-0a0519f9c692': {
                     id: '0dd0b2bb-a4fc-493e-9d22-0a0519f9c692',
                     targetState: sm2PersonDeceased.id,
-                    guard: isSurvivalTimerExpired,
+                    guard: isSurvivalTimerExpired(),
                 },
             },
             [rescuePatientTask.id],
@@ -494,12 +548,12 @@ export namespace StateMachineTesting {
                 'ba50f4bb-4611-40ff-8b86-e90fb84be623': {
                     id: 'ba50f4bb-4611-40ff-8b86-e90fb84be623',
                     targetState: sm2PersonLocated.id,
-                    guard: isSearchComplete,
+                    guard: isSearchComplete(),
                 },
                 'cf48c05f-39e6-44be-862b-e5335a1fc5dc': {
                     id: 'cf48c05f-39e6-44be-862b-e5335a1fc5dc',
                     targetState: sm2PersonDeceased.id,
-                    guard: isSurvivalTimerExpired,
+                    guard: isSurvivalTimerExpired(),
                 },
             },
             [searchTask.id],
@@ -590,7 +644,6 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
                 simulationStartTime: 0,
                 taskTimeSpent: {},
                 assignedPersonnel: {},
-                taskGuards: {},
             },
         },
         id: '9d629cfb-440e-4fe1-9155-ffdb6f97248f',

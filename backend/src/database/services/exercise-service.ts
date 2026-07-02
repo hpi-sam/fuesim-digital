@@ -15,6 +15,7 @@ import {
     newExerciseState,
     currentStateVersion,
     exerciseStateSchema,
+    invalidateGuardIndex,
 } from 'fuesim-digital-shared';
 import { ZodError } from 'zod';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
@@ -89,6 +90,19 @@ export class ExerciseService {
         this.exerciseMap.delete(exercise.participantKey);
         this.exerciseMap.delete(exercise.trainerKey);
         this.exerciseMap.delete(exercise.exercise.id);
+
+        // Evict this exercise's technical-challenge guard indices/caches
+        // (see `guard-index.ts`) so they don't leak for the process's
+        // lifetime.
+        for (const technicalChallenge of Object.values(
+            exercise.getStateSnapshot().technicalChallenges
+        )) {
+            for (const stateMachine of Object.values(
+                technicalChallenge.stateMachines
+            )) {
+                invalidateGuardIndex(stateMachine.id);
+            }
+        }
     }
 
     public async createExerciseFromBlank(

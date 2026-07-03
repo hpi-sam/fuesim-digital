@@ -3,7 +3,10 @@ import type { Personnel } from '../models/personnel.js';
 import type { TaskType } from '../models/task-type.js';
 import type { StateMachineEvent } from '../models/technical-challenge/event.js';
 import { newStateMachineEvent } from '../models/technical-challenge/event.js';
-import type { GuardIndex } from '../models/technical-challenge/guard-index.js';
+import type {
+    GuardIndex,
+    NextChange,
+} from '../models/technical-challenge/guard-index.js';
 import { getGuardIndex } from '../models/technical-challenge/guard-index.js';
 import type {
     TechnicalChallengeId,
@@ -204,7 +207,12 @@ export function updateTaskProgress(
     // eslint-disable-next-line no-param-reassign
     state ??= currentStateOf(stateMachine);
 
-    if (!state.possibleTasks[taskId]) return;
+    if (!state.possibleTasks[taskId]) {
+        console.log(
+            `[updateTaskProgress:error] updateTaskProgress called with invalid taskId ${taskId}`
+        );
+        return;
+    }
 
     const taskProgress = stateMachine.taskTimeSpent[taskId];
 
@@ -255,21 +263,22 @@ function computeEarliestEvent(
 
     for (const transition of transitions) {
         const guard = transition.guard;
-        const eventTimestamp = getGuardTimestamp(
+        const eventTimestamp = calculateGuardNextChange(
             stateMachine,
             exerciseState,
             index,
-            guard
+            guard,
+            true
         );
 
         console.log(
-            `[computeEarliestEvent]\n\ttransitionId=${transition.id}\n\tcurrent=${eventTimestamp.current}\n\tnextChange=${eventTimestamp.nextChange}`
+            `[computeEarliestEvent]\n\ttransitionId=${transition.id}\n\tcurrent=${eventTimestamp.currentValue}\n\tnextChange=${eventTimestamp.changeTimestamp}`
         );
 
-        if (eventTimestamp.nextChange >= earliestTimestamp) continue;
-        earliestTimestamp = eventTimestamp.nextChange;
+        if (eventTimestamp.changeTimestamp >= earliestTimestamp) continue;
+        earliestTimestamp = eventTimestamp.changeTimestamp;
         earliestEvent = newStateMachineEvent(
-            eventTimestamp.nextChange,
+            eventTimestamp.changeTimestamp,
             technicalChallengeId,
             stateMachine.id,
             transition.id
@@ -282,6 +291,34 @@ function computeEarliestEvent(
     return earliestEvent;
 }
 
+function didChangesChange(a: NextChange, b: NextChange) {
+    return (
+        a.changeTimestamp !== b.changeTimestamp || a.nextValue !== b.nextValue
+    );
+}
+
+function updateMax(
+    currentMax: number,
+    oldValue: number,
+    newValue: number,
+    rescan: () => number
+) {
+    if (newValue >= currentMax) return newValue;
+    if (oldValue < currentMax) return currentMax;
+    return rescan();
+}
+
+function updateMin(
+    currentMin: number,
+    oldValue: number,
+    newValue: number,
+    rescan: () => number
+) {
+    if (newValue <= currentMin) return newValue;
+    if (oldValue > currentMin) return currentMin;
+    return rescan();
+}
+
 function propagateTaskChange(
     exerciseState: WritableDraft<ExerciseState>,
     technicalChallengeId: TechnicalChallengeId,
@@ -289,13 +326,17 @@ function propagateTaskChange(
     index: GuardIndex,
     transitionId: Transition['id'],
     guardId: GuardId | undefined,
-    oldTimestamp?: number,
-    newTimestamp?: number
+    childPreviousNextChange?: NextChange,
+    childNextChange?: NextChange
 ): StateMachineEvent | null {
     if (guardId === undefined) {
-        if (oldTimestamp === newTimestamp) return null;
+        console.log(
+            `[propagateTaskChange]\n\tchildPreviousNextChange: ${JSON.stringify(childPreviousNextChange, null, 2)}\n\tchildNextChange: ${JSON.stringify(childNextChange, null, 2)}`
+        );
+        if (childPreviousNextChange === childNextChange) return null;
+        console.log('\n\tBuilding new event …');
         return newStateMachineEvent(
-            newTimestamp!,
+            childNextChange!.changeTimestamp,
             technicalChallengeId,
             stateMachine.id,
             transitionId
@@ -305,26 +346,20 @@ function propagateTaskChange(
     const parentId = index.parentOf.get(guardId) ?? undefined;
     switch (guard.type) {
         case 'taskGuard': {
-            const taskProgress = getTaskProgress(
-                guard.taskId,
+            const nextChange = calculateGuardNextChange(
                 stateMachine,
-                exerciseState.currentTime
+                exerciseState,
+                index,
+                guard,
+                false
             );
-
-            const totalDuration =
-                stateMachine.tasks[guard.taskId]!.totalDuration;
-            const remainingDuration =
-                guard.minProgress * totalDuration - taskProgress.timeSpent;
-            const nextChange =
-                exerciseState.currentTime +
-                remainingDuration / taskProgress.rate;
-
-            const thisOldTimestamp = index.nextChangeOf.get(guardId)!;
+            const previousNextChange = index.nextChangeOf.get(guardId)!;
             index.nextChangeOf.set(guardId, nextChange);
-
             console.log(
-                `[propagate:task]\n\ttaskId=${guard.taskId}\n\ttransitionId=${transitionId}\n\tnextChange: ${thisOldTimestamp}→${nextChange}\n\tparentId=${parentId ?? 'null(root)'}`
+                `[propagate:task]\n\ttaskId=${guard.taskId}\n\ttransitionId=${transitionId}\n\tnextChange: ${previousNextChange.changeTimestamp}→${nextChange.changeTimestamp}\n\tparentId=${parentId ?? 'null(root)'}`
             );
+
+            if (!didChangesChange(previousNextChange, nextChange)) return null;
 
             return propagateTaskChange(
                 exerciseState,
@@ -333,14 +368,24 @@ function propagateTaskChange(
                 index,
                 transitionId,
                 parentId,
-                thisOldTimestamp,
+                previousNextChange,
                 nextChange
             );
         }
         case 'notGuard': {
             console.log(
-                `[propagate:not]\n\ttransitionId=${transitionId}\n\tpassthrough old=${oldTimestamp}\n\tnew=${newTimestamp}\n\tparentId=${parentId ?? 'null(root)'}`
+                `[propagate:not]\n\ttransitionId=${transitionId}\n\tpassthrough old=${JSON.stringify(childPreviousNextChange, null, 2)}\n\tnew=${JSON.stringify(childNextChange, null, 2)}\n\tparentId=${parentId ?? 'null(root)'}`
             );
+
+            // If we reach this, the child must have changed, which means this will also change -- no need to check
+            const nextChange: NextChange = {
+                currentValue: !childNextChange!.currentValue,
+                nextValue: !childNextChange!.nextValue,
+                changeTimestamp: childNextChange!.changeTimestamp,
+            };
+            const previousNextChange = index.nextChangeOf.get(guardId)!;
+            index.nextChangeOf.set(guardId, nextChange);
+
             return propagateTaskChange(
                 exerciseState,
                 technicalChallengeId,
@@ -348,25 +393,197 @@ function propagateTaskChange(
                 index,
                 transitionId,
                 parentId,
-                oldTimestamp,
-                newTimestamp
+                previousNextChange,
+                nextChange
             );
         }
         case 'andGuard': {
+            if (
+                childPreviousNextChange === undefined ||
+                childNextChange === undefined
+            ) {
+                throw new Error(
+                    'propagateTaskChange called on an AND-node with no propagating child.'
+                );
+            }
             const currentNextChange = index.nextChangeOf.get(guardId)!;
-            if (currentNextChange !== oldTimestamp) {
-                // This guard did not define this trees next event
-                if (newTimestamp! <= currentNextChange) {
-                    console.log(
-                        `[propagate:and]\n\ttransitionId=${transitionId}\n\tNOT the defining child (nextChange=${currentNextChange} !== old=${oldTimestamp})\n\tnew=${newTimestamp} ≤ nextChange → STOP`
-                    );
+            if (currentNextChange.currentValue) {
+                if (
+                    childPreviousNextChange.changeTimestamp >
+                    currentNextChange.changeTimestamp
+                ) {
+                    if (
+                        childNextChange.changeTimestamp <
+                        currentNextChange.changeTimestamp
+                    ) {
+                        const newNextChange: NextChange = {
+                            currentValue: true,
+                            nextValue: false,
+                            changeTimestamp: childNextChange.changeTimestamp,
+                        };
+                        index.nextChangeOf.set(guardId, newNextChange);
+                        return propagateTaskChange(
+                            exerciseState,
+                            technicalChallengeId,
+                            stateMachine,
+                            index,
+                            transitionId,
+                            parentId,
+                            currentNextChange,
+                            newNextChange
+                        );
+                    }
+                    // TODO: Terminate
                     return null;
                 }
-                // The new timestamp is after the nextChange timestamp, so this is the new nextChange timestamp
-                index.nextChangeOf.set(guardId, newTimestamp!);
-                console.log(
-                    `[propagate:and]\n\ttransitionId=${transitionId}\n\tNOT the defining child but new=${newTimestamp} > nextChange=${currentNextChange}\n\t→ nextChange: ${currentNextChange}→${newTimestamp}\n\tparentId=${parentId ?? 'null(root)'}`
-                );
+                if (
+                    childPreviousNextChange.changeTimestamp ===
+                    currentNextChange.changeTimestamp
+                ) {
+                    if (
+                        childNextChange.changeTimestamp ===
+                        currentNextChange.changeTimestamp
+                    )
+                        return null;
+
+                    if (
+                        childNextChange.changeTimestamp <
+                        currentNextChange.changeTimestamp
+                    ) {
+                        // TODO: Propagate (earliest turning false is now earlier)
+                        const newNextChange: NextChange = {
+                            currentValue: true,
+                            nextValue: false,
+                            changeTimestamp: childNextChange.changeTimestamp,
+                        };
+                        index.nextChangeOf.set(guardId, newNextChange);
+                        return propagateTaskChange(
+                            exerciseState,
+                            technicalChallengeId,
+                            stateMachine,
+                            index,
+                            transitionId,
+                            parentId,
+                            currentNextChange,
+                            newNextChange
+                        );
+                    } else if (
+                        childNextChange.changeTimestamp >
+                        currentNextChange.changeTimestamp
+                    ) {
+                        // TODO: Rescan children, propagate if result !== currentNextChange.changeTimestamp
+                        const newNextChangeTimestamp = Math.min(
+                            ...guard.guards.map(
+                                (g) =>
+                                    index.nextChangeOf.get(g.id)!
+                                        .changeTimestamp
+                            )
+                        );
+                        if (
+                            newNextChangeTimestamp ===
+                            currentNextChange.changeTimestamp
+                        )
+                            return null;
+                        const newNextChange: NextChange = {
+                            currentValue: true,
+                            nextValue: false,
+                            changeTimestamp: newNextChangeTimestamp,
+                        };
+                        index.nextChangeOf.set(guard.id, newNextChange);
+                        return propagateTaskChange(
+                            exerciseState,
+                            technicalChallengeId,
+                            stateMachine,
+                            index,
+                            transitionId,
+                            parentId,
+                            currentNextChange,
+                            newNextChange
+                        );
+                    }
+                }
+            } else {
+                let L = currentNextChange.latestTrue;
+                let F = currentNextChange.earliestFalse;
+
+                if (L === undefined || F == undefined)
+                    throw new Error(
+                        'latestTrue and earliestFalse should be seeded'
+                    );
+
+                const childInL =
+                    !childNextChange.currentValue && childNextChange.nextValue;
+                if (childInL) {
+                    L = updateMax(
+                        L,
+                        childPreviousNextChange.changeTimestamp,
+                        childNextChange.changeTimestamp,
+                        () =>
+                            Math.max(
+                                ...guard.guards
+                                    .map((g) => index.nextChangeOf.get(g.id))
+                                    .filter(
+                                        (g) =>
+                                            g !== undefined &&
+                                            !g.currentValue &&
+                                            g.nextValue
+                                    )
+                                    .map((g) => g!.changeTimestamp)
+                            )
+                    );
+                }
+
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
+                const childWasInF = childPreviousNextChange.nextValue === false;
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
+                const childIsInF = childNextChange.nextValue === false;
+
+                if (childWasInF && childIsInF) {
+                    F = updateMin(
+                        F,
+                        childPreviousNextChange.changeTimestamp,
+                        childNextChange.changeTimestamp,
+                        () =>
+                            Math.min(
+                                ...guard.guards
+                                    .map((g) => index.nextChangeOf.get(g.id))
+                                    .filter(
+                                        (g) => g !== undefined && !g.nextValue
+                                    )
+                                    .map((g) => g!.changeTimestamp)
+                            )
+                    );
+                } else if (childIsInF) {
+                    F = Math.min(F, childNextChange.changeTimestamp);
+                } else if (childWasInF) {
+                    if (childPreviousNextChange.changeTimestamp <= F) {
+                        F = Math.min(
+                            ...guard.guards
+                                .map((g) => index.nextChangeOf.get(g.id))
+                                .filter((g) => g !== undefined && !g.nextValue)
+                                .map((g) => g!.changeTimestamp)
+                        );
+                    }
+                }
+
+                const newNextValue = L < F;
+                const newT = newNextValue ? L : F;
+
+                const newNextChange: NextChange = {
+                    currentValue: false,
+                    nextValue: newNextValue,
+                    changeTimestamp: newT,
+                    latestTrue: L,
+                    earliestFalse: F,
+                };
+                index.nextChangeOf.set(guardId, newNextChange);
+
+                if (
+                    newT === currentNextChange.changeTimestamp &&
+                    newNextValue === currentNextChange.nextValue
+                )
+                    return null;
+
                 return propagateTaskChange(
                     exerciseState,
                     technicalChallengeId,
@@ -375,99 +592,124 @@ function propagateTaskChange(
                     transitionId,
                     parentId,
                     currentNextChange,
-                    newTimestamp
+                    newNextChange
                 );
             }
-
-            // This guard might have defined this trees next event
-            const subGuards = guard.guards.map(
-                (g) => index.nextChangeOf.get(g.id)!
-            );
-
-            const nextChange = Math.max(...subGuards);
-            if (nextChange !== currentNextChange) {
-                index.nextChangeOf.set(guardId, nextChange);
-                console.log(
-                    `[propagate:and]\n\ttransitionId=${transitionId}\n\tWAS the defining child, subGuards=[${subGuards.join(',')}]\n\tnextChange: ${currentNextChange}→${nextChange}\n\tparentId=${parentId ?? 'null(root)'}`
-                );
-                return propagateTaskChange(
-                    exerciseState,
-                    technicalChallengeId,
-                    stateMachine,
-                    index,
-                    transitionId,
-                    parentId,
-                    currentNextChange,
-                    nextChange
-                );
-            }
-            console.log(
-                `[propagate:and]\n\ttransitionId=${transitionId}\n\tWAS the defining child, subGuards=[${subGuards.join(',')}]\n\tnextChange unchanged=${currentNextChange} → STOP`
-            );
-            return null;
+            break;
         }
         case 'timerGuard':
             throw new Error('This should be unreachable.');
     }
+    return null;
 }
 
-function getGuardTimestamp(
+function calculateGuardNextChange(
     stateMachine: WritableDraft<StateMachine>,
     exerciseState: WritableDraft<ExerciseState>,
     index: GuardIndex,
-    guard: WritableDraft<Guard>
-): {
-    current: boolean;
-    nextChange: number;
-} {
+    guard: Guard,
+    setNextChange: boolean = false
+): NextChange {
     switch (guard.type) {
         case 'notGuard': {
-            const subGuard = getGuardTimestamp(
+            const subGuard = calculateGuardNextChange(
                 stateMachine,
                 exerciseState,
                 index,
-                guard.guard
+                guard.guard,
+                setNextChange
             );
-            const cached = index.nextChangeOf.has(guard.id);
-            if (!cached) index.nextChangeOf.set(guard.id, subGuard.nextChange);
             console.log(
-                `[guardTs:not]\n\tchild.current=${subGuard.current}\n\tchild.nextChange=${subGuard.nextChange}\n\t→ current=${!subGuard.current}${cached ? ' [cached]' : ''}`
+                `[guardTs:not]\n\tchild.current=${subGuard.currentValue}\n\tchild.nextChange=${subGuard.changeTimestamp}\n\t→ current=${!subGuard.currentValue}`
             );
-            return {
-                current: !subGuard.current,
-                nextChange: subGuard.nextChange,
+            const nextChange: NextChange = {
+                currentValue: !subGuard.currentValue,
+                nextValue: !!subGuard.currentValue,
+                changeTimestamp: subGuard.changeTimestamp,
             };
+            if (setNextChange) {
+                index.nextChangeOf.set(guard.id, nextChange);
+            }
+            return nextChange;
         }
         case 'andGuard': {
             const subGuards = guard.guards.map((g) =>
-                getGuardTimestamp(stateMachine, exerciseState, index, g)
+                calculateGuardNextChange(
+                    stateMachine,
+                    exerciseState,
+                    index,
+                    g,
+                    setNextChange
+                )
             );
-            const current = subGuards.reduce((v, g) => v && g.current, true);
-            const nextChange = current
-                ? Math.min(...subGuards.map((g) => g.nextChange))
-                : Math.max(
-                      ...subGuards
-                          .filter((g) => !g.current)
-                          .map((g) => g.nextChange)
-                  );
+            const currentValue = subGuards.reduce(
+                (v, g) => v && g.currentValue,
+                true
+            );
 
-            const cached = index.nextChangeOf.has(guard.id);
-            if (!cached) index.nextChangeOf.set(guard.id, nextChange);
             console.log(
-                `[guardTs:and]\n\tchildren=[${subGuards.map((g) => `{cur:${g.current},nc:${g.nextChange}}`).join(',')}]\n\tallFulfilled=${current}\n\tnextChange=${nextChange}${cached ? ' [cached]' : ''}`
+                `[guardTs:and]\n\tchildren=[${subGuards.map((g) => `{cur:${g.currentValue},nc:${g.changeTimestamp}}`).join(',')}]\n\tallFulfilled=${currentValue}`
             );
-            return {
-                current,
-                nextChange,
+
+            const latestTrue = Math.max(
+                ...subGuards
+                    .filter((g) => !g.currentValue && g.nextValue)
+                    .map((g) => g.changeTimestamp)
+            );
+
+            const earliestFalse = Math.min(
+                ...subGuards
+                    .filter((g) => !g.nextValue)
+                    .map((g) => g.changeTimestamp)
+            );
+
+            if (currentValue) {
+                console.log(`\n\tWill turn false at ${earliestFalse}`);
+                const nextChange = {
+                    currentValue,
+                    nextValue: false,
+                    changeTimestamp: earliestFalse,
+                    latestTrue,
+                    earliestFalse,
+                };
+                if (setNextChange) {
+                    index.nextChangeOf.set(guard.id, nextChange);
+                }
+                return nextChange;
+            }
+
+            if (latestTrue < earliestFalse) {
+                console.log(`\n\tWill turn true at ${latestTrue}`);
+                const nextChange = {
+                    currentValue: false,
+                    nextValue: true,
+                    changeTimestamp: latestTrue,
+                    latestTrue,
+                    earliestFalse,
+                };
+                if (setNextChange) {
+                    index.nextChangeOf.set(guard.id, nextChange);
+                }
+                return nextChange;
+            }
+
+            console.log(
+                `\n\tOne subGard will turn false at t=${earliestFalse}, which is earlier than t=${latestTrue} where the last will turn true`
+            );
+
+            const nextChange = {
+                currentValue: false,
+                nextValue: false,
+                changeTimestamp: earliestFalse,
+                latestTrue,
+                earliestFalse,
             };
+            if (setNextChange) {
+                index.nextChangeOf.set(guard.id, nextChange);
+            }
+            return nextChange;
         }
         case 'taskGuard': {
-            const taskProgress = getTaskProgress(
-                guard.taskId,
-                stateMachine,
-                exerciseState.currentTime
-            );
-
             if (
                 isTaskGuardFulfilled(
                     guard,
@@ -476,29 +718,45 @@ function getGuardTimestamp(
                 )
             ) {
                 console.log(
-                    `[guardTs:task]\n\ttaskId=${guard.taskId}\n\tprogress=${(taskProgress.progressPercentage * 100).toFixed(2)}%\n\tFULFILLED → nextChange=Infinity`
+                    `[guardTs:task]\n\ttaskId=${guard.taskId}\n\tprogress=>=100%\n\tFULFILLED → nextChange=Infinity`
                 );
-                return { current: true, nextChange: Infinity };
+                const nextChange = {
+                    currentValue: true,
+                    nextValue: true,
+                    changeTimestamp: Infinity,
+                };
+                if (setNextChange) {
+                    index.nextChangeOf.set(guard.id, nextChange);
+                }
+                return nextChange;
             }
+
+            const taskProgress = getTaskProgress(
+                guard.taskId,
+                stateMachine,
+                exerciseState.currentTime
+            );
 
             const totalDuration =
                 stateMachine.tasks[guard.taskId]!.totalDuration;
             const remainingDuration =
                 guard.minProgress * totalDuration - taskProgress.timeSpent;
-            const nextChange =
+            const nextChangeTimestamp =
                 exerciseState.currentTime +
                 remainingDuration / taskProgress.rate;
 
-            const cached = index.nextChangeOf.has(guard.id);
-            if (!cached) index.nextChangeOf.set(guard.id, nextChange);
-
             console.log(
-                `[guardTs:task]\n\ttaskId=${guard.taskId}\n\tprogress=${(taskProgress.progressPercentage * 100).toFixed(2)}%\n\trate=${taskProgress.rate}\n\tremaining=${remainingDuration.toFixed(3)}\n\tnextChange=${nextChange}${cached ? ' [cached]' : ''}`
+                `[guardTs:task]\n\ttaskId=${guard.taskId}\n\tprogress=${(taskProgress.progressPercentage * 100).toFixed(2)}%\n\trate=${taskProgress.rate}\n\tremaining=${remainingDuration.toFixed(3)}\n\tnextChange=${nextChangeTimestamp}`
             );
-            return {
-                current: false,
-                nextChange,
+            const nextChange = {
+                currentValue: false,
+                nextValue: true,
+                changeTimestamp: nextChangeTimestamp,
             };
+            if (setNextChange) {
+                index.nextChangeOf.set(guard.id, nextChange);
+            }
+            return nextChange;
         }
         case 'timerGuard': {
             if (
@@ -511,24 +769,34 @@ function getGuardTimestamp(
                 console.log(
                     `[guardTs:timer]\n\ttimerId=${guard.timerId}\n\tFULFILLED → nextChange=Infinity`
                 );
-                return { current: true, nextChange: Infinity };
+                const nextChange = {
+                    currentValue: true,
+                    nextValue: true,
+                    changeTimestamp: Infinity,
+                };
+                if (setNextChange) {
+                    index.nextChangeOf.set(guard.id, nextChange);
+                }
+                return nextChange;
             }
 
             const timer = stateMachine.timers[guard.timerId]!;
-            const nextChange =
+            const nextChangeTimestamp =
                 stateMachine.simulationStartTime +
                 guard.minProgress * timer.totalDuration;
 
-            const cached = index.nextChangeOf.has(guard.id);
-            if (!cached) index.nextChangeOf.set(guard.id, nextChange);
-
             console.log(
-                `[guardTs:timer]\n\ttimerId=${guard.timerId}\n\tsimulationStartTime=${stateMachine.simulationStartTime}\n\tminProgress=${guard.minProgress}\n\ttotalDuration=${timer.totalDuration}\n\tnextChange=${nextChange}${cached ? ' [cached]' : ''}`
+                `[guardTs:timer]\n\ttimerId=${guard.timerId}\n\tsimulationStartTime=${stateMachine.simulationStartTime}\n\tminProgress=${guard.minProgress}\n\ttotalDuration=${timer.totalDuration}\n\tnextChange=${nextChangeTimestamp}`
             );
-            return {
-                current: false,
-                nextChange,
+            const nextChange = {
+                currentValue: false,
+                nextValue: true,
+                changeTimestamp: nextChangeTimestamp,
             };
+            if (setNextChange) {
+                index.nextChangeOf.set(guard.id, nextChange);
+            }
+            return nextChange;
         }
     }
 }
@@ -627,6 +895,7 @@ export function updateEventQueueAfterTaskChange(
     );
 
     let newEvent: StateMachineEvent | undefined;
+    // TODO: this currently ignores all non-affected transitions. If the only affected transition is now Infinity due to no personnel assigned, the correct non-affected event is not added
     for (const [transitionId, guardIds] of affectedTransitions) {
         // Only transitions outgoing from the *current* state are relevant.
         if (!(transitionId in state.outgoingTransitions)) continue;
@@ -672,16 +941,11 @@ export function updateEventQueueAfterTaskChange(
         return;
     }
     const current = queue.events[queue.indices[stateMachine.id]!]!;
-    if (newEvent.timestamp < current.timestamp) {
-        console.log(
-            `[updateQueueTask:update]\n\tsmId=${stateMachine.id}\n\ttransitionId: ${current.transitionId}→${newEvent.transitionId}\n\tt: ${current.timestamp}→${newEvent.timestamp}`
-        );
-        modify(queue, stateMachine.id, newEvent);
-    } else {
-        console.log(
-            `[updateQueueTask:noOp]\n\tsmId=${stateMachine.id}\n\tnew t=${newEvent.timestamp} ≥ current t=${current.timestamp}\n\t→ unchanged`
-        );
-    }
+
+    console.log(
+        `[updateQueueTask:update]\n\tsmId=${stateMachine.id}\n\ttransitionId: ${current.transitionId}→${newEvent.transitionId}\n\tt: ${current.timestamp}→${newEvent.timestamp}`
+    );
+    modify(queue, stateMachine.id, newEvent);
 }
 
 function simulateStateMachine(
@@ -700,7 +964,12 @@ function simulateStateMachine(
 
     const nextTransition = state.outgoingTransitions[transitionId];
 
-    if (!nextTransition) return;
+    if (!nextTransition) {
+        console.log(
+            `[simulate:error] simulateStateMachine called with invalid transitionId ${transitionId}`
+        );
+        return;
+    }
 
     console.log(
         `[simulate]\n\tsmId=${stateMachine.id}\n\ttransitionId=${transitionId}\n\tstate: ${stateMachine.currentStateId}→${nextTransition.targetState}\n\tt=${exerciseState.currentTime}`

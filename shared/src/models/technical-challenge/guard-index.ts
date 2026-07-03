@@ -1,26 +1,27 @@
-import { z } from 'zod';
-import { taskTypeSchema } from '../task-type.js';
+import type { TaskType } from '../task-type.js';
 import {
     type StateMachine,
     type Transition,
     type Guard,
-    guardSchema,
 } from './state-machine.js';
-import type { GuardId, StateMachineId } from './ids.js';
-import { guardIdSchema, transitionIdSchema } from './ids.js';
+import type { GuardId, StateMachineId, TransitionId } from './ids.js';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const guardIndexSchema = z.strictObject({
-    parentOf: z.map(guardIdSchema, guardIdSchema.nullable()),
-    transitionOf: z.map(guardIdSchema, transitionIdSchema),
-    taskGuardsByTransition: z.map(
-        taskTypeSchema.shape.id,
-        z.map(transitionIdSchema, z.array(guardIdSchema))
-    ),
-    guardById: z.map(guardIdSchema, guardSchema),
-    nextChangeOf: z.map(guardIdSchema, z.number()),
-});
-export type GuardIndex = z.infer<typeof guardIndexSchema>;
+export interface NextChange {
+    currentValue: boolean;
+    nextValue: boolean;
+    changeTimestamp: number;
+    // `and`-node specific values
+    latestTrue?: number;
+    earliestFalse?: number;
+}
+
+export interface GuardIndex {
+    parentOf: Map<GuardId, GuardId | null>;
+    transitionOf: Map<GuardId, TransitionId>;
+    taskGuardsByTransition: Map<TaskType['id'], Map<TransitionId, GuardId[]>>;
+    guardById: Map<GuardId, Guard>;
+    nextChangeOf: Map<GuardId, NextChange>;
+}
 
 function newGuardIndex(): GuardIndex {
     return {

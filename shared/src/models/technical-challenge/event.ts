@@ -1,14 +1,10 @@
 import { z } from 'zod';
 import { exerciseTimeSchema } from '../time.js';
-import type {
-    StateMachineId,
-    TechnicalChallengeId,
-    TransitionId,
-} from './ids.js';
+import type { GuardId, StateMachineId, TechnicalChallengeId } from './ids.js';
 import {
+    guardIdSchema,
     stateMachineIdSchema,
     technicalChallengeIdSchema,
-    transitionIdSchema,
 } from './ids.js';
 
 export const stateMachineEventSchema = z.strictObject({
@@ -16,7 +12,7 @@ export const stateMachineEventSchema = z.strictObject({
     timestamp: exerciseTimeSchema,
     technicalChallengeId: technicalChallengeIdSchema,
     stateMachineId: stateMachineIdSchema,
-    transitionId: transitionIdSchema,
+    guardId: guardIdSchema,
 });
 
 export type StateMachineEvent = z.infer<typeof stateMachineEventSchema>;
@@ -25,20 +21,24 @@ export function newStateMachineEvent(
     timestamp: number,
     technicalChallengeId: TechnicalChallengeId,
     stateMachineId: StateMachineId,
-    transitionId: TransitionId
+    guardId: GuardId
 ): StateMachineEvent {
     return {
         type: 'stateMachineEvent',
         timestamp,
         technicalChallengeId,
         stateMachineId,
-        transitionId,
+        guardId,
     };
 }
 
 export const stateMachineEventQueueSchema = z.strictObject({
     events: z.array(stateMachineEventSchema),
-    indices: z.record(stateMachineIdSchema, z.int().nonnegative()),
+    guardIndices: z.record(guardIdSchema, z.int().nonnegative()),
+    guardIdsOf: z.record(
+        stateMachineIdSchema,
+        z.record(guardIdSchema, z.boolean())
+    ),
 });
 
 export type StateMachineEventQueue = z.infer<
@@ -48,6 +48,7 @@ export type StateMachineEventQueue = z.infer<
 export function newStateMachineEventQueue(): StateMachineEventQueue {
     return {
         events: [],
-        indices: {},
+        guardIndices: {},
+        guardIdsOf: {},
     };
 }

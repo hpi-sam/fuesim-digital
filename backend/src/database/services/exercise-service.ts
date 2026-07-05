@@ -14,7 +14,7 @@ import {
     ReducerError,
     newExerciseState,
     currentStateVersion,
-    invalidateGuardIndex,
+    GuardIndex,
 } from 'fuesim-digital-shared';
 import { ZodError } from 'zod';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
@@ -95,7 +95,7 @@ export class ExerciseService {
             for (const stateMachine of Object.values(
                 technicalChallenge.stateMachines
             )) {
-                invalidateGuardIndex(stateMachine.id);
+                GuardIndex.invalidateIndex(stateMachine.id);
             }
         }
     }

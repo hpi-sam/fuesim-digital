@@ -1,3 +1,5 @@
+import { enableMapSet } from 'immer';
+
 export * from './export-import/file-format/index.js';
 export * from './models/index.js';
 export * from './models/utils/index.js';
@@ -16,3 +18,5 @@ export * from './store/action-reducers/utils/index.js';
 export * from './state-migrations/index.js';
 export * from './ids.js';
 export * from './validation-messages.js';
+
+enableMapSet();

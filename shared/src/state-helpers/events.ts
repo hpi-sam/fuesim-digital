@@ -2,14 +2,31 @@ import type {
     StateMachineEvent,
     StateMachineEventQueue,
 } from '../models/technical-challenge/event.js';
-import type { StateMachineId } from '../models/technical-challenge/ids.js';
+import type {
+    GuardId,
+    StateMachineId,
+} from '../models/technical-challenge/ids.js';
+import { TypeAssertedObject } from '../utils/type-asserted-object.js';
+
+function guardIdsOf(
+    queue: StateMachineEventQueue,
+    stateMachineId: StateMachineId
+): { [key: GuardId]: boolean } {
+    let set = queue.guardIdsOf[stateMachineId];
+    if (!set) {
+        set = {};
+        queue.guardIdsOf[stateMachineId] = set;
+    }
+    return set;
+}
 
 export function insert(
     queue: StateMachineEventQueue,
     event: StateMachineEvent
 ) {
     queue.events.push(event);
-    queue.indices[event.stateMachineId] = queue.events.length - 1;
+    queue.guardIndices[event.guardId] = queue.events.length - 1;
+    guardIdsOf(queue, event.stateMachineId)[event.guardId] = true;
     bubbleUp(queue, queue.events.length - 1);
 }
 
@@ -20,30 +37,33 @@ export function peek(queue: StateMachineEventQueue): StateMachineEvent | null {
 export function pop(queue: StateMachineEventQueue): StateMachineEvent | null {
     if (queue.events.length === 0) return null;
     if (queue.events.length === 1) {
-        delete queue.indices[queue.events[0]!.stateMachineId];
-        return queue.events.pop()!;
+        const event = queue.events.pop()!;
+        delete queue.guardIndices[event.guardId];
+        delete guardIdsOf(queue, event.stateMachineId)[event.guardId];
+        return event;
     }
 
     const min = queue.events[0]!;
-    delete queue.indices[min.stateMachineId];
+    delete queue.guardIndices[min.guardId];
+    delete guardIdsOf(queue, min.stateMachineId)[min.guardId];
 
     queue.events[0] = queue.events.pop()!;
-    queue.indices[queue.events[0].stateMachineId] = 0;
+    queue.guardIndices[queue.events[0].guardId] = 0;
     bubbleDown(queue, 0);
 
     return min;
 }
 
-export function remove(
+export function removeByGuardId(
     queue: StateMachineEventQueue,
-    id: StateMachineId
+    id: GuardId
 ): boolean {
-    const index = queue.indices[id];
+    const index = queue.guardIndices[id];
     if (index === undefined) return false;
 
     if (index === queue.events.length - 1) {
         queue.events.pop();
-        delete queue.indices[id];
+        delete queue.guardIndices[id];
         return true;
     }
 
@@ -51,7 +71,7 @@ export function remove(
     swap(queue, index, lastIndex);
 
     queue.events.pop();
-    delete queue.indices[id];
+    delete queue.guardIndices[id];
 
     bubbleUp(queue, index);
     bubbleDown(queue, index);
@@ -59,12 +79,29 @@ export function remove(
     return true;
 }
 
+export function removeByStateMachineId(
+    queue: StateMachineEventQueue,
+    stateMachineId: StateMachineId
+): boolean {
+    const set = queue.guardIdsOf[stateMachineId];
+
+    if (set === undefined) return false;
+
+    for (const guardId of TypeAssertedObject.keys(set)) {
+        removeByGuardId(queue, guardId);
+    }
+
+    delete queue.guardIdsOf[stateMachineId];
+
+    return true;
+}
+
 export function modify(
     queue: StateMachineEventQueue,
-    id: StateMachineId,
+    id: GuardId,
     updates: Partial<StateMachineEvent>
 ) {
-    const index = queue.indices[id];
+    const index = queue.guardIndices[id];
     if (index === undefined) return false;
 
     queue.events[index] = { ...queue.events[index]!, ...updates };
@@ -80,8 +117,8 @@ function swap(queue: StateMachineEventQueue, i: number, j: number) {
     queue.events[i] = queue.events[j]!;
     queue.events[j] = tmp;
 
-    queue.indices[queue.events[i].stateMachineId] = i;
-    queue.indices[queue.events[j].stateMachineId] = j;
+    queue.guardIndices[queue.events[i].guardId] = i;
+    queue.guardIndices[queue.events[j].guardId] = j;
 }
 
 function bubbleUp(queue: StateMachineEventQueue, index: number) {

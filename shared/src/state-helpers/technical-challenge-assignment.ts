@@ -61,7 +61,6 @@ export function unassignPersonnelFromTechnicalChallenge(
 
     updateEventQueueAfterTaskChange(
         exerciseState,
-        technicalChallenge.id,
         technicalChallenge.stateMachines[result.stateMachineId]!,
         result.taskTypeId
     );

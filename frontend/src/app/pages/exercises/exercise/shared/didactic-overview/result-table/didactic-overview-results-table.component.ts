@@ -6,14 +6,15 @@ import {
     input,
     OnInit,
     signal,
+    WritableSignal,
 } from '@angular/core';
 import {
-    EvalCriterion,
     EvalCriterionId,
     EvalResult,
     getChildResultsOfResult,
     getEvalCriterionTreeDepth,
     isCombinedEvalCriterion,
+    uuid,
     UUID,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
@@ -22,14 +23,16 @@ import {
     selectEvalCriteria,
     selectEvalResults,
 } from '../../../../../../state/application/selectors/exercise.selectors';
-import { DidacticOverviewResultsSubTable } from './sub-table/didactic-overview-results-sub-table.component';
 import { DidacticOverviewCriterionEntryComponent } from './criterion-entry/didactic-overview-criterion-entry.component';
 import { EvalResultStatusBadgeComponent } from '../result-status-badge/eval-result-status-badge.component';
+import { NgStyle } from '@angular/common';
 
 interface subTable {
+    id: UUID;
     result: EvalResult;
     index: number;
     subResults: EvalResult[];
+    subTables: UUID[];
     localIndent: number;
     indentOffset: boolean[];
     badgeOffset: boolean[];
@@ -54,18 +57,26 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
         Object.values(this.results())
     );
     public readonly evalCriteria = this.store.selectSignal(selectEvalCriteria);
-
-    public readonly extraCols = computed(() =>
-        this.getOffset(this.globalDepth() - 1)
-    );
     public readonly subTables = signal<subTable[]>([]);
 
-    public readonly subTablesMapCache = signal<{ [resultId: UUID]: subTable }>(
+    public readonly subTablesMapCache = signal<{ [tableId: UUID]: subTable }>(
         {}
     );
+    public readonly subTablesByIndex = signal<{ [index: number]: subTable }>(
+        {}
+    );
+    public readonly selectedResults = signal<{
+        [criterionId: EvalCriterionId]: boolean;
+    }>({});
 
     ngOnInit(): void {
         this.updateSubTables();
+        /* initializing selected results */
+        const results = Object.values(this.results());
+        this.selectedResults.update((obj) => {
+            results.forEach((res) => (obj[res.criterionId] = false));
+            return obj;
+        });
     }
     constructor() {
         effect(async () => {
@@ -74,94 +85,104 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
     }
 
     public async updateSubTables() {
-        const currentResults = this.results();
-        /* We initialize the sub tables to recursively update it. */
-        await this.initCache();
-        await this.getSubTablesMap(
-            this.rootResults(),
-            currentResults,
-            this.evalCriteria(),
-            0
-        );
-        const subTablesByIndex = this.getSubTablesByIndex(
-            this.subTablesMapCache()
-        );
-        const resultsLength = Object.values(currentResults).length;
-        let subTableUpdate: subTable[] = [];
+        const results = Object.values(this.results());
+        let runningIndex = 0;
+        const resultsLength = results.length;
+        /* filling cache with subTables */
         for (let i = 0; i < resultsLength; i += 1) {
+            const result = results[i]!;
+            this.getSubTablesByResult(
+                this.subTablesMapCache,
+                result,
+                runningIndex
+            );
+            runningIndex += getEvalCriterionTreeDepth(
+                result.criterion,
+                this.evalCriteria()
+            );
+        }
+
+        const subTablesByIndex = this.subTablesByIndex();
+        const subTablesLength = Object.values(subTablesByIndex).length;
+        let subTableUpdate: subTable[] = [];
+        for (let i = 0; i < subTablesLength; i += 1) {
             subTableUpdate = [...subTableUpdate, subTablesByIndex[i]!];
         }
-        await this.subTables.set(subTableUpdate);
-    }
-    public async initCache() {
-        const initTables = Object.values(this.results()).reduce<{
-            [resultId: UUID]: subTable;
-        }>((obj, result) => {
-            obj[result.id] = {
-                result: result,
-                index: -1,
-                subResults: [] as EvalResult[],
-                localIndent: 0,
-                indentOffset: [],
-                badgeOffset: [],
-            } as subTable;
-            return obj;
-        }, {});
-        this.subTablesMapCache.set(initTables);
+        this.subTables.set(subTableUpdate);
     }
 
-    public async getSubTablesMap(
-        rootResults: EvalResult[],
-        results: { [criterionId: EvalCriterionId]: EvalResult },
-        evalcriteria: { [criterionId: EvalCriterionId]: EvalCriterion },
-        runningSubIndex: number
+    /**
+     * Recursively fills the cache with all subTables from the tree of results
+     * @param cache This is the cache for subTables
+     * @param result the root result
+     * @param runningIndex this gives the index of the SubTable in the results table
+     * @param parentId the Id of the parent SubTable
+     */
+    public getSubTablesByResult(
+        cache: WritableSignal<{
+            [tableId: string]: subTable;
+        }>,
+        result: EvalResult,
+        runningIndex: number,
+        parentId?: UUID
     ) {
-        let runningIndex = 0;
-        for (let i = 0; i < rootResults.length; i += 1) {
-            const res = rootResults[i]!;
-            const subResults = getChildResultsOfResult(
-                res,
-                results,
-                evalcriteria
-            );
-            this.subTablesMapCache.update((cache) => {
-                /* update index */
-                let table = cache[res.id]!;
-                if (table.index === -1) {
-                    table.index = runningIndex;
-                } else {
-                    table.index = runningIndex + runningSubIndex;
-                }
-                /* update sub results */
-                table.subResults = subResults;
-
-                /* update indents of sub results*/
-                const localIndent = table.localIndent;
-                subResults.forEach((subRes) => {
-                    /* TODO @JohannesPotzi : this changes the indent of the root result instead of the subresult */
-                    cache[subRes.id]!.localIndent = localIndent + 1;
-                    cache[subRes.id]!.index = table.index;
-                });
-                /* update local indentOffset and bageOffset */
-                table.indentOffset = this.getOffset(localIndent);
-                table.badgeOffset = this.getOffset(
-                    this.globalDepth() - localIndent - 1
-                );
-                return cache;
-            });
-            runningIndex += getEvalCriterionTreeDepth(
-                res.criterion,
-                evalcriteria
-            );
-            this.getSubTablesMap(
-                subResults,
-                results,
-                evalcriteria,
-                runningSubIndex + 1
+        const crit = result.criterion;
+        const critType = crit.criterionType;
+        let subResults: EvalResult[] = [];
+        if (
+            critType === 'andEvalCriterion' ||
+            critType === 'orEvalCriterion' ||
+            critType === 'countCompletedEvalCriterion'
+        ) {
+            subResults = crit.children.map(
+                (childId) => this.results()[childId]!
             );
         }
+        if (
+            critType === 'firstTrueAtEvalCriterion' ||
+            critType === 'notEvalCriterion'
+        ) {
+            subResults = [this.results()[crit.child]!];
+        }
+        if (critType === 'greaterThanEvalCriterion') {
+            subResults = [
+                this.results()[crit.leftChild]!,
+                this.results()[crit.rightChild]!,
+            ];
+        }
+        const id = uuid();
+        cache.update((obj) => {
+            obj[id] = {
+                id: id,
+                result: result,
+                index: runningIndex,
+                subResults: subResults,
+                subTables: [],
+                localIndent: 0,
+                indentOffset: [],
+                badgeOffset: this.getOffset(this.globalDepth() - 1),
+            } as subTable;
+            if (parentId) {
+                let parent = obj[parentId]!;
+                parent.subTables.push(id);
+                const newIndent = parent.localIndent + 1;
+                obj[id].localIndent = newIndent;
+                obj[id].badgeOffset = this.getOffset(
+                    this.globalDepth() - newIndent
+                );
+                obj[id].indentOffset = this.getOffset(newIndent);
+            }
+            return obj;
+        });
+        this.subTablesByIndex.update((obj) => {
+            obj[runningIndex] = cache()[id]!;
+            return obj;
+        });
+        subResults.forEach((res) =>
+            this.getSubTablesByResult(cache, res, runningIndex + 1, id)
+        );
     }
-    public getSubTablesByIndex(cache: { [resultId: UUID]: subTable }) {
+    public getSubTablesByIndex(cache: { [tableId: UUID]: subTable }) {
         return Object.values(cache).reduce<{
             [index: number]: subTable;
         }>((obj, subTable) => {
@@ -169,31 +190,10 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
             return obj;
         }, {});
     }
-
-    public readonly tableContext = input.required<'baseTable' | 'subTable'>();
+    /* the default of 590 fits nicely into a card with width 600 */
     public readonly tableMinWidth = input<number>(590);
-    public readonly maxIndent = computed(() =>
-        this.tableContext() === 'subTable' ? 100 : 0
-    );
-    public readonly minIndent = computed(() =>
-        this.tableContext() === 'subTable' ? 50 : 0
-    );
-    public readonly overflow = computed(() =>
-        this.tableContext() === 'subTable' ? 'visible' : 'auto'
-    );
-    public readonly getTableMinWidth = computed(() =>
-        this.tableContext() === 'subTable'
-            ? this.tableMinWidth() - this.maxIndent()
-            : this.tableMinWidth()
-    );
-    public readonly getTableClass = computed(() =>
-        this.tableContext() === 'subTable'
-            ? 'card col rounded-0 rounded-end'
-            : ''
-    );
 
     public isCombinedEvalCriterion = isCombinedEvalCriterion;
-
     public getEvalCriterionTreeDepth = getEvalCriterionTreeDepth;
     public readonly globalDepth = computed(() =>
         Math.max(
@@ -202,14 +202,28 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
             )
         )
     );
-    //**
-    // returns an array of a specified length.
-    // This allows for an @for in the template.*/
+    /**
+     * This allows for a for-loop in the template.
+     * @param length the length of the array
+     * @returns returns an array of the specified length.
+     */
     private getOffset(length: number) {
         let ret = [] as boolean[];
         for (let i = 0; i < length; i += 1) {
             ret = [...ret, true];
         }
         return ret;
+    }
+
+    public toggleSelectResult(result: EvalResult) {
+        console.log('toggling selected result');
+        this.selectedResults.update((obj) => {
+            if (obj[result.criterionId]) {
+                obj[result.criterionId] = false;
+            } else {
+                obj[result.criterionId] = true;
+            }
+            return obj;
+        });
     }
 }

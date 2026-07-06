@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { EvalCriterion } from 'fuesim-digital-shared';
 
 @Component({
@@ -9,7 +9,5 @@ import { EvalCriterion } from 'fuesim-digital-shared';
 })
 export class DidacticOverviewCriterionEntryComponent {
     public readonly criterion = input.required<EvalCriterion>();
-    /*  public readonly resultsMap = input.required<{
-        [criterionId: EvalCriterionId]: EvalResult;
-    }>(); */
+    public readonly indent = input.required<number>();
 }

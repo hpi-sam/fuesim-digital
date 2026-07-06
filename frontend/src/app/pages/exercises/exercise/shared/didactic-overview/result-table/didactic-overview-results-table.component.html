@@ -1,55 +1,47 @@
-@if (tableContext() === 'baseTable') {}
-<div
-    class="container-fluid d-flex flex-column h-100"
-    [style.overflow]="this.overflow()"
->
+<div class="container-fluid d-flex flex-column h-100" [style.overflow]="'auto'">
     <div class="flex-fill row">
-        <div
-            class="col-1 flex-grow-1"
-            [style.max-witdh.px]="this.maxIndent()"
-            [style.min-width.px]="this.minIndent()"
-        ></div>
-        <div
-            [class]="this.getTableClass()"
-            [style.min-width.px]="this.getTableMinWidth()"
-        >
+        <div [style.min-width.px]="this.tableMinWidth()">
+            <!-- table table-striped -->
             <table class="table table-striped mb-0" ;>
-                @if (tableContext() === 'baseTable') {
-                    <thead>
-                        <tr>
-                            <th>Auswertungskriterium</th>
-                            @for (col of this.extraCols(); track $index) {
-                                <th></th>
-                            }
-                            <th style="max-width: 100px">Ergebnis</th>
-                        </tr>
-                    </thead>
-                }
+                <thead>
+                    <tr>
+                        <th>Auswertungskriterium</th>
+                        <th style="max-width: 100px">Ergebnis</th>
+                    </tr>
+                </thead>
+
                 <tbody>
                     @for (subTable of this.subTables(); track $index) {
                         @if (subTable.result) {
                             @let result = subTable.result;
                             @let criterion = result.criterion;
 
-                            <tr>
-                                @for (
-                                    offset of subTable.indentOffset;
-                                    track $index
-                                ) {
-                                    <td></td>
-                                }
-                                <td>
+                            <tr (click)="this.toggleSelectResult(result)">
+                                <td
+                                    [class.selected]="
+                                        this.selectedResults()[
+                                            result.criterionId
+                                        ]
+                                    "
+                                >
+                                    @for (
+                                        offset of subTable.indentOffset;
+                                        track $index
+                                    ) {
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    }
                                     <app-didactic-overview-criterion-entry
                                         [criterion]="criterion"
+                                        [indent]="subTable.localIndent"
                                     />
                                 </td>
-                                @for (
-                                    offset of subTable.badgeOffset;
-                                    track $index
-                                ) {
-                                    <td></td>
-                                }
-                                <td>
+                                <td
+                                    [class.selected]="
+                                        this.selectedResults()[
+                                            result.criterionId
+                                        ]
+                                    "
+                                >
                                     <app-eval-result-status-badge
                                         [result]="result"
                                         [resultsMap]="this.results()"

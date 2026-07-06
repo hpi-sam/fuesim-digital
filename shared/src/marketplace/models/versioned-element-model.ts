@@ -16,6 +16,9 @@ export const versionedElementModelSchema = z.strictObject({
     }),
 });
 
+export const versionedElementModelStateExtension =
+    versionedElementModelSchema.partial().shape;
+
 export type VersionedElementModel = z.infer<typeof versionedElementModelSchema>;
 
 export function getEntityIdFromElement(

@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { uuidSchema } from '../utils/uuid.js';
-import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
+import { versionedElementModelStateExtension } from '../marketplace/models/versioned-element-model.js';
 import { imagePropertiesSchema } from './utils/image-properties.js';
 import { registerEditableValue } from './utils/editable-values-registry.js';
 import { registerDependency } from './utils/dependency-registry.js';
 
 export const vehicleTemplateSchema = z.strictObject({
-    ...versionedElementModelSchema.partial().shape,
+    ...versionedElementModelStateExtension,
     id: uuidSchema,
     type: z.literal('vehicleTemplate'),
     vehicleType: z.string(),

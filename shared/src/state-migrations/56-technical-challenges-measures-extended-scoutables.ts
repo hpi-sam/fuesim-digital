@@ -6,7 +6,7 @@ interface Scoutable {
     viewedByParticipants?: boolean;
 }
 
-export const technicalChallengesMeasuresExtendedScoutables56: Migration = {
+export const technicalChallengesMeasuresExtendedScoutables57: Migration = {
     action: (intermediateState, action) => {
         const typedAction = action as { type: string };
         if (typedAction.type === '[Scoutable] Make scoutable') {
@@ -24,7 +24,7 @@ export const technicalChallengesMeasuresExtendedScoutables56: Migration = {
         };
 
         state.technicalChallenges = {};
-        state.tasks = {};
+        state.taskTypes = {};
         state.measures = {};
         state.measureTemplates = {};
         state.drawings = {};

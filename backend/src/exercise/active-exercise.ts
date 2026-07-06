@@ -23,7 +23,7 @@ import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
 import { RestoreError } from '../utils/restore-error.js';
 import { ActionWrapper } from './action-wrapper.js';
 import type { ExerciseClientWrapper } from './client-wrapper.js';
-import { patientTick } from './patient-ticking.js';
+import { buildTickAction } from './tick-action.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
 
 export class ActiveExercise {
@@ -85,32 +85,16 @@ export class ActiveExercise {
     public readonly emitterId = null;
 
     /**
-     * How many ticks have to pass until treatments get recalculated (e.g. with {@link tickInterval} === 1000 and {@link refreshTreatmentInterval} === 60 every minute)
-     */
-    private readonly refreshTreatmentInterval = 20;
-    /**
      * This function gets called once every second in case the exercise is running.
      * All periodic actions of the exercise (e.g. status changes for patients) should happen here.
      */
     private readonly tick = async () => {
         try {
-            const patientUpdates = patientTick(
+            const updateAction = buildTickAction(
                 this.getStateSnapshot(),
-                this.tickInterval
+                this.tickInterval,
+                this.exercise.tickCounter
             );
-            const updateAction: ExerciseAction = {
-                type: '[Exercise] Tick',
-                patientUpdates,
-                /**
-                 * Refresh every {@link refreshTreatmentInterval} * {@link tickInterval} ms seconds
-                 */
-                // TODO: Refactor this: do this in the reducer instead of sending it in the action
-                refreshTreatments:
-                    this.exercise.tickCounter %
-                        this.refreshTreatmentInterval ===
-                    0,
-                tickInterval: this.tickInterval,
-            };
             this.applyAction(updateAction, this.emitterId);
             this.exercise.tickCounter++;
             this.markAsModified();

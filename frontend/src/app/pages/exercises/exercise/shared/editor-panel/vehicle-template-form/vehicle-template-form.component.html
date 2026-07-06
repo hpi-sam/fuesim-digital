@@ -1,6 +1,14 @@
 @if (values) {
     <div class="form-group mb-3">
-        <label class="form-label">Standardname von neuen Fahrzeugen:</label>
+        <label class="form-label">
+            Standardname von neuen Fahrzeugen:
+            <span
+                class="text-info"
+                ngbTooltip="'#' im Namen werden automatisch fortlaufend nummeriert"
+            >
+                <i class="bi bi-lightbulb"></i>
+            </span>
+        </label>
         <input
             #nameInput="ngModel"
             [(ngModel)]="values.name"

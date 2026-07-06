@@ -24,6 +24,7 @@ import {
     joinParallelExercise,
 } from '../test/parallel-exercise-utils.js';
 import type { OrganisationEntry } from '../database/schema.js';
+import { MAX_FAST_FORWARD_DURATION_MS } from '../exercise/fast-forward-exercise.js';
 
 describe('parallel exercise router', () => {
     const environment = createTestEnvironment();
@@ -436,6 +437,132 @@ describe('parallel exercise router', () => {
             expect(
                 newExercise.temporaryActionHistory[0]!.getAction().actionString
             ).toMatchObject(action);
+        });
+
+        it('fast-forwards a new instance to match a running instance', async () => {
+            const firstJoin = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const firstParticipant =
+                postJoinParallelExerciseResponseDataSchema.parse(
+                    firstJoin.body
+                );
+            const firstInstance = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(firstParticipant.participantKey)!;
+
+            firstInstance.exercise.currentStateString = {
+                ...firstInstance.exercise.currentStateString,
+                currentStatus: 'running',
+                currentTime: 10 * 60 * 1000,
+            };
+
+            const secondJoin = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const secondParticipant =
+                postJoinParallelExerciseResponseDataSchema.parse(
+                    secondJoin.body
+                );
+            const secondInstance = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(secondParticipant.participantKey)!;
+
+            expect(
+                secondInstance.exercise.currentStateString.currentStatus
+            ).toBe('running');
+            expect(secondInstance.exercise.currentStateString.currentTime).toBe(
+                10 * 60 * 1000
+            );
+
+            secondInstance.pause();
+        });
+
+        it('fast-forwards a new instance to match a paused instance', async () => {
+            const firstJoin = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const firstParticipant =
+                postJoinParallelExerciseResponseDataSchema.parse(
+                    firstJoin.body
+                );
+            const firstInstance = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(firstParticipant.participantKey)!;
+
+            firstInstance.exercise.currentStateString = {
+                ...firstInstance.exercise.currentStateString,
+                currentStatus: 'paused',
+                currentTime: 15 * 60 * 1000,
+            };
+
+            const secondJoin = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const secondParticipant =
+                postJoinParallelExerciseResponseDataSchema.parse(
+                    secondJoin.body
+                );
+            const secondInstance = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(secondParticipant.participantKey)!;
+
+            expect(
+                secondInstance.exercise.currentStateString.currentStatus
+            ).toBe('paused');
+            expect(secondInstance.exercise.currentStateString.currentTime).toBe(
+                15 * 60 * 1000
+            );
+        });
+
+        it('rejects joining when the reference instance is too far along', async () => {
+            const firstJoin = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const firstParticipant =
+                postJoinParallelExerciseResponseDataSchema.parse(
+                    firstJoin.body
+                );
+            const firstInstance = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(firstParticipant.participantKey)!;
+
+            firstInstance.exercise.currentStateString = {
+                ...firstInstance.exercise.currentStateString,
+                currentStatus: 'running',
+                currentTime: MAX_FAST_FORWARD_DURATION_MS + 1000,
+            };
+
+            const sizeBefore =
+                environment.services.exerciseService.TESTING_getExerciseMap()
+                    .size;
+
+            await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(409);
+
+            expect(
+                environment.services.exerciseService.TESTING_getExerciseMap()
+                    .size
+            ).toBe(sizeBefore);
         });
     });
 });

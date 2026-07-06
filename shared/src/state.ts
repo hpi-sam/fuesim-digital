@@ -49,7 +49,7 @@ import {
 import { drawingSchema } from './models/drawing.js';
 import { defaultMeasureTemplateCategories } from './data/default-state/measure-templates.js';
 import { technicalChallengeSchema } from './models/technical-challenge/technical-challenge.js';
-import { taskSchema } from './models/task.js';
+import { taskTypeSchema } from './models/task-type.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
@@ -92,7 +92,7 @@ export const exerciseStateSchema = z.strictObject({
 
     mapImages: z.record(uuidSchema, mapImageSchema),
 
-    tasks: z.record(taskSchema.shape.id, taskSchema),
+    taskTypes: z.record(uuidSchema, taskTypeSchema),
 
     technicalChallenges: z.record(uuidSchema, technicalChallengeSchema),
 
@@ -127,6 +127,7 @@ export const exerciseStateSchema = z.strictObject({
 
     configuration: exerciseConfigurationSchema,
     patientCounter: z.int().nonnegative(),
+    vehicleCounters: resourceDescriptionSchema,
 
     logEntries: z.array(logEntrySchema).optional(),
     lastLogEntry: logEntrySchema.optional(),
@@ -158,7 +159,7 @@ export function newExerciseState(
         measures: {},
         drawings: {},
         mapImages: {},
-        tasks: getDefaultTasks(),
+        taskTypes: getDefaultTasks(),
         technicalChallenges: {},
         transferPoints: {},
         hospitals: {},
@@ -184,6 +185,7 @@ export function newExerciseState(
         },
         configuration: newExerciseConfiguration(),
         patientCounter: 0,
+        vehicleCounters: {},
         logEntries: undefined,
         lastLogEntry: undefined,
         previousTreatmentAssignment: undefined,

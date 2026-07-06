@@ -20,7 +20,11 @@ import type {
     OrganisationInviteLinkId,
     VersionedElementContent,
 } from 'fuesim-digital-shared';
-import { uuid as fuesimUUID } from 'fuesim-digital-shared';
+import {
+    
+    collectionVisibilityValues,
+    uuid as fuesimUUID,
+} from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations } from 'drizzle-orm';
 import {
@@ -281,6 +285,10 @@ function stateVersionedEntity<EntityBrand, VersionBrand>(prefix: string) {
     };
 }
 
+export const collectionVisibilityEnum = pgEnum(
+    'collection_visibility_enum',
+    collectionVisibilityValues
+);
 export const collectionTable = pgTable(
     'collections',
     {
@@ -289,7 +297,7 @@ export const collectionTable = pgTable(
         ),
         title: varchar().notNull(),
         description: varchar().notNull(),
-        visibility: varchar().notNull().default('private'),
+        visibility: collectionVisibilityEnum().notNull().default('private'),
         draftState: boolean().notNull(),
         archived: boolean().notNull().default(false),
         // fyi: we cant use computed/generated columns for
@@ -420,7 +428,10 @@ export const collectionOrganisationMappingTable = pgTable(
 );
 
 export const collectionJoinCodesTable = pgTable('collection_join_codes', {
-    code: varchar().primaryKey().notNull(),
+    code: varchar()
+        .primaryKey()
+        .notNull()
+        .$defaultFn(() => crypto.randomBytes(10).toString('hex')),
     collection: varchar().notNull().unique().$type<CollectionEntityId>(),
     expiresAt: timestamp({ withTimezone: true, mode: 'date' }).notNull(),
 });

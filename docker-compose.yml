@@ -23,8 +23,8 @@ services:
         volumes:
             - db:/var/lib/postgresql
         # Use this to expose the database to your host machine
-        #ports:
-        #    - 127.0.0.1:${DFM_DB_PORT}:5432
+        ports:
+            - ${DFM_DB_PORT}:5432
         environment:
             - POSTGRES_USER=${DFM_DB_USER}
             - POSTGRES_PASSWORD=${DFM_DB_PASSWORD}
@@ -34,7 +34,7 @@ services:
         image: docker.io/authelia/authelia:4.39.16
         restart: unless-stopped
         ports:
-            - 127.0.0.1:9091:9091
+            - 9091:9091
         volumes:
             - ./docker/authelia-config:/config:ro
             - authelia-secrets:/secrets

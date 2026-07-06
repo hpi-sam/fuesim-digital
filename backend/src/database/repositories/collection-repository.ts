@@ -1,4 +1,3 @@
-import crypto from 'node:crypto';
 import type {
     CollectionVersion,
     CollectionEntityId,
@@ -174,11 +173,6 @@ export class CollectionRepository extends BaseRepository {
         if (existingCode && existingCode.expiresAt > new Date()) {
             return existingCode;
         }
-        const newCode = crypto
-            .randomBytes(8)
-            .toString('base64url')
-            .replaceAll(' ', '-');
-
         return this.onlySingleStrict(
             await this.databaseConnection
                 .insert(collectionJoinCodesTable)
@@ -186,7 +180,6 @@ export class CollectionRepository extends BaseRepository {
                     expiresAt: new Date(
                         Date.now() + this.INVITE_CODE_VALIDITY_DURATION_MS
                     ),
-                    code: newCode,
                     collection: collectionEntityId,
                 })
                 .returning()

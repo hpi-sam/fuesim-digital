@@ -257,31 +257,33 @@ export const selectVisibleScoutableIndicators = createSelector(
                         isInViewport(viewport, scoutableIndicator.position))
             );
         const technicalChallengeScoutables: ScoutableIndicator[] =
-            Object.values(technicalChallenges).map((challenge) => {
-                const currentState = currentStateOf(challenge);
+            Object.values(technicalChallenges).flatMap((challenge) =>
+                Object.values(challenge.stateMachines).map((stateMachine) => {
+                    const currentState = currentStateOf(stateMachine);
 
-                const offset = { x: challenge.size.width, y: 0 };
-                const elementPos = currentCoordinatesOf(challenge);
+                    const offset = { x: challenge.size.width, y: 0 };
+                    const elementPos = currentCoordinatesOf(challenge);
 
-                const position = newMapCoordinatesAt(
-                    elementPos.x + offset.x,
-                    elementPos.y + offset.y
-                );
+                    const position = newMapCoordinatesAt(
+                        elementPos.x + offset.x,
+                        elementPos.y + offset.y
+                    );
 
-                const viewStatus =
-                    currentState.viewedByParticipants &&
-                    currentRole === 'trainer'
-                        ? 'viewed'
-                        : 'unviewed';
-                return {
-                    id: `${challenge.id}:${currentState.id}`,
-                    position,
-                    scoutableElementType: 'technicalChallenge',
-                    scoutableElementId: challenge.id,
-                    imageUrl: scoutableImages[viewStatus].generic,
-                    height: 50,
-                };
-            });
+                    const viewStatus =
+                        currentState.viewedByParticipants &&
+                        currentRole === 'trainer'
+                            ? 'viewed'
+                            : 'unviewed';
+                    return {
+                        id: `${stateMachine.id}:${currentState.id}`,
+                        position,
+                        scoutableElementType: 'technicalChallenge',
+                        scoutableElementId: challenge.id,
+                        imageUrl: scoutableImages[viewStatus].generic,
+                        height: 50,
+                    };
+                })
+            );
 
         return [...normalScoutables, ...technicalChallengeScoutables].reduce<{
             [id: `${UUID}:${UUID}`]: ScoutableIndicator;

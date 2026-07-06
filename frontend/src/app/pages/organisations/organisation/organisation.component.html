@@ -88,18 +88,20 @@
                     </ng-template>
                 </ng-container>
                 <div class="flex-grow-1"></div>
-                <ng-container ngbNavItem="settings">
-                    <a ngbNavLink>
-                        <i class="bi bi-gear me-1"></i>
-                        Einstellungen
-                    </a>
-                    <ng-template ngbNavContent>
-                        <app-organisation-tab-settings
-                            [organisation]="org"
-                            (update)="reload()"
-                        />
-                    </ng-template>
-                </ng-container>
+                @if (org.userRole === 'admin' && !org.personalOrganisationOf) {
+                    <ng-container ngbNavItem="settings">
+                        <a ngbNavLink>
+                            <i class="bi bi-gear me-1"></i>
+                            Einstellungen
+                        </a>
+                        <ng-template ngbNavContent>
+                            <app-organisation-tab-settings
+                                [organisation]="org"
+                                (update)="reload()"
+                            />
+                        </ng-template>
+                    </ng-container>
+                }
             }
         </nav>
         <div [ngbNavOutlet]="nav"></div>

@@ -12,6 +12,7 @@ import type {
     UUID,
     Vehicle,
     WithPosition,
+    StateMachine,
 } from 'fuesim-digital-shared';
 import {
     currentStateOf,
@@ -54,7 +55,7 @@ export const selectPersonnel = selectPropertyFactory('personnel');
 export const selectAlarmGroups = selectPropertyFactory('alarmGroups');
 export const selectMaterials = selectPropertyFactory('materials');
 export const selectMeasures = selectPropertyFactory('measures');
-export const selectTasks = selectPropertyFactory('tasks');
+export const selectTaskTypes = selectPropertyFactory('taskTypes');
 export const selectTransferPoints = selectPropertyFactory('transferPoints');
 export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
@@ -120,7 +121,8 @@ export const createSelectPersonnel =
     createSelectElementFromMapFactory(selectPersonnel);
 export const createSelectMaterial =
     createSelectElementFromMapFactory(selectMaterials);
-export const createSelectTask = createSelectElementFromMapFactory(selectTasks);
+export const createSelectTaskType =
+    createSelectElementFromMapFactory(selectTaskTypes);
 export const createSelectPatient =
     createSelectElementFromMapFactory(selectPatients);
 export const createSelectVehicle =
@@ -433,21 +435,47 @@ export function createSelectActivityStatesByType<
     );
 }
 
-function createSelectAvailableTaskIds(
-    technicalChallengeId: TechnicalChallengeId
+export function createSelectCurrentStateOf(
+    technicalChallengeId: TechnicalChallengeId,
+    stateMachineId: StateMachine['id']
 ) {
     return createSelector(
         createSelectTechnicalChallenge(technicalChallengeId),
-        (challenge) => Object.keys(currentStateOf(challenge).possibleTasks)
+        (challenge) => {
+            const stateMachine = challenge.stateMachines[stateMachineId];
+            if (!stateMachine)
+                throw Error(
+                    `StateMachine ${stateMachineId} not found in challenge ${technicalChallengeId}.
+                     (Not one of ${Object.keys(challenge.stateMachines).join(',')}.)`
+                );
+            return currentStateOf(stateMachine);
+        }
     );
 }
+
 export function createSelectAvailableTasks(
     technicalChallengeId: TechnicalChallengeId
 ) {
     return createSelector(
-        createSelectAvailableTaskIds(technicalChallengeId),
-        selectTasks,
-        (taskIds, taskMap) => taskIds.map((id) => taskMap[id]!)
+        createSelectTechnicalChallenge(technicalChallengeId),
+        selectTaskTypes,
+        (challenge, taskTypes) =>
+            Object.values(challenge.stateMachines).map((stateMachine) => {
+                const currentState = currentStateOf(stateMachine);
+                return {
+                    stateMachine,
+                    tasks: Object.keys(currentState.possibleTasks).map(
+                        (taskId) => {
+                            const taskType = taskTypes[taskId];
+                            if (!taskType)
+                                throw new Error(
+                                    `Invalid taskTypeId ${taskId} in TechnicalChallenge(${technicalChallengeId}).StateMachine(${stateMachine.id}).`
+                                );
+                            return taskTypes[taskId];
+                        }
+                    ),
+                };
+            })
     );
 }
 
@@ -455,9 +483,12 @@ export const selectWorkingPersonnel = createSelector(
     selectTechnicalChallenges,
     (challenges) => {
         const workingPersonnel = new Set<UUID>();
-        for (const challenge of Object.values(challenges)) {
+        const stateMachines = Object.values(challenges).flatMap((challenge) =>
+            Object.values(challenge.stateMachines)
+        );
+        for (const stateMachine of stateMachines) {
             for (const personnelId of Object.keys(
-                challenge.assignedPersonnel
+                stateMachine.assignedPersonnel
             )) {
                 workingPersonnel.add(personnelId);
             }

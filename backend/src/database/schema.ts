@@ -21,7 +21,6 @@ import type {
     VersionedElementContent,
 } from 'fuesim-digital-shared';
 import {
-    
     collectionVisibilityValues,
     uuid as fuesimUUID,
 } from 'fuesim-digital-shared';

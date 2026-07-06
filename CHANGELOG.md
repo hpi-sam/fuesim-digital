@@ -11,10 +11,21 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - There are now notifications when viewing an exercise replay whenever a measure is taken or a scoutable element is viewed.
 - There is now a banner that is displayed when the application is unable to start properly, informing the user about potential causes.
+- New participants joining a parallel exercise after it started now get fast-forwarded to be in sync with all other participants.
 
 ### Fixed
 
 - The deletion of alarm groups no longer breaks breaks measure templates that use them.
+
+## [0.17.0] - 2026-06-30
+
+### Added
+
+- Names of new vehicle are automatically numbered using a counter per vehicle template. This can be en-/disabled using the '#' placeholder in the default name.
+
+### Fixed
+
+- Complete exports (including history) of exercise templates are now permitted.
 
 ## [0.16.0] - 2026-06-23
 
@@ -492,7 +503,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.16.0...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.1...v0.14.0

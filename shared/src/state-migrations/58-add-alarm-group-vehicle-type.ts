@@ -4,7 +4,7 @@ interface AlarmGroupVehicle {
     type: 'alarmGroupVehicle';
 }
 
-export const addAlarmGroupVehicleType57: Migration = {
+export const addAlarmGroupVehicleType58: Migration = {
     action: (_, action) => {
         const typedAction = action as {
             type: string | '[AlarmGroup] Add AlarmGroupVehicle';

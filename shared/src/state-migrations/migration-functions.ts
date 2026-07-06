@@ -53,8 +53,9 @@ import { fixInfinity52 } from './52-fix-infinity.js';
 import { addIsActiveToClient53 } from './53-add-is-active-to-client.js';
 import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loading-and-highlighting.js';
 import { vehicleLoadTimes55 } from './55-vehicle-load-times.js';
-import { technicalChallengesMeasuresExtendedScoutables56 } from './56-technical-challenges-measures-extended-scoutables.js';
-import { addAlarmGroupVehicleType57 } from './57-add-alarm-group-vehicle-type.js';
+import { vehicleCounters56 } from './56-vehicle-counters.js';
+import { technicalChallengesMeasuresExtendedScoutables57 } from './56-technical-challenges-measures-extended-scoutables.js';
+import { addAlarmGroupVehicleType58 } from './58-add-alarm-group-vehicle-type.js';
 
 /**
  * Migrate a single action
@@ -137,6 +138,7 @@ export const migrations: {
     53: addIsActiveToClient53,
     54: configVehicleLoadingAndHighlighting54,
     55: vehicleLoadTimes55,
-    56: technicalChallengesMeasuresExtendedScoutables56,
-    57: addAlarmGroupVehicleType57,
+    56: vehicleCounters56,
+    57: technicalChallengesMeasuresExtendedScoutables57,
+    58: addAlarmGroupVehicleType58,
 };

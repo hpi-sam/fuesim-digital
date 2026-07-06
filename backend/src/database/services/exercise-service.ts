@@ -23,7 +23,10 @@ import { pushAll } from '../../utils/array.js';
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type { ExerciseInsert } from '../schema.js';
+import type {
+    ExerciseDetailsEntryWithUserRole,
+    ExerciseInsert,
+} from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
     ApiError,
@@ -73,7 +76,9 @@ export class ExerciseService {
         return new Set(this.exerciseMap.values());
     }
 
-    public async getAllExercisesForUser(session: SessionInformation) {
+    public async getAllExercisesForUser(
+        session: SessionInformation
+    ): Promise<ExerciseDetailsEntryWithUserRole[]> {
         return this.exerciseRepository.getAllExercisesForUser(session.user.id);
     }
 

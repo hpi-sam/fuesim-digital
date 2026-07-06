@@ -6,9 +6,9 @@ import type {
 import {
     organisationMembershipTable,
     organisationTable,
-    type ParallelExercise,
+    type ParallelExerciseDetailsEntry,
     type ParallelExerciseInsert,
-    type ParallelExerciseWithUserRole,
+    type ParallelExerciseDetailsEntryWithUserRole,
 } from '../schema.js';
 import {
     exerciseTable,
@@ -42,7 +42,7 @@ export class ParallelExerciseRepository extends BaseRepository {
 
     public async getParallelExerciseById(
         id: ParallelExerciseId
-    ): Promise<ParallelExercise | null> {
+    ): Promise<ParallelExerciseDetailsEntry | null> {
         return this.onlySingle(
             await this.parallelExerciseQuery.where(
                 eq(parallelExerciseTable.id, id)
@@ -52,7 +52,7 @@ export class ParallelExerciseRepository extends BaseRepository {
 
     public async getParallelExerciseByParticipantKey(
         key: ParallelExerciseKey
-    ): Promise<ParallelExercise | null> {
+    ): Promise<ParallelExerciseDetailsEntry | null> {
         return this.onlySingle(
             await this.parallelExerciseQuery.where(
                 eq(parallelExerciseTable.participantKey, key)
@@ -62,7 +62,7 @@ export class ParallelExerciseRepository extends BaseRepository {
 
     public async getParallelExercisesForUser(
         userId: string
-    ): Promise<ParallelExerciseWithUserRole[]> {
+    ): Promise<ParallelExerciseDetailsEntryWithUserRole[]> {
         const subquery = this.databaseConnection
             .select()
             .from(organisationMembershipTable)

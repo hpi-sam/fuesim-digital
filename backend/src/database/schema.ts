@@ -15,7 +15,7 @@ import {
     type ParallelExerciseKey,
     type OrganisationInviteLinkId,
 } from 'fuesim-digital-shared';
-import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+import { type InferInsertModel, type InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
 import {
     char,
@@ -179,6 +179,14 @@ export type ExerciseTemplateEntry = InferSelectModel<
 export type ExerciseTemplateInsert = InferInsertModel<
     typeof exerciseTemplateTable
 >;
+export interface ExerciseTemplateDetailsEntry extends ExerciseTemplateEntry {
+    trainerKey: TrainerKey;
+    exercise: ExerciseEntry;
+    organisation: OrganisationEntry;
+}
+export interface ExerciseTemplateDetailsEntryWithUserRole extends ExerciseTemplateDetailsEntry {
+    userRole: OrganisationMembershipRole;
+}
 
 export const exerciseTable = pgTable('exercise_entity', {
     ...baseTable<ExerciseId>(),
@@ -219,6 +227,16 @@ export const exerciseTable = pgTable('exercise_entity', {
 });
 export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
 export type ExerciseInsert = InferInsertModel<typeof exerciseTable>;
+
+export interface ExerciseDetailsEntry extends ExerciseEntry {
+    template?: ExerciseTemplateEntry | null;
+    baseTemplate: ExerciseTemplateEntry | null;
+    organisation: OrganisationEntry;
+    actionsCount?: number | undefined;
+}
+export interface ExerciseDetailsEntryWithUserRole extends ExerciseDetailsEntry {
+    userRole: OrganisationMembershipRole;
+}
 
 export const actionTable = pgTable(
     'action_entity',
@@ -282,10 +300,10 @@ export type ParallelExerciseEntry = InferSelectModel<
 export type ParallelExerciseInsert = InferInsertModel<
     typeof parallelExerciseTable
 >;
-export interface ParallelExercise extends ParallelExerciseEntry {
+export interface ParallelExerciseDetailsEntry extends ParallelExerciseEntry {
     template: ExerciseTemplateEntry;
     organisation: OrganisationEntry;
 }
-export interface ParallelExerciseWithUserRole extends ParallelExercise {
+export interface ParallelExerciseDetailsEntryWithUserRole extends ParallelExerciseDetailsEntry {
     userRole: OrganisationMembershipRole;
 }

@@ -8,7 +8,7 @@ import { Subject } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type {
     ParallelExerciseInsert,
-    ParallelExerciseWithUserRole,
+    ParallelExerciseDetailsEntryWithUserRole,
 } from '../schema.js';
 import {
     ApiError,
@@ -42,7 +42,7 @@ export class ParallelExerciseService {
 
     public async getParallelExercisesForUser(
         session: SessionInformation
-    ): Promise<ParallelExerciseWithUserRole[]> {
+    ): Promise<ParallelExerciseDetailsEntryWithUserRole[]> {
         return this.parallelExerciseRepository.getParallelExercisesForUser(
             session.user.id
         );
@@ -51,7 +51,7 @@ export class ParallelExerciseService {
     public async getParallelExerciseById(
         id: ParallelExerciseId,
         session: SessionInformation
-    ): Promise<ParallelExerciseWithUserRole> {
+    ): Promise<ParallelExerciseDetailsEntryWithUserRole> {
         const parallelExercise =
             await this.parallelExerciseRepository.getParallelExerciseById(id);
         if (!parallelExercise) {
@@ -167,7 +167,7 @@ export class ParallelExerciseService {
             'joinViewportId' | 'name' | 'templateId'
         >,
         session: SessionInformation
-    ): Promise<ParallelExerciseWithUserRole> {
+    ): Promise<ParallelExerciseDetailsEntryWithUserRole> {
         const template =
             await this.exerciseManagerService.getExerciseTemplateById(
                 data.templateId,
@@ -204,7 +204,7 @@ export class ParallelExerciseService {
         id: ParallelExerciseId,
         session: SessionInformation,
         data: Partial<ParallelExerciseInsert>
-    ): Promise<ParallelExerciseWithUserRole> {
+    ): Promise<ParallelExerciseDetailsEntryWithUserRole> {
         const parallelExercise =
             await this.parallelExerciseRepository.getParallelExerciseById(id);
         if (!parallelExercise) {

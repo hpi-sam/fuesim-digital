@@ -1,35 +1,19 @@
 import { currentStateVersion } from 'fuesim-digital-shared';
-import type {
-    ExerciseId,
-    ExerciseTemplateId,
-    TrainerKey,
-} from 'fuesim-digital-shared';
+import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
 import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import {
-    type ExerciseEntry,
     type ExerciseInsert,
-    type ExerciseTemplateEntry,
     type ExerciseTemplateInsert,
-    type OrganisationEntry,
     organisationMembershipTable,
     organisationTable,
     actionTable,
+    type ExerciseTemplateDetailsEntry,
+    type ExerciseTemplateDetailsEntryWithUserRole,
+    type ExerciseDetailsEntryWithUserRole,
 } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import { Config } from '../../config.js';
 import { BaseRepository } from './base-repository.js';
-
-export interface ExerciseTemplateDetailsEntry extends ExerciseTemplateEntry {
-    trainerKey: TrainerKey;
-    exercise: ExerciseEntry;
-    organisation: OrganisationEntry;
-}
-
-export interface ExerciseDetailsEntry extends ExerciseEntry {
-    template: ExerciseTemplateEntry | null;
-    organisation?: OrganisationEntry;
-    actionsCount?: number | undefined;
-}
 
 export class ExerciseRepository extends BaseRepository {
     private get exerciseTemplateQuery() {
@@ -55,9 +39,7 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .select({
                 ...getTableColumns(exerciseTable),
-                template: {
-                    ...getTableColumns(exerciseTemplateTable),
-                },
+                template: getTableColumns(exerciseTemplateTable),
                 ...(withActionsCount
                     ? {
                           actionsCount: this.databaseConnection.$count(
@@ -74,9 +56,7 @@ export class ExerciseRepository extends BaseRepository {
             );
     }
 
-    public async getExerciseById(
-        id: ExerciseId
-    ): Promise<ExerciseDetailsEntry | null> {
+    public async getExerciseById(id: ExerciseId) {
         return this.onlySingle(
             await this.getExerciseQuery().where(eq(exerciseTable.id, id))
         );
@@ -86,7 +66,9 @@ export class ExerciseRepository extends BaseRepository {
         return this.getExerciseQuery(true);
     }
 
-    public getAllExercisesForUser(userId: string) {
+    public async getAllExercisesForUser(
+        userId: string
+    ): Promise<ExerciseDetailsEntryWithUserRole[]> {
         const subquery = this.databaseConnection
             .select()
             .from(organisationMembershipTable)
@@ -95,11 +77,9 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .select({
                 ...getTableColumns(exerciseTable),
-                baseTemplate: {
-                    id: exerciseTemplateTable.id,
-                    name: exerciseTemplateTable.name,
-                },
+                baseTemplate: getTableColumns(exerciseTemplateTable),
                 organisation: getTableColumns(organisationTable),
+                userRole: subquery.role,
             })
             .from(exerciseTable)
             .innerJoin(
@@ -120,13 +100,29 @@ export class ExerciseRepository extends BaseRepository {
 
     public async getAllExerciseTemplatesForUser(
         userId: string
-    ): Promise<ExerciseTemplateDetailsEntry[]> {
+    ): Promise<ExerciseTemplateDetailsEntryWithUserRole[]> {
         const subquery = this.databaseConnection
             .select()
             .from(organisationMembershipTable)
             .where(eq(organisationMembershipTable.userId, userId))
             .as('memberships');
-        return this.exerciseTemplateQuery
+        return this.databaseConnection
+            .select({
+                ...getTableColumns(exerciseTemplateTable),
+                trainerKey: exerciseTable.trainerKey,
+                exercise: getTableColumns(exerciseTable),
+                organisation: getTableColumns(organisationTable),
+                userRole: subquery.role,
+            })
+            .from(exerciseTemplateTable)
+            .innerJoin(
+                exerciseTable,
+                eq(exerciseTemplateTable.id, exerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(exerciseTemplateTable.organisationId, organisationTable.id)
+            )
             .innerJoin(
                 subquery,
                 eq(

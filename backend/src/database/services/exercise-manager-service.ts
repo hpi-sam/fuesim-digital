@@ -7,7 +7,11 @@ import type {
 } from 'fuesim-digital-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import { type ExerciseInsert, type ExerciseTemplateInsert } from '../schema.js';
+import {
+    type ExerciseInsert,
+    type ExerciseTemplateDetailsEntryWithUserRole,
+    type ExerciseTemplateInsert,
+} from '../schema.js';
 import {
     ApiError,
     NotFoundError,
@@ -25,7 +29,9 @@ export class ExerciseManagerService {
         private readonly organisationRepository: OrganisationRepository
     ) {}
 
-    public async getAllExerciseTemplatesForUser(session: SessionInformation) {
+    public async getAllExerciseTemplatesForUser(
+        session: SessionInformation
+    ): Promise<ExerciseTemplateDetailsEntryWithUserRole[]> {
         return this.exerciseRepository.getAllExerciseTemplatesForUser(
             session.user.id
         );

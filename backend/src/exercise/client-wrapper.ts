@@ -13,7 +13,7 @@ import cookie from 'cookie';
 import type { ExerciseSocket } from '../exercise-server.js';
 import { Config, isDevelopment } from '../config.js';
 import type { SessionInformation } from '../auth/auth-service.js';
-import type { ParallelExercise } from '../database/schema.js';
+import type { ParallelExerciseDetailsEntry } from '../database/schema.js';
 import { PermissionDeniedError } from '../utils/http.js';
 import type { Services } from '../database/services/index.js';
 import type { Repositories } from '../database/repositories/index.js';
@@ -160,7 +160,7 @@ export class ExerciseClientWrapper extends ClientWrapper {
 }
 
 export class ParallelExerciseClientWrapper extends ClientWrapper {
-    private chosenExercise: ParallelExercise | null = null;
+    private chosenExercise: ParallelExerciseDetailsEntry | null = null;
     private readonly subscriptions: Subscription[] = [];
     private readonly cachedActiveExercises: ActiveExercise[] = [];
     private readonly aggregatedActions = new Subject<void>();

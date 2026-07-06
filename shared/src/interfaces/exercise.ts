@@ -8,7 +8,10 @@ import {
 import { participantKeySchema, trainerKeySchema } from '../exercise-keys.js';
 import { stringToDate } from './utils.js';
 import { getExerciseTemplateDetailsResponseDataSchema } from './exercise-template.js';
-import { getOrganisationResponseDataSchema } from './organisation.js';
+import {
+    getOrganisationResponseDataSchema,
+    organisationMembershipRoleSchema,
+} from './organisation.js';
 
 export const getExerciseConfigResponseDataSchema = z.object({
     autoDeleteDays: z.int().nonnegative(),
@@ -35,10 +38,11 @@ export const getExerciseDetailsResponseDataSchema = z.object({
         .object({ id: exerciseTemplateIdSchema, name: z.string() })
         .nullable(),
     organisation: getOrganisationResponseDataSchema,
+    userRole: organisationMembershipRoleSchema,
 });
 
 export type GetExerciseDetailsResponseData = z.infer<
-    typeof getExerciseResponseDataSchema
+    typeof getExerciseDetailsResponseDataSchema
 >;
 
 export const getExercisesResponseDataSchema = z.array(

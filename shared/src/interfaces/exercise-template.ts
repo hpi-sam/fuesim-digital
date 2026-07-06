@@ -2,7 +2,10 @@ import { z } from 'zod';
 import { exerciseTemplateIdSchema, organisationIdSchema } from '../ids.js';
 import { trainerKeySchema } from '../exercise-keys.js';
 import { stringToDate } from './utils.js';
-import { getOrganisationResponseDataSchema } from './organisation.js';
+import {
+    getOrganisationResponseDataSchema,
+    organisationMembershipRoleSchema,
+} from './organisation.js';
 
 export const getExerciseTemplateResponseDataSchema = z.object({
     id: exerciseTemplateIdSchema,
@@ -18,11 +21,12 @@ export type GetExerciseTemplateResponseData = z.infer<
 export type GetExerciseTemplateResponseDataInput = z.input<
     typeof getExerciseTemplateResponseDataSchema
 >;
-export const getExerciseTemplateDetailsResponseDataSchema =
-    getExerciseTemplateResponseDataSchema.extend({
-        trainerKey: trainerKeySchema,
-        organisation: getOrganisationResponseDataSchema,
-    });
+export const getExerciseTemplateDetailsResponseDataSchema = z.object({
+    ...getExerciseTemplateResponseDataSchema.shape,
+    trainerKey: trainerKeySchema,
+    organisation: getOrganisationResponseDataSchema,
+    userRole: organisationMembershipRoleSchema,
+});
 export type GetExerciseTemplateDetailsResponseData = z.infer<
     typeof getExerciseTemplateDetailsResponseDataSchema
 >;

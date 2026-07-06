@@ -51,10 +51,15 @@
                 Öffnen
             </a>
             <div class="flex-grow-1"></div>
-            <button class="btn btn-outline-danger" (click)="deleteExercise()">
-                <i class="bi bi-trash me-2"></i>
-                Löschen
-            </button>
+            @if (exercise.userRole !== 'viewer') {
+                <button
+                    class="btn btn-outline-danger"
+                    (click)="deleteExercise()"
+                >
+                    <i class="bi bi-trash me-2"></i>
+                    Löschen
+                </button>
+            }
         </div>
     </div>
 }

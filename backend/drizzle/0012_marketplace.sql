@@ -1,3 +1,4 @@
+CREATE TYPE "public"."collection_visibility_enum" AS ENUM('public', 'private', 'embedded');--> statement-breakpoint
 CREATE TABLE "collection_dependency_mapping" (
 	"dependentCollectionEntityId" varchar NOT NULL,
 	"dependentCollectionVersionId" varchar NOT NULL,
@@ -29,7 +30,7 @@ CREATE TABLE "collections" (
 	"editedAt" timestamp with time zone DEFAULT now() NOT NULL,
 	"title" varchar NOT NULL,
 	"description" varchar NOT NULL,
-	"visibility" varchar DEFAULT 'private' NOT NULL,
+	"visibility" "collection_visibility_enum" DEFAULT 'private' NOT NULL,
 	"draftState" boolean NOT NULL,
 	"archived" boolean DEFAULT false NOT NULL,
 	CONSTRAINT "collections_versionId_unique" UNIQUE("versionId"),

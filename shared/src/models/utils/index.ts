@@ -31,3 +31,5 @@ export * from './occupations/index.js';
 export * from './tag-helpers.js';
 export * from './vehicle-parameters.js';
 export * from './resource-description.js';
+export * from './editable-values-registry.js';
+export * from './dependency-registry.js';

@@ -55,6 +55,7 @@ import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loadi
 import { vehicleLoadTimes55 } from './55-vehicle-load-times.js';
 import { vehicleCounters56 } from './56-vehicle-counters.js';
 import { technicalChallengesMeasuresExtendedScoutables57 } from './56-technical-challenges-measures-extended-scoutables.js';
+import { addAlarmGroupVehicleType58 } from './58-add-alarm-group-vehicle-type.js';
 
 /**
  * Migrate a single action
@@ -77,6 +78,7 @@ type MigrateStateFunction = (state: object) => void;
 export interface Migration {
     action: MigrateActionFunction | null;
     state: MigrateStateFunction | null;
+    unmigratableActions?: true | undefined;
 }
 
 export const migrations: {
@@ -138,4 +140,5 @@ export const migrations: {
     55: vehicleLoadTimes55,
     56: vehicleCounters56,
     57: technicalChallengesMeasuresExtendedScoutables57,
+    58: addAlarmGroupVehicleType58,
 };

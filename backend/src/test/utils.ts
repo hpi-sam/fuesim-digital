@@ -36,6 +36,8 @@ import { ParallelExerciseRepository } from '../database/repositories/parallel-ex
 import type { Repositories } from '../database/repositories/index.js';
 import { OrganisationService } from '../database/services/organisation-service.js';
 import { OrganisationRepository } from '../database/repositories/organisation-repository.js';
+import { CollectionRepository } from '../database/repositories/collection-repository.js';
+import { CollectionService } from '../database/services/collection-service.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
@@ -151,10 +153,11 @@ export class TestEnvironment {
         return this._services;
     }
 
-    public httpRequest(
+    public httpRequest<TData extends object | string>(
         method: HttpMethod,
         url: string,
-        session?: string
+        session?: string,
+        data?: TData
     ): request.Test {
         const req = request(this.server.httpServer.httpServer)[method](url);
         if (session) {
@@ -163,6 +166,7 @@ export class TestEnvironment {
                 `${this.services.authService.SESSION_COOKIE_NAME}=${session}`
             );
         }
+        req.send(data);
 
         return req;
     }
@@ -212,6 +216,8 @@ export function createTestEnvironment(): TestEnvironment {
     let actionRepository: ActionRepository;
     let userRepository: UserRepository;
     let sessionRepository: SessionRepository;
+    let collectionService: CollectionService;
+    let collectionRepository: CollectionRepository;
     let accessKeyRepository: AccessKeyRepository;
     let parallelExerciseService: ParallelExerciseService;
     let parallelExerciseRepository: ParallelExerciseRepository;
@@ -235,6 +241,13 @@ export function createTestEnvironment(): TestEnvironment {
         );
         organisationRepository = new OrganisationRepository(
             databaseService.databaseConnection
+        );
+        collectionRepository = new CollectionRepository(
+            databaseService.databaseConnection
+        );
+        collectionService = new CollectionService(
+            organisationService,
+            collectionRepository
         );
 
         exerciseService = new ExerciseService(
@@ -275,6 +288,7 @@ export function createTestEnvironment(): TestEnvironment {
             sessionRepository,
             userRepository,
             organisationRepository,
+            collectionRepository,
         };
         const services: Services = {
             authService,
@@ -283,6 +297,7 @@ export function createTestEnvironment(): TestEnvironment {
             parallelExerciseService,
             databaseService,
             organisationService,
+            collectionService,
         };
         environment.init(repositories, services);
     });

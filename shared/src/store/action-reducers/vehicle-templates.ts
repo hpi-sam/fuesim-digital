@@ -33,6 +33,9 @@ export type EditVehicleTemplateAction = Immutable<
     z.infer<typeof editVehicleTemplateActionSchema>
 >;
 
+/**
+ * @deprecated This becomes obsolete with the Marketplace
+ */
 const deleteVehicleTemplateActionSchema = z.strictObject({
     type: z.literal('[VehicleTemplate] Delete vehicleTemplate'),
     id: vehicleTemplateSchema.shape.id,
@@ -91,6 +94,9 @@ export namespace VehicleTemplateActionReducers {
             rights: 'trainer',
         };
 
+    /**
+     * @deprecated This becomes obsolete with the Marketplace
+     */
     export const deleteVehicleTemplate: ActionReducer<DeleteVehicleTemplateAction> =
         {
             type: deleteVehicleTemplateActionSchema.shape.type.value,

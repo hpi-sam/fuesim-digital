@@ -278,6 +278,7 @@ export function createTestEnvironment(): TestEnvironment {
         );
         parallelExerciseService = new ParallelExerciseService(
             parallelExerciseRepository,
+            exerciseRepository,
             exerciseManagerService,
             exerciseService,
             organisationRepository

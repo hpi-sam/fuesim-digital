@@ -76,6 +76,7 @@ async function main() {
     );
     const parallelExerciseService = new ParallelExerciseService(
         repositories.parallelExerciseRepository,
+        repositories.exerciseRepository,
         exerciseManagerService,
         exerciseService,
         repositories.organisationRepository

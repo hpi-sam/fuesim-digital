@@ -25,6 +25,7 @@ import type { ParallelExerciseRepository } from '../repositories/parallel-exerci
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 import type { OrganisationRepository } from '../repositories/organisation-repository.js';
+import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { ExerciseManagerService } from './exercise-manager-service.js';
 import type { ExerciseService } from './exercise-service.js';
 
@@ -36,6 +37,7 @@ export class ParallelExerciseService {
     public newJoin = new Subject<ParallelExerciseJoin>();
     public constructor(
         private readonly parallelExerciseRepository: ParallelExerciseRepository,
+        private readonly exerciseRepository: ExerciseRepository,
         private readonly exerciseManagerService: ExerciseManagerService,
         private readonly exerciseService: ExerciseService,
         private readonly organisationRepository: OrganisationRepository
@@ -129,7 +131,8 @@ export class ParallelExerciseService {
                 parallelExercise.template.id,
                 'parallel',
                 undefined,
-                { parallelExerciseId: parallelExercise.id }
+                { parallelExerciseId: parallelExercise.id },
+                parallelExercise.templateStateString
             );
 
         const setAutojoinViewportAction: SetAutojoinViewportAction = {
@@ -195,6 +198,8 @@ export class ParallelExerciseService {
         >,
         session: SessionInformation
     ): Promise<ParallelExerciseDetailsEntryWithUserRole> {
+        await this.exerciseService.saveUnsavedExercises();
+
         const template =
             await this.exerciseManagerService.getExerciseTemplateById(
                 data.templateId,
@@ -212,6 +217,7 @@ export class ParallelExerciseService {
         return this.parallelExerciseRepository.transaction(async (tx) => {
             const created = await tx.createParallelExercise({
                 ...data,
+                templateStateString: template.exercise.currentStateString,
                 participantKey: await new AccessKeyRepository(tx).generateKey(
                     7
                 ),

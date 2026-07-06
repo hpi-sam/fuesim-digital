@@ -481,6 +481,7 @@ export const parallelExerciseTable = pgTable('parallel_exercise', {
         .$type<ExerciseTemplateId>()
         .references(() => exerciseTemplateTable.id, { onDelete: 'cascade' })
         .notNull(),
+    templateStateString: json().$type<ExerciseState>().notNull(),
     participantKey: char({ length: 7 })
         .$type<ParallelExerciseKey>()
         .notNull()

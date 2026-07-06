@@ -19,6 +19,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Elements are now only marked scoutable once their name or content is specified, and can be marked as unscoutable again.
 - The measures toolbar no longer interferes with map interactions.
 - Show exercise import validation error messages in a readable format.
+- Exercise instances in a parallel exercise are now created based on the state the exercise template was in when the parallel exercise was created.
 
 ## [0.17.0] - 2026-06-30
 

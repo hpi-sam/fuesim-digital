@@ -1,6 +1,7 @@
 import type {
     ExerciseType,
     ExerciseTemplateId,
+    ExerciseState,
     StateExport,
     ParticipantKey,
     TrainerKey,
@@ -182,7 +183,8 @@ export class ExerciseManagerService {
         templateId: ExerciseTemplateId,
         type: ExerciseType = 'standalone',
         session?: SessionInformation,
-        optionalData?: Partial<Omit<ExerciseInsert, 'baseTemplateId' | 'user'>>
+        optionalData?: Partial<Omit<ExerciseInsert, 'baseTemplateId' | 'user'>>,
+        initialStateOverride?: ExerciseState
     ): Promise<ActiveExercise> {
         await this.exerciseService.saveUnsavedExercises();
 
@@ -212,7 +214,8 @@ export class ExerciseManagerService {
                 await accessKeyRepository.generateKey<TrainerKey>(8);
 
             const initialState = {
-                ...exerciseTemplate.exercise.currentStateString,
+                ...(initialStateOverride ??
+                    exerciseTemplate.exercise.currentStateString),
                 participantKey,
                 type,
             };

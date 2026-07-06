@@ -284,4 +284,5 @@ export type ParallelExerciseInsert = InferInsertModel<
 >;
 export interface ParallelExercise extends ParallelExerciseEntry {
     template: ExerciseTemplateEntry;
+    organisation: OrganisationEntry;
 }

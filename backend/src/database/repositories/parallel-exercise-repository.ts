@@ -5,6 +5,7 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     organisationMembershipTable,
+    organisationTable,
     type ParallelExercise,
     type ParallelExerciseInsert,
 } from '../schema.js';
@@ -19,7 +20,8 @@ export class ParallelExerciseRepository extends BaseRepository {
     private getColumns() {
         return {
             ...getTableColumns(parallelExerciseTable),
-            template: { ...getTableColumns(exerciseTemplateTable) },
+            template: getTableColumns(exerciseTemplateTable),
+            organisation: getTableColumns(organisationTable),
         };
     }
 
@@ -30,6 +32,10 @@ export class ParallelExerciseRepository extends BaseRepository {
             .innerJoin(
                 exerciseTemplateTable,
                 eq(exerciseTemplateTable.id, parallelExerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(parallelExerciseTable.organisationId, organisationTable.id)
             );
     }
 

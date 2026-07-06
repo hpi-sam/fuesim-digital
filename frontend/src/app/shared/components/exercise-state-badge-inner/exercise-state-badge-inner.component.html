@@ -20,7 +20,7 @@
     }
     {{ currentTime() | date: 'H:mm:ss' : 'UTC' }}
 
-    @if (isDevMode()) {
+    @if (showSingleTickButton()) {
         <app-single-tick-button />
     }
 </span>

@@ -6,7 +6,10 @@ import type {
 import { parallelExerciseInstanceSummarySchema } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import type { ParallelExercise, ParallelExerciseInsert } from '../schema.js';
+import type {
+    ParallelExerciseInsert,
+    ParallelExerciseWithUserRole,
+} from '../schema.js';
 import {
     ApiError,
     ExerciseAlreadyStartedError,
@@ -37,7 +40,9 @@ export class ParallelExerciseService {
         private readonly organisationRepository: OrganisationRepository
     ) {}
 
-    public async getParallelExercisesForUser(session: SessionInformation) {
+    public async getParallelExercisesForUser(
+        session: SessionInformation
+    ): Promise<ParallelExerciseWithUserRole[]> {
         return this.parallelExerciseRepository.getParallelExercisesForUser(
             session.user.id
         );
@@ -46,21 +51,21 @@ export class ParallelExerciseService {
     public async getParallelExerciseById(
         id: ParallelExerciseId,
         session: SessionInformation
-    ) {
+    ): Promise<ParallelExerciseWithUserRole> {
         const parallelExercise =
             await this.parallelExerciseRepository.getParallelExerciseById(id);
         if (!parallelExercise) {
             throw new NotFoundError();
         }
-        const isMember =
-            await this.organisationRepository.isMemberOfOrganisationById(
+        const userRole =
+            await this.organisationRepository.getOrganisationMembershipRoleForUserById(
                 parallelExercise.organisationId,
                 session.user.id
             );
-        if (!isMember) {
+        if (!userRole) {
             throw new PermissionDeniedError();
         }
-        return parallelExercise;
+        return { ...parallelExercise, userRole };
     }
 
     public async getParallelExerciseByParticipantKey(key: ParallelExerciseKey) {
@@ -162,19 +167,18 @@ export class ParallelExerciseService {
             'joinViewportId' | 'name' | 'templateId'
         >,
         session: SessionInformation
-    ): Promise<ParallelExercise> {
+    ): Promise<ParallelExerciseWithUserRole> {
         const template =
             await this.exerciseManagerService.getExerciseTemplateById(
                 data.templateId,
                 session
             );
-        const isEditorOrAdmin =
-            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+        const userRole =
+            await this.organisationRepository.getOrganisationMembershipRoleForUserById(
                 template.organisationId,
-                session.user.id,
-                ['editor', 'admin']
+                session.user.id
             );
-        if (!isEditorOrAdmin) {
+        if (!userRole || !['editor', 'admin'].includes(userRole)) {
             throw new PermissionDeniedError();
         }
 
@@ -192,7 +196,7 @@ export class ParallelExerciseService {
             const parallelExercise = await tx.getParallelExerciseById(
                 created.id
             );
-            return parallelExercise!;
+            return { ...parallelExercise!, userRole };
         });
     }
 
@@ -200,21 +204,22 @@ export class ParallelExerciseService {
         id: ParallelExerciseId,
         session: SessionInformation,
         data: Partial<ParallelExerciseInsert>
-    ) {
+    ): Promise<ParallelExerciseWithUserRole> {
         const parallelExercise =
             await this.parallelExerciseRepository.getParallelExerciseById(id);
         if (!parallelExercise) {
             throw new NotFoundError();
         }
-        const isEditorOrAdmin =
-            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+
+        const userRole =
+            await this.organisationRepository.getOrganisationMembershipRoleForUserById(
                 parallelExercise.organisationId,
-                session.user.id,
-                ['editor', 'admin']
+                session.user.id
             );
-        if (!isEditorOrAdmin) {
+        if (!userRole || !['editor', 'admin'].includes(userRole)) {
             throw new PermissionDeniedError();
         }
+
         await this.parallelExerciseRepository.updateParallelExercise(
             parallelExercise.id,
             data
@@ -226,7 +231,7 @@ export class ParallelExerciseService {
         if (!updatedParallelExercise) {
             throw new ApiError();
         }
-        return updatedParallelExercise;
+        return { ...updatedParallelExercise, userRole };
     }
 
     public async deleteParallelExercise(

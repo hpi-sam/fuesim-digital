@@ -1,18 +1,22 @@
 <div class="card">
     <div class="card-body">
         <h2 class="card-title h4 d-flex">
-            <app-inline-text-editor
-                class="flex-grow-1"
-                [required]="true"
-                [value]="parallelExercise().name"
-                name="Name der Parallelübung"
-                (update)="
-                    patchParallelExercise({
-                        name: $event,
-                    })
-                "
-                [singleLine]="true"
-            />
+            @if (parallelExercise().userRole !== 'viewer') {
+                <app-inline-text-editor
+                    class="flex-grow-1"
+                    [required]="true"
+                    [value]="parallelExercise().name"
+                    name="Name der Parallelübung"
+                    (update)="
+                        patchParallelExercise({
+                            name: $event,
+                        })
+                    "
+                    [singleLine]="true"
+                />
+            } @else {
+                {{ parallelExercise().name }}
+            }
         </h2>
         <p class="card-text">
             Teilnehmenden-PIN: {{ parallelExercise().participantKey }}
@@ -52,9 +56,11 @@
             Öffnen
         </a>
         <div class="flex-grow-1"></div>
-        <button class="btn btn-outline-danger" (click)="deleteExercise()">
-            <i class="bi bi-trash me-2"></i>
-            Löschen
-        </button>
+        @if (parallelExercise().userRole !== 'viewer') {
+            <button class="btn btn-outline-danger" (click)="deleteExercise()">
+                <i class="bi bi-trash me-2"></i>
+                Löschen
+            </button>
+        }
     </div>
 </div>

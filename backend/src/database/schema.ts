@@ -286,3 +286,6 @@ export interface ParallelExercise extends ParallelExerciseEntry {
     template: ExerciseTemplateEntry;
     organisation: OrganisationEntry;
 }
+export interface ParallelExerciseWithUserRole extends ParallelExercise {
+    userRole: OrganisationMembershipRole;
+}

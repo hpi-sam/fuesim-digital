@@ -8,6 +8,7 @@ import {
     organisationTable,
     type ParallelExercise,
     type ParallelExerciseInsert,
+    type ParallelExerciseWithUserRole,
 } from '../schema.js';
 import {
     exerciseTable,
@@ -61,13 +62,23 @@ export class ParallelExerciseRepository extends BaseRepository {
 
     public async getParallelExercisesForUser(
         userId: string
-    ): Promise<ParallelExercise[]> {
+    ): Promise<ParallelExerciseWithUserRole[]> {
         const subquery = this.databaseConnection
             .select()
             .from(organisationMembershipTable)
             .where(eq(organisationMembershipTable.userId, userId))
             .as('memberships');
-        return this.parallelExerciseQuery
+        return this.databaseConnection
+            .select({ ...this.getColumns(), userRole: subquery.role })
+            .from(parallelExerciseTable)
+            .innerJoin(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.id, parallelExerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(parallelExerciseTable.organisationId, organisationTable.id)
+            )
             .innerJoin(
                 subquery,
                 eq(

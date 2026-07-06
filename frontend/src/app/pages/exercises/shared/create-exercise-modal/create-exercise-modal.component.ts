@@ -2,7 +2,7 @@ import { output, signal, Component, inject, effect } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import {
-    ExerciseKeys,
+    GetExerciseResponseData,
     GetOrganisationsResponseData,
     OrganisationId,
     postExerciseRequestDataSchema,
@@ -39,7 +39,7 @@ export class CreateExerciseModalComponent {
     private readonly messageService = inject(MessageService);
     private readonly exerciseService = inject(ExerciseService);
 
-    readonly created = output<ExerciseKeys>();
+    readonly created = output<GetExerciseResponseData>();
 
     readonly model = signal<{
         organisationId: OrganisationId;

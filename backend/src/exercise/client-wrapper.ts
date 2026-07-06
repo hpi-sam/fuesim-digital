@@ -16,6 +16,7 @@ import type { SessionInformation } from '../auth/auth-service.js';
 import type { ParallelExercise } from '../database/schema.js';
 import { PermissionDeniedError } from '../utils/http.js';
 import type { Services } from '../database/services/index.js';
+import type { Repositories } from '../database/repositories/index.js';
 import type { ActiveExercise } from './active-exercise.js';
 import { clientMap } from './client-map.js';
 
@@ -27,7 +28,8 @@ export abstract class ClientWrapper {
 
     public constructor(
         public readonly socket: ExerciseSocket,
-        public readonly services: Services
+        public readonly services: Services,
+        public readonly repositories: Repositories
     ) {}
 
     public static init<T extends typeof ClientWrapper>(
@@ -228,7 +230,16 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
         );
     }
 
-    public applyActionToAll(action: ExerciseAction) {
+    public async applyActionToAll(action: ExerciseAction) {
+        const isEditorOrAdmin =
+            await this.repositories.organisationRepository.isMemberWithRoleOfOrganisationById(
+                this.chosenExercise!.organisationId,
+                this.session!.user.id,
+                ['editor', 'admin']
+            );
+        if (!isEditorOrAdmin) {
+            throw new PermissionDeniedError();
+        }
         for (const activeExercise of this.cachedActiveExercises) {
             try {
                 activeExercise.applyAction(action, null);
@@ -241,14 +252,14 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
         }
     }
 
-    public start() {
-        this.applyActionToAll({
+    public async start() {
+        await this.applyActionToAll({
             type: '[Exercise] Start',
         } satisfies StartExerciseAction);
     }
 
-    public pause() {
-        this.applyActionToAll({
+    public async pause() {
+        await this.applyActionToAll({
             type: '[Exercise] Pause',
         } satisfies PauseExerciseAction);
     }

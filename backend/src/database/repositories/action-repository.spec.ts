@@ -20,7 +20,9 @@ describe('ActionRepository', () => {
         // This is to test whether actions before exercise id assignment
         // are saved and retrieved correctly with this exerciseId.
         const activeExercise =
-            await environment.services.exerciseService.createExerciseFromBlank();
+            await environment.services.exerciseService.createExerciseFromBlank(
+                {}
+            );
 
         const actions = [
             new ActionWrapper(

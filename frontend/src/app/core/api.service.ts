@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import {
     exerciseExistsResponseDataSchema,
     ExerciseKey,
-    exerciseKeysSchema,
+    getExerciseResponseDataSchema,
     getExercisesResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     getOrganisationDetailsResponseDataSchema,
@@ -55,7 +55,7 @@ export class ApiService {
         return lastValueFrom(
             this.httpClient
                 .post(`${httpOrigin}/api/exercise`, data)
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
+                .pipe(map((v) => getExerciseResponseDataSchema.parse(v)))
         );
     }
 
@@ -179,7 +179,7 @@ export class ApiService {
                     `${httpOrigin}/api/exercise_templates/${templateId}/new`,
                     {}
                 )
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
+                .pipe(map((v) => getExerciseResponseDataSchema.parse(v)))
         );
     }
 

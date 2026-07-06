@@ -1,6 +1,7 @@
 import {
     exerciseExistsResponseDataSchema,
     getExerciseConfigResponseDataSchema,
+    getExerciseResponseDataSchema,
     getExercisesResponseDataSchema,
     isExerciseKey,
     isTrainerKey,
@@ -39,10 +40,9 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
             req.session
         );
 
-        res.status(201).send({
-            participantKey: exercise.participantKey,
-            trainerKey: exercise.trainerKey,
-        });
+        res.status(201).send(
+            getExerciseResponseDataSchema.encode(exercise.exercise)
+        );
     });
 
     router

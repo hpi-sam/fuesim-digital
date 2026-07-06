@@ -34,12 +34,12 @@ export function createParallelExerciseRouter(
         .route('/')
         .all(areParallelExercisesEnabled, isAuthenticatedMiddleware)
         .get(async (req, res) => {
-            const parallelExercies =
+            const parallelExercises =
                 await parallelExerciseService.getParallelExercisesForUser(
                     req.session!
                 );
             res.send(
-                getParallelExercisesResponseDataSchema.encode(parallelExercies)
+                getParallelExercisesResponseDataSchema.encode(parallelExercises)
             );
         })
         .post(async (req, res) => {

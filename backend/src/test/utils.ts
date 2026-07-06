@@ -2,11 +2,12 @@ import type {
     ClientToServerEvents,
     MergeIntersection,
     OrganisationId,
+    PostExerciseRequestData,
     PostExerciseTemplateRequestData,
     ServerToClientEvents,
 } from 'fuesim-digital-shared';
 import {
-    exerciseKeysSchema,
+    getExerciseResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     sleep,
     socketIoTransports,
@@ -353,13 +354,18 @@ async function setupDatabase(): Promise<DatabaseService> {
 
 export async function createExercise(
     environment: TestEnvironment,
-    session?: string
+    session?: string,
+    organisationId?: OrganisationId
 ) {
     const response = await environment
         .httpRequest('post', '/api/exercise', session)
+        .send({
+            organisationId: organisationId ?? null,
+            importObject: null,
+        } satisfies PostExerciseRequestData)
         .expect(201);
 
-    return exerciseKeysSchema.parse(response.body);
+    return getExerciseResponseDataSchema.parse(response.body);
 }
 
 export async function createExerciseTemplate(
@@ -378,9 +384,8 @@ export async function createExerciseTemplate(
         .expect(201);
 
     const parsed = getExerciseTemplateResponseDataSchema.parse(response.body);
-    const template =
-        (await environment.repositories.exerciseRepository.getExerciseTemplateById(
-            parsed.id
-        ))!;
-    return template;
+
+    return (await environment.repositories.exerciseRepository.getExerciseTemplateById(
+        parsed.id
+    ))!;
 }

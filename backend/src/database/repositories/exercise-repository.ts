@@ -26,6 +26,7 @@ export interface ExerciseTemplateDetailsEntry extends ExerciseTemplateEntry {
 }
 
 export interface ExerciseDetailsEntry extends ExerciseEntry {
+    template: ExerciseTemplateEntry | null;
     organisation?: OrganisationEntry;
     actionsCount?: number | undefined;
 }

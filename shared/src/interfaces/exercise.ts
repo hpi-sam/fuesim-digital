@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+    exerciseIdSchema,
     exerciseTemplateIdSchema,
     organisationIdSchema,
     parallelExerciseIdSchema,
@@ -8,12 +9,6 @@ import { participantKeySchema, trainerKeySchema } from '../exercise-keys.js';
 import { stringToDate } from './utils.js';
 import { getExerciseTemplateDetailsResponseDataSchema } from './exercise-template.js';
 import { getOrganisationResponseDataSchema } from './organisation.js';
-
-export const exerciseKeysSchema = z.object({
-    participantKey: participantKeySchema,
-    trainerKey: trainerKeySchema,
-});
-export type ExerciseKeys = z.infer<typeof exerciseKeysSchema>;
 
 export const getExerciseConfigResponseDataSchema = z.object({
     autoDeleteDays: z.int().nonnegative(),
@@ -24,21 +19,30 @@ export type GetExerciseConfigResponseData = z.infer<
 >;
 
 export const getExerciseResponseDataSchema = z.object({
+    id: exerciseIdSchema,
     participantKey: participantKeySchema,
     trainerKey: trainerKeySchema,
     createdAt: stringToDate,
     lastUsedAt: stringToDate,
-    baseTemplate: z
-        .object({ id: exerciseTemplateIdSchema, name: z.string() })
-        .nullable(),
-    organisation: getOrganisationResponseDataSchema,
 });
 export type GetExerciseResponseData = z.infer<
     typeof getExerciseResponseDataSchema
 >;
 
+export const getExerciseDetailsResponseDataSchema = z.object({
+    ...getExerciseResponseDataSchema.shape,
+    baseTemplate: z
+        .object({ id: exerciseTemplateIdSchema, name: z.string() })
+        .nullable(),
+    organisation: getOrganisationResponseDataSchema,
+});
+
+export type GetExerciseDetailsResponseData = z.infer<
+    typeof getExerciseResponseDataSchema
+>;
+
 export const getExercisesResponseDataSchema = z.array(
-    getExerciseResponseDataSchema
+    getExerciseDetailsResponseDataSchema
 );
 export type GetExercisesResponseData = z.infer<
     typeof getExercisesResponseDataSchema

@@ -4,7 +4,7 @@ import type {
     ClientToServerEvents,
     ExerciseAction,
     ExerciseKey,
-    ExerciseKeys,
+    GetExerciseResponseData,
     ExerciseState,
     JoinExerciseResponseData,
     ServerToClientEvents,
@@ -385,7 +385,7 @@ export class ExerciseService {
 
     public async createExercise(
         fileList?: FileList | object,
-        callback?: (exerciseKeys: ExerciseKeys) => void
+        callback?: (exercise: GetExerciseResponseData) => void
     ) {
         if (this.authService.authData().user) {
             const modalRef = this.ngbModalService.open(
@@ -393,8 +393,8 @@ export class ExerciseService {
             );
             const componentInstance =
                 modalRef.componentInstance as CreateExerciseModalComponent;
-            componentInstance.created.subscribe((exerciseKeys) => {
-                callback?.(exerciseKeys);
+            componentInstance.created.subscribe((exercise) => {
+                callback?.(exercise);
             });
             if (fileList) {
                 await componentInstance.importFile(fileList);
@@ -408,8 +408,8 @@ export class ExerciseService {
             }
             await this.apiService
                 .createExercise({ organisationId: null, importObject })
-                .then((exerciseKeys) => {
-                    callback?.(exerciseKeys);
+                .then((exercise) => {
+                    callback?.(exercise);
                 });
         }
     }

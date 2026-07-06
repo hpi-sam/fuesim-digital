@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import type { PostExerciseRequestData } from 'fuesim-digital-shared';
 import { createTestEnvironment } from './utils.js';
 
 const basePath = '../test-scenarios/migration-test-scenarios';
@@ -90,7 +91,10 @@ describe('migration', () => {
                             );
                             await environment
                                 .httpRequest('post', '/api/exercise')
-                                .send(exercise)
+                                .send({
+                                    importObject: exercise,
+                                    organisationId: null,
+                                } satisfies PostExerciseRequestData)
                                 .expect(201);
                         },
                         120_000

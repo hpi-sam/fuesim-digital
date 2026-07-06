@@ -116,7 +116,9 @@ export class ExerciseService {
             }
         } else {
             // Anonymous exercise
-            parsedData.organisationId = null;
+            if (data.organisationId) {
+                throw new PermissionDeniedError();
+            }
         }
 
         let exercise;
@@ -341,8 +343,19 @@ export class ExerciseService {
         if (exerciseEntry.template) {
             throw new PermissionDeniedError();
         }
-        if (exerciseEntry.user && exerciseEntry.user !== session?.user.id) {
-            throw new PermissionDeniedError();
+        if (exerciseEntry.organisationId) {
+            if (!session) {
+                throw new PermissionDeniedError();
+            }
+            const isEditorOrAdmin =
+                await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                    exerciseEntry.organisationId,
+                    session.user.id,
+                    ['editor', 'admin']
+                );
+            if (!isEditorOrAdmin) {
+                throw new PermissionDeniedError();
+            }
         }
 
         await this.deleteExerciseById(activeExercise.exercise.id);

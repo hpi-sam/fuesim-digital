@@ -1,7 +1,7 @@
 import { Component, inject, resource, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
-    ExerciseKeys,
+    GetExerciseResponseData,
     isAccessKey,
     isExerciseKey,
     isParallelExerciseKey,
@@ -114,7 +114,7 @@ export class LandingPageComponent {
         }
         await this.exerciseService.createExercise(
             fileList,
-            (exerciseKeys: ExerciseKeys) => {
+            (exerciseKeys: GetExerciseResponseData) => {
                 this.trainerKey = exerciseKeys.trainerKey;
                 this.model.set({ joinKey: this.trainerKey });
                 this.participantKey = exerciseKeys.participantKey;

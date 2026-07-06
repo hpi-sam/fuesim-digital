@@ -168,6 +168,16 @@ export class ParallelExerciseService {
                 data.templateId,
                 session
             );
+        const isEditorOrAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                template.organisationId,
+                session.user.id,
+                ['editor', 'admin']
+            );
+        if (!isEditorOrAdmin) {
+            throw new PermissionDeniedError();
+        }
+
         return this.parallelExerciseRepository.transaction(async (tx) => {
             const created = await tx.createParallelExercise({
                 ...data,

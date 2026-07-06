@@ -5,6 +5,7 @@ import {
     patchExerciseTemplateRequestDataSchema,
     exerciseTemplateIdSchema,
     getExerciseTemplateResponseDataSchema,
+    getExerciseResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
@@ -61,10 +62,9 @@ export function createExerciseManagerRouter(
                     req.session
                 );
 
-            res.status(201).send({
-                participantKey: newExercise.participantKey,
-                trainerKey: newExercise.trainerKey,
-            });
+            res.status(201).send(
+                getExerciseResponseDataSchema.encode(newExercise.exercise)
+            );
         });
 
     router.get('/exercise_templates/:id/viewports', async (req, res) => {

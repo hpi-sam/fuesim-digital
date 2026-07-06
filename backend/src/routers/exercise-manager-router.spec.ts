@@ -6,7 +6,7 @@ import type {
     StateExport,
 } from 'fuesim-digital-shared';
 import {
-    exerciseKeysSchema,
+    getExerciseResponseDataSchema,
     getExercisesResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
@@ -94,7 +94,7 @@ describe('exercise manager router', () => {
                 .expect(403);
         });
 
-        it('succeeds creating an exercise template', async () => {
+        it('succeeds creating in personal organisation', async () => {
             const beforeCreation = new Date();
 
             const response = await environment
@@ -176,7 +176,9 @@ describe('exercise manager router', () => {
         it('succeeds creating an exercise template', async () => {
             const beforeCreation = new Date();
             const exercise =
-                await environment.services.exerciseService.createExerciseFromBlank();
+                await environment.services.exerciseService.createExerciseFromBlank(
+                    {}
+                );
             exercise.applyAction(
                 {
                     type: '[Viewport] Add viewport',
@@ -727,7 +729,7 @@ describe('exercise manager router', () => {
                     session
                 )
                 .expect(201);
-            const parsed = exerciseKeysSchema.parse(response.body);
+            const parsed = getExerciseResponseDataSchema.parse(response.body);
 
             // Ensure different trainer key
             expect(parsed.trainerKey).not.toBe(
@@ -799,7 +801,9 @@ describe('exercise manager router', () => {
                         session
                     )
                     .expect(201);
-                const parsed = exerciseKeysSchema.parse(response.body);
+                const parsed = getExerciseResponseDataSchema.parse(
+                    response.body
+                );
 
                 // Ensure different trainer key
                 expect(parsed.trainerKey).not.toBe(

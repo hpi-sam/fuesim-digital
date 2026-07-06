@@ -16,6 +16,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Fixed
 
 - The deletion of alarm groups no longer breaks breaks measure templates that use them.
+- Elements are now only marked scoutable once their name or content is specified, and can be marked as unscoutable again.
 
 ## [0.17.0] - 2026-06-30
 

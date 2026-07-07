@@ -29,7 +29,7 @@ import {
     selectTechnicalChallenges,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { AppState } from '../../../../../state/app.state';
-import { EvalCriterionCreationFormComponent } from './eval-criterion-creation-form/eval-criterion-creation-form.component';
+import { EvalCriterionCreationCardComponent } from './eval-criterion-creation-card/eval-criterion-creation-card.component';
 import { ExerciseService } from '../../../../../core/exercise.service';
 import { DidacticOverViewResultsTableComponent } from './result-table/didactic-overview-results-table.component';
 
@@ -38,7 +38,7 @@ import { DidacticOverViewResultsTableComponent } from './result-table/didactic-o
     templateUrl: './didactic-overview.component.html',
     styleUrls: ['./didactic-overview.component.scss'],
     imports: [
-        EvalCriterionCreationFormComponent,
+        EvalCriterionCreationCardComponent,
         NgbDropdown,
         NgbDropdownToggle,
         NgbDropdownMenu,

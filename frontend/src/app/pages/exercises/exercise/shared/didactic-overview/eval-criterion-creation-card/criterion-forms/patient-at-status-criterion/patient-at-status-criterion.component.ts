@@ -24,23 +24,23 @@ import {
     NgbDropdownToggle,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FieldTree } from '@angular/forms/signals';
-import { AppState } from '../../../../../../../state/app.state';
+import { AppState } from '../../../../../../../../state/app.state';
 import {
     selectConfiguration,
     selectPatients,
-} from '../../../../../../../state/application/selectors/exercise.selectors';
-import { comparePatientsByVisibleStatus } from '../../../simulation/trainer-modal/tabs/compare-patients';
-import { SimulatedRegionPreviewCardComponent } from '../../../simulation/trainer-modal/preview-card/simulated-region-preview-card.component';
-import { PatientHeaderComponent } from '../../../../../../../shared/components/patient-header/patient-header.component';
-import { PatientsDetailsComponent } from '../../../../../../../shared/components/patients-details/patients-details.component';
-import { PatientStatusBadgeComponent } from '../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
-import { InputData } from '../utils/input-data';
+} from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { comparePatientsByVisibleStatus } from '../../../../simulation/trainer-modal/tabs/compare-patients';
+import { SimulatedRegionPreviewCardComponent } from '../../../../simulation/trainer-modal/preview-card/simulated-region-preview-card.component';
+import { PatientHeaderComponent } from '../../../../../../../../shared/components/patient-header/patient-header.component';
+import { PatientsDetailsComponent } from '../../../../../../../../shared/components/patients-details/patients-details.component';
+import { PatientStatusBadgeComponent } from '../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { InputData } from '../../input-data';
 import { DidacticOverviewPatientInteractionBarComponent } from './interaction-bar/didactic-overview-patient-interaction-bar.component';
 
 @Component({
-    selector: 'app-patient-at-sk-criterion',
-    templateUrl: './patient-at-sk-criterion.component.html',
-    styleUrls: ['./patient-at-sk-criterion.component.scss'],
+    selector: 'app-patient-at-status-criterion',
+    templateUrl: './patient-at-status-criterion.component.html',
+    styleUrls: ['./patient-at-status-criterion.component.scss'],
     imports: [
         SimulatedRegionPreviewCardComponent,
         PatientHeaderComponent,
@@ -54,11 +54,10 @@ import { DidacticOverviewPatientInteractionBarComponent } from './interaction-ba
         NgbDropdownItem,
     ],
 })
-export class PatientAtSKCriterionComponent {
+export class PatientAtStatusCriterionComponent {
     private readonly store = inject<Store<AppState>>(Store);
 
-    public readonly criterionForm =
-        input.required<FieldTree<InputData>>();
+    public readonly criterionForm = input.required<FieldTree<InputData>>();
 
     readonly selectedPatientsOut = output<Patient[]>();
     readonly selectedPatientStatusMapOut = output<{

@@ -150,76 +150,21 @@
                     </form>
                 }
                 @case ('reachTechnicalChallengeStateEvalCriterion') {
-                    <form class="ms-2">
-                        <label>
-                            Art:
-                            {{
-                                evalCriterionTypesNames.reachTechnicalChallengeStateEvalCriterion
-                            }}
-                        </label>
-                        <div>
-                            @if (technicalChallenges().length === 0) {
-                                <hr />
-                                <span class="mt-3 text-muted"
-                                    >Es befinden sich aktuell keine technischen
-                                    Herausforderungen auf der Karte.</span
-                                >
-                                <hr />
-                            } @else {
-                                <select
-                                    class="form-select"
-                                    [formField]="
-                                        this.criterionForm.technicalChallengeId
-                                    "
-                                >
-                                    <option value="" disabled>
-                                        Keine Technische Herausforderung
-                                        ausgewählt
-                                    </option>
-                                    @for (
-                                        challenge of this.technicalChallenges();
-                                        track challenge.id
-                                    ) {
-                                        <option value="{{ challenge.id }}">
-                                            {{ challenge.name }}
-                                        </option>
-                                    }
-                                </select>
-                            }
-
-                            @if (
-                                this.criterionForm
-                                    .technicalChallengeId()
-                                    .value() !== ''
-                            ) {
-                                <label class="mt-1">
-                                    Ziel-Zustand:
-                                    <select
-                                        class="form-select me-2"
-                                        [formField]="
-                                            this.criterionForm
-                                                .targetTechnicalChallengeState
-                                        "
-                                    >
-                                        <option value="" disabled>
-                                            Kein Zustand ausgewählt
-                                        </option>
-                                        @for (
-                                            state of this.selectedTechnicalChallengeStates();
-                                            track state.id
-                                        ) {
-                                            <option value="{{ state.id }}">
-                                                {{ state.title }}
-                                            </option>
-                                        }
-                                    </select>
-                                </label>
-                            }
-                        </div>
-                    </form>
+                    <app-reach-technical-challenge-state-criterion-form
+                        (targetTechnicalChallengeStateOut)="
+                            this.criterionForm
+                                .targetTechnicalChallengeState()
+                                .value.set($event)
+                        "
+                        (technicalChallengeIdOut)="
+                            this.criterionForm
+                                .technicalChallengeId()
+                                .value.set($event)
+                        "
+                    />
                 }
                 @case ('patientAtStatusEvalCriterion') {
-                    <app-patient-at-sk-criterion
+                    <app-patient-at-status-criterion
                         [criterionForm]="this.criterionForm"
                         (selectedPatientsOut)="addPatients($event)"
                         (selectedPatientStatusMapOut)="
@@ -228,33 +173,19 @@
                     />
                 }
                 @case ('viewScoutableEvalCriterion') {
-                    <form class="ms-2">
-                        <label>
-                            Art:
-                            {{
-                                evalCriterionTypesNames.viewScoutableEvalCriterion
-                            }}
-                        </label>
-                        <!-- TODO @JohannesPotzi @Jogius -->
-                    </form>
+                    <app-view-scoutable-criterion-form
+                        (targetScoutableIdOut)="
+                            this.criterionForm
+                                .targetScoutableId()
+                                .value.set($event)
+                        "
+                    />
                 }
                 @case ('andEvalCriterion') {
-                    <form class="ms-2">
-                        <label>
-                            Art:
-                            {{ evalCriterionTypesNames.andEvalCriterion }}
-                        </label>
-                        <!-- TODO @JohannesPotzi @Jogius -->
-                    </form>
+                    <!-- TODO @JohannesPotzi @Jogius : combine this form with the orEvalCriterion form -->
                 }
                 @case ('orEvalCriterion') {
-                    <form class="ms-2">
-                        <label>
-                            Art:
-                            {{ evalCriterionTypesNames.orEvalCriterion }}
-                        </label>
-                        <!-- TODO @JohannesPotzi @Jogius -->
-                    </form>
+                    <!-- TODO @JohannesPotzi @Jogius : combine this form with the orEvalCriterion form -->
                 }
                 @case ('constNumEvalCriterion') {
                     <form class="ms-2">
@@ -287,26 +218,8 @@
                         <!-- TODO @JohannesPotzi @Jogius -->
                     </form>
                 }
-                @case ('greaterThanEvalCriterion') {
-                    <form class="ms-2">
-                        <label>
-                            Art:
-                            {{
-                                evalCriterionTypesNames.greaterThanEvalCriterion
-                            }}
-                        </label>
-                        <!-- TODO @JohannesPotzi @Jogius -->
-                    </form>
-                }
-                @case ('notEvalCriterion') {
-                    <form class="ms-2">
-                        <label>
-                            Art:
-                            {{ evalCriterionTypesNames.notEvalCriterion }}
-                        </label>
-                        <!-- TODO @JohannesPotzi @Jogius -->
-                    </form>
-                }
+                @case ('greaterThanEvalCriterion') {}
+                @case ('notEvalCriterion') {}
                 @case ('timeStampEvalCriterion') {
                     <form class="ms-2">
                         <label>

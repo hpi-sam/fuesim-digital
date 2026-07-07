@@ -1,6 +1,5 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import {
-    
     Patient,
     PatientStatus,
     patientStatusAllowedValues,
@@ -14,10 +13,10 @@ import {
     NgbDropdownToggle,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FieldTree } from '@angular/forms/signals';
-import { ExerciseService } from '../../../../../../../../core/exercise.service';
-import { SelectPatientService } from '../../../../simulation/trainer-modal/select-patient.service';
-import { PatientStatusBadgeComponent } from '../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
-import { InputData } from '../../utils/input-data';
+import { ExerciseService } from '../../../../../../../../../core/exercise.service';
+import { SelectPatientService } from '../../../../../simulation/trainer-modal/select-patient.service';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { InputData } from '../../../input-data';
 
 @Component({
     selector: 'app-didactic-overview-patient-interaction-bar',
@@ -39,8 +38,7 @@ export class DidacticOverviewPatientInteractionBarComponent {
     public readonly patientStatusAllowedValues = patientStatusAllowedValues;
     public readonly statusNames = statusNames;
 
-    public readonly criterionForm =
-        input.required<FieldTree<InputData>>();
+    public readonly criterionForm = input.required<FieldTree<InputData>>();
     readonly patient = input.required<Patient>();
     readonly selectedGlobalTargetStatus =
         input.required<PatientStatus | null>();

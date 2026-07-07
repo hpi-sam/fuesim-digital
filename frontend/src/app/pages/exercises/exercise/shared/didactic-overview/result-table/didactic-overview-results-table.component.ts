@@ -49,6 +49,7 @@ interface subTable {
 })
 export class DidacticOverViewResultsTableComponent implements OnInit {
     public readonly store = inject<Store<AppState>>(Store);
+    public readonly isInSelectionMode = input<boolean>(false);
     public readonly rootResults = input.required<EvalResult[]>();
 
     public getChildResultsOfResult = getChildResultsOfResult;

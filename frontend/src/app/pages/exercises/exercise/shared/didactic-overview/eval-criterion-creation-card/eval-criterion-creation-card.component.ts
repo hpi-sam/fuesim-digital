@@ -29,12 +29,9 @@ import {
     newXPatientsAtStatusEvalCriterion,
     newReachTechnicalChallengeStateEvalCriterion,
     newPatientAtStatusEvalCriterion,
-    EvalCriterionId,
     newAndEvalCriterion,
-    BoolEvalCriterion,
     BoolEvalCriterionId,
     isBoolEvalCriterion,
-    boolEvalCriterionIdSchema,
 } from '../../../../../../../../../shared/dist/models/eval-criterion';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { AppState } from '../../../../../../state/app.state';
@@ -42,25 +39,29 @@ import {
     selectEvalCriteria,
     selectTechnicalChallenges,
 } from '../../../../../../state/application/selectors/exercise.selectors';
-import { PatientAtSKCriterionComponent } from './patient-at-sk-criterion/patient-at-sk-criterion.component';
-import { InputData } from './utils/input-data';
+import { PatientAtStatusCriterionComponent } from './criterion-forms/patient-at-status-criterion/patient-at-status-criterion.component';
+import { InputData } from './input-data';
+import { ReachTechnicalChallengeStateEvalCriterionFormComponent } from './criterion-forms/reach-technical-challenge-state-criterion/reach-technical-challenge-state-criterion-form.component';
+import { ViewScoutableEvalCriterionFormComponent } from './criterion-forms/view-scoutable-criterion/view-scoutable-criterion-form.component';
 @Component({
-    selector: 'app-eval-criterion-creation-form',
-    templateUrl: './eval-criterion-creation-form.component.html',
-    styleUrls: ['./eval-criterion-creation-form.component.scss'],
+    selector: 'app-eval-criterion-creation-card',
+    templateUrl: './eval-criterion-creation-card.component.html',
+    styleUrls: ['./eval-criterion-creation-card.component.scss'],
     imports: [
         FormField,
         FormsModule,
         AppSaveOnTypingDirective,
-        PatientAtSKCriterionComponent,
         NgbDropdown,
         NgbDropdownToggle,
         NgbDropdownMenu,
         NgbDropdownButtonItem,
         NgbDropdownItem,
+        PatientAtStatusCriterionComponent,
+        ReachTechnicalChallengeStateEvalCriterionFormComponent,
+        ViewScoutableEvalCriterionFormComponent,
     ],
 })
-export class EvalCriterionCreationFormComponent {
+export class EvalCriterionCreationCardComponent {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     public readonly criterionCreationCategory =
@@ -81,7 +82,6 @@ export class EvalCriterionCreationFormComponent {
     public readonly criterionCreationType = signal<EvalCriterionType | null>(
         null
     );
-    public readonly evalCriterionCategoryNames = evalCriterionCategoryNames;
 
     /* TODO @JohannesPotzi : prune this for sub criteria selection to prevent circular input. */
     public readonly evalCriteria = computed(() =>
@@ -104,6 +104,7 @@ export class EvalCriterionCreationFormComponent {
         [id: UUID]: PatientStatus;
     }>({});
 
+    public readonly evalCriterionCategoryNames = evalCriterionCategoryNames;
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
     public readonly patientStatusAllowedValues = patientStatusAllowedValues;
     public readonly statusNames = statusNames;
@@ -112,11 +113,12 @@ export class EvalCriterionCreationFormComponent {
     readonly inputModel = signal<InputData>({
         name: '',
         countInput: 0,
-        targetPatients: [],
         patientStatusInput: 'black',
         patientTargetStatusMap: {},
         technicalChallengeId: '',
         targetTechnicalChallengeState: '',
+        targetPatients: [],
+        targetScoutableId: '',
         subCriteria: [],
     });
     criterionForm = form(this.inputModel);

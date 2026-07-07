@@ -1,20 +1,20 @@
-import type {
-    EvalCriterion,
-    EvalCriterionId,
-    Patient,
-    PatientStatus,
-    TechnicalChallengeId,
-    TechnicalChallengeStateId,
-    UUID,
+import {
+    type EvalCriterion,
+    type Patient,
+    type PatientStatus,
+    type TechnicalChallengeId,
+    type TechnicalChallengeStateId,
+    type UUID,
 } from 'fuesim-digital-shared';
 
 export interface InputData {
     name: string;
     countInput: number;
-    targetPatients: Patient[];
     patientStatusInput: PatientStatus;
     patientTargetStatusMap: { [id: UUID]: PatientStatus };
     technicalChallengeId: TechnicalChallengeId | '';
     targetTechnicalChallengeState: TechnicalChallengeStateId | '';
+    targetPatients: Patient[];
+    targetScoutableId: UUID | '';
     subCriteria: (EvalCriterion | null)[];
 }

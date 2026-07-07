@@ -1,9 +1,9 @@
 import { Component, inject, resource } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../core/exercise-element.service';
 import { CollectionCardComponent } from '../shared/cards/collection-card/collection-card.component';
-import { PromptModalService } from '../../../core/prompt-modal/prompt-modal.service';
+import { openCreateCollectionModal } from '../shared/modals/create-collection-modal/open-create-collection-modal';
 
 @Component({
     selector: 'app-marketplace',
@@ -13,7 +13,7 @@ import { PromptModalService } from '../../../core/prompt-modal/prompt-modal.serv
 })
 export class MarketplaceComponent {
     private readonly collectionService = inject(CollectionService);
-    private readonly promptModalService = inject(PromptModalService);
+    private readonly ngbModalService = inject(NgbModal);
 
     public readonly userAvailableCollections = resource({
         loader: async () => this.collectionService.getMyCollections(),
@@ -24,14 +24,10 @@ export class MarketplaceComponent {
     });
 
     public async createNewCollection() {
-        const title = await this.promptModalService.prompt({
-            title: 'Neue Sammlung erstellen',
-            description: 'Geben Sie einen Titel für die neue Sammlung ein.',
-            confirmationButtonText: 'Erstellen',
-            placeholder: "z.B. 'Feuerwehr Musterstadt'",
+        openCreateCollectionModal(this.ngbModalService).subscribe((created) => {
+            if (created) {
+                this.userAvailableCollections.reload();
+            }
         });
-        if (!title.result) return;
-        await this.collectionService.createColletion(title.value);
-        this.userAvailableCollections.reload();
     }
 }

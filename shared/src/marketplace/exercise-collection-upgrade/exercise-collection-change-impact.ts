@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { templateVersionSchema } from '../models/marketplace-element.js';
+import { templateVersionSchema } from '../models/versioned-elements.js';
 import { changeTargetSchema } from './exercise-collection-change-target.js';
 import type { ImmutableInfer } from './../../utils/infer.js';
 import { collectionUpgradeChangeElementSchema } from './exercise-collection-change-element.js';

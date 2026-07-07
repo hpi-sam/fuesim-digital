@@ -76,7 +76,6 @@ export function migratePartialExport(
         dataVersion: partialExport.dataVersion,
     } satisfies StateExport;
 
-
     const migratedStateExport = migrateStateExport(stateExport);
     // Check for `undefined` in the original partial export here as `undefined` has the meaning of `no changes`
     // compared to `[]` with the meaning of `nothing`. If later choosing to override using this partial export,
@@ -111,19 +110,13 @@ export function migratePartialExport(
 
     // Fix template id lookups, since migration 44 always computes new template IDs
     if (vehicleTemplates) {
-        console.log({ vehicleTemplates });
         vehicleTemplates = vehicleTemplates.map((t) => ({
             ...t,
             personnelTemplateIds: t.personnelTemplateIds.map((id) => {
-                console.log({ id, migrated: migratedStateExport.currentState });
                 const requiredType = getTemplates(
                     migratedStateExport.currentState,
                     'personnelTemplate'
                 )[id]!.personnelType;
-
-                console.log({
-                    requiredType,
-                });
 
                 return Object.values(
                     getTemplates(
@@ -133,10 +126,6 @@ export function migratePartialExport(
                 ).find((pt) => pt.personnelType === requiredType)!.id;
             }),
             materialTemplateIds: t.materialTemplateIds.map((id) => {
-                console.log({
-                    id,
-                    migratedState: migratedStateExport.currentState,
-                });
                 const requiredType = getTemplates(
                     migratedStateExport.currentState,
                     'materialTemplate'
@@ -188,9 +177,7 @@ export function applyMigrations<H extends StateHistoryCompound | undefined>(
         const cannotMigrateHistory = migrationsToApply.some(
             (migration) => migration.unmigratableActions
         );
-        const cannotMigrateHistory = migrationsToApply.some(
-            (migration) => migration.unmigratableActions
-        );
+
         try {
             if (cannotMigrateHistory) {
                 throw new ReducerError(

@@ -16,7 +16,6 @@ import {
     checkEditableValueEdited,
     getEditableValueCheckers,
 } from '../../models/utils/editable-values-registry.js';
-import { getTemplates } from '../../models/template-helpers.js';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
 import { newVehiclePositionIn } from '../../models/utils/position/vehicle-position.js';
 import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
@@ -24,6 +23,7 @@ import { type VehicleTemplate } from '../../models/vehicle-template.js';
 import type { Material } from '../../models/material.js';
 import type { Personnel } from '../../models/personnel.js';
 import type { Vehicle } from '../../models/vehicle.js';
+import { getTemplates } from '../../models/template.js';
 import {
     hasEntityProperties,
     type MarketplaceRegistryEntry,
@@ -393,8 +393,6 @@ export const marketplaceVehicleTemplate: MarketplaceRegistryEntry = {
                     }
                 }
             }
-
-            console.log('Impacts for vehicle template update:', impacts);
         }
         if (change.type === 'remove') {
             // Check on Map

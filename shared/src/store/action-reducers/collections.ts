@@ -1,16 +1,11 @@
-import { Immutable, WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { z } from 'zod';
-import { IsValue } from '../../utils/validators/is-value.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { TemplateVersion } from '../../marketplace/models/marketplace-element.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { CollectionElementType } from '../../marketplace/models/collection-element-type.js';
-import { ExerciseState } from '../../state.js';
-import {
-    ChangeApply,
-    changeApplySchema,
-} from '../../marketplace/exercise-collection-upgrade/exercise-collection-change-apply.js';
+import type { CollectionElementType } from '../../marketplace/models/collection-element-type.js';
+import type { ExerciseState } from '../../state.js';
+import type { ChangeApply } from '../../marketplace/exercise-collection-upgrade/exercise-collection-change-apply.js';
+import { changeApplySchema } from '../../marketplace/exercise-collection-upgrade/exercise-collection-change-apply.js';
 import {
     hasEntityProperties,
     marketplaceElementsDefinitions,
@@ -19,49 +14,39 @@ import {
     type CollectionElements,
     collectionElementsSchema,
 } from '../../marketplace/models/collection-elements.js';
-import {
-    versionedCollectionPartialSchema,
-    type VersionedCollectionPartial,
-} from './../../marketplace/models/versioned-id-schema.js';
+import type { TemplateVersion } from '../../marketplace/models/versioned-elements.js';
+import { versionedCollectionPartialSchema } from './../../marketplace/models/versioned-id-schema.js';
 
-export class AddCollection implements Action {
-    @IsValue('[Collection] Add Collection' as const)
-    public readonly type = '[Collection] Add Collection';
+export const addCollectionActionSchema = z.strictObject({
+    type: z.literal('[Collection] Add Collection'),
+    collectionVersion: versionedCollectionPartialSchema,
+    elements: collectionElementsSchema,
+});
+export type AddCollectionAction = Immutable<
+    z.infer<typeof addCollectionActionSchema>
+>;
 
-    @IsZodSchema(versionedCollectionPartialSchema)
-    public readonly collectionVersion!: VersionedCollectionPartial;
+export const upgradeCollectionActionSchema = z.strictObject({
+    type: z.literal('[Collection] Upgrade Collection'),
+    collectionVersion: versionedCollectionPartialSchema,
+    overwriteTemplates: collectionElementsSchema,
+    changeApplies: z.array(changeApplySchema),
+});
 
-    @IsZodSchema(collectionElementsSchema)
-    public readonly elements!: CollectionElements;
-}
+export type UpgradeCollectionAction = Immutable<
+    z.infer<typeof upgradeCollectionActionSchema>
+>;
 
-export class UpgradeCollection implements Action {
-    @IsValue('[Collection] Upgrade Collection' as const)
-    public readonly type = '[Collection] Upgrade Collection';
+export const removeCollectionActionSchema = z.strictObject({
+    type: z.literal('[Collection] Remove Collection'),
+    collectionVersion: versionedCollectionPartialSchema,
+    overwriteTemplates: collectionElementsSchema,
+    changeApplies: z.array(changeApplySchema),
+});
 
-    @IsZodSchema(versionedCollectionPartialSchema)
-    public readonly collectionVersion!: VersionedCollectionPartial;
-
-    @IsZodSchema(collectionElementsSchema)
-    public readonly overwriteTemplates!: CollectionElements;
-
-    @IsZodSchema(z.array(changeApplySchema))
-    public readonly changeApplies!: ChangeApply[];
-}
-
-export class RemoveCollection implements Action {
-    @IsValue('[Collection] Remove Collection' as const)
-    public readonly type = '[Collection] Remove Collection';
-
-    @IsZodSchema(versionedCollectionPartialSchema)
-    public readonly collectionVersion!: VersionedCollectionPartial;
-
-    @IsZodSchema(collectionElementsSchema)
-    public readonly overwriteTemplates!: CollectionElements;
-
-    @IsZodSchema(z.array(changeApplySchema))
-    public readonly changeApplies!: ChangeApply[];
-}
+export type RemoveCollectionAction = Immutable<
+    z.infer<typeof removeCollectionActionSchema>
+>;
 
 function addElement(
     draftState: WritableDraft<ExerciseState>,
@@ -100,8 +85,9 @@ function addCollectionElements(
 }
 
 export namespace CollectionReducers {
-    export const addCollection: ActionReducer<AddCollection> = {
-        action: AddCollection,
+    export const addCollection: ActionReducer<AddCollectionAction> = {
+        type: addCollectionActionSchema.shape.type.value,
+        actionSchema: addCollectionActionSchema,
         reducer: (draftState, data) => {
             addCollectionElements(draftState, data.elements);
             draftState.selectedCollections.push(data.collectionVersion);
@@ -109,8 +95,9 @@ export namespace CollectionReducers {
         },
         rights: 'trainer',
     };
-    export const upgradeCollection: ActionReducer<UpgradeCollection> = {
-        action: UpgradeCollection,
+    export const upgradeCollection: ActionReducer<UpgradeCollectionAction> = {
+        type: upgradeCollectionActionSchema.shape.type.value,
+        actionSchema: upgradeCollectionActionSchema,
         reducer: (draftState, data) => {
             overwriteStateTemplates(draftState, data.overwriteTemplates);
             applyAllChangeApplies(draftState, data.changeApplies);
@@ -130,8 +117,9 @@ export namespace CollectionReducers {
         },
         rights: 'trainer',
     };
-    export const removeCollection: ActionReducer<RemoveCollection> = {
-        action: RemoveCollection,
+    export const removeCollection: ActionReducer<RemoveCollectionAction> = {
+        type: removeCollectionActionSchema.shape.type.value,
+        actionSchema: removeCollectionActionSchema,
         reducer: (draftState, data) => {
             overwriteStateTemplates(draftState, data.overwriteTemplates);
             applyAllChangeApplies(draftState, data.changeApplies);

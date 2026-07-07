@@ -1,4 +1,4 @@
-import { checkCollectionRole } from 'fuesim-digital-shared';
+import { checkCollectionMembershipRole } from 'fuesim-digital-shared';
 import type { Services } from '../../database/services/index.js';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { ClientWrapper, CollectionClientWrapper } from '../client-wrapper.js';
@@ -82,7 +82,7 @@ export function registerCollectionHandler(
             }
 
             const rolecheck =
-                checkCollectionRole(relationship).isAtLeast('other');
+                checkCollectionMembershipRole(relationship).isAtLeast('other');
 
             if (!rolecheck) {
                 callback({

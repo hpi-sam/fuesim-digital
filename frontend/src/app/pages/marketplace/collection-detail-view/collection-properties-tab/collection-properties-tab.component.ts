@@ -8,10 +8,9 @@ import {
     signal,
 } from '@angular/core';
 import {
-    checkCollectionRole,
+    collectionOrganisationRelationshipTypeAllowedValues,
     CollectionVersion,
-    collectionRelationshipTypeAllowedValues,
-    collectionRelationshipTypeSchema,
+    OrganisationId,
 } from 'fuesim-digital-shared';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -44,7 +43,8 @@ export class CollectionDetailsTabComponent {
         ConfirmationModalService
     );
 
-    public readonly allowedRoleValues = collectionRelationshipTypeAllowedValues;
+    public readonly allowedRoleValues =
+        collectionOrganisationRelationshipTypeAllowedValues;
 
     public readonly collection = input.required<CollectionVersion>();
 
@@ -58,12 +58,8 @@ export class CollectionDetailsTabComponent {
                     collectionEntityId
                 )
             )
-                .sort((a, b) => b.displayName.localeCompare(a.displayName))
-                .sort(
-                    (a, b) =>
-                        checkCollectionRole(b.role).indexOf() -
-                        checkCollectionRole(a.role).indexOf()
-                ),
+                .sort((a, b) => b.name.localeCompare(a.name))
+                .sort((a, b) => Number(b.owner) - Number(a.owner)),
     });
 
     public readonly ownUserId = computed(
@@ -113,7 +109,10 @@ export class CollectionDetailsTabComponent {
         this.inviteCode.set(undefined);
     }
 
-    public async removeCollectionMember(userId: string, userName: string) {
+    public async removeCollectionMember(
+        organisationId: OrganisationId,
+        userName: string
+    ) {
         const confirmationResult = await this.confirmationModalService.confirm({
             title: 'Mitglied entfernen',
             description: `Möchten Sie ${userName} wirklich entfernen? Dadurch verliert die Person den Zugriff auf die Sammlung. Die Person kann die Sammlung erneut betreten, wenn sie einen gültigen Einladungslink hat.`,
@@ -121,19 +120,7 @@ export class CollectionDetailsTabComponent {
         if (!confirmationResult) return;
         await this.collectionService.removeCollectionMember(
             this.collection().entityId,
-            userId
-        );
-    }
-
-    public async updateCollectionMemberRole(userId: string, newRole: Event) {
-        const parsedRole = collectionRelationshipTypeSchema.parse(
-            (newRole.target as HTMLSelectElement).value
-        );
-
-        await this.collectionService.setCollectionMemberRole(
-            this.collection().entityId,
-            userId,
-            parsedRole
+            organisationId
         );
     }
 

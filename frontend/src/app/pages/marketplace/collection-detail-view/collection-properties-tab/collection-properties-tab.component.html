@@ -70,22 +70,8 @@
             <li
                 class="list-group-item d-flex flex-row align-items-center gap-3"
             >
-                <select
-                    [disabled]="member.id === ownUserId()"
-                    (change)="updateCollectionMemberRole(member.id, $event)"
-                    class="form-select form-select-sm w-auto"
-                >
-                    @for (role of allowedRoleValues; track role) {
-                        <option
-                            [selected]="role === member.role"
-                            [value]="role"
-                        >
-                            {{ role | collectionRelationshipType }}
-                        </option>
-                    }
-                </select>
                 <span>
-                    {{ member.displayName }}
+                    {{ member.name }}
                     @if (member.id === ownUserId()) {
                         <span class="badge text-bg-secondary ms-1">Sie</span>
                     }
@@ -93,12 +79,7 @@
                 @if (member.id !== ownUserId()) {
                     <button
                         class="btn btn-outline-danger btn-sm ms-auto"
-                        (click)="
-                            removeCollectionMember(
-                                member.id,
-                                member.displayName
-                            )
-                        "
+                        (click)="removeCollectionMember(member.id, member.name)"
                     >
                         <i class="bi bi-x-square"></i>
                     </button>

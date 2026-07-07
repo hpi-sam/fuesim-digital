@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 import {
-    checkCollectionRole,
-    gatherCollectionElements,
+    checkCollectionMembershipRole,
+    gatherAllVisibleCollectionElements,
 } from 'fuesim-digital-shared';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionSubscriptionData } from '../../../../core/exercise-element.service';
@@ -25,10 +25,10 @@ export class CollectionElementsTabComponent {
     public readonly availableElements = computed(() => {
         const selectedCollectionData = this.collectionData();
 
-        return gatherCollectionElements(
+        return gatherAllVisibleCollectionElements(
             selectedCollectionData.objects
-        ).allVisibleElements();
+        );
     });
 
-    public readonly checkRole = checkCollectionRole.bind(this);
+    public readonly checkRole = checkCollectionMembershipRole.bind(this);
 }

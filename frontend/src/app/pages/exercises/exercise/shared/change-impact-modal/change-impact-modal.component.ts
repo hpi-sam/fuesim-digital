@@ -65,9 +65,7 @@ export class ChangeImpactModalComponent implements OnInit {
     public readonly selectedChange = signal<ChangeImpact | null>(null);
 
     public ngOnInit() {
-        console.log({ changeeeeees: this.changes });
         const tree = buildChangeImpactTree(this.changes);
-        console.log({ tree });
         this.changeImpactTreeNodes.set(tree);
     }
 

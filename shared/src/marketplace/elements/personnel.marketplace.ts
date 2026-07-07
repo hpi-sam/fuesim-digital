@@ -99,8 +99,6 @@ export const marketplacePersonnel: MarketplaceRegistryEntry = {
                 );
             }
 
-            console.log({ parsedNewContent });
-
             if (!hasEntityProperties(parsedNewContent.data)) {
                 throw new ReducerError(
                     'PersonnelTemplate of ChangeApply does not contain required entity attribute'

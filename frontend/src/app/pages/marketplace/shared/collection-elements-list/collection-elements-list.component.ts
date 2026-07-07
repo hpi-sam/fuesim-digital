@@ -2,12 +2,14 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import {
     ChangeElementType,
     TemplateVersion,
-    gatherCollectionElements,
     getCollectionElementDiff,
     VersionedCollectionPartial,
     MarketplaceElementContent,
     CollectionElements,
     ChangedTemplateVersion,
+    gatherAllVisibleCollectionElements,
+    gatherAllDirectCollectionElements,
+    gatherAllImportedCollectionElements,
 } from 'fuesim-digital-shared';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
@@ -119,9 +121,9 @@ export class CollectionElementsListComponent {
                     );
                 },
                 collection: this.collection(),
-                availableCollectionElements: gatherCollectionElements(
+                availableCollectionElements: gatherAllVisibleCollectionElements(
                     this.collectionElements()
-                ).allVisibleElements(),
+                ),
             } satisfies CreatingVersionedElementModalData<any>
         );
     }
@@ -131,9 +133,7 @@ export class CollectionElementsListComponent {
         if (!publishedElements) return {};
         const changes = getCollectionElementDiff(
             publishedElements,
-            gatherCollectionElements(
-                this.collectionElements()
-            ).allDirectElements()
+            gatherAllDirectCollectionElements(this.collectionElements())
         );
         return changes.reduce<{ [entityId: string]: ChangeElementType }>(
             (acc, change) => {
@@ -145,13 +145,9 @@ export class CollectionElementsListComponent {
     });
 
     public readonly visibleElements = computed(() => [
-        ...gatherCollectionElements(
-            this.collectionElements()
-        ).allDirectElements(),
+        ...gatherAllDirectCollectionElements(this.collectionElements()),
         ...(this.showImportedElements()
-            ? gatherCollectionElements(
-                  this.collectionElements()
-              ).allImportedElements()
+            ? gatherAllImportedCollectionElements(this.collectionElements())
             : []),
         ...(this.publishedElements() ?? []).filter(
             (f) => this.elementHasChanges()[f.entityId] === 'remove'

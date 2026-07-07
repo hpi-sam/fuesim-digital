@@ -4,7 +4,6 @@ import {
     ClientToServerEvents,
     CollectionVersion,
     CollectionEntityId,
-    CollectionRelationshipType,
     CollectionVersionId,
     ElementEntityId,
     ElementVersionId,
@@ -15,6 +14,8 @@ import {
     VersionedElementPartial,
     cloneDeepMutable,
     CollectionElements,
+    CollectionMembershipRole,
+    OrganisationId,
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
@@ -30,7 +31,7 @@ export interface CollectionSubscriptionData {
     objects: CollectionElements;
     publishedCollection: CollectionVersion;
     publishedElements: CollectionElements;
-    ownRole: CollectionRelationshipType;
+    ownRole: CollectionMembershipRole;
 }
 
 @Injectable({
@@ -248,7 +249,6 @@ export class CollectionService {
         }
         this.loadingModalService.closeLoading();
 
-        console.log(this.socket.connected);
         this.socket.emit('joinCollectionRoom', setEntityId, (response) => {
             this.socketFailHard = true;
             if (!response.success) return;
@@ -383,12 +383,16 @@ export class CollectionService {
         return parsedData.result;
     }
 
-    public async createColletion(title: string) {
+    public async createColletion(
+        title: string,
+        organisationId: OrganisationId
+    ) {
         const data = await lastValueFrom(
             this.httpClient.post<typeof Marketplace.Collection.Create.Response>(
                 `${this.ENDPOINT}/create`,
                 {
                     title,
+                    organisationId,
                 } satisfies typeof Marketplace.Collection.Create.Request
             )
         );
@@ -879,12 +883,12 @@ export class CollectionService {
     public async getCollectionMembers(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.get<
-                typeof Marketplace.Collection.GetCollectionMembers.Response
+                typeof Marketplace.Collection.GetCollectionOrganisations.Response
             >(`${this.ENDPOINT}/${collectionEntityId}/members`)
         );
 
         const typedData =
-            Marketplace.Collection.GetCollectionMembers.responseSchema.parse(
+            Marketplace.Collection.GetCollectionOrganisations.responseSchema.parse(
                 data
             );
 
@@ -893,15 +897,15 @@ export class CollectionService {
 
     public async removeCollectionMember(
         collectionEntityId: CollectionEntityId,
-        userId: string
+        organisationId: OrganisationId
     ) {
         await lastValueFrom(
             this.httpClient.delete(
                 `${this.ENDPOINT}/${collectionEntityId}/members/`,
                 {
-                    body: Marketplace.Collection.DeleteCollectionMember.requestSchema.encode(
+                    body: Marketplace.Collection.RemoveCollectionOrganisation.requestSchema.encode(
                         {
-                            userId,
+                            organisationId,
                         }
                     ),
                 }
@@ -922,23 +926,5 @@ export class CollectionService {
             body: 'Sie haben die Sammlung verlassen und können nun nicht mehr auf die Inhalte zugreifen.',
             color: 'success',
         });
-    }
-
-    public async setCollectionMemberRole(
-        collectionEntityId: CollectionEntityId,
-        userId: string,
-        role: CollectionRelationshipType
-    ) {
-        await lastValueFrom(
-            this.httpClient.patch(
-                `${this.ENDPOINT}/${collectionEntityId}/members/`,
-                Marketplace.Collection.PatchCollectionMember.requestSchema.encode(
-                    {
-                        userId,
-                        role,
-                    }
-                )
-            )
-        );
     }
 }

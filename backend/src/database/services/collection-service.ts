@@ -3,7 +3,6 @@ import type {
     CollectionElements,
     CollectionElementsSingle,
     CollectionEntityId,
-    CollectionRelationshipType,
     CollectionVersionId,
     TemplateVersion,
     ElementEntityId,
@@ -12,19 +11,18 @@ import type {
     Marketplace,
     ParticipantKey,
     VehicleTemplate,
-    MarketplaceElementContent,
     VersionedElementContent,
     VersionedElementPartial,
     OrganisationId,
     CollectionOrganisationRelationshipType,
-    OrganisationMembershipRole,
+    ExerciseState,
+    CollectionMembershipRole,
 } from 'fuesim-digital-shared';
 import {
     applyMigrations,
     checkCollectionOrganisationRole,
     cloneDeepMutable,
-    ExerciseState,
-    gatherCollectionElements,
+    newExerciseState,
     getAllCollectionElements,
     gatherAllDirectCollectionElements,
     getCollectionElementDiff,
@@ -32,13 +30,14 @@ import {
     getElementDependencies,
     isMarketplaceElementContent,
     replaceDependencies,
+    currentStateVersion,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type { WritableDraft } from 'immer';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 import { Config } from '../../config.js';
-import type { ExerciseService } from './exercise-service.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
+import type { ExerciseService } from './exercise-service.js';
 import type { OrganisationService } from './organisation-service.js';
 
 interface EventBuffer {
@@ -52,6 +51,7 @@ export class CollectionService {
     ): Promise<T> {
         return this.collectionRepository.transaction(async (tx) => {
             const serviceCopy = new CollectionService(
+                this.exerciseService,
                 this.organisationService,
                 tx,
                 this.eventSubject
@@ -172,7 +172,7 @@ export class CollectionService {
     public async getUserRoleInCollection(
         collectionEntityId: CollectionEntityId,
         user: SessionInformation
-    ): Promise<OrganisationMembershipRole | null> {
+    ): Promise<CollectionMembershipRole | null> {
         const organisations =
             await this.organisationService.getOrganisationsForUser(user);
 
@@ -240,11 +240,12 @@ export class CollectionService {
     public async getUserRoleInCollectionTransitive(
         collectionEntityId: CollectionEntityId,
         user: SessionInformation
-    ): Promise<CollectionRelationshipType | null> {
+    ): Promise<CollectionMembershipRole | null> {
         const directRole = await this.getUserRoleInCollection(
             collectionEntityId,
             user
         );
+
         if (directRole !== null) return directRole;
 
         const parentCollections =
@@ -271,7 +272,9 @@ export class CollectionService {
         return rolesInParents.some((r) => r) ? 'other' : null;
     }
 
-    public async getCollectionMembers(collectionEntityId: CollectionEntityId) {
+    public async getCollectionOrganisation(
+        collectionEntityId: CollectionEntityId
+    ) {
         return this.collectionRepository.getCollectionOrganisations(
             collectionEntityId
         );
@@ -1164,7 +1167,7 @@ export class CollectionService {
             eventBuffer.flush();
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            using cleanup = this.afterCollectionUpdate(draftState);
+            using cleanup = this.afterCollectionUpdate(draftState.entityId);
 
             return {
                 newSetVersionId: draftState.versionId,
@@ -1206,10 +1209,14 @@ export class CollectionService {
 
     public async deleteElementFromCollection(
         elementEntityId: ElementEntityId,
+        collectionEntityId: CollectionEntityId,
         acceptedCascadingDeletions: ElementVersionId[] = []
     ): Promise<typeof Marketplace.Element.Delete.Response> {
-        return this.transaction(async (tx) => {
-            const eventBuffer = tx.newDeferredEventBuffer();
+        const collection = this.exists(
+            await this.getLatestCollectionById(collectionEntityId, {
+                draftState: true,
+            })
+        );
 
         return this.reduce(
             collection.entityId,
@@ -1227,11 +1234,15 @@ export class CollectionService {
                     );
                 }
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            using cleanup = this.afterCollectionUpdate(containingSet.entityId);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                using cleanup = this.afterCollectionUpdate(
+                    containingSet.entityId
+                );
 
-            const [elementIsInLatestCollectionVersion] =
-                await this.isElementInLatestCollectionVersion(elementEntityId);
+                const [elementIsInLatestCollectionVersion] =
+                    await this.isElementInLatestCollectionVersion(
+                        elementEntityId
+                    );
 
                 if (!elementIsInLatestCollectionVersion) {
                     throw new Error(
@@ -1239,23 +1250,11 @@ export class CollectionService {
                     );
                 }
 
-            const [draftState, createdNewDraftState] =
-                await tx.collectionRepository.getOrCreateDraftState(
-                    containingSet.entityId
+                const latestElementVersion = tx.exists(
+                    await tx.collectionRepository.getLatestElementVersion(
+                        elementEntityId
+                    )
                 );
-            if (createdNewDraftState) {
-                eventBuffer.next({
-                    event: 'collection:update',
-                    data: draftState,
-                    collectionEntityId: containingSet.entityId,
-                });
-            }
-
-            const latestElementVersion = tx.exists(
-                await tx.collectionRepository.getLatestElementVersion(
-                    elementEntityId
-                )
-            );
 
                 // We want to fail the deletion if the element we want to delete is being referenced by other elements
                 // that have not been picked up by the frontend and as such not been shown to the user
@@ -1310,21 +1309,22 @@ export class CollectionService {
                     );
                 }
 
-            eventBuffer.next({
-                event: 'element:delete',
-                data: {
-                    entityId: elementEntityId,
-                },
-                collectionEntityId: containingSet.entityId,
-            });
+                eventBuffer.next({
+                    event: 'element:delete',
+                    data: {
+                        entityId: elementEntityId,
+                    },
+                    collectionEntityId: containingSet.entityId,
+                });
 
                 eventBuffer.flush();
 
-            return {
-                newSetVersionId: draftState.versionId,
-                requiresConfirmation: [],
-            };
-        });
+                return {
+                    newSetVersionId: draftState.versionId,
+                    requiresConfirmation: [],
+                };
+            }
+        );
     }
 
     public async restoreDeletedElementVersion(
@@ -1711,12 +1711,12 @@ export class CollectionService {
             const currentElementVersion = allElementVersions
                 .values()
                 .next().value!;
-            if (ExerciseState.currentStateVersion === currentElementVersion) {
+            if (currentStateVersion === currentElementVersion) {
                 return 0;
             }
 
             let state = cloneDeepMutable(
-                ExerciseState.create(
+                newExerciseState(
                     '123456' as ParticipantKey
                 ) as WritableDraft<ExerciseState>
             );
@@ -1760,10 +1760,10 @@ export class CollectionService {
             });
 
             const affectedElementCount = await tx.UNSAFE_overwriteElements(
-                migratedState.newVersion,
+                currentStateVersion,
                 [
                     ...Object.values(
-                        migratedState.migratedProperties.currentState.templates
+                        migratedState.currentState.templates
                     ).filter(isMarketplaceElementContent),
                 ]
             );
@@ -1793,7 +1793,7 @@ export class CollectionService {
                 await this.collectionRepository.getExercisesUsingCollection(
                     collection.entityId
                 );
-            console.log(affectedExercises);
+
             await Promise.all(
                 affectedExercises.rows.map(async (exerciseEntry) => {
                     const exercise = this.exerciseService.getExerciseById(
@@ -1811,8 +1811,10 @@ export class CollectionService {
                                 versionId: collection.versionId,
                             },
                             overwriteTemplates: await getAllCollectionElements(
-                                exerciseEntry.currentStateString
-                                    .selectedCollections,
+                                cloneDeepMutable(
+                                    exerciseEntry.currentStateString
+                                        .selectedCollections
+                                ),
                                 // We allow draftState here only bc we are in a section where Versioning is disabled
                                 async (c) =>
                                     this.getElementsOfCollectionVersion(

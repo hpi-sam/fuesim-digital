@@ -5,18 +5,17 @@ import type {
 } from 'express';
 import { Router } from 'express';
 import type {
-    CollectionRelationshipType,
+    CollectionMembershipRole,
     ExtendedCollectionVersion,
-    OrganisationMembershipRole,
 } from 'fuesim-digital-shared';
 import {
-    checkCollectionRole,
     isCollectionEntityId,
     isCollectionVersionId,
     isElementEntityId,
     isElementVersionId,
     Marketplace,
     cloneDeepMutable,
+    checkCollectionMembershipRole,
 } from 'fuesim-digital-shared';
 import { z } from 'zod';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
@@ -60,68 +59,100 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         'elementVersionId'
     );
 
-    const createRoleMiddleware =
-        (lowestAllowedRole: OrganisationMembershipRole) =>
-        async (
-            req: ExpressRequest,
-            res: ExpressResponse,
-            next: NextFunction
-        ) => {
-            const collectionEntityId = getCollectionEntityId(req);
+    type RoleMiddlewareFunction = (
+        req: ExpressRequest,
+        res: ExpressResponse,
+        next: NextFunction
+    ) => Promise<void> | void;
 
-            const collection = await collectionService.getLatestCollectionById(
-                collectionEntityId,
-                { draftState: true }
-            );
+    interface RoleMiddlewareFunctionWithStrict extends RoleMiddlewareFunction {
+        strict: RoleMiddlewareFunction;
+    }
 
-            if (!collection) {
-                res.status(404).send({ error: 'Collection not found' });
-                return;
-            }
+    const createRoleMiddleware = (
+        lowestAllowedRole: CollectionMembershipRole
+    ): RoleMiddlewareFunctionWithStrict => {
+        const accessMiddlewareFunction =
+            (strict: boolean = false) =>
+            async (
+                req: ExpressRequest,
+                res: ExpressResponse,
+                next: NextFunction
+            ) => {
+                const collectionEntityId = getCollectionEntityId(req);
 
-            const generallyAllowedVisibility = ['public', 'embedded'];
+                const collection =
+                    await collectionService.getLatestCollectionById(
+                        collectionEntityId,
+                        { draftState: true }
+                    );
 
-            if (generallyAllowedVisibility.includes(collection.visibility)) {
+                if (!collection) {
+                    res.status(404).send({ error: 'Collection not found' });
+                    return;
+                }
+
+                const generallyAllowedVisibility = ['public', 'embedded'];
+
+                if (
+                    generallyAllowedVisibility.includes(collection.visibility)
+                ) {
+                    next();
+                    return;
+                }
+
+                // We are not using the middleware here _before_,
+                // because we want to allow access to PUBLIC/EMBEDDED collection
+                // for users who are not logged in
+                if (!req.session) {
+                    throw new PermissionDeniedError();
+                }
+
+                const relationship =
+                    await collectionService.getUserRoleInCollectionTransitive(
+                        collectionEntityId,
+                        req.session
+                    );
+
+                if (!relationship) {
+                    res.status(403).send({
+                        error: 'You do not have access to this collection',
+                    });
+                    return;
+                }
+
+                if (strict && relationship !== lowestAllowedRole) {
+                    res.status(403).send({
+                        error: 'You do not have the required permissions to perform this action',
+                    });
+                    return;
+                }
+
+                const rolecheck =
+                    checkCollectionMembershipRole(relationship).isAtLeast(
+                        lowestAllowedRole
+                    );
+
+                if (!rolecheck) {
+                    res.status(403).send({
+                        error: 'You do not have the required permissions to perform this action',
+                    });
+                    return;
+                }
                 next();
-                return;
-            }
+            };
 
-            // We are not using the middleware here _before_,
-            // because we want to allow access to PUBLIC/EMBEDDED collection
-            // for users who are not logged in
-            if (!req.session) {
-                throw new PermissionDeniedError();
-            }
-
-            const userId = req.session.user.id;
-            const relationship =
-                await collectionService.getUserRoleInCollectionTransitive(
-                    collectionEntityId,
-                    req.session
-                );
-
-            if (!relationship) {
-                res.status(403).send({
-                    error: 'You do not have access to this collection',
-                });
-                return;
-            }
-
-            const rolecheck =
-                checkCollectionRole(relationship).isAtLeast(lowestAllowedRole);
-
-            if (!rolecheck) {
-                res.status(403).send({
-                    error: 'You do not have the required permissions to perform this action',
-                });
-                return;
-            }
-            next();
-        };
+        const wrapperFunction = accessMiddlewareFunction(false);
+        return Object.assign(wrapperFunction, {
+            strict: accessMiddlewareFunction(true),
+        });
+    };
 
     const adminAccess = createRoleMiddleware('admin');
     const editorAccess = createRoleMiddleware('editor');
     const viewerAccess = createRoleMiddleware('viewer');
+
+    // When the user has access to the collection through dependecies (access to collection A which uses B == "other" access to B)
     const otherAccess = createRoleMiddleware('other');
 
     publicRouter.get('/my', isAuthenticatedMiddleware, async (req, res) => {
@@ -186,24 +217,21 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
-    publicRouter.post(
-        '/join/:joinCode',
-        isAuthenticatedMiddleware,
-        async (req, res) => {
-            const { joinCode } = req.params;
+    publicRouter.post('/join', isAuthenticatedMiddleware, async (req, res) => {
+        const parsedBody =
+            Marketplace.Collection.JoinByJoinCode.requestSchema.parse(req.body);
 
-            const result = await collectionService.joinCollectionByCode(
-                z.string().parse(joinCode),
-                req.session!.user.id
-            );
+        const result = await collectionService.joinCollectionByCode(
+            z.string().parse(parsedBody.joinCode),
+            parsedBody.organisationId
+        );
 
-            res.send(
-                Marketplace.Collection.JoinByJoinCode.responseSchema.encode({
-                    result,
-                })
-            );
-        }
-    );
+        res.send(
+            Marketplace.Collection.JoinByJoinCode.responseSchema.encode({
+                result,
+            })
+        );
+    });
 
     publicRouter.get(
         '/join/:joinCode/preview',
@@ -405,7 +433,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             const collectionEntityId = getCollectionEntityId(req);
 
             const data =
-                await collectionService.getCollectionMembers(
+                await collectionService.getCollectionOrganisation(
                     collectionEntityId
                 );
 
@@ -419,39 +447,23 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    publicRouter.patch(
-        '/:collectionEntityId/members',
-        adminAccess,
-        async (req, res) => {
-            const collectionEntityId = getCollectionEntityId(req);
-
-            const parsedBody =
-                Marketplace.Collection.PatchCollectionMember.requestSchema.parse(
-                    req.body
-                );
-
-            await collectionService.setCollectionMemberRole(
-                collectionEntityId,
-                parsedBody.userId,
-                parsedBody.role
-            );
-
-            res.send();
-        }
-    );
-
     // This endpoint is seperate from the delete members endpoint,
     // as it has a different permission requirement and to
     // make the permissions clearer.
     publicRouter.post(
         '/:collectionEntityId/members/leave',
-        viewerAccess,
+        viewerAccess.strict,
         async (req, res) => {
             const collectionEntityId = getCollectionEntityId(req);
 
-            await collectionService.removeCollectionMember(
+            const parsedBody =
+                Marketplace.Collection.LeaveCollection.requestSchema.parse(
+                    req.body
+                );
+
+            await collectionService.removeCollectionOrganisation(
                 collectionEntityId,
-                req.session!.user.id
+                parsedBody.organisationId
             );
 
             res.send();
@@ -465,13 +477,13 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             const collectionEntityId = getCollectionEntityId(req);
 
             const parsedBody =
-                Marketplace.Collection.DeleteCollectionMember.requestSchema.parse(
+                Marketplace.Collection.RemoveCollectionOrganisation.requestSchema.parse(
                     req.body
                 );
 
-            await collectionService.removeCollectionMember(
+            await collectionService.removeCollectionOrganisation(
                 collectionEntityId,
-                parsedBody.userId
+                parsedBody.organisationId
             );
 
             res.send();
@@ -844,7 +856,8 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
             const data = await collectionService.duplicateElementVersion(
                 elementVersionId,
-                body.externalCollection ?? collectionEntityId
+                body.externalCollection ?? collectionEntityId,
+                body.externalCollection !== undefined
             );
 
             res.send(
@@ -887,6 +900,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         editorAccess,
         async (req, res) => {
             const elementEntityId = getElementEntityId(req);
+            const collectionEntityId = getCollectionEntityId(req);
             const parsedBody = Marketplace.Element.Delete.requestSchema.parse(
                 req.body
             );
@@ -894,6 +908,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             const deletionResult =
                 await collectionService.deleteElementFromCollection(
                     elementEntityId,
+                    collectionEntityId,
                     parsedBody.conflictResolution?.acceptedCascadingDeletions ??
                         []
                 );

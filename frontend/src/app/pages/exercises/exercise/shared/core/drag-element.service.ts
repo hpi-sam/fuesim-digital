@@ -98,9 +98,8 @@ export class DragElementService {
             return;
         }
         this.transferringTemplate = transferTemplate;
-        console.log(transferTemplate);
+
         if (hasEntityProperties(transferTemplate.template)) {
-            console.log('YIPPE - entity');
             this.transferringEntityVersion = transferTemplate.template.entity;
         }
 

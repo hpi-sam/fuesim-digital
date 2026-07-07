@@ -7,16 +7,16 @@ import {
     signal,
 } from '@angular/core';
 import {
-    checkCollectionRole,
     CollectionVersion,
     CollectionEntityId,
-    gatherCollectionElements,
     VersionedCollectionPartial,
+    gatherAllVisibleCollectionElements,
+    checkCollectionOrganisationRole,
 } from 'fuesim-digital-shared';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { RouterLink, RouterLinkWithHref } from '@angular/router';
-// its a nessesary evil
+// we cannot get around it
 // eslint-disable-next-line import/no-cycle
 import { CollectionElementsListComponent } from '../../collection-elements-list/collection-elements-list.component';
 import { CollectionService } from '../../../../../core/exercise-element.service';
@@ -71,9 +71,9 @@ export class MarketplaceSelectCollectionModalComponent {
                 collections.filter((collection) => {
                     if (
                         this.restrictToEditable &&
-                        !checkCollectionRole(collection.relationship).isAtLeast(
-                            'editor'
-                        )
+                        !checkCollectionOrganisationRole(
+                            collection.relationship
+                        ).isAtLeast('owner')
                     ) {
                         return false;
                     }
@@ -107,7 +107,7 @@ export class MarketplaceSelectCollectionModalComponent {
         if (!data) return [];
 
         if (this.showDependencyElements) {
-            return gatherCollectionElements(data[1]).allVisibleElements();
+            return gatherAllVisibleCollectionElements(data[1]);
         }
         return data[1].direct;
     });

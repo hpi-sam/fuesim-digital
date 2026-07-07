@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import {
     TemplateVersion,
-    gatherCollectionElements,
+    gatherAllCollectionElements,
     VersionedCollectionPartial,
     MarketplaceElementContent,
     CollectionElements,
@@ -82,9 +82,9 @@ export class ElementCardComponent {
                 },
                 collection,
                 element: this.element(),
-                availableCollectionElements: gatherCollectionElements(
+                availableCollectionElements: gatherAllCollectionElements(
                     this.collectionElements()!
-                ).allElements(),
+                ),
                 hideVersionHistory: this.hideVersionHistory(),
             } satisfies EditingVersionedElementModalData<MarketplaceElementContent>,
             {

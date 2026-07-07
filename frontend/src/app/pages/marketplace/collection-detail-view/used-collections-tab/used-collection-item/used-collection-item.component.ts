@@ -11,7 +11,7 @@ import {
     ElementVersionId,
     TemplateVersion,
     ChangeDependencies,
-    gatherCollectionElements,
+    gatherAllVisibleCollectionElements,
     CollectionVersion,
     getElementDependencies,
 } from 'fuesim-digital-shared';
@@ -131,15 +131,13 @@ export class UsedCollectionItemComponent {
             modal.componentInstance as CollectionUpgradeImpactModalComponent;
         modalInstance.changes = changes;
         modalInstance.collectionElements =
-            gatherCollectionElements(newVersionElements).allVisibleElements();
+            gatherAllVisibleCollectionElements(newVersionElements);
         modalInstance.changeDependencies = changeDependencies;
         modalInstance.confirmationButtonText =
             'Änderungen annehmen und Sammlung aktualisieren';
 
         const result = await firstValueFrom(modalInstance.confirmationResult$);
         if (!result) return;
-
-        console.log({ changeDependencies });
 
         const newVersion = value.latestVersion;
         await this.collectionService.upgradeCollectionDependency({

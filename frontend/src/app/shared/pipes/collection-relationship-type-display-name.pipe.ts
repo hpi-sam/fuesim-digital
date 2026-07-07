@@ -1,13 +1,17 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
 import {
-    CollectionRelationshipType,
-    collectionRelationshipTypesDisplayNames,
+    CollectionOrganisationRelationshipType,
+    collectionOrganisationRelationshipTypeDisplayNames,
 } from 'fuesim-digital-shared';
 
 @Pipe({ name: 'collectionRelationshipType' })
 export class CollectionRelationshipTypeDisplayNamePipe implements PipeTransform {
-    transform(relationshipType: CollectionRelationshipType): string {
-        return collectionRelationshipTypesDisplayNames[relationshipType];
+    transform(
+        relationshipType: CollectionOrganisationRelationshipType
+    ): string {
+        return collectionOrganisationRelationshipTypeDisplayNames[
+            relationshipType
+        ];
     }
 }

@@ -1,7 +1,6 @@
 import { Component, inject, input, resource } from '@angular/core';
 import {
     TemplateVersion,
-    gatherCollectionElements,
     VersionedCollectionPartial,
     getCollectionElementDiff,
     CollectionVersion,
@@ -11,6 +10,8 @@ import {
     ChangeApply,
     getAllCollectionElements,
     ChangedTemplateVersion,
+    gatherAllVisibleCollectionElements,
+    cloneDeepMutable,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -66,9 +67,7 @@ export class ExerciseColletionItemComponent {
             await this.collectionService.getElementsOfCollectionVersion(
                 this.collection()
             );
-        return gatherCollectionElements(
-            collectionElements
-        ).allVisibleElements();
+        return gatherAllVisibleCollectionElements(collectionElements);
     }
 
     public async removeCollection(collection: CollectionVersion) {
@@ -89,7 +88,7 @@ export class ExerciseColletionItemComponent {
             );
 
             const currentElements = await getAllCollectionElements(
-                currentSelectedCollections,
+                cloneDeepMutable(currentSelectedCollections),
                 async (c) =>
                     this.collectionService.getElementsOfCollectionVersion(c)
             );
@@ -100,8 +99,8 @@ export class ExerciseColletionItemComponent {
             );
 
             const elementsChanges = getCollectionElementDiff(
-                gatherCollectionElements(currentElements).allVisibleElements(),
-                gatherCollectionElements(newElements).allVisibleElements()
+                gatherAllVisibleCollectionElements(currentElements),
+                gatherAllVisibleCollectionElements(newElements)
             );
 
             const currentState = selectStateSnapshot(
@@ -125,7 +124,7 @@ export class ExerciseColletionItemComponent {
             const result = await openChangeImpactModal(this.ngbModalService, {
                 changeImpacts: changeImpacts.impact,
                 visibleAvailableElements:
-                    gatherCollectionElements(newTemplates).allVisibleElements(),
+                    gatherAllVisibleCollectionElements(newTemplates),
             });
 
             if (!result.apply) return;
@@ -194,9 +193,7 @@ export class ExerciseColletionItemComponent {
 
             const changes = getCollectionElementDiff(
                 currentCollectionElements,
-                gatherCollectionElements(
-                    newerCollectionElements
-                ).allVisibleElements()
+                gatherAllVisibleCollectionElements(newerCollectionElements)
             );
 
             const newTemplates = await getAllCollectionElements(
@@ -215,14 +212,12 @@ export class ExerciseColletionItemComponent {
                 changes
             );
 
-            console.log({ changes, changeImpacts });
-
             this.loadingModalService.closeLoading();
 
             const result = await openChangeImpactModal(this.ngbModalService, {
                 changeImpacts: changeImpacts.impact,
                 visibleAvailableElements:
-                    gatherCollectionElements(newTemplates).allVisibleElements(),
+                    gatherAllVisibleCollectionElements(newTemplates),
             });
 
             if (!result.apply) return;

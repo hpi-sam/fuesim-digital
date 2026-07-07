@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import type { ImmutableInfer } from '../utils/infer.js';
-import type { TemplateVersion } from './models/marketplace-element.js';
-import { templateVersionSchema } from './models/marketplace-element.js';
+import type { Immutable } from 'immer';
 import type { ElementVersionId } from './models/versioned-id-schema.js';
 import { elementVersionIdSchema } from './models/versioned-id-schema.js';
+import type { TemplateVersion } from './models/versioned-elements.js';
+import { templateVersionSchema } from './models/versioned-elements.js';
 
 const deletedTemplateVersionSchema = z.object({
     id: elementVersionIdSchema,
@@ -32,12 +32,12 @@ export const changedTemplateVersionSchema = z.union([
     addedTemplateVersionSchema,
 ]);
 
-export type ChangeElementType = ImmutableInfer<
-    typeof changedTemplateVersionSchema
+export type ChangeElementType = Immutable<
+    z.infer<typeof changedTemplateVersionSchema>
 >['type'];
 
-export type ChangedTemplateVersion = ImmutableInfer<
-    typeof changedTemplateVersionSchema
+export type ChangedTemplateVersion = Immutable<
+    z.infer<typeof changedTemplateVersionSchema>
 >;
 
 export const changeDependenciesSchema = z.record(

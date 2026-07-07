@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { collectionElementTypeSchema } from '../models/collection-element-type.js';
 import { marketplaceElementContentSchema } from '../elements/marketplace-elements.js';
-import { templateVersionSchema } from '../models/marketplace-element.js';
+import { templateVersionSchema } from '../models/versioned-elements.js';
 import type { ImmutableInfer } from './../../utils/infer.js';
 import { changeTargetSchema } from './exercise-collection-change-target.js';
 

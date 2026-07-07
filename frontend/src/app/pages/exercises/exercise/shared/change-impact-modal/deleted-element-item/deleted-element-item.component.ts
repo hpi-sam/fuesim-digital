@@ -100,7 +100,6 @@ export class DeletedElementChangeApplyItemComponent {
                     | RemoveChangeApply['action']
                     | undefined) ?? null
             );
-            console.log('effect called');
         });
     }
 

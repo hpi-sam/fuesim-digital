@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Immutable } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import type { ExerciseState } from '../state.js';
 import { vehicleTemplateSchema } from './vehicle-template.js';
 import { personnelTemplateSchema } from './personnel-template.js';
@@ -24,14 +24,14 @@ export const templateTypeSchema = z.union(
 export type TemplateType = z.infer<typeof templateTypeSchema>;
 
 export function getTemplates<T extends Template['type']>(
-    draftState: ExerciseState,
-    templateId: T
+    draftState: Pick<ExerciseState | WritableDraft<ExerciseState>, 'templates'>,
+    templateType: T
 ): {
     [key: string]: Extract<Template, { type: T }>;
 } {
     return Object.fromEntries(
         Object.entries(draftState.templates).filter(
-            ([_, template]) => template.type === templateId
+            ([_, template]) => template.type === templateType
         ) as [key: string, value: Extract<Template, { type: T }>][]
     );
 }

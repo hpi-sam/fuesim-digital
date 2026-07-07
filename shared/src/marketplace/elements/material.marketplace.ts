@@ -99,8 +99,6 @@ export const marketplaceMaterial: MarketplaceRegistryEntry = {
                 );
             }
 
-            console.log({ parsedNewContent });
-
             if (!hasEntityProperties(parsedNewContent.data)) {
                 throw new ReducerError(
                     'MaterialTemplate of ChangeApply does not contain required entity attribute'

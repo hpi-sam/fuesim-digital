@@ -1,66 +1,17 @@
-import { z } from 'zod';
-import type { Immutable } from 'immer';
 import type { Immutable, WritableDraft } from 'immer';
 import { cloneDeepMutable } from '../utils/clone-deep.js';
 import type {
-    ElementVersionId,
     CollectionVersionId,
     VersionedCollectionPartial,
 } from './models/versioned-id-schema.js';
-import { elementVersionIdSchema } from './models/versioned-id-schema.js';
-import { templateVersionSchema } from './models/versioned-elements.js';
 import type { TemplateVersion } from './models/versioned-elements.js';
 import {
     gatherAllDirectCollectionElements,
     gatherAllImportedCollectionElements,
     gatherAllReferencedCollectionElements,
-    type CollectionElements,
 } from './models/collection-elements.js';
 
-const deletedTemplateVersionSchema = z.object({
-    id: elementVersionIdSchema,
-    type: z.literal('remove'),
-    old: templateVersionSchema,
-    new: z.null(),
-});
-
-const updatedTemplateVersionSchema = z.object({
-    id: elementVersionIdSchema,
-    type: z.literal('update'),
-    old: templateVersionSchema,
-    new: templateVersionSchema,
-});
-
-const addedTemplateVersionSchema = z.object({
-    id: elementVersionIdSchema,
-    type: z.literal('create'),
-    old: z.null(),
-    new: templateVersionSchema,
-});
-
-export const changedTemplateVersionSchema = z.union([
-    deletedTemplateVersionSchema,
-    updatedTemplateVersionSchema,
-    addedTemplateVersionSchema,
-]);
-
-export type ChangeElementType = Immutable<
-    z.infer<typeof changedTemplateVersionSchema>
->['type'];
-
-export type ChangedTemplateVersion = Immutable<
-    z.infer<typeof changedTemplateVersionSchema>
->;
-
-export const changeDependenciesSchema = z.record(
-    elementVersionIdSchema,
-    z.array(templateVersionSchema)
-);
-
-export type ChangeDependencies = { [T in ElementVersionId]: TemplateVersion[] };
 import type { CollectionElements } from './models/collection-elements.js';
-import { gatherCollectionElements } from './models/collection-elements.js';
-import type { TemplateVersion } from './models/marketplace-element.js';
 import type { ChangedTemplateVersion } from './collection-element-diff.js';
 
 export function getCollectionElementDiff(

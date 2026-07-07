@@ -1,3 +1,4 @@
+import type { ExerciseState } from '../state.js';
 import { renameDeleteTransferAction10 } from './10-rename-delete-transfer-action.js';
 import { addMapImageIsLocked11 } from './11-add-map-image-is-locked.js';
 import { renameIncorrectPatientImages12 } from './12-rename-incorrect-patient-images.js';
@@ -55,7 +56,6 @@ import { vehicleLoadTimes55 } from './55-vehicle-load-times.js';
 import { vehicleCounters56 } from './56-vehicle-counters.js';
 import { technicalChallengesMeasuresExtendedScoutables57 } from './56-technical-challenges-measures-extended-scoutables.js';
 import { addAlarmGroupVehicleType58 } from './58-add-alarm-group-vehicle-type.js';
-import { addCollections58 } from './58-add-collections.js';
 
 /**
  * Migrate a single action
@@ -65,7 +65,7 @@ import { addCollections58 } from './58-add-collections.js';
  * @throws a {@link RestoreError} when a migration is not possible.
  */
 type MigrateActionFunction = (
-    intermediaryState: object,
+    intermediaryState: ExerciseState,
     action: object
 ) => boolean;
 
@@ -140,5 +140,5 @@ export const migrations: {
     55: vehicleLoadTimes55,
     56: vehicleCounters56,
     57: technicalChallengesMeasuresExtendedScoutables57,
-    58: addAlarmGroupVehicleType58
+    58: addAlarmGroupVehicleType58,
 };

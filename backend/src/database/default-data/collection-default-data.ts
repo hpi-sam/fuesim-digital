@@ -3,7 +3,6 @@ import type {
     ElementVersionId,
     TemplateVersion,
 } from 'fuesim-digital-shared';
-import type { CollectionVersion, TemplateVersion } from 'fuesim-digital-shared';
 import {
     collectionEntityIdSchema,
     collectionVersionIdSchema,
@@ -24,7 +23,7 @@ export type DefaultCollection = Omit<CollectionVersion, 'stateVersion'> & {
 };
 
 function newElementVersionId(uuid: string) {
-    return elementVersionIdSchema.parse(`element_version_${uuid}`);
+    return elementVersionIdSchema.parse(uuid);
 }
 
 function newElementEntityId(uuid: string) {

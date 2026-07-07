@@ -1,7 +1,6 @@
 import type {
     CollectionVersion,
     CollectionEntityId,
-    CollectionRelationshipType,
     CollectionVersionId,
     CollectionVisibility,
     TemplateVersion,
@@ -15,11 +14,6 @@ import type {
     CollectionOrganisationRelationshipType,
 } from 'fuesim-digital-shared';
 import { currentStateVersion } from 'fuesim-digital-shared';
-import type { InferInsertModel, SQL } from 'drizzle-orm';
-import {
-    collectionRelationshipTypeAllowedValues,
-    ExerciseState,
-} from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
 import {
     eq,
@@ -40,8 +34,8 @@ import {
     elementTable,
     collectionJoinCodesTable,
     collectionOrganisationMappingTable,
-    userTable,
     organisationTable,
+    exerciseTable,
 } from '../schema.js';
 import { defaultCollectionData } from '../default-data/collection-default-data.js';
 import { Config } from '../../config.js';
@@ -170,19 +164,19 @@ export class CollectionRepository extends BaseRepository {
         );
     }
 
-   public async getExercisesUsingCollection(
-           collectionEntitiyId: CollectionEntityId
-       ) {
-           return this.databaseConnection.execute<
-               InferSelectModel<typeof exerciseTable>
-           >(
-               sql`
+    public async getExercisesUsingCollection(
+        collectionEntitiyId: CollectionEntityId
+    ) {
+        return this.databaseConnection.execute<
+            InferSelectModel<typeof exerciseTable>
+        >(
+            sql`
                    SELECT ${exerciseTable}.*
                    FROM ${exerciseTable}, json_array_elements("currentStateString"->'selectedCollections') AS t
                    WHERE t->>'entityId' = ${collectionEntitiyId}
                `
-           );
-       }
+        );
+    }
 
     public async getJoinCode(collectionEntityId: CollectionEntityId) {
         return this.onlySingle(
@@ -194,8 +188,6 @@ export class CollectionRepository extends BaseRepository {
                 )
         );
     }
-
-
 
     public async getOrCreateJoinCode(collectionEntityId: CollectionEntityId) {
         const existingCode = await this.getJoinCode(collectionEntityId);
@@ -292,10 +284,10 @@ export class CollectionRepository extends BaseRepository {
             })
             .from(collectionOrganisationMappingTable)
             .innerJoin(
-                userTable,
+                organisationTable,
                 eq(
                     collectionOrganisationMappingTable.organisationId,
-                    userTable.id
+                    organisationTable.id
                 )
             )
             .where(
@@ -378,7 +370,7 @@ export class CollectionRepository extends BaseRepository {
                         elementCollectionMappingTable.collectionVersionId,
                 })
                 .from(elementCollectionMappingTable)
-                .groupBy(elementCollectionMappingTable.elementVersionId)
+                .groupBy(elementCollectionMappingTable.collectionVersionId)
         );
     }
 
@@ -1044,10 +1036,7 @@ export class CollectionRepository extends BaseRepository {
                         .select({
                             // WARNING: This is order-sensitive, based on the order in the schema
                             // and requires ALL fields (even defaulted ones) to be selected
-                            versionId:
-                                sql`'element_version_' || uuid_generate_v4()`.as(
-                                    'versionId'
-                                ),
+                            versionId: sql`uuid_generate_v4()`.as('versionId'),
                             entityId:
                                 sql`'element_entity_' || uuid_generate_v4()`.as(
                                     'entityId'

@@ -17,9 +17,6 @@ export interface ServerToClientEvents {
     collectionUpdate: (
         data: z.input<typeof Marketplace.Collection.Events.SSEvent.schema>
     ) => void;
-    collectionUpdate: (
-        data: z.input<typeof Marketplace.Collection.Events.SSEvent.schema>
-    ) => void;
     collectionVersioningEnabled: (data: boolean) => void;
 }
 

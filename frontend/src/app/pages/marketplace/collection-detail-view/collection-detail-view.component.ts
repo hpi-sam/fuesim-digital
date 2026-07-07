@@ -2,8 +2,8 @@ import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
-    checkCollectionRole,
-    gatherCollectionElements,
+    checkCollectionMembershipRole,
+    gatherAllVisibleCollectionElements,
     getCollectionElementDiff,
 } from 'fuesim-digital-shared';
 import { Subject, takeUntil } from 'rxjs';
@@ -61,7 +61,7 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
         link: '/collections',
     };
 
-    public readonly checkRole = checkCollectionRole.bind(this);
+    public readonly checkRole = checkCollectionMembershipRole.bind(this);
 
     private readonly collection = this.activatedRoute.snapshot.data[
         'collectionSubscription'
@@ -140,9 +140,9 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
         const modalInstance =
             modal.componentInstance as CollectionUpgradeImpactModalComponent;
         modalInstance.changes = changes;
-        modalInstance.collectionElements = gatherCollectionElements(
+        modalInstance.collectionElements = gatherAllVisibleCollectionElements(
             collectionData.objects
-        ).allVisibleElements();
+        );
     }
 
     public async saveDraftState() {

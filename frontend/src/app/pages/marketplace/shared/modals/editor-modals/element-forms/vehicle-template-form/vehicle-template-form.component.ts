@@ -73,6 +73,7 @@ export class VehicleTemplateFormMarketplaceComponent implements BaseVersionedEle
         name: '',
         patientCapacity: 0,
         vehicleType: '',
+        patientLoadMinutes: 0,
     });
     public readonly btnText = input<string>('Änderungen speichern');
     public readonly disabled = input<boolean>(false);

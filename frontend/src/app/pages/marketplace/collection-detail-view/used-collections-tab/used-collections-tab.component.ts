@@ -1,6 +1,6 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { checkCollectionRole } from 'fuesim-digital-shared';
+import { checkCollectionMembershipRole } from 'fuesim-digital-shared';
 import {
     CollectionService,
     CollectionSubscriptionData,
@@ -28,7 +28,7 @@ export class UsedCollectionsTabComponent {
         )
     );
 
-    public readonly checkRole = checkCollectionRole.bind(this);
+    public readonly checkRole = checkCollectionMembershipRole.bind(this);
 
     public async openCollectionSelectionModal() {
         const result = await openSelectCollectionModal(this.ngbModalService, {

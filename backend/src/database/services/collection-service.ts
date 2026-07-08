@@ -17,6 +17,7 @@ import type {
     CollectionOrganisationRelationshipType,
     ExerciseState,
     CollectionMembershipRole,
+    CollectionVisibility,
 } from 'fuesim-digital-shared';
 import {
     applyMigrations,
@@ -1486,6 +1487,31 @@ export class CollectionService {
         });
 
         return data;
+    }
+
+    public isPublicVisibility(visibility: CollectionVisibility): boolean {
+        const generallyPublicVisibilities: CollectionVisibility[] = [
+            'public',
+            'embedded',
+        ];
+
+        return generallyPublicVisibilities.includes(visibility);
+    }
+
+    public async isCollectionPublic(collectionEntityId: CollectionEntityId) {
+        const collection =
+            await this.collectionRepository.getLatestCollectionByEntityId(
+                collectionEntityId,
+                { allowDraftState: true }
+            );
+
+        if (!collection) {
+            throw new Error(
+                `Collection with entityId ${collectionEntityId} not found`
+            );
+        }
+
+        return this.isPublicVisibility(collection.visibility);
     }
 
     public async duplicateElementVersion(

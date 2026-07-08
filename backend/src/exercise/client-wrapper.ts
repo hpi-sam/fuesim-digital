@@ -7,6 +7,7 @@ import type {
     ParallelExerciseId,
     Client,
     CollectionEntityId,
+    CollectionMembershipRole,
 } from 'fuesim-digital-shared';
 import {
     Marketplace,
@@ -14,6 +15,7 @@ import {
     newClient,
     newClientRole,
     cloneDeepMutable,
+    checkCollectionMembershipRole,
 } from 'fuesim-digital-shared';
 import {
     Subject,
@@ -440,14 +442,13 @@ export class CollectionClientWrapper extends ClientWrapper {
                 }
             );
 
-        const userRelationship =
-            await this.services.collectionService.getUserRoleInCollection(
-                latestDraftStateVersion.entityId,
-                this.session!
-            );
-        if (!userRelationship) {
-            this.abort('User has no relationship to collection');
-            return;
+        let userRelationship: CollectionMembershipRole | null = null;
+        if (this.session) {
+            userRelationship =
+                await this.services.collectionService.getUserRoleInCollection(
+                    latestDraftStateVersion.entityId,
+                    this.session
+                );
         }
 
         return Marketplace.Collection.Events.InitialData.schema.encode({
@@ -456,10 +457,38 @@ export class CollectionClientWrapper extends ClientWrapper {
             data: {
                 collection: latestDraftStateVersion,
                 elements: cloneDeepMutable(draftStateElements),
-                userRelationship,
+                userRelationship: userRelationship ?? 'other',
                 publishedCollection: latestPubishedVersion,
                 publishedElements: cloneDeepMutable(publishedElements),
             },
         });
+    }
+
+    public async canAccessCollection(collectionEntityId: CollectionEntityId) {
+        let canAccessCollection = false;
+
+        if (this.session) {
+            const relationship =
+                await this.services.collectionService.getUserRoleInCollectionTransitive(
+                    collectionEntityId,
+                    this.session
+                );
+
+            if (relationship !== null) {
+                canAccessCollection =
+                    checkCollectionMembershipRole(relationship).isAtLeast(
+                        'other'
+                    );
+            }
+        }
+
+        if (!canAccessCollection) {
+            canAccessCollection =
+                await this.services.collectionService.isCollectionPublic(
+                    collectionEntityId
+                );
+        }
+
+        return canAccessCollection;
     }
 }

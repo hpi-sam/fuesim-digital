@@ -1,4 +1,3 @@
-import { checkCollectionMembershipRole } from 'fuesim-digital-shared';
 import type { Services } from '../../database/services/index.js';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { ClientWrapper, CollectionClientWrapper } from '../client-wrapper.js';
@@ -28,15 +27,6 @@ export function registerCollectionHandler(
 
         await clientWrapper.getSessionInformation();
 
-        if (clientWrapper.session === undefined) {
-            callback({
-                success: false,
-                message: 'You are not authenticated',
-                expected: false,
-            });
-            return;
-        }
-
         socket.emit(
             'collectionVersioningEnabled',
             !Config.experimentalDisableVersioning
@@ -56,35 +46,10 @@ export function registerCollectionHandler(
                 return;
             }
 
-            if (!clientWrapper.session) {
-                callback({
-                    success: false,
-                    message: 'You are not authenticated',
-                    expected: false,
-                });
-                return;
-            }
+            const canAccessCollection =
+                await clientWrapper.canAccessCollection(collectionEntityId);
 
-            const relationship =
-                await services.collectionService.getUserRoleInCollectionTransitive(
-                    collectionEntityId,
-                    clientWrapper.session
-                );
-
-            if (!relationship) {
-                callback({
-                    success: false,
-                    message:
-                        'User doesnt have sufficient permissions to access this collection',
-                    expected: false,
-                });
-                return;
-            }
-
-            const rolecheck =
-                checkCollectionMembershipRole(relationship).isAtLeast('other');
-
-            if (!rolecheck) {
+            if (!canAccessCollection) {
                 callback({
                     success: false,
                     message:

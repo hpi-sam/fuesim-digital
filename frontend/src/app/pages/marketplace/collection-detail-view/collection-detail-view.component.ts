@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
     checkCollectionMembershipRole,
+    exerciseKeySchema,
     gatherAllVisibleCollectionElements,
     getCollectionElementDiff,
 } from 'fuesim-digital-shared';
@@ -56,9 +57,18 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
     public readonly selectedCollectionData =
         signal<CollectionSubscriptionData | null>(null);
 
-    public routerBackLink: { title: string; link: string } = {
+    public routerBackLink: {
+        title: string;
+        link: string;
+        important: boolean;
+        icon: string | null;
+        queryParams: object | null;
+    } = {
         title: 'meinen Sammlungen',
         link: '/collections',
+        important: false,
+        icon: null,
+        queryParams: null,
     };
 
     public readonly checkRole = checkCollectionMembershipRole.bind(this);
@@ -80,14 +90,32 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
             .pipe(takeUntil(this.destroy$))
             .subscribe((params) => {
                 const fromLocation = params.get('from');
+                console.log({
+                    fromLocation,
+                    parse: exerciseKeySchema.safeParse(fromLocation),
+                });
                 switch (fromLocation) {
                     case 'archive':
                         this.routerBackLink = {
                             title: 'meinem Archiv',
                             link: '/collections/archive',
+                            important: false,
+                            icon: null,
+                            queryParams: null,
                         };
                         break;
                     default:
+                        if (exerciseKeySchema.safeParse(fromLocation).success) {
+                            this.routerBackLink = {
+                                title: 'der Übung',
+                                link: `/exercises/${fromLocation}`,
+                                important: true,
+                                icon: 'bi bi-map mx-1',
+                                queryParams: {
+                                    openmanagecollectionmodal: 'true',
+                                },
+                            };
+                        }
                         break;
                 }
             });

@@ -13,12 +13,13 @@
             <i class="bi bi-clock me-1"></i> Zuletzt bearbeitet:
             {{ collection().editedAt | date }}
         </li>
-        <li class="list-group-item py-1" >
+        <li class="list-group-item py-1">
             <i class="bi bi-grid me-1"></i>
             {{ collection().elementCount }} Übungselemente
             @if (collection().draftState) {
-                <i class="bi bi-pencil-fill ms-1 draftstate-indicator"
-ngbTooltip="befindet sich im Entwurfsstatus"
+                <i
+                    class="bi bi-pencil-fill ms-1 draftstate-indicator"
+                    ngbTooltip="befindet sich im Entwurfsstatus"
                 ></i>
             }
         </li>

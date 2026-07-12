@@ -58,40 +58,18 @@
                 Neue Sammlung hinzufügen
             </button>
         }
-
-        <div ngbAccordion #accordion="ngbAccordion" [closeOthers]="true">
-            @for (collection of selectedCollections(); track collection) {
-                <div [ngbAccordionItem]="collection.versionId">
-                    <h5 ngbAccordionHeader>
-                        <button ngbAccordionButton style="cursor: auto">
-                            <app-exercise-collection-item-component
-                                class="w-100 d-block me-3"
-                                [collection]="collection"
-                            />
-                        </button>
-                    </h5>
-
-                    <div ngbAccordionCollapse>
-                        <div ngbAccordionBody>
-                            <ng-template>
-                                @if (collectionElements.isLoading()) {
-                                    <div class="spinner-border"></div>
-                                } @else if (collectionElements.hasValue()) {
-                                    <app-collection-elements-list
-                                        [collection]="collection"
-                                        [collectionElements]="
-                                            getElementsByCollection(collection)
-                                        "
-                                        [showImportedElements]="true"
-                                        [editable]="false"
-                                        [smallCards]="true"
-                                    />
-                                } @else {}
-                            </ng-template>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
+        @if (currentExerciseKey(); as currentExerciseKey) {
+            <ul class="list-group">
+                @for (collection of selectedCollections(); track collection) {
+                    <li class="list-group-item">
+                        <app-exercise-collection-item-component
+                            class="w-100 d-block me-3"
+                            [exerciseKey]="currentExerciseKey"
+                            [collection]="collection"
+                        />
+                    </li>
+                }
+            </ul>
+        }
     </div>
 </div>

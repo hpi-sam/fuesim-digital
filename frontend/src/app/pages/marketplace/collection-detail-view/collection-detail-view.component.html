@@ -1,10 +1,16 @@
 <div class="container">
     <a
-        class="btn btn-outline-secondary btn-sm mb-4"
+        class="btn mb-4"
+        [class.btn-sm]="!routerBackLink.important"
+        [class.btn-outline-secondary]="!routerBackLink.important"
+        [class.btn-primary]="routerBackLink.important"
+        [class.pulsating]="routerBackLink.important"
         [routerLink]="routerBackLink.link"
+        [queryParams]="routerBackLink.queryParams"
     >
-        <i class="bi bi-arrow-left"></i
-        ><span> Zurück zu {{ routerBackLink.title }}</span>
+        <i class="bi bi-arrow-left"></i>
+        <i [class]="routerBackLink.icon"></i>
+        <span> Zurück zu {{ routerBackLink.title }} </span>
     </a>
     @if (selectedCollectionData(); as collectionData) {
         <div class="d-flex flex-row justify-content-between container w-100">

@@ -7,6 +7,7 @@ import { JoinCollectionGuard } from './guards/join-collection.guard';
 import { MarketplaceArchiveComponent } from './marketplace-archive/marketplace-archive.component';
 import { collectionDataResolver } from './collection-data.resolver';
 import { ViewCollectionGuard } from './guards/view-collection-guard';
+import { LeaveDraftCollectionGuard } from './guards/can-leave-draft-collection.guard';
 
 export const routes: Routes = [
     {
@@ -26,6 +27,7 @@ export const routes: Routes = [
                 path: ':collectionEntityId',
                 component: MarketplaceSetDetailComponent,
                 canActivate: [JoinCollectionGuard, ViewCollectionGuard],
+                canDeactivate: [LeaveDraftCollectionGuard],
                 resolve: {
                     collectionSubscription: collectionDataResolver,
                 },

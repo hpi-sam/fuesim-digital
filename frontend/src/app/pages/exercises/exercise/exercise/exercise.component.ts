@@ -15,8 +15,8 @@ import {
     exportPatientsToCSV,
     currentStateVersion,
 } from 'fuesim-digital-shared';
-import { Subject } from 'rxjs';
-import { RouterLink } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import Package from '../../../../../../package.json';
 import { openPartialExportModal } from '../shared/partial-export/open-partial-export-selection-modal';
@@ -55,6 +55,7 @@ import { environment } from '../../../../../environments/environment.js';
 import { MapOperatorMapComponent } from '../shared/map-operator-map/map-operator-map.component';
 import { openSelectCollectionModal } from '../../../marketplace/shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { LoadingModalService } from '../../../../core/loading-modal/loading-modal.service';
+import { openManageExerciseCollectionsModal } from '../shared/manage-exercise-collections/open-manage-exercise-collections-modal';
 
 @Component({
     selector: 'app-exercise',
@@ -88,6 +89,8 @@ export class ExerciseComponent implements OnDestroy, OnInit {
     private readonly messageService = inject(MessageService);
     private readonly modalService = inject(NgbModal);
     private readonly loadingModalService = inject(LoadingModalService);
+    private readonly activatedRoute = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
     private readonly destroy = new Subject<void>();
 
@@ -134,6 +137,22 @@ export class ExerciseComponent implements OnDestroy, OnInit {
                 this.loadingModalService.closeLoading();
             });
         }
+        this.activatedRoute.queryParamMap
+            .pipe(takeUntil(this.destroy))
+            .subscribe((params) => {
+                const openCollectionModal = params.get(
+                    'openmanagecollectionmodal'
+                );
+                if (openCollectionModal === 'true') {
+                    openManageExerciseCollectionsModal(this.modalService);
+                    // remove the query param so that the modal doesn't open again on page reload
+                    this.router.navigate([], {
+                        relativeTo: this.activatedRoute,
+                        queryParams: { openmanagecollectionmodal: null },
+                        queryParamsHandling: 'merge',
+                    });
+                }
+            });
     }
 
     readonly version: string = Package.version;

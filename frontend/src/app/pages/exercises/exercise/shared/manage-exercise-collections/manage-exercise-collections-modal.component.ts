@@ -18,6 +18,7 @@ import { openSelectCollectionModal } from '../../../../marketplace/shared/modals
 import { DragElementService } from '../core/drag-element.service';
 import { CollectionElementsListComponent } from '../../../../marketplace/shared/collection-elements-list/collection-elements-list.component';
 import { selectSelectedCollections } from '../../../../../state/application/selectors/exercise.selectors';
+import { selectExerciseKey } from '../../../../../state/application/selectors/application.selectors';
 import { ExerciseColletionItemComponent } from './exercise-collection-item/exercise-collection-item.component';
 
 @Component({
@@ -62,6 +63,8 @@ export class ManageExerciseCollectionsModalComponent {
                 }))
             ),
     });
+
+    public currentExerciseKey = this.store.selectSignal(selectExerciseKey);
 
     public getElementsByCollection(
         collection: VersionedCollectionPartial

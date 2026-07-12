@@ -64,7 +64,7 @@ import { HelpBannerComponent } from '../../../../../help-banner/help-banner.comp
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group-overview-page.component';
 import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
-import { ManageExerciseCollectionsModalComponent } from '../manage-exercise-collections/manage-exercise-collections-modal.component';
+import { openManageExerciseCollectionsModal } from '../manage-exercise-collections/open-manage-exercise-collections-modal';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -234,9 +234,7 @@ export class TrainerMapEditorComponent implements OnInit {
     }
 
     public openTemplateManagementModal() {
-        this.ngbModalService.open(ManageExerciseCollectionsModalComponent, {
-            size: 'lg',
-        });
+        openManageExerciseCollectionsModal(this.ngbModalService);
     }
 
     public importingTemplates = false;

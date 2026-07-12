@@ -13,7 +13,7 @@ import {
     gatherAllVisibleCollectionElements,
     checkCollectionOrganisationRole,
 } from 'fuesim-digital-shared';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { RouterLink, RouterLinkWithHref } from '@angular/router';
 // we cannot get around it
@@ -25,7 +25,12 @@ import { CollectionService } from '../../../../../core/exercise-element.service'
     selector: 'app-select-collection-modal',
     templateUrl: './marketplace-select-collection-modal.component.html',
     styleUrl: './marketplace-select-collection-modal.component.scss',
-    imports: [CollectionElementsListComponent, RouterLink, RouterLinkWithHref],
+    imports: [
+        CollectionElementsListComponent,
+        RouterLink,
+        RouterLinkWithHref,
+        NgbTooltip,
+    ],
 })
 export class MarketplaceSelectCollectionModalComponent {
     private readonly collectionService = inject(CollectionService);

@@ -12,10 +12,13 @@ import {
     ChangedTemplateVersion,
     gatherAllVisibleCollectionElements,
     cloneDeepMutable,
+    ExerciseKey,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
+import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import {
@@ -32,7 +35,7 @@ import { ConfirmationModalService } from '../../../../../../core/confirmation-mo
     selector: 'app-exercise-collection-item-component',
     templateUrl: './exercise-collection-item.component.html',
     styleUrl: './exercise-collection-item.component.scss',
-    imports: [],
+    imports: [RouterLink, DatePipe],
 })
 export class ExerciseColletionItemComponent {
     private readonly exerciseService = inject(ExerciseService);
@@ -42,6 +45,7 @@ export class ExerciseColletionItemComponent {
     private readonly loadingModalService = inject(LoadingModalService);
     private readonly confirmationModal = inject(ConfirmationModalService);
 
+    public readonly exerciseKey = input.required<ExerciseKey>();
     public readonly collection = input.required<VersionedCollectionPartial>();
 
     public readonly collectionData = resource({
@@ -260,5 +264,9 @@ export class ExerciseColletionItemComponent {
             }
         }
         return { impact: changeImpacts, apply: changeApplies };
+    }
+
+    public closeActiveModal() {
+        this.ngbModalService.dismissAll();
     }
 }

@@ -1,17 +1,35 @@
-<div class="d-flex justify-content-between align-items-center">
+<div class="my-3">
     @if (collectionData.isLoading()) {
         <div class="spinner-border"></div>
     }
     @if (collectionData.hasValue()) {
         <span>
-            {{ collectionData.value().title }}
+            <b>{{ collectionData.value().title }}</b>
+            <span class="text-muted small ms-1">
+                (Version {{ collectionData.value().version }} &ndash;
+                {{ collectionData.value().createdAt | date: 'short' }})
+            </span>
         </span>
-        <div class="d-flex flex-row gap-1">
+        <div class="d-flex flex-row gap-2 mt-2">
             @let newerVersion = newerVersionAvailable.value();
+
+            <a
+                class="btn btn-primary btn-sm"
+                (click)="closeActiveModal()"
+                [routerLink]="'/collections/' + collection().entityId"
+                [queryParams]="{ from: exerciseKey() }"
+            >
+                Elemente anzeigen
+                <i class="bi bi-box-arrow-up-right ms-1"></i>
+            </a>
             @if (newerVersion; as version) {
                 @if (version.newerVersionAvailable) {
                     <button
-                        class="btn btn-outline-warning btn-sm"
+                        class="btn btn-outline-warning btn-sm pulsating"
+                        style="
+                            --pulsating-color: #b508ff;
+                            --pulsating-strength: 1px;
+                        "
                         (click)="
                             $event.stopPropagation();
                             upgradeCollectionVersion(collectionData.value())
@@ -24,10 +42,7 @@
             }
             <button
                 class="btn btn-outline-danger btn-sm text-danger"
-                (click)="
-                    $event.stopPropagation();
-                    removeCollection(collectionData.value())
-                "
+                (click)="removeCollection(collectionData.value())"
             >
                 <i class="bi bi-trash me-1"></i>
                 Sammlung entfernen

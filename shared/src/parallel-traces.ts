@@ -91,18 +91,10 @@ export const actionProcessors = [
     ),
     new ActionProcessor(
         '[Scoutable] Mark as viewed',
-        (currentState, action) => {
-            const scoutable = getElement(
-                currentState,
-                'scoutable',
-                action.scoutableId
-            );
-            return {
-                // name: `[Scoutable] Viewed ${scoutable.name || scoutable.id}`,
-                name: action.type,
-                verboseName: `Erkunden`,
-            };
-        },
+        (currentState, action) => ({
+            name: action.type,
+            verboseName: `Erkunden`,
+        }),
         true
     ),
     new ActionProcessor(
@@ -118,17 +110,8 @@ export const actionProcessors = [
                 name: `[Assign Personnel] ${task.taskName} ${technicalChallenge.name}`,
                 verboseName: `Auftrag: ${task.taskName} bei ${technicalChallenge.name}`,
             };
-        },
-        true
+        }
     ),
-    // new ActionProcessor(
-    //     '[Patient] Set Visible Status',
-    //     (currentState, action) => ({
-    //         name: action.type,
-    //         verboseName: `Patienten vorsichten`,
-    //     }),
-    //     true
-    // ),
 ];
 
 export const actionProcessorDictionary = Object.fromEntries(
@@ -174,13 +157,11 @@ export const clusterSchema = z.object({
 export type ParallelTracesCluster = z.infer<typeof clusterSchema>;
 
 export const miningServiceResponseSchema = z.object({
-    dfg: z.json(),
     clusters: z.array(clusterSchema),
 });
 
 export const parallelTracesOverviewSchema = z.object({
     events: z.record(participantKeySchema, z.array(processEventSchema)),
-    dfg: z.json(),
     clusters: z.array(clusterSchema),
 });
 export type ParallelTracesOverview = z.infer<

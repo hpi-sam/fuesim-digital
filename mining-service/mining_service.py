@@ -16,10 +16,8 @@ def do_process_mining():
 
 
     dataframe = DataFrame.from_dict(request.json)
-    print(dataframe.dtypes)
     dataframe = pm4py.format_dataframe(dataframe, case_id='participantKey', activity_key='name',
                                        timestamp_key='timestamp')
-    print(dataframe.dtypes)
     event_log = pm4py.convert_to_event_log(dataframe, return_legacy_log_object=True)
 
 
@@ -38,7 +36,6 @@ def do_process_mining():
         arcs_set = set()
         for node in bpmn_graph.get_nodes():
             if isinstance(node, BPMN.Gateway):
-                print(node.id, node.get_in_arcs(), node.get_out_arcs())
                 gateways[node.id] = {
                     "id": node.id,
                     "type": node.__class__.__name__,
@@ -46,6 +43,7 @@ def do_process_mining():
                 }
                 arcs_set.update(node.get_in_arcs())
                 arcs_set.update(node.get_out_arcs())
+
             if isinstance(node, BPMN.Task):
                 activities[node.id] = {
                     "id": node.id,
@@ -62,7 +60,6 @@ def do_process_mining():
 
         arcs = []
         for arc in list(arcs_set):
-            print(arc.get_source(), arc.get_target(), type(arc.get_source()), type(arc.get_target()))
             allowed_things = BPMN.Task |  BPMN.Gateway
             if not isinstance(arc.get_source(), allowed_things) or not isinstance(arc.get_target(), allowed_things):
                 continue
@@ -70,7 +67,6 @@ def do_process_mining():
                 "source": arc.get_source().id,
                 "target": arc.get_target().id
             })
-        print(gateways, arcs)
 
         for trace in clust_log:
             for event in trace:
@@ -93,7 +89,6 @@ def do_process_mining():
                     max_time = end_time
                 if event["participantKey"] not in activities[activity_id]["occurrences"]:
                     activities[activity_id]["occurrences"].append({"participantKey": event["participantKey"], "startTime": start_time, "endTime": end_time, "actionIndex": event["actionIndex"]})
-        print(activities)
 
         clusters.append({
             "participantKeys": participant_keys,
@@ -106,15 +101,10 @@ def do_process_mining():
         })
 
 
-    dfg, sa, ea = pm4py.discover_directly_follows_graph(event_log)
-
     data = {
-        "dfg": [{"activities": activities, "count": count} for activities, count in dfg.items()],
-        "startActivities": sa,
-        "endActivities": ea,
         "clusters": sorted(clusters, key=lambda cluster: len(cluster["participantKeys"]), reverse=True)
     }
-    # print(data)
+
     return jsonify(data), 200
 
 def main():

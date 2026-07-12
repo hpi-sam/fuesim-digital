@@ -343,7 +343,6 @@ export class ParallelExerciseService {
 
         return {
             events: processEvents,
-            dfg: data.dfg,
             clusters: data.clusters,
         };
     }

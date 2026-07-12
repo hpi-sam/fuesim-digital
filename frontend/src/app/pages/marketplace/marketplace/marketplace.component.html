@@ -35,6 +35,10 @@
                         <app-collection-card
                             [collection]="collection"
                             fromLocation="mycollections"
+                            [showArchiveButton]="
+                                collection.relationship === 'owner'
+                            "
+                            (archive)="archiveCollection(collection)"
                         />
                     </div>
                 } @empty {

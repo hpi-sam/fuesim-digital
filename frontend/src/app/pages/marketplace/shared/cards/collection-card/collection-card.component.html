@@ -24,7 +24,7 @@
             }
         </li>
     </ul>
-    <div class="card-body d-flex flex-wrap">
+    <div class="card-body d-flex flex-row flex-wrap justify-content-between">
         <a
             [routerLink]="
                 noLink() ? undefined : '/collections/' + collection().entityId
@@ -34,5 +34,18 @@
         >
             Öffnen
         </a>
+        @if (showArchiveButton()) {
+            <button
+                class="btn btn-outline-danger"
+                (click)="
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    archive.emit()
+                "
+            >
+                <i class="bi bi-archive me-1"></i>
+                Archivieren
+            </button>
+        }
     </div>
 </a>

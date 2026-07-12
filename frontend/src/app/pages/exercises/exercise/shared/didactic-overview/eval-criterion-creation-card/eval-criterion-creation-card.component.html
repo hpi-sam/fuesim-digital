@@ -1,5 +1,5 @@
 <div class="container-fluid d-flex flex-column h-100 mt-3 ms-1">
-    <div class="card rounded-2" style="min-width: 400px">
+    <div class="card rounded-2" style="min-width: 600px; max-width: 700px">
         <div class="card-header text-center">
             <h5 class="mb-0 ms-0 d-flex align-items-center">
                 Neues
@@ -103,12 +103,12 @@
                         oben aus.</span
                     >
                 }
-                @case ('xPatientsAtStatusEvalCriterion') {
+                @case ('countPatientsAtStatusEvalCriterion') {
                     <form class="ms-2">
                         <label>
                             Art:
                             {{
-                                evalCriterionTypesNames.xPatientsAtStatusEvalCriterion
+                                evalCriterionTypesNames.countPatientsAtStatusEvalCriterion
                             }}
                         </label>
                         <label>
@@ -139,12 +139,12 @@
                         >
                     </form>
                 }
-                @case ('doMeasureXTimesEvalCriterion') {
+                @case ('countMeasuresEvalCriterionn') {
                     <form class="ms-2">
                         <label>
                             Art:
                             {{
-                                evalCriterionTypesNames.doMeasureXTimesEvalCriterion
+                                evalCriterionTypesNames.countMeasuresEvalCriterionn
                             }}
                         </label>
                     </form>
@@ -218,13 +218,13 @@
                         <!-- TODO @JohannesPotzi @Jogius -->
                     </form>
                 }
-                @case ('greaterThanEvalCriterion') {}
+                @case ('compareEvalCriterion') {}
                 @case ('notEvalCriterion') {}
-                @case ('timeStampEvalCriterion') {
+                @case ('timestampEvalCriterion') {
                     <form class="ms-2">
                         <label>
                             Art:
-                            {{ evalCriterionTypesNames.timeStampEvalCriterion }}
+                            {{ evalCriterionTypesNames.timestampEvalCriterion }}
                         </label>
                         <!-- TODO @JohannesPotzi @Jogius -->
                     </form>
@@ -235,14 +235,38 @@
             criterionCreationType() ||
             criterionCreationCategory() === 'combinedEvalCriterion'
         ) {
-            <!-- TODO @JohannesPotzi: implement disable logic -->
-            <button
-                class="btn btn-outline-success mt-1 ms-2 me-2 mb-1"
-                (click)="submitCriterion()"
-                [disabled]=""
-            >
-                Bestätigen
-            </button>
+            <div class="form-group mb-2">
+                <!-- TODO @JohannesPotzi: implement disable logic -->
+                <button
+                    class="btn btn-outline-success mt-1 ms-2 me-2 mb-1"
+                    style="min-width: 200px"
+                    (click)="submit()"
+                    [disabled]=""
+                >
+                    Bestätigen
+                </button>
+                weitere Criterien erstellen:
+                <input
+                    [ngModel]="this.createFurtherCriteraOption()"
+                    (ngModelChange)="this.toggleCreateFurtherCriteraOption()"
+                    class="form-check-input mt-3"
+                    type="checkbox"
+                />
+            </div>
         }
+        <div
+            class="card rounded rounded-end mx-2 my-2"
+            style="min-width: 600px"
+        >
+            <!-- TODO @JohannesPotzi : shopping cart -->
+            @if (this.shoppingCartResults().length > 0) {
+                <app-didactic-overview-results-table
+                    [rootResults]="this.shoppingCartResults()"
+                    [isInSelectionModeInput]="
+                        this.areResultsTablesInSelectionMode()
+                    "
+                />
+            }
+        </div>
     </div>
 </div>

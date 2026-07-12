@@ -73,7 +73,8 @@ async function main() {
     const parallelExerciseService = new ParallelExerciseService(
         repositories.parallelExerciseRepository,
         exerciseManagerService,
-        exerciseService
+        exerciseService,
+        repositories.actionRepository
     );
     const organisationService = new OrganisationService(
         repositories.organisationRepository,

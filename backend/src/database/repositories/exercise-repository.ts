@@ -4,7 +4,16 @@ import type {
     TrainerKey,
 } from 'fuesim-digital-shared';
 import { ExerciseState } from 'fuesim-digital-shared';
-import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
+import {
+    getTableColumns,
+    sql,
+    eq,
+    lt,
+    and,
+    isNull,
+    desc,
+    asc,
+} from 'drizzle-orm';
 import {
     type ExerciseEntry,
     type ExerciseInsert,

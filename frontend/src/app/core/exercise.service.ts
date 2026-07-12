@@ -92,6 +92,8 @@ export class ExerciseService {
         [criterionId: EvalCriterionId]: EvalResult;
     }>({});
 
+    public readonly mostRecentAtion = new Subject<ExerciseAction>();
+
     private optimisticActionHandler?: OptimisticActionHandler<
         ExerciseAction,
         ExerciseState,
@@ -286,6 +288,7 @@ export class ExerciseService {
             });
             return { success: false };
         }
+        this.mostRecentAtion.next(action);
 
         // TODO: throw if `response.success` is false
         return this.optimisticActionHandler.proposeAction(action, optimistic);

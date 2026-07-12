@@ -18,6 +18,16 @@ import type { Scoutable } from '../models/scoutable.js';
 import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
 import type { UUID } from './uuid.js';
 import { uuid, uuidSchema } from './uuid.js';
+import {
+    Measure,
+    MeasureTemplate,
+    MeasureTemplateCategory,
+} from '../models/index.js';
+import { ExerciseTimeline } from './exercise-time-line.js';
+import { ExerciseState } from '../state.js';
+import { produce } from 'immer';
+import { applyAction } from '../store/reduce-exercise-state.js';
+import { ExerciseAction } from '../store/index.js';
 
 export const evalResultBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -37,6 +47,7 @@ export const boolEvalResultSchema = z.strictObject({
     type: z.literal('boolEvalResult'),
     criterion: boolEvalCriterionSchema,
     isCompleted: z.boolean(),
+    isYellow: z.boolean(),
 });
 export type BoolEvalResult = z.infer<typeof boolEvalResultSchema>;
 
@@ -73,16 +84,10 @@ export function getEvalResultFromCriterion(
     }
 
     let isCompleted = false;
+    let isYellow = false;
     let num = null;
     switch (evalCriterion.criterionType) {
         /* ------------------------BOOL CRITERIA------------------------ */
-        case 'doMeasureXTimesEvalCriterion': {
-            /* TODO @JohannesPotzi @Jogius : implementation*/
-            console.log(
-                'TODO: implement evaluation of doMeasureXTimesEvalCriterion'
-            );
-            break;
-        }
         case 'reachTechnicalChallengeStateEvalCriterion': {
             const criterion = evalCriterion;
             const targetChallengeId = criterion.targetTechnicalChallengeId;
@@ -98,14 +103,6 @@ export function getEvalResultFromCriterion(
             isCompleted = patient.realStatus === criterion.targetStatus;
             break;
         }
-        case 'xPatientsAtStatusEvalCriterion': {
-            const criterion = evalCriterion;
-            num = Object.values(patients).filter(
-                (patient) => patient.realStatus === criterion.targetStatus
-            ).length;
-            isCompleted = num === criterion.targetCount;
-            break;
-        }
         case 'viewScoutableEvalCriterion': {
             const criterion = evalCriterion;
             const scoutable = scoutables[criterion.targetScoutableId]!;
@@ -114,14 +111,18 @@ export function getEvalResultFromCriterion(
         }
         case 'andEvalCriterion': {
             const criterion = evalCriterion;
-            isCompleted = true;
+            let isIncomplete = false;
+            let atLeastOneCompleted = false;
             for (const childId of criterion.children) {
                 const res = shortCritToRes(evalCriteria[childId]!);
                 if (res.type !== 'boolEvalResult' || !res.isCompleted) {
-                    isCompleted = false;
-                    break;
+                    isIncomplete = true;
+                } else if (!atLeastOneCompleted) {
+                    atLeastOneCompleted = true;
                 }
             }
+            isCompleted = !isIncomplete;
+            isYellow = isIncomplete && atLeastOneCompleted;
             break;
         }
         case 'orEvalCriterion': {
@@ -147,7 +148,8 @@ export function getEvalResultFromCriterion(
                 res.type === 'boolEvalResult' ? res.isCompleted : true;
             break;
         }
-        case 'greaterThanEvalCriterion': {
+        case 'compareEvalCriterion': {
+            /* TODO @JohannesPotzi: implement ealuation by new generelized comarison */
             const criterion = evalCriterion;
             const leftCrit = evalCriteria[criterion.leftChild];
             const rightCrit = evalCriteria[criterion.rightChild];
@@ -187,16 +189,51 @@ export function getEvalResultFromCriterion(
             } else {
                 rightVal = rightRes.num;
             }
+            /* the comparison */
+            switch (criterion.operator) {
+                case 'greaterThanOrEqual': {
+                    if (leftVal >= rightVal) {
+                        isCompleted = true;
+                    } else {
+                    }
+                    break;
+                }
+                case 'greaterThan': {
+                    break;
+                }
+                case 'lessThanOrEqual': {
+                    break;
+                }
+                case 'lessThan': {
+                    break;
+                }
+                case 'equal': {
+                    break;
+                }
+            }
             isCompleted = leftVal > rightVal;
             break;
         }
         /* ------------------------NUMBER CRITERIA------------------------ */
+        case 'countMeasuresEvalCriterionn': {
+            /* TODO @JohannesPotzi @Jogius : implementation*/
+            console.log(
+                'TODO: implement evaluation of countMeasuresEvalCriterionn'
+            );
+            num = -1;
+            break;
+        }
+        case 'countPatientsAtStatusEvalCriterion': {
+            /* TODO @JohannesPotzi @Jogius : implementation*/
+            num = -1;
+            break;
+        }
         case 'constNumEvalCriterion': {
             num = evalCriterion.num;
             break;
         }
-        case 'timeStampEvalCriterion': {
-            num = evalCriterion.num;
+        case 'timestampEvalCriterion': {
+            num = evalCriterion.timestamp;
             break;
         }
         case 'countCompletedEvalCriterion': {
@@ -267,26 +304,30 @@ export function getEvalResultFromCriterion(
         criterion: evalCriterion as BoolEvalCriterion,
         type: 'boolEvalResult',
         isCompleted,
+        isYellow,
         timestamp: currentTime,
     };
     cache[evalCriterion.id] = critRes;
     return critRes;
 }
 export function getEvalResultsFromCriteria(
-    evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
+    wantedEvalCriteria: { [key: EvalCriterionId]: EvalCriterion },
+    allEvalCriteria: { [key: EvalCriterionId]: EvalCriterion },
     technicalChallenges: { [key: string]: TechnicalChallenge },
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
+    measures: { [key: string]: Measure },
+    measureTemplates: { [key: string]: MeasureTemplateCategory },
     currentTime: number
 ): { [evalCriterionId: UUID]: EvalResult } {
-    const criteria = Object.values(evalCriteria);
+    const criteria = Object.values(wantedEvalCriteria);
     const cache: { [key: string]: EvalResult } = {};
     return criteria
         .flatMap(
             (criterion: EvalCriterion): EvalResult =>
                 getEvalResultFromCriterion(
                     criterion,
-                    evalCriteria,
+                    allEvalCriteria,
                     technicalChallenges,
                     patients,
                     scoutables,
@@ -367,4 +408,32 @@ export function getChildResultsOfResult(
         }
         return obj;
     }, []);
+}
+export function getEvalResultsByExerciseState(state: ExerciseState) {
+    return getEvalResultsFromCriteria(
+        state.evalCriteria,
+        state.evalCriteria,
+        state.technicalChallenges,
+        state.patients,
+        state.scoutables,
+        state.measures,
+        state.measureTemplates,
+        state.currentTime
+    );
+}
+
+export function getEvalResultsByActionHistory(
+    actions: ExerciseAction[],
+    initialStateString: ExerciseState
+): { [criterionId: EvalCriterionId]: EvalResult } {
+    if (actions.length === 0) {
+        return getEvalResultsByExerciseState(initialStateString);
+    }
+    const finalState = produce(initialStateString, (draftState) => {
+        actions.forEach((action) => {
+            applyAction(draftState, action);
+        });
+    });
+
+    return getEvalResultsByExerciseState(finalState);
 }

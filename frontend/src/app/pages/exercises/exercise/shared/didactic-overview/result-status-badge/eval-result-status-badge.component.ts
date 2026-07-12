@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import {
     EvalCriterionId,
     EvalResult,
@@ -6,6 +6,9 @@ import {
     getNumFromEvalResult,
 } from 'fuesim-digital-shared';
 import { NgStyle } from '@angular/common';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../../../../../state/app.state';
+import { selectEvalResults } from '../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-eval-result-status-badge',
@@ -14,10 +17,14 @@ import { NgStyle } from '@angular/common';
     imports: [NgStyle],
 })
 export class EvalResultStatusBadgeComponent {
+    private readonly store = inject<Store<AppState>>(Store);
     public readonly result = input.required<EvalResult>();
     public readonly resultsMap = input.required<{
         [criterionId: EvalCriterionId]: EvalResult;
     }>();
+    public readonly results = this.store.selectSignal(selectEvalResults);
+
+    /* this is needed to display 'ja' or 'nein' */
     public readonly isCompleted = computed(() =>
         getIsCompletedFromEvalResult(this.result())
     );
@@ -26,7 +33,7 @@ export class EvalResultStatusBadgeComponent {
     );
     public readonly leftNumResult = computed(() => {
         const result = this.result();
-        if (result.criterion.criterionType === 'greaterThanEvalCriterion') {
+        if (result.criterion.criterionType === 'compareEvalCriterion') {
             const resultMap = this.resultsMap();
             return resultMap[result.criterion.leftChild] ?? null;
         }
@@ -34,16 +41,19 @@ export class EvalResultStatusBadgeComponent {
     });
     public readonly rightNumResult = computed(() => {
         const result = this.result();
-        if (result.criterion.criterionType === 'greaterThanEvalCriterion') {
+        if (result.criterion.criterionType === 'compareEvalCriterion') {
             const resultMap = this.resultsMap();
             return resultMap[result.criterion.rightChild] ?? null;
         }
         return null;
     });
     public readonly color = computed(() => {
-        const isCompleted = this.isCompleted();
-        if (isCompleted !== null) {
-            return isCompleted ? 'green' : 'red';
+        const result = this.result();
+        if (result.type === 'boolEvalResult') {
+            if (result.isYellow) {
+                return 'yellow';
+            }
+            return result.isCompleted ? 'green' : 'red';
         }
         const leftRes = this.leftNumResult();
         const rightRes = this.rightNumResult();

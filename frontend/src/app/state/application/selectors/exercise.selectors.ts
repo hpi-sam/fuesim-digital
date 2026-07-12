@@ -476,13 +476,26 @@ export const selectEvalResults = createSelector(
     selectTechnicalChallenges,
     selectPatients,
     selectScoutables,
+    selectMeasures,
+    selectMeasureTemplateCategories,
     selectCurrentTime,
-    (evalCriteria, technicalChallenges, patients, scoutables, currentTime) =>
+    (
+        evalCriteria,
+        technicalChallenges,
+        patients,
+        scoutables,
+        measures,
+        measureTemplates,
+        currentTime
+    ) =>
         getEvalResultsFromCriteria(
+            evalCriteria,
             evalCriteria,
             technicalChallenges,
             patients,
             scoutables,
+            measures,
+            measureTemplates,
             currentTime
         )
 );

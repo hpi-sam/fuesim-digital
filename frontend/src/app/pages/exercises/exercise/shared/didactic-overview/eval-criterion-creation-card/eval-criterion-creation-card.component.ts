@@ -1,6 +1,17 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    computed,
+    effect,
+    inject,
+    input,
+    output,
+    signal,
+} from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import {
+    EvalResult,
+    getEvalResultFromCriterion,
+    getEvalResultsFromCriteria,
     type Patient,
     type PatientStatus,
     patientStatusAllowedValues,
@@ -26,23 +37,29 @@ import {
     numberEvalCriterionTypes,
     evalCriterionCategoryNames,
     EvalCriterion,
-    newXPatientsAtStatusEvalCriterion,
     newReachTechnicalChallengeStateEvalCriterion,
     newPatientAtStatusEvalCriterion,
     newAndEvalCriterion,
     BoolEvalCriterionId,
     isBoolEvalCriterion,
+    EvalCriterionId,
 } from '../../../../../../../../../shared/dist/models/eval-criterion';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { AppState } from '../../../../../../state/app.state';
 import {
+    selectCurrentTime,
     selectEvalCriteria,
+    selectEvalResults,
+    selectPatients,
+    selectScoutables,
     selectTechnicalChallenges,
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { PatientAtStatusCriterionComponent } from './criterion-forms/patient-at-status-criterion/patient-at-status-criterion.component';
 import { InputData } from './input-data';
 import { ReachTechnicalChallengeStateEvalCriterionFormComponent } from './criterion-forms/reach-technical-challenge-state-criterion/reach-technical-challenge-state-criterion-form.component';
 import { ViewScoutableEvalCriterionFormComponent } from './criterion-forms/view-scoutable-criterion/view-scoutable-criterion-form.component';
+import { DidacticOverViewResultsTableComponent } from '../result-table/didactic-overview-results-table.component';
+import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-eval-criterion-creation-card',
     templateUrl: './eval-criterion-creation-card.component.html',
@@ -59,11 +76,46 @@ import { ViewScoutableEvalCriterionFormComponent } from './criterion-forms/view-
         PatientAtStatusCriterionComponent,
         ReachTechnicalChallengeStateEvalCriterionFormComponent,
         ViewScoutableEvalCriterionFormComponent,
+        DidacticOverViewResultsTableComponent,
     ],
 })
 export class EvalCriterionCreationCardComponent {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
+    private readonly tickSubscribtion: Subscription | null = null;
+    public readonly evalCriterionCategoryNames = evalCriterionCategoryNames;
+    public readonly evalCriterionTypesNames = evalCriterionTypesNames;
+    public readonly patientStatusAllowedValues = patientStatusAllowedValues;
+    public readonly statusNames = statusNames;
+
+    constructor() {
+        /* TODO @JohannesPotzi : instead do this: add a draft marker to eval criteria in the state.
+        Also add an input option to the results table to only show draft results. Default is no drafts are shown.
+        Also create criatia as draft when added to the shopping cart.
+            Also edit as non draft on submit.
+            Also delete draft criteria Action when criteria creation mode is ended in the overview.  */
+        const sub = this.exerciseService.mostRecentAtion.subscribe((action) => {
+            if (action.type === '[Exercise] Tick') {
+                const shoppingCart = Object.values(this.criteriaShoppingCart());
+                const cache: { [key: string]: EvalResult } = {};
+                console.log('Hello! ' + shoppingCart);
+                this.shoppingCartResults.set(
+                    shoppingCart.map((crit) =>
+                        this.shortCriterionToResult(crit, cache)
+                    )
+                );
+            }
+        });
+        this.tickSubscribtion = sub;
+        effect(() => {
+            this.areResultsTablesInSelectionModeOut.emit(
+                this.areResultsTablesInSelectionMode()
+            );
+        });
+    }
+
+    public readonly areResultsTablesInSelectionMode = signal<boolean>(false);
+    public readonly areResultsTablesInSelectionModeOut = output<boolean>();
     public readonly criterionCreationCategory =
         input.required<EvalCriterionCategory>();
     public readonly criterionTypeOptions = computed(() => {
@@ -87,27 +139,41 @@ export class EvalCriterionCreationCardComponent {
     public readonly evalCriteria = computed(() =>
         Object.values(this.store.selectSignal(selectEvalCriteria)())
     );
+    private readonly criteriaShoppingCart = signal<{
+        [key: EvalCriterionId]: EvalCriterion;
+    }>({});
 
-    private readonly tcs = this.store.selectSignal(selectTechnicalChallenges);
-    public readonly technicalChallenges = signal(Object.values(this.tcs()));
-    public readonly selectedTechnicalChallengeStates = computed(() => {
-        if (this.criterionForm.technicalChallengeId().value() !== '') {
-            const id = this.criterionForm.technicalChallengeId().value();
-            const tcWithId =
-                this.technicalChallenges().filter((tc) => tc.id === id)[0] ??
-                null;
-            return Object.values(tcWithId!.states);
-        }
-        return null;
-    });
+    public readonly shoppingCartResults = signal<EvalResult[]>([]);
+    /* public readonly shoppingCartResults = computed(() => {
+        const shoppingCart = Object.values(this.criteriaShoppingCart());
+        const criteria = this.store.selectSignal(selectEvalCriteria)();
+        const tcs = this.store.selectSignal(selectTechnicalChallenges)();
+        const patients = this.store.selectSignal(selectPatients)();
+        const scoutables = this.store.selectSignal(selectScoutables)();
+        const currentTime = this.store.selectSignal(selectCurrentTime)();
+        const cache: { [key: string]: EvalResult } = {};
+        console.log(shoppingCart);
+        return shoppingCart.map((crit) =>
+            getEvalResultFromCriterion(
+                crit,
+                criteria,
+                tcs,
+                patients,
+                scoutables,
+                currentTime,
+                cache
+            )
+        );
+    }); */
+    public readonly createFurtherCriteraOption = signal<boolean>(false);
+    public toggleCreateFurtherCriteraOption() {
+        this.createFurtherCriteraOption.set(!this.createFurtherCriteraOption());
+    }
+
     readonly selectedPatientStatusMap = signal<{
         [id: UUID]: PatientStatus;
     }>({});
 
-    public readonly evalCriterionCategoryNames = evalCriterionCategoryNames;
-    public readonly evalCriterionTypesNames = evalCriterionTypesNames;
-    public readonly patientStatusAllowedValues = patientStatusAllowedValues;
-    public readonly statusNames = statusNames;
     public countInput: number | null = null;
     public nameInput: string | null = null;
     readonly inputModel = signal<InputData>({
@@ -189,6 +255,24 @@ export class EvalCriterionCreationCardComponent {
             criterions: criteria,
         });
     }
+    public addCriteriaToCart(criteria: EvalCriterion[]) {
+        this.criteriaShoppingCart.update((cart) => {
+            criteria.forEach((crit) => {
+                cart[crit.id] = crit;
+            });
+            return cart;
+        });
+    }
+    public checkoutShoppingCart() {
+        this.createCriteria(Object.values(this.criteriaShoppingCart()));
+        this.criteriaShoppingCart.set({});
+    }
+    public submit() {
+        this.submitCriterion();
+        if (!this.createFurtherCriteraOption()) {
+            this.checkoutShoppingCart();
+        }
+    }
     public submitCriterion() {
         const criterionType = this.criterionCreationType();
         const criterionCategory = this.criterionCreationCategory();
@@ -206,18 +290,9 @@ export class EvalCriterionCreationCardComponent {
                         return obj;
                     }, [])
             );
-            this.createCriteria([criterion]);
+            this.addCriteriaToCart([criterion]);
         }
         switch (criterionType) {
-            case 'xPatientsAtStatusEvalCriterion': {
-                const criterion = newXPatientsAtStatusEvalCriterion(
-                    'Patienten mit Sichtungskategorie',
-                    this.criterionForm.countInput().value(),
-                    this.criterionForm.patientStatusInput().value()
-                );
-                this.createCriteria([criterion]);
-                break;
-            }
             case 'reachTechnicalChallengeStateEvalCriterion': {
                 const stateId = this.criterionForm
                     .targetTechnicalChallengeState()
@@ -235,7 +310,7 @@ export class EvalCriterionCreationCardComponent {
                               stateId
                           )
                         : null;
-                    if (criterion) this.createCriteria([criterion]);
+                    if (criterion) this.addCriteriaToCart([criterion]);
                 }
                 break;
             }
@@ -254,14 +329,18 @@ export class EvalCriterionCreationCardComponent {
                             status
                         );
                     });
-                this.createCriteria(criteria);
+                this.addCriteriaToCart(criteria);
                 break;
             }
             case 'viewScoutableEvalCriterion': {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }
-            case 'doMeasureXTimesEvalCriterion': {
+            case 'countPatientsAtStatusEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
+                break;
+            }
+            case 'countMeasuresEvalCriterionn': {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }
@@ -269,7 +348,7 @@ export class EvalCriterionCreationCardComponent {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }
-            case 'timeStampEvalCriterion': {
+            case 'timestampEvalCriterion': {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }
@@ -277,7 +356,7 @@ export class EvalCriterionCreationCardComponent {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }
-            case 'greaterThanEvalCriterion': {
+            case 'compareEvalCriterion': {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }
@@ -300,5 +379,26 @@ export class EvalCriterionCreationCardComponent {
             default:
                 break;
         }
+    }
+
+    public shortCriterionToResult(
+        criterion: EvalCriterion,
+        cache?: { [key: string]: EvalResult }
+    ): EvalResult {
+        const criteria = this.store.selectSignal(selectEvalCriteria)();
+        const tcs = this.store.selectSignal(selectTechnicalChallenges)();
+        const patients = this.store.selectSignal(selectPatients)();
+        const scoutables = this.store.selectSignal(selectScoutables)();
+        const currentTime = this.store.selectSignal(selectCurrentTime)();
+
+        return getEvalResultFromCriterion(
+            criterion,
+            criteria,
+            tcs,
+            patients,
+            scoutables,
+            currentTime,
+            cache ?? {}
+        );
     }
 }

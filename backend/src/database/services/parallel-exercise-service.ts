@@ -5,8 +5,10 @@ import type {
     SetAutojoinViewportAction,
     ParallelExerciseKey,
     ExerciseId,
+    ExerciseAction,
 } from 'fuesim-digital-shared';
 import {
+    getEvalResultsByActionHistory,
     parallelExerciseInstanceSummarySchema,
     updateEvalResultsMap,
 } from 'fuesim-digital-shared';
@@ -24,6 +26,7 @@ import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 import type { ExerciseManagerService } from './exercise-manager-service.js';
 import type { ExerciseService } from './exercise-service.js';
+import { ActionRepository } from '../repositories/action-repository.js';
 
 export interface ParallelExerciseJoin {
     parallelExerciseId: ParallelExerciseId;
@@ -40,7 +43,8 @@ export class ParallelExerciseService {
     public constructor(
         private readonly parallelExerciseRepository: ParallelExerciseRepository,
         private readonly exerciseManagerService: ExerciseManagerService,
-        private readonly exerciseService: ExerciseService
+        private readonly exerciseService: ExerciseService,
+        private readonly actionRepository: ActionRepository
     ) {
         this.newJoin.subscribe((join) => {
             if (!this.subscriptions[join.activeExercise.exercise.id]) {
@@ -63,6 +67,27 @@ export class ParallelExerciseService {
                 );
                 this.subscriptions[join.activeExercise.exercise.id] = sub;
             }
+        });
+    }
+    public async initEvalResultsMap(exercises: ActiveExercise[]) {
+        exercises.forEach(async (exercise) => {
+            const exerciseId = exercise.exercise.id;
+            const actionsDetailed =
+                await this.actionRepository.getActionsForExerciseId(exerciseId);
+            console.log(
+                actionsDetailed
+                    ? 'action history found'
+                    : 'action history undefined'
+            );
+            const actions = actionsDetailed.map(
+                (action) => action.actionString
+            );
+            const initialState = exercise.exercise.initialStateString;
+            const results = getEvalResultsByActionHistory(
+                actions,
+                initialState
+            );
+            this.evalResultsMap[exerciseId] = results;
         });
     }
 
@@ -237,9 +262,27 @@ export class ParallelExerciseService {
         return this.getParallelExerciseInstanceSummaries(activeExercises);
     }
 
-    public getParallelExerciseInstanceSummaries(exercises: ActiveExercise[]) {
+    public async getParallelExerciseInstanceSummaries(
+        exercises: ActiveExercise[]
+    ) {
+        let isComplete = true;
+        exercises.forEach((exercise) => {
+            if (!this.evalResultsMap[exercise.exercise.id]) {
+                isComplete = false;
+            }
+        });
+        if (!isComplete) {
+            await this.initEvalResultsMap(exercises);
+        }
         return exercises.map((exercise) => {
+            let incomplete = false;
             const state = exercise.exercise.currentStateString;
+            let evalResults: { [criterionId: EvalCriterionId]: EvalResult };
+            if (this.evalResultsMap[exercise.exercise.id]) {
+                evalResults = this.evalResultsMap[exercise.exercise.id]!;
+            } else {
+                incomplete = true;
+            }
             return parallelExerciseInstanceSummarySchema.parse({
                 participantKey: exercise.participantKey,
                 trainerKey: exercise.trainerKey,
@@ -247,7 +290,7 @@ export class ParallelExerciseService {
                 currentTime: state.currentTime,
                 currentStatus: state.currentStatus,
                 lastLogEntry: state.lastLogEntry,
-                evalResults: this.evalResultsMap[exercise.exercise.id],
+                evalResults: this.evalResultsMap[exercise.exercise.id] ?? {},
                 isActive: Object.values(state.clients).some(
                     (client) =>
                         client.role.mainRole === 'participant' &&

@@ -25,7 +25,7 @@ import {
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { DidacticOverviewCriterionEntryComponent } from './criterion-entry/didactic-overview-criterion-entry.component';
 import { EvalResultStatusBadgeComponent } from '../result-status-badge/eval-result-status-badge.component';
-import { NgStyle } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 interface subTable {
     id: UUID;
@@ -45,13 +45,15 @@ interface subTable {
     imports: [
         DidacticOverviewCriterionEntryComponent,
         EvalResultStatusBadgeComponent,
+        FormsModule,
     ],
 })
 export class DidacticOverViewResultsTableComponent implements OnInit {
     public readonly store = inject<Store<AppState>>(Store);
-    public readonly isInSelectionMode = input<boolean>(false);
+    public readonly isInSelectionModeInput = input<boolean>(true);
     public readonly rootResults = input.required<EvalResult[]>();
 
+    public readonly isInSelectionMode = signal<boolean>(false);
     public getChildResultsOfResult = getChildResultsOfResult;
     public readonly results = this.store.selectSignal(selectEvalResults);
     public readonly resultsValues = computed(() =>
@@ -71,6 +73,7 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
     }>({});
 
     ngOnInit(): void {
+        this.isInSelectionMode.set(this.isInSelectionModeInput());
         this.updateSubTables();
         /* initializing selected results */
         const results = Object.values(this.results());
@@ -82,16 +85,17 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
     constructor() {
         effect(async () => {
             this.updateSubTables();
+            this.isInSelectionMode.set(this.isInSelectionModeInput());
         });
     }
 
     public async updateSubTables() {
-        const results = Object.values(this.results());
+        const rootResults = this.rootResults();
+        const resultsLength = rootResults.length;
         let runningIndex = 0;
-        const resultsLength = results.length;
         /* filling cache with subTables */
         for (let i = 0; i < resultsLength; i += 1) {
-            const result = results[i]!;
+            const result = rootResults[i]!;
             this.getSubTablesByResult(
                 this.subTablesMapCache,
                 result,
@@ -145,7 +149,7 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
         ) {
             subResults = [this.results()[crit.child]!];
         }
-        if (critType === 'greaterThanEvalCriterion') {
+        if (critType === 'compareEvalCriterion') {
             subResults = [
                 this.results()[crit.leftChild]!,
                 this.results()[crit.rightChild]!,
@@ -226,5 +230,9 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
             }
             return obj;
         });
+    }
+
+    public toggleIsInSelectionMode() {
+        this.isInSelectionMode.set(!this.isInSelectionMode());
     }
 }

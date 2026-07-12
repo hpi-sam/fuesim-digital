@@ -214,16 +214,20 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
     }
 
     public emitUpdateExerciseInstances() {
-        this.socket.emit('updateExerciseInstances', {
-            exerciseInstances: this.getInstanceSummaries(),
-        });
+        if (this.chosenExercise) {
+            this.getInstanceSummaries().then((value) => {
+                this.socket.emit('updateExerciseInstances', {
+                    exerciseInstances: value,
+                });
+            });
+        }
     }
 
     /**
      * Get summaries of all exercise instances
      */
-    public getInstanceSummaries() {
-        return this.services.parallelExerciseService.getParallelExerciseInstanceSummaries(
+    public async getInstanceSummaries() {
+        return await this.services.parallelExerciseService.getParallelExerciseInstanceSummaries(
             this.cachedActiveExercises
         );
     }

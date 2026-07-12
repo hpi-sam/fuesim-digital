@@ -1,3 +1,14 @@
+<div class="form-group ms-3">
+    Auswahl Modus:
+    <div class="from-switch">
+        <input
+            [ngModel]="this.isInSelectionMode()"
+            (ngModelChange)="toggleIsInSelectionMode()"
+            class="form-check-input"
+            type="checkbox"
+        />
+    </div>
+</div>
 <div class="container-fluid d-flex flex-column h-100" [style.overflow]="'auto'">
     <div class="flex-fill row">
         <div [style.min-width.px]="this.tableMinWidth()">
@@ -5,6 +16,9 @@
             <table class="table table-striped mb-0" ;>
                 <thead>
                     <tr>
+                        @if (isInSelectionMode()) {
+                            <th>Auswahl</th>
+                        }
                         <th>Auswertungskriterium</th>
                         <th style="max-width: 100px">Ergebnis</th>
                     </tr>
@@ -17,6 +31,28 @@
                             @let criterion = result.criterion;
 
                             <tr (click)="this.toggleSelectResult(result)">
+                                @if (isInSelectionMode()) {
+                                    <td
+                                        [class.selected]="
+                                            this.selectedResults()[
+                                                result.criterionId
+                                            ] && this.isInSelectionMode()
+                                        "
+                                    >
+                                        <div class="form-group">
+                                            <input
+                                                [disabled]="true"
+                                                [ngModel]="
+                                                    this.selectedResults()[
+                                                        result.criterionId
+                                                    ]
+                                                "
+                                                class="form-check-input"
+                                                type="checkbox"
+                                            />
+                                        </div>
+                                    </td>
+                                }
                                 <td
                                     [class.selected]="
                                         this.selectedResults()[

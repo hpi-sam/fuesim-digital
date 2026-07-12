@@ -10,7 +10,7 @@ import {
     styleUrls: ['./timestamp-criterion-form.component.scss'],
     imports: [],
 })
-export class timeStampEvalCriterionFormComponent {
+export class timestampEvalCriterionFormComponent {
     public readonly evalCriterionCategoryNames = evalCriterionCategoryNames;
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
 }

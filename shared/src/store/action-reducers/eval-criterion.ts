@@ -8,13 +8,6 @@ import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { ReducerError } from '../reducer-error.js';
 import { getElement } from './utils/get-element.js';
 
-/* The EvalCriteria at criterionType are:
-doMeasureXTimesEvalCriterion
-reachTechnicalChallengeStateEvalCriterion
-patientAtStatusEvalCriterion
-xPatientsAtStatusEvalCriterion
-viewScoutableEvalCriterion
-*/
 const createNewCriterionsActionSchema = z.strictObject({
     type: z.literal('[EvalCriterion] New Criterions'),
     criterions: z.array(evalCriterionSchema).min(1),
@@ -28,14 +21,6 @@ const updateCriterionActionSchema = z.strictObject({
     newCriterion: evalCriterionSchema,
 });
 export type UpdateCriterionAction = z.infer<typeof updateCriterionActionSchema>;
-
-/* TODO @JohannesPotzi @Jogius : drop this, below as well */
-/* const updateResultActionSchema = z.strictObject({
-    type: z.literal('[EvalCriterion] Update Result'),
-    criterionId: uuidSchema,
-    newResult: evalResultSchema,
-});
-export type UpdateResultAction = z.infer<typeof updateResultActionSchema>; */
 export namespace EvalCriterionActionReducers {
     export const createNewCriterions: ActionReducer<NewCriterionAction> = {
         type: createNewCriterionsActionSchema.shape.type.value,
@@ -66,39 +51,4 @@ export namespace EvalCriterionActionReducers {
         },
         rights: 'trainer',
     };
-    /* export const updateResult: ActionReducer<UpdateResultAction> = {
-        type: updateResultActionSchema.shape.type.value,
-        actionSchema: updateResultActionSchema,
-        reducer: (draftState, { criterionId, newResult }) => {
-            const criterion = getElement(
-                draftState,
-                'evalCriterion',
-                criterionId
-            );
-            const resultType = newResult.type;
-            if (isNumberEvalCriterion(criterion)) {
-                const typedCriterion = criterion as NumberEvalCriterion;
-                if (resultType !== 'numberEvalResult') {
-                    throw new ReducerError(
-                        '[logic Error] trying to assign a non number evalResult to a NumberEvalCriterion.'
-                    );
-                } else {
-                    typedCriterion.results.push(newResult);
-                    draftState.evalCriteria[criterionId] = typedCriterion;
-                }
-            } else {
-                const typedCriterion = criterion as BoolEvalCriterion;
-                if (resultType !== 'boolEvalResult') {
-                    throw new ReducerError(
-                        '[logic Error] trying to assign a non boolean evalResult to a BoolEvalCriterion.'
-                    );
-                } else {
-                    typedCriterion.results.push(newResult);
-                    draftState.evalCriteria[criterionId] = typedCriterion;
-                }
-            }
-            return draftState;
-        },
-        rights: 'participant',
-    }; */
 }

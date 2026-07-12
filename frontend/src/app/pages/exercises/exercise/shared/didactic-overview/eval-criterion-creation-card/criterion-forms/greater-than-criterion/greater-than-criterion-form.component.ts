@@ -17,7 +17,7 @@ interface LocalInputData {
     styleUrls: ['./greater-than-criterion-form.component.scss'],
     imports: [],
 })
-export class GreaterThanEvalCriterionFormComponent {
+export class CompareEvalCriterionFormComponent {
     public readonly leftChildOut = output<EvalCriterionId | null>();
     public readonly rightChildOut = output<EvalCriterionId | null>();
 

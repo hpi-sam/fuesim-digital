@@ -7,7 +7,6 @@ import type { TechnicalChallengeId } from './technical-challenge/technical-chall
 import { technicalChallengeIdSchema } from './technical-challenge/technical-challenge.js';
 import type { PatientStatus } from './utils/patient-status.js';
 import { patientStatusSchema } from './utils/patient-status.js';
-import { EvalResult } from '../utils/eval-result.js';
 
 export const boolEvalCriterionIdSchema = uuidSchema.brand(
     'BoolEvalCriterionId'
@@ -26,11 +25,12 @@ export const evalCriterionIdSchema = z.union([
 
 export type EvalCriterionId = z.infer<typeof evalCriterionIdSchema>;
 
-/* TODO @JohannesPotzi @Jogius : add showInTable attribute. Also, update addCriterion action accordingly. */
 export const evalCriterionBaseSchema = z.strictObject({
     id: evalCriterionIdSchema,
     name: z.string(),
     type: z.literal('evalCriterion'),
+    isVisibleForParticipants: z.boolean(),
+    isDraft: z.boolean(),
 });
 export const boolEvalCriterionBaseSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
@@ -56,26 +56,34 @@ export const notEvalCriterionSchema = z.strictObject({
     child: boolEvalCriterionIdSchema,
 });
 export type NotEvalCriterion = z.infer<typeof notEvalCriterionSchema>;
-
-/* TODO @JohannesPotzi @Jogius : maybe generalise this and include a comparative operator? */
-export const greaterThanEvalCriterionSchema = z.strictObject({
+export const comparativeOperatorSubSchema = z.union([
+    z.literal('greaterThan'),
+    z.literal('greaterThanOrEqual'),
+    z.literal('lessThan'),
+    z.literal('lessThanOrEqual'),
+    z.literal('equal'),
+]);
+export type ComparativeOperator = z.infer<typeof comparativeOperatorSubSchema>;
+/* TODO @JohannesPotzi: Idea: seperate SubSchema for the different comp operators */
+export const compareEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
-    criterionType: z.literal('greaterThanEvalCriterion'),
+    criterionType: z.literal('compareEvalCriterion'),
+    operator: comparativeOperatorSubSchema,
     leftChild: numberEvalCriterionIdSchema,
     rightChild: numberEvalCriterionIdSchema,
+    greenThreshold: z.number(),
+    yellowThreshold: z.number(),
+    redThreshold: z.number(),
 });
-export type GreaterThanEvalCriterion = z.infer<
-    typeof greaterThanEvalCriterionSchema
->;
+export type CompareEvalCriterion = z.infer<typeof compareEvalCriterionSchema>;
 
-/* TODO @JohannesPotzi @Jogius : drop the num attribute.  With this, also add a timestamp attribute to the timeStampEvalCriterionSchema and a num attribute to the constNumEvalCriterionSchema.*/
 export const numberEvalCriterionBaseSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
-    num: z.number(),
 });
 export const constNumEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
     criterionType: z.literal('constNumEvalCriterion'),
+    num: z.number(),
 });
 export type ConstNumEvalCriterion = z.infer<typeof constNumEvalCriterionSchema>;
 
@@ -88,15 +96,16 @@ export type CountCompletedEvalCriterion = z.infer<
     typeof countCompletedEvalCriterionSchema
 >;
 
-export const timeStampEvalCriterionSchema = z.strictObject({
+export const timestampEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
-    criterionType: z.literal('timeStampEvalCriterion'),
+    criterionType: z.literal('timestampEvalCriterion'),
+    timestamp: z.number(),
 });
-export type TimeStampEvalCriterion = z.infer<
-    typeof timeStampEvalCriterionSchema
+export type timestampEvalCriterion = z.infer<
+    typeof timestampEvalCriterionSchema
 >;
 export const firstTrueAtEvalCriterionSchema = z.strictObject({
-    ...timeStampEvalCriterionSchema.shape,
+    ...numberEvalCriterionBaseSchema.shape,
     criterionType: z.literal('firstTrueAtEvalCriterion'),
     child: evalCriterionIdSchema,
 });
@@ -106,21 +115,21 @@ export type FirstTrueAtEvalCriterion = z.infer<
 
 export const countPatientsAtStatusEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
+    targetStatus: patientStatusSchema,
     criterionType: z.literal('countPatientsAtStatusEvalCriterion'),
 });
 export type CountPatientsAtStatusEvalCriterion = z.infer<
     typeof countPatientsAtStatusEvalCriterionSchema
 >;
 
-export const doMeasureXTimesEvalCriterionSchema = z.strictObject({
-    ...boolEvalCriterionBaseSchema.shape,
-    criterionType: z.literal('doMeasureXTimesEvalCriterion'),
-    targetCount: z.number(),
-    targetMeasureId: uuidSchema,
+export const countMeasuresEvalCriterionSchema = z.strictObject({
+    ...numberEvalCriterionBaseSchema.shape,
+    criterionType: z.literal('countMeasuresEvalCriterionn'),
+    targetMeasureTemplateId: uuidSchema,
 });
-/* TODO @JohannesPotzi @Jogius : Drop this and add a measure count criterion and a template to the combined criteria creation form using the greater than criterion with comparative operator attribute. */
-export type DoMeasureXTimesEvalCriterion = z.infer<
-    typeof doMeasureXTimesEvalCriterionSchema
+
+export type CountMeasuresEvalCriterionn = z.infer<
+    typeof countMeasuresEvalCriterionSchema
 >;
 
 export const reachTechnicalChallengeStateEvalCriterionSchema = z.strictObject({
@@ -143,17 +152,6 @@ export type PatientAtStatusEvalCriterion = z.infer<
     typeof patientAtStatusEvalCriterionSchema
 >;
 
-/* TODO @JohannesPotzi @Jogius : Drop this and add a patient count criterion and a template to the combined criteria creation form using the greater than criterion with comparative operator attribute. */
-export const xPatientsAtStatusEvalCriterionSchema = z.strictObject({
-    ...boolEvalCriterionBaseSchema.shape,
-    criterionType: z.literal('xPatientsAtStatusEvalCriterion'),
-    targetCount: z.number(),
-    targetStatus: patientStatusSchema,
-});
-export type XPatientsAtStatusEvalCriterion = z.infer<
-    typeof xPatientsAtStatusEvalCriterionSchema
->;
-
 export const viewScoutableEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('viewScoutableEvalCriterion'),
@@ -163,7 +161,7 @@ export type ViewScoutableEvalCriterion = z.infer<
     typeof viewScoutableEvalCriterionSchema
 >;
 
-/* TODO @JohannesPotzi @Jogius : lessThanXUnqualifiedMeasuresEvalCriterion : as a template in the combined criteria creation form using the greater than criterion with comparative operator attribute. */
+/* TODO @JohannesPotzi @Jogius : countUnqualifiedMeasuresEvalCriterion : as a template in the combined criteria creation form using the greater than criterion with comparative operator attribute. */
 
 export const boolEvalCriterionLeafSchema = z.discriminatedUnion(
     'criterionType',
@@ -171,15 +169,14 @@ export const boolEvalCriterionLeafSchema = z.discriminatedUnion(
         reachTechnicalChallengeStateEvalCriterionSchema,
         patientAtStatusEvalCriterionSchema,
         viewScoutableEvalCriterionSchema,
-        doMeasureXTimesEvalCriterionSchema,
-        xPatientsAtStatusEvalCriterionSchema,
+        countMeasuresEvalCriterionSchema,
     ]
 );
 export type BoolEvalCriterionLeaf = z.infer<typeof boolEvalCriterionLeafSchema>;
 
 export const targetCountCriterionSchema = z.discriminatedUnion(
     'criterionType',
-    [doMeasureXTimesEvalCriterionSchema, xPatientsAtStatusEvalCriterionSchema]
+    [countMeasuresEvalCriterionSchema]
 );
 export type TargetCountEvalCriterion = z.infer<
     typeof targetCountCriterionSchema
@@ -190,7 +187,7 @@ export const boolEvalCriterionSchema = z.discriminatedUnion('criterionType', [
     andEvalCriterionSchema,
     orEvalCriterionSchema,
     notEvalCriterionSchema,
-    greaterThanEvalCriterionSchema,
+    compareEvalCriterionSchema,
 ]);
 export type BoolEvalCriterion = z.infer<typeof boolEvalCriterionSchema>;
 
@@ -198,7 +195,8 @@ export const numberEvalCriterionSchema = z.discriminatedUnion('criterionType', [
     constNumEvalCriterionSchema,
     countPatientsAtStatusEvalCriterionSchema,
     countCompletedEvalCriterionSchema,
-    timeStampEvalCriterionSchema,
+    countMeasuresEvalCriterionSchema,
+    timestampEvalCriterionSchema,
     firstTrueAtEvalCriterionSchema,
 ]);
 export type NumberEvalCriterion = z.infer<typeof numberEvalCriterionSchema>;
@@ -225,12 +223,11 @@ export const boolEvalCritrionTypes = [
     'andEvalCriterion',
     'orEvalCriterion',
     'notEvalCriterion',
-    'doMeasureXTimesEvalCriterion',
-    'greaterThanEvalCriterion',
+    'countMeasuresEvalCriterionn',
+    'compareEvalCriterion',
     'patientAtStatusEvalCriterion',
     'reachTechnicalChallengeStateEvalCriterion',
     'viewScoutableEvalCriterion',
-    'xPatientsAtStatusEvalCriterion',
 ] satisfies BoolEvalCriterionType[];
 
 export type NumberEvalCriterionType = NumberEvalCriterion['criterionType'];
@@ -239,7 +236,7 @@ export const numberEvalCriterionTypes = [
     'countPatientsAtStatusEvalCriterion',
     'countCompletedEvalCriterion',
     'firstTrueAtEvalCriterion',
-    'timeStampEvalCriterion',
+    'timestampEvalCriterion',
 ] satisfies NumberEvalCriterionType[];
 
 export type EvalCriterionType = EvalCriterion['criterionType'];
@@ -249,12 +246,13 @@ export const combinedEvalCriterionTypes = [
     'countCompletedEvalCriterion',
     'notEvalCriterion',
     'firstTrueAtEvalCriterion',
-    'greaterThanEvalCriterion',
+    'compareEvalCriterion',
 ] satisfies EvalCriterionType[];
 
 export type EvalcriterionType = BoolEvalCriterionType | NumberEvalCriterionType;
 
-/* Results of criteria with one of these criteriaTypes can not be calculated from the ExerciseState alone. Previous results with this type need to be cached in the respective exercise services. */
+/* Results of criteria with one of these criteriaTypes can not be calculated from the ExerciseState alone.
+Previous results with this type need to be cached in the respective exercise services. */
 export const temporalEvalCriterionTypes = [
     'firstTrueAtEvalCriterion',
 ] satisfies EvalCriterionType[];
@@ -278,145 +276,188 @@ export type TemporalEvalCriterion = z.infer<typeof temporalEvalCriterionSchema>;
 export const evalCriterionTypesNames: {
     [key in EvalcriterionType]: string;
 } = {
-    doMeasureXTimesEvalCriterion: 'Maßnahme X Mal',
+    countMeasuresEvalCriterionn: 'Maßnahme X Mal',
     reachTechnicalChallengeStateEvalCriterion:
         'Zustand Technischer Herausforderung',
     patientAtStatusEvalCriterion: 'Patient mit SK',
-    xPatientsAtStatusEvalCriterion: 'X Patienten mit SK',
     viewScoutableEvalCriterion: 'Erkundung auf der Karte',
     orEvalCriterion: 'Oder-Kriterium',
     andEvalCriterion: 'Und-Kriterium',
     constNumEvalCriterion: 'Konstante Zahl',
     countCompletedEvalCriterion: 'Anzahl erfüllter Kriterien',
-    greaterThanEvalCriterion: 'Mindest-Anzahl Kriterium',
+    compareEvalCriterion: 'Mindest-Anzahl Kriterium',
     notEvalCriterion: 'Negation',
-    timeStampEvalCriterion: 'Zeitpunkt',
+    timestampEvalCriterion: 'Zeitpunkt',
     firstTrueAtEvalCriterion: 'Zeitpunkt von Kriterium Erfüllung',
     countPatientsAtStatusEvalCriterion: 'Anzahl von Patienten mit Status',
 } as const;
 export function newAndEvalCriterion(
     name: string,
-    children?: BoolEvalCriterionId[]
+    children?: BoolEvalCriterionId[],
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
 ): AndEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
         criterionType: 'andEvalCriterion',
         children: children ?? [],
     };
 }
 export function newOrEvalCriterion(
     name: string,
-    children?: BoolEvalCriterionId[]
+    children?: BoolEvalCriterionId[],
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
 ): OrEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
         criterionType: 'orEvalCriterion',
         children: children ?? [],
     };
 }
 export function newNotEvalCriterion(
     name: string,
-    child: BoolEvalCriterionId
+    child: BoolEvalCriterionId,
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
 ): NotEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
         criterionType: 'notEvalCriterion',
         child,
     };
 }
-export function newGreaterThanEvalCriterion(
+export function newCompareEvalCriterion(
     name: string,
     leftChild: NumberEvalCriterionId,
-    rightChild: NumberEvalCriterionId
-): GreaterThanEvalCriterion {
+    rightChild: NumberEvalCriterionId,
+    operator: ComparativeOperator,
+    greenThreshold: number,
+    yellowThreshold: number,
+    redThreshold: number,
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
+): CompareEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
-        criterionType: 'greaterThanEvalCriterion',
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
+        criterionType: 'compareEvalCriterion',
+        operator,
         leftChild,
         rightChild,
+        greenThreshold,
+        yellowThreshold,
+        redThreshold,
     };
 }
 export function newConstNumEvalCriterion(
     name: string,
-    num: number
+    num: number,
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
 ): ConstNumEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
         criterionType: 'constNumEvalCriterion',
         num,
     };
 }
 export function newCountCompletedEvalCriterion(
     name: string,
-    children: BoolEvalCriterionId[]
+    children: BoolEvalCriterionId[],
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
 ): CountCompletedEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
         criterionType: 'countCompletedEvalCriterion',
-        num: -1,
         children,
     };
 }
 export function newFirstTrueAtEvalCriterion(
     name: string,
-    child: BoolEvalCriterionId
+    child: BoolEvalCriterionId,
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
 ): FirstTrueAtEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
         criterionType: 'firstTrueAtEvalCriterion',
-        num: -1,
         child,
     };
 }
-export function newTimeStampEvalCriterion(
+export function newtimestampEvalCriterion(
     name: string,
-    num: number
-): TimeStampEvalCriterion {
+    timestamp: number,
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
+): timestampEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
-        criterionType: 'timeStampEvalCriterion',
-        num,
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
+        criterionType: 'timestampEvalCriterion',
+        timestamp,
     };
 }
-export function newDoMeasureXTimesEvalCriterion(
+export function newCountMeasuresEvalCriterionn(
     name: string,
-    targetCount: number,
-    targetMeasureId: UUID
-): DoMeasureXTimesEvalCriterion {
+    targetMeasureTemplateId: UUID,
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
+): CountMeasuresEvalCriterionn {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
-        criterionType: 'doMeasureXTimesEvalCriterion',
-        targetCount,
-        targetMeasureId,
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
+        criterionType: 'countMeasuresEvalCriterionn',
+        targetMeasureTemplateId,
     };
 }
 export function newReachTechnicalChallengeStateEvalCriterion(
     name: string,
     targetTechnicalChallengeId: TechnicalChallengeId,
-    targetTechnicalChallengeStateId: TechnicalChallengeStateId
+    targetTechnicalChallengeStateId: TechnicalChallengeStateId,
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
 ): ReachTechnicalChallengeStateEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
         criterionType: 'reachTechnicalChallengeStateEvalCriterion',
         targetTechnicalChallengeId,
         targetTechnicalChallengeStateId,
@@ -425,39 +466,33 @@ export function newReachTechnicalChallengeStateEvalCriterion(
 export function newPatientAtStatusEvalCriterion(
     name: string,
     targetPatientId: UUID,
-    targetStatus: PatientStatus
+    targetStatus: PatientStatus,
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
 ): PatientAtStatusEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
         criterionType: 'patientAtStatusEvalCriterion',
         targetPatientId,
         targetStatus,
     };
 }
-export function newXPatientsAtStatusEvalCriterion(
-    name: string,
-    targetCount: number,
-    targetStatus: PatientStatus
-): XPatientsAtStatusEvalCriterion {
-    return {
-        id: uuid() as EvalCriterionId,
-        name,
-        type: 'evalCriterion',
-        criterionType: 'xPatientsAtStatusEvalCriterion',
-        targetCount,
-        targetStatus,
-    };
-}
 export function newViewScoutableEvalCriterion(
     name: string,
-    targetScoutableId: UUID
+    targetScoutableId: UUID,
+    isVisibleForParticipants?: boolean,
+    isDraft?: boolean
 ): ViewScoutableEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
+        isVisibleForParticipants: isVisibleForParticipants ?? false,
+        isDraft: isDraft ?? false,
         criterionType: 'viewScoutableEvalCriterion',
         targetScoutableId,
     };
@@ -475,15 +510,6 @@ export function isBoolEvalCriterion(
 ): criterion is BoolEvalCriterion {
     //@ts-expect-error: not assignable
     return boolEvalCritrionTypes.includes(criterion.criterionType);
-}
-/* TypeScript and Angular don't understand, that isNumberEvalCriterion(criterion)===true also means that criterion.num exists.*/
-export function getNumFromEvalCriterion(
-    criterion: EvalCriterion
-): number | null {
-    if (isNumberEvalCriterion(criterion)) {
-        return criterion.num;
-    }
-    return null;
 }
 /**
  * recursively removes the childCriteria of an initial eval criterion from the input map
@@ -528,7 +554,7 @@ export function removeChildren(
             criterion = null;
         }
     }
-    if (type === 'greaterThanEvalCriterion') {
+    if (type === 'compareEvalCriterion') {
         let leftCriterion = criteriaMap[currentCriterion.leftChild];
         let rightCriterion = criteriaMap[currentCriterion.rightChild];
         if (leftCriterion) {
@@ -593,7 +619,7 @@ export function getChildrenOfEvalCriterion(
         ) {
             return [criteriaMap[criterion.child]!];
         }
-        if (type === 'greaterThanEvalCriterion') {
+        if (type === 'compareEvalCriterion') {
             return [
                 criteriaMap[criterion.leftChild]!,
                 criteriaMap[criterion.rightChild]!,

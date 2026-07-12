@@ -45,16 +45,18 @@ export function registerJoinParallelExerciseHandler(
             });
             return;
         }
+        console.log('wrapper init done. getting session info.');
         clientWrapper.getSessionInformation().then(() => {
             clientWrapper
                 .joinParallelExercise(parsedId.data)
                 .then(() => {
-                    callback({
-                        success: true,
-                        payload: {
-                            exerciseInstances:
-                                clientWrapper.getInstanceSummaries(),
-                        },
+                    clientWrapper.getInstanceSummaries().then((value) => {
+                        callback({
+                            success: true,
+                            payload: {
+                                exerciseInstances: value,
+                            },
+                        });
                     });
                 })
                 .catch((e: unknown) => {

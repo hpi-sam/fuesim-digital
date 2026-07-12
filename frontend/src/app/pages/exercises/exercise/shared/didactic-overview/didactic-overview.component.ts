@@ -12,7 +12,6 @@ import {
     numberEvalCriterionTypes,
     combinedEvalCriterionTypes,
     evalCriterionTypesNames,
-    getNumFromEvalCriterion,
     getRootCriteriaMap,
     type EvalCriterionCategory,
     type EvalCriterionId,
@@ -121,6 +120,5 @@ export class DidacticOverviewComponent {
         return tcWithId?.states[stateId]?.title;
     }
     public getNumFromEvalResult = getNumFromEvalResult;
-    public getNumFromEvalCriterion = getNumFromEvalCriterion;
     public getRootCriteriaMap = getRootCriteriaMap;
 }

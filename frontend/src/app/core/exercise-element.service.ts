@@ -477,19 +477,30 @@ export class CollectionService {
 
     public async duplicateCollection(
         setVersionId: CollectionEntityId,
-        specificCollectionVersionId: CollectionVersionId
+        specificCollectionVersionId: CollectionVersionId,
+        title: string,
+        targetOrganisationId: OrganisationId
     ) {
         const data = await lastValueFrom(
             this.httpClient.post<
                 typeof Marketplace.Collection.Duplicate.Response
             >(
                 `${this.ENDPOINT}/${setVersionId}/version/${specificCollectionVersionId}/duplicate`,
-                {}
+                Marketplace.Collection.Duplicate.requestSchema.parse({
+                    title,
+                    targetOrganisationId,
+                })
             )
         );
 
         const parsedData =
             Marketplace.Collection.Duplicate.responseSchema.parse(data);
+
+        this.messageService.postMessage({
+            title: 'Sammlung dupliziert',
+            body: 'Die Sammlung wurde erfolgreich dupliziert.',
+            color: 'success',
+        });
 
         return parsedData.createdSet;
     }

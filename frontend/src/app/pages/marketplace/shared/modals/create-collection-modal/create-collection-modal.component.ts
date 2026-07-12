@@ -1,5 +1,12 @@
 import { HttpResourceRef } from '@angular/common/http';
-import { Component, effect, inject, output, signal } from '@angular/core';
+import {
+    Component,
+    effect,
+    inject,
+    OnInit,
+    output,
+    signal,
+} from '@angular/core';
 import {
     disabled,
     form,
@@ -7,9 +14,11 @@ import {
     validateStandardSchema,
 } from '@angular/forms/signals';
 import {
+    CollectionVersion,
     GetOrganisationsResponseData,
     Marketplace,
     OrganisationId,
+    VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -30,13 +39,16 @@ import { DisplayModelValidationComponent } from '../../../../../shared/validatio
         AutofocusDirective,
     ],
 })
-export class CreateCollectionModalComponent {
+export class CreateCollectionModalComponent implements OnInit {
     private readonly apiService = inject(ApiService);
     private readonly authService = inject(AuthService);
     private readonly collectionService = inject(CollectionService);
     private readonly activeModal = inject(NgbActiveModal);
 
-    readonly created = output<boolean>();
+    public basedOnCollection: VersionedCollectionPartial | null = null;
+    public prefilledName = '';
+
+    readonly created = output<CollectionVersion | null>();
 
     public readonly model = signal<
         typeof Marketplace.Collection.Create.Request
@@ -77,16 +89,30 @@ export class CreateCollectionModalComponent {
             }
         });
     }
-
-    public async createNewCollection() {
-        await this.collectionService.createColletion(
-            this.collectionCreationForm.title().value(),
-            this.collectionCreationForm.organisationId().value()
-        );
-        this.close(true);
+    ngOnInit() {
+        this.collectionCreationForm.title().value.set(this.prefilledName);
     }
 
-    public close(created: boolean = false) {
+    public async createNewCollection() {
+        let createdCollection: CollectionVersion | null = null;
+        if (this.basedOnCollection === null) {
+            createdCollection = await this.collectionService.createColletion(
+                this.collectionCreationForm.title().value(),
+                this.collectionCreationForm.organisationId().value()
+            );
+        } else {
+            createdCollection =
+                await this.collectionService.duplicateCollection(
+                    this.basedOnCollection.entityId,
+                    this.basedOnCollection.versionId,
+                    this.collectionCreationForm.title().value(),
+                    this.collectionCreationForm.organisationId().value()
+                );
+        }
+        this.close(createdCollection);
+    }
+
+    public close(created: CollectionVersion | null = null) {
         this.activeModal.close();
         this.created.emit(created);
     }

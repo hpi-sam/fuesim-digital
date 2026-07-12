@@ -717,7 +717,8 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             const createdSet =
                 await collectionService.duplicateCollectionVersion(
                     collectionVersionId,
-                    parsedBody.targetOrganisationId
+                    parsedBody.targetOrganisationId,
+                    parsedBody.title
                 );
 
             res.send(

@@ -23,6 +23,8 @@ import { CollectionUpgradeImpactModalComponent } from '../shared/modals/marketpl
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { CollectionDataResolverResult } from '../collection-data.resolver';
 import { openSelectCollectionModal } from '../shared/modals/marketplace-select-collection-modal/select-collection-modal';
+import { openCreateCollectionModal } from '../shared/modals/create-collection-modal/open-create-collection-modal';
+import { MessageService } from '../../../core/messages/message.service';
 import { UsedCollectionsTabComponent } from './used-collections-tab/used-collections-tab.component';
 import { CollectionDetailsTabComponent } from './collection-properties-tab/collection-properties-tab.component';
 import { CollectionElementsTabComponent } from './collection-elements-tab/collection-elements-tab.component';
@@ -48,6 +50,7 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
     private readonly ngbModalService = inject(NgbModal);
     private readonly router = inject(Router);
     private readonly confirmationService = inject(ConfirmationModalService);
+    private readonly messageService = inject(MessageService);
     public versioningEnabled = this.collectionService.versioningEnabled;
 
     public readonly resolved = toSignal(this.activatedRoute.data);
@@ -131,15 +134,27 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
     }
 
     public async duplicateCollection() {
-        const selectedVersion =
-            this.selectedCollectionData()?.collection.versionId;
-        if (!selectedVersion) return;
+        const selectedCollection = this.selectedCollectionData()?.collection;
+        if (!selectedCollection) return;
 
-        const newCollection = await this.collectionService.duplicateCollection(
-            this.collection.collectionEntityId,
-            selectedVersion
-        );
-        this.router.navigate(['/collections/', newCollection.entityId]);
+        openCreateCollectionModal(this.ngbModalService, {
+            basedOnCollection: selectedCollection,
+            prefilledName: `Kopie von ${selectedCollection.title}`,
+        }).subscribe((created) => {
+            if (created) {
+                this.router.navigate(['/collections/', created.entityId]);
+                this.messageService.postMessage({
+                    color: 'info',
+                    title: 'Zu neuer Sammlung gewechselt',
+                    body: 'Sie befinden sich nun in der neuen Sammlung, die auf der vorherigen Sammlung basiert.',
+                });
+            } else {
+                this.messageService.postError({
+                    title: 'Fehler beim Duplizieren der Sammlung',
+                    body: 'Die Sammlung konnte nicht dupliziert werden.',
+                });
+            }
+        });
     }
 
     public async leaveCollection() {

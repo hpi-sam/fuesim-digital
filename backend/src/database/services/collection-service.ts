@@ -1623,7 +1623,8 @@ export class CollectionService {
 
     public async duplicateCollectionVersion(
         collectionVersionId: CollectionVersionId,
-        targetOrganisationId: OrganisationId
+        targetOrganisationId: OrganisationId,
+        newTitle: string
     ) {
         return this.collectionRepository.transaction(async (tx) => {
             const latestCollectionEntity =
@@ -1637,7 +1638,7 @@ export class CollectionService {
 
             const newCollection = await tx.createFirstCollectionVersion(
                 // TODO: Quixelation : also duplicate description (visbility should stay private)
-                `Kopie von ${latestCollectionEntity.title}`,
+                newTitle,
                 true
             );
 

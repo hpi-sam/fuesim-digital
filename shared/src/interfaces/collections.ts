@@ -288,6 +288,10 @@ export namespace Marketplace {
 
         export const Duplicate = new Route({
             request: z.object({
+                title: z
+                    .string()
+                    .trim()
+                    .nonempty('Bitte geben Sie einen Titel ein'),
                 targetOrganisationId: organisationIdSchema,
             }),
             response: z.object({

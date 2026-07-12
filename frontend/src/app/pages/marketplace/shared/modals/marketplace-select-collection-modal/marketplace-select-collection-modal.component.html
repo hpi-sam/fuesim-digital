@@ -37,7 +37,7 @@
                     class="btn btn-primary ml-auto pulsating"
                     (click)="close(collection)"
                 >
-                    "{{ collection.title }}" auswählen
+                    Diese Elemente verwenden
                     <i class="bi bi-arrow-right"></i>
                 </button>
             </div>
@@ -56,15 +56,41 @@
             </button>
         }
         <hr />
-        <div class="card">
-            <div class="card-body bg-light">
-                <app-collection-elements-list
-                    [collection]="collection"
-                    [collectionElements]="collectionData[1]"
-                    [editable]="false"
-                    [showImportedElements]="showDependencyElements"
-                    [smallCards]="true"
-                />
+        <div ngbAccordion>
+            <div ngbAccordionItem>
+                <h2 ngbAccordionHeader>
+                    <button ngbAccordionButton>
+                        <i class="bi bi-eye me-1"></i>
+                        <em>Elemente Vorschau</em>
+                    </button>
+                </h2>
+                <div ngbAccordionCollapse>
+                    <div ngbAccordionBody>
+                        <ng-template>
+                            <div
+                                class="alert alert-info d-flex align-items-center gap-2"
+                            >
+                                <i class="bi bi-patch-exclamation"></i>
+                                <span>
+                                    <b
+                                        >Dies ist nur eine Vorschau der
+                                        Elemente.</b
+                                    ><br />
+                                    Wählen Sie die Sammlung über den obigen
+                                    Knopf aus, um diese Elemente in der Übung
+                                    verwenden zu können.
+                                </span>
+                            </div>
+                            <app-collection-elements-list
+                                [collection]="collection"
+                                [collectionElements]="collectionData[1]"
+                                [editable]="false"
+                                [showImportedElements]="showDependencyElements"
+                                [smallCards]="true"
+                            />
+                        </ng-template>
+                    </div>
+                </div>
             </div>
         </div>
     } @else {

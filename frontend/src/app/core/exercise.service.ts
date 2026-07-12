@@ -282,6 +282,11 @@ export class ExerciseService {
                 entityId: collection.entityId,
             },
         });
+        this.messageService.postMessage({
+            title: 'Sammlung wurde hinzugefügt.',
+            body: 'Sie können die Elemente der Sammlung nun in der Übung verwenden.',
+            color: 'success',
+        });
     }
 
     private readonly stopNotifications$ = new Subject<void>();

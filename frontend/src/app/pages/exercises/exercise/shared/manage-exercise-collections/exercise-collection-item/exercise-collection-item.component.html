@@ -1,10 +1,15 @@
-<div class="my-3">
+<div
+    class="my-3"
+    [class.update-available]="
+        newerVersionAvailable.value()?.newerVersionAvailable
+    "
+>
     @if (collectionData.isLoading()) {
         <div class="spinner-border"></div>
     }
     @if (collectionData.hasValue()) {
         <span>
-            <b>{{ collectionData.value().title }}</b>
+            <b class="collection-title">{{ collectionData.value().title }}</b>
             <span class="text-muted small ms-1">
                 (Version {{ collectionData.value().version }} &ndash;
                 {{ collectionData.value().createdAt | date: 'short' }})
@@ -19,7 +24,7 @@
                 [routerLink]="'/collections/' + collection().entityId"
                 [queryParams]="{ from: exerciseKey() }"
             >
-                Elemente anzeigen
+                Elemente verwalten
                 <i class="bi bi-box-arrow-up-right ms-1"></i>
             </a>
             @if (newerVersion; as version) {

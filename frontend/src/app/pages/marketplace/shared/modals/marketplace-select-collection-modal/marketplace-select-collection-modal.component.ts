@@ -13,7 +13,11 @@ import {
     gatherAllVisibleCollectionElements,
     checkCollectionOrganisationRole,
 } from 'fuesim-digital-shared';
-import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbAccordionModule,
+    NgbActiveModal,
+    NgbTooltip,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { RouterLink, RouterLinkWithHref } from '@angular/router';
 // we cannot get around it
@@ -30,6 +34,7 @@ import { CollectionService } from '../../../../../core/exercise-element.service'
         RouterLink,
         RouterLinkWithHref,
         NgbTooltip,
+        NgbAccordionModule,
     ],
 })
 export class MarketplaceSelectCollectionModalComponent {

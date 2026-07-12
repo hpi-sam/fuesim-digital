@@ -104,4 +104,24 @@
             }
         }
     </div>
+    @if (showIndicator()) {
+        <div
+            class="w-100 text-center small fw-medium"
+            [class.bg-success]="showIndicator() === 'created'"
+            [class.bg-warning]="showIndicator() === 'changed'"
+            [class.bg-danger-subtle]="showIndicator() === 'ghost'"
+        >
+            @switch (showIndicator()) {
+                @case ('created') {
+                    <span class="text-white">Neu</span>
+                }
+                @case ('changed') {
+                    <span class="text-black">Verändert</span>
+                }
+                @case ('ghost') {
+                    <span class="text-gray">Gelöscht</span>
+                }
+            }
+        </div>
+    }
 </div>

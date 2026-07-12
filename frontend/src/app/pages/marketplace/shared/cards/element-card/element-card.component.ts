@@ -99,7 +99,7 @@ export class ElementCardComponent {
         const confirmation = await this.confirmationService.confirm({
             title: 'Element löschen',
             description: `Möchten Sie das Element "${this.element().title}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`,
-            confirmationButtonText: 'Unwiederuflich löschen',
+            confirmationButtonText: 'Unwiderruflich löschen',
         });
         if (!confirmation) return;
         const result = await this.collectionService.deleteElement(
@@ -110,8 +110,8 @@ export class ElementCardComponent {
             const cascadingConfirmation =
                 await this.confirmationService.confirm({
                     title: 'Element in weiteren Elementen verwendet',
-                    description: `Das Element "${this.element().title}" wird in folgenden Elementen verwendet: ${result.requiresConfirmation.map((e) => `"${e.title}"`).join(', ')}. Wenn Sie es jetzt löschen wird es auch aus diesen weiteren Elemente entfernt. Möchten Sie es trotzdem löschen?`,
-                    confirmationButtonText: `Unwiederuflich aus ${result.requiresConfirmation.length} Elementen löschen`,
+                    description: `Das Element "${this.element().title}" wird in folgenden Elementen verwendet: ${result.requiresConfirmation.map((e) => `"${e.title}"`).join(', ')}. Wenn Sie es jetzt löschen, wird es auch aus diesen weiteren Elemente entfernt. Möchten Sie es trotzdem löschen?`,
+                    confirmationButtonText: `Unwiderruflich aus ${result.requiresConfirmation.length} Elementen löschen`,
                 });
 
             if (!cascadingConfirmation) return;

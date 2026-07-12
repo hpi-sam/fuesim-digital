@@ -88,6 +88,15 @@
                 </button>
             </div>
         }
+        @if (showInfoBanner) {
+            <div class="alert alert-secondary mt-3 d-flex gap-2" role="alert">
+                <i class="bi bi-info-circle"></i>
+                <span class="d-block text-muted">
+                    Wählen Sie eine Sammlung aus, deren Elemente Sie in der
+                    Übung verwenden möchten.
+                </span>
+            </div>
+        }
         @if (userAvailableCollections.hasValue()) {
             <div class="card">
                 <ul class="list-group list-group-flush">
@@ -119,21 +128,12 @@
                             } @else {
                                 <button class="btn btn-outline-primary">
                                     Auswählen
-                                    <i class="bi bi-arrow-right ms-1"></i>
+                                    <i class="bi bi-chevron-right ms-1"></i>
                                 </button>
                             }
                         </li>
                     }
                 </ul>
-            </div>
-        }
-        @if (showInfoBanner) {
-            <div class="alert alert-secondary mt-3 d-flex gap-2" role="alert">
-                <i class="bi bi-info-circle"></i>
-                <span class="d-block text-muted">
-                    Wähle Sie eine Sammlung aus, deren Elemente Sie in der Übung
-                    verwenden möchten.
-                </span>
             </div>
         }
     }

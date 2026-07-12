@@ -118,7 +118,6 @@ export class AlarmGroupItemComponent implements OnInit {
         time: number | null,
         name: string | null
     ) {
-        console.log('editAlarmGroupVehicle', alarmGroupVehicleId, time, name);
         if (time === null) {
             return;
         }
@@ -160,7 +159,6 @@ export class AlarmGroupItemComponent implements OnInit {
             this.alarmGroup().alarmGroupVehicles
         );
         for (const agv of alarmGroupVehicles) {
-            console.log(agv, agv.time, delta, agv.time + delta);
             const newTime = Math.max(0, agv.time + delta);
             this.editAlarmGroupVehicle(agv.id, newTime, agv.name);
         }

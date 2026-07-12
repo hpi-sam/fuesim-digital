@@ -1528,7 +1528,7 @@ export class CollectionService {
                     )
                 );
 
-                // If we copy this Element into a differnent collection, we want to make sure, that all the dependencies
+                // If we copy this Element into a different collection, we want to make sure, that all the dependencies
                 // are also copied over.
                 const dependencyIds = isExternalCopy
                     ? getElementDependencies(sourceElement.content)

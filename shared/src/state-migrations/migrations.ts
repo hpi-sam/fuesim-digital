@@ -103,11 +103,6 @@ export function migratePartialExport(
               )
             : undefined;
 
-    console.log({
-        migratedState: migratedStateExport.currentState,
-        currentState,
-    });
-
     // Fix template id lookups, since migration 44 always computes new template IDs
     if (vehicleTemplates) {
         vehicleTemplates = vehicleTemplates.map((t) => ({

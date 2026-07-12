@@ -600,6 +600,12 @@ export class CollectionService {
                 title: 'Sammlung konnte nicht gespeichert werden',
                 body: 'Probieren Sie es erneut oder laden Sie die Seite neu.',
             });
+        } else {
+            this.messageService.postMessage({
+                title: 'Sammlung gespeichert',
+                body: 'Eine neue Version wurde erfolgreich gespeichert.',
+                color: 'success',
+            });
         }
     }
 

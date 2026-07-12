@@ -1,12 +1,15 @@
 <div class="container">
+    <div class="d-flex flex-row align-items-center justify-content-between">
+    <div>
     <h1>Übungselemente</h1>
     <p class="text-muted">
-        Verwalten Sie hier Sammlungen von Übungselementen, die Sie in
-        Übungsszenarien verwenden können.
+    Verwalten Sie hier Sammlungen von Übungselementen, die Sie in
+    Übungsszenarien verwenden können.
     </p>
+    </div>
 
     @if (isAuthenticated()) {
-        <div class="d-flex flex-row justify-content-end gap-2 mb-3">
+        <div class="d-flex flex-row gap-2 my-2">
             <a
                 class="btn btn-outline-secondary"
                 routerLink="/collections/archive"
@@ -18,6 +21,10 @@
                 Neue Sammlung erstellen
             </button>
         </div>
+        }
+    </div>
+
+    @if (isAuthenticated()) {
 
         @if (userAvailableCollections.hasValue()) {
             <div class="row row-cols-3">
@@ -43,7 +50,7 @@
                                 organisieren.
                             </small>
                             <button
-                                class="btn btn-outline-primary mt-2 d-flex gap-1 align-items-center"
+                                class="btn btn-outline-primary mt-2 d-flex gap-1 align-items-center mt-3"
                                 (click)="createNewCollection()"
                             >
                                 <span class="me-1"

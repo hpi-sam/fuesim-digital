@@ -10,22 +10,16 @@ export const appRoutes: Routes = [
     },
     {
         path: 'about',
-        loadChildren: async () =>
-            import('./pages/about/about.routes').then((m) => m.aboutRoutes),
+        loadChildren: async () => import('./pages/about/about.routes'),
     },
     {
         path: 'exercises',
-        // eslint-disable-next-line @typescript-eslint/promise-function-async
-        loadChildren: () =>
-            import('./pages/exercises/exercises.routes').then((m) => m.routes),
+        loadChildren: async () => import('./pages/exercises/exercises.routes'),
     },
     {
         path: 'organisations',
-        // eslint-disable-next-line @typescript-eslint/promise-function-async
-        loadChildren: () =>
-            import('./pages/organisations/organisations.routes').then(
-                (m) => m.routes
-            ),
+        loadChildren: async () =>
+            import('./pages/organisations/organisations.routes'),
     },
     {
         path: 'health',

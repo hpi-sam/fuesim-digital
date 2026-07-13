@@ -46,12 +46,10 @@ import {
     selectExerciseState,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
-import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { FileInputDirective } from '../../../../../shared/directives/file-input.directive';
 import { MapEditorCardComponent } from '../editor-panel/map-editor-card/map-editor-card.component';
 import { PatientStatusBadgeComponent } from '../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
-import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 import { HelpBannerComponent } from '../../../../../help-banner/help-banner.component.js';
 
@@ -70,7 +68,6 @@ type FilterCategory =
     templateUrl: './trainer-map-editor.component.html',
     styleUrls: ['./trainer-map-editor.component.scss'],
     imports: [
-        ExerciseMapComponent,
         FileInputDirective,
         NgbAccordionDirective,
         NgbAccordionItem,
@@ -83,16 +80,12 @@ type FilterCategory =
         PatientStatusBadgeComponent,
         NgbTooltip,
         PatientStatusDisplayComponent,
-        TrainerToolbarComponent,
         AsyncPipe,
         KeyValuePipe,
         ValuesPipe,
         HelpBannerComponent,
     ],
 })
-/**
- * A wrapper around the map that provides trainers with more options and tools.
- */
 export class TrainerMapEditorComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     readonly dragElementService = inject(DragElementService);

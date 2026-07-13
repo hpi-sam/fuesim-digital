@@ -4,7 +4,7 @@ import { OrganisationListComponent } from './list/organisation-list.component';
 import { OrganisationComponent } from './organisation/organisation.component';
 import { JoinOrganisationComponent } from './join/join-organisation.component';
 
-export const routes: Routes = [
+const organisationsRoutes: Routes = [
     {
         path: '',
         component: OrganisationListComponent,
@@ -21,3 +21,4 @@ export const routes: Routes = [
         component: OrganisationComponent,
     },
 ];
+export default organisationsRoutes;

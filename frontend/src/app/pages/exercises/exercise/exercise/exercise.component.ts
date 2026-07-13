@@ -1,5 +1,4 @@
-import type { OnDestroy } from '@angular/core';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import {
     NgbModal,
     NgbTooltip,
@@ -15,15 +14,18 @@ import {
     exportPatientsToCSV,
     currentStateVersion,
 } from 'fuesim-digital-shared';
-import { Subject } from 'rxjs';
 import { AsyncPipe, Location as NgLocation } from '@angular/common';
+import {
+    ActivatedRoute,
+    Router,
+    RouterOutlet,
+    RouterLinkWithHref,
+} from '@angular/router';
 import Package from '../../../../../../package.json';
 import { openPartialExportModal } from '../shared/partial-export/open-partial-export-selection-modal';
 import { ExerciseService } from '../../../../core/exercise.service';
 import type { AppState } from '../../../../state/app.state';
 import { ApiService } from '../../../../core/api.service';
-import { ApplicationService } from '../../../../core/application.service';
-import { MessageService } from '../../../../core/messages/message.service';
 import { saveBlob } from '../../../../shared/functions/save-blob';
 import {
     selectExerciseStateMode,
@@ -36,11 +38,7 @@ import {
 } from '../../../../state/application/selectors/exercise.selectors';
 import { selectOwnClient } from '../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../state/get-state-snapshot';
-import { TimeTravelComponent } from '../shared/time-travel/time-travel.component';
-import { TrainerMapEditorComponent } from '../shared/trainer-map-editor/trainer-map-editor.component';
-import { EmergencyOperationsCenterFullComponent } from '../shared/emergency-operations-center/emergency-operations-center-full/emergency-operations-center-full.component';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
-import { OperationsTabletViewComponent } from '../shared/operations-tablet-view/operations-tablet-view.component';
 import { ExerciseStateBadgeComponent } from '../../../../shared/components/exercise-state-badge/exercise-state-badge.component';
 import { ParallelExerciseStatusBarComponent } from '../../../../shared/components/parallel-exercise-status-bar/parallel-exercise-status-bar.component';
 import { CopyButtonComponent } from '../../../../shared/components/copy-button/copy-button.component';
@@ -50,7 +48,6 @@ import {
     openTrainersModal,
 } from '../shared/clients-modal/open-clients-modal';
 import { environment } from '../../../../../environments/environment.js';
-import { MapOperatorMapComponent } from '../shared/map-operator-map/map-operator-map.component';
 
 @Component({
     selector: 'app-exercise',
@@ -64,29 +61,24 @@ import { MapOperatorMapComponent } from '../shared/map-operator-map/map-operator
         NgbDropdownMenu,
         NgbDropdownButtonItem,
         NgbDropdownItem,
-        TimeTravelComponent,
-        TrainerMapEditorComponent,
-        EmergencyOperationsCenterFullComponent,
         AsyncPipe,
         FormatDurationPipe,
-        OperationsTabletViewComponent,
         ParallelExerciseStatusBarComponent,
         CopyButtonComponent,
-        MapOperatorMapComponent,
+        RouterOutlet,
+        RouterLinkWithHref,
     ],
 })
-export class ExerciseComponent implements OnDestroy {
+export class ExerciseComponent {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly apiService = inject(ApiService);
-    private readonly applicationService = inject(ApplicationService);
     readonly exerciseService = inject(ExerciseService);
-    private readonly messageService = inject(MessageService);
     private readonly modalService = inject(NgbModal);
     readonly location = inject(NgLocation);
+    private readonly router = inject(Router);
+    protected readonly route = inject(ActivatedRoute);
 
-    private readonly destroy = new Subject<void>();
-
-    public readonly exerciseStateMode$ = this.store.select(
+    public readonly exerciseStateMode = this.store.selectSignal(
         selectExerciseStateMode
     );
     public readonly participantKey =
@@ -108,6 +100,43 @@ export class ExerciseComponent implements OnDestroy {
     readonly version: string = Package.version;
     readonly docsUrl = environment.docsUrl;
 
+    constructor() {
+        effect(() => {
+            if (this.exerciseStateMode() !== 'exercise') return;
+
+            if (this.ownClient()?.isInWaitingRoom) {
+                this.router.navigate(['/exercises', this.exerciseKey()]);
+            } else {
+                switch (this.ownClient()?.role.specificRole) {
+                    case 'eoc':
+                        this.router.navigate(['eoc'], {
+                            relativeTo: this.route,
+                            replaceUrl: true,
+                        });
+                        break;
+                    case 'operationsTablet':
+                        this.router.navigate(['operations'], {
+                            relativeTo: this.route,
+                            replaceUrl: true,
+                        });
+                        break;
+                    case 'mapOperator':
+                    case 'trainer':
+                        this.router.navigate(['map'], {
+                            relativeTo: this.route,
+                            replaceUrl: true,
+                        });
+                        break;
+                    case undefined:
+                        this.router.navigate([], {
+                            relativeTo: this.route,
+                            replaceUrl: true,
+                        });
+                }
+            }
+        });
+    }
+
     public openInviteModal() {
         openInviteModal(this.modalService);
     }
@@ -118,14 +147,6 @@ export class ExerciseComponent implements OnDestroy {
 
     public openAddTrainerModal() {
         openTrainersModal(this.modalService);
-    }
-
-    public leaveTimeTravel() {
-        this.applicationService.rejoinExercise();
-        this.messageService.postMessage({
-            title: 'Zurück in die Zukunft!',
-            color: 'info',
-        });
     }
 
     public async exportExerciseWithHistory() {
@@ -180,9 +201,5 @@ export class ExerciseComponent implements OnDestroy {
             } satisfies StateExport),
         ]);
         saveBlob(blob, `exercise-state-${currentState.participantKey}.json`);
-    }
-
-    ngOnDestroy(): void {
-        this.destroy.next();
     }
 }

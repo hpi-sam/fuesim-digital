@@ -180,14 +180,15 @@
                 >
                     Statistiken
                 </button>
-                <button
+                <a
                     ngbDropdownItem
-                    (click)="applicationService.startTimeTravel()"
+                    routerLink="../replay"
+                    [relativeTo]="route"
                     class="btn btn-primary"
                     data-cy="trainerToolbarRecordingButton"
                 >
                     Aufzeichnung
-                </button>
+                </a>
             </div>
         </div>
     }

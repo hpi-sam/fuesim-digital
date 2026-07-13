@@ -1,0 +1,25 @@
+<div #fullscreenWrapper class="container-fluid d-flex flex-column h-100">
+    <div class="flex-fill row">
+        <div class="col p-0 rounded-start overflow-hidden">
+            <app-exercise-map [fullscreenContainer]="fullscreenWrapper" />
+        </div>
+
+        <div
+            class="card col-3 p-0 rounded-0 rounded-end"
+            style="min-width: 400px"
+        >
+            <router-outlet />
+        </div>
+    </div>
+
+    @switch (exerciseStateMode()) {
+        @case ('exercise') {
+            @if (role() === 'trainer') {
+                <app-trainer-toolbar />
+            }
+        }
+        @case ('timeTravel') {
+            <app-time-travel-toolbar />
+        }
+    }
+</div>

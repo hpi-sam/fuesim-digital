@@ -1,0 +1,13 @@
+@if (exerciseStateMode() === 'timeTravel') {
+    <!-- TODO: Replace placeholder -->
+    You can click an element on the map to view its details
+} @else {
+    @switch (role()) {
+        @case ('trainer') {
+            <app-trainer-map-editor />
+        }
+        @case ('participant') {
+            <app-map-operator-toolbar />
+        }
+    }
+}

@@ -35,7 +35,7 @@ import {
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, KeyValuePipe, NgTemplateOutlet } from '@angular/common';
-import { CdkDrag, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import {
     DragElementService,
     TransferTemplate,
@@ -58,15 +58,11 @@ import {
     selectTechnicalChallengeTemplates,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
-import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { PatientStatusBadgeComponent } from '../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
-import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 import { HelpBannerComponent } from '../../../../../help-banner/help-banner.component.js';
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
-import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group-overview-page.component';
-import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
 import { openManageExerciseCollectionsModal } from '../manage-exercise-collections/open-manage-exercise-collections-modal';
 import { CollectionService } from '../../../../../core/collection.service';
 import { openUploadTechnicalChallengeModal } from '../editor-panel/upload-technical-challenge-template-modal/upload-technical-challenge-template-modal.component.js';
@@ -88,7 +84,6 @@ type FilterCategory =
     styleUrls: ['./trainer-map-editor.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
-        ExerciseMapComponent,
         NgbAccordionDirective,
         NgbAccordionItem,
         NgbAccordionHeader,
@@ -100,22 +95,15 @@ type FilterCategory =
         PatientStatusBadgeComponent,
         NgbTooltip,
         PatientStatusDisplayComponent,
-        TrainerToolbarComponent,
         AsyncPipe,
         KeyValuePipe,
         ValuesPipe,
         HelpBannerComponent,
         CdkDrag,
         CdkDropList,
-        CdkDropListGroup,
         NgTemplateOutlet,
-        AlarmGroupOverviewPageComponent,
-        HospitalEditorPageComponent,
     ],
 })
-/**
- * A wrapper around the map that provides trainers with more options and tools.
- */
 export class TrainerMapEditorComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly dragElementService = inject(DragElementService);

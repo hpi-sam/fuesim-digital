@@ -49,9 +49,12 @@ export class CreateExerciseModalComponent {
         importObject: undefined,
     });
     readonly importFileName = signal<string | null>(null);
+    readonly organisationLocked = signal<boolean>(false);
+
     readonly exerciseForm = form(this.model, (schemaPath) => {
-        disabled(schemaPath.organisationId, () =>
-            this.organisations.isLoading()
+        disabled(
+            schemaPath.organisationId,
+            () => this.organisations.isLoading() || this.organisationLocked()
         );
         validateStandardSchema(schemaPath, postExerciseRequestDataSchema);
     });
@@ -75,6 +78,11 @@ export class CreateExerciseModalComponent {
                 }
             }
         });
+    }
+
+    public setOrganisation(organisationId: OrganisationId) {
+        this.model.set({ ...this.model(), organisationId });
+        this.organisationLocked.set(true);
     }
 
     public async importFile(fileList: FileList | object) {

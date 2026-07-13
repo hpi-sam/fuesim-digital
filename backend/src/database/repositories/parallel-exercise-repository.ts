@@ -2,6 +2,7 @@ import { eq, desc, getTableColumns } from 'drizzle-orm';
 import type {
     ParallelExerciseKey,
     ParallelExerciseId,
+    OrganisationId,
 } from 'fuesim-digital-shared';
 import {
     organisationMembershipTable,
@@ -86,6 +87,24 @@ export class ParallelExerciseRepository extends BaseRepository {
                     parallelExerciseTable.organisationId
                 )
             )
+            .orderBy(desc(parallelExerciseTable.createdAt));
+    }
+
+    public async getParallelExercisesForOrganisation(
+        organisationId: OrganisationId
+    ): Promise<ParallelExerciseDetailsEntry[]> {
+        return this.databaseConnection
+            .select(this.getColumns())
+            .from(parallelExerciseTable)
+            .innerJoin(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.id, parallelExerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(parallelExerciseTable.organisationId, organisationTable.id)
+            )
+            .where(eq(parallelExerciseTable.organisationId, organisationId))
             .orderBy(desc(parallelExerciseTable.createdAt));
     }
 

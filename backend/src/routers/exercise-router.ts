@@ -5,6 +5,7 @@ import {
     getExercisesResponseDataSchema,
     isExerciseKey,
     isTrainerKey,
+    organisationIdSchema,
     postExerciseRequestDataSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
@@ -26,8 +27,12 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
     });
 
     router.get('/exercises/', isAuthenticatedMiddleware, async (req, res) => {
+        const orgIdRes = organisationIdSchema.safeParse(
+            req.query['organisationId']
+        );
         const exercises = await exerciseService.getAllExercisesForUser(
-            req.session!
+            req.session!,
+            orgIdRes.success ? orgIdRes.data : undefined
         );
 
         res.send(getExercisesResponseDataSchema.encode(exercises));

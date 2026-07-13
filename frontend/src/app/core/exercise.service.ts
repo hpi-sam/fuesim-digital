@@ -10,6 +10,8 @@ import type {
     ServerToClientEvents,
     SocketResponse,
     UUID,
+    OrganisationId,
+    GetExerciseTemplateResponseData,
 } from 'fuesim-digital-shared';
 import {
     joinExerciseResponseDataSchema,
@@ -52,6 +54,7 @@ import {
 } from '../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
 import { CreateExerciseModalComponent } from '../pages/exercises/shared/create-exercise-modal/create-exercise-modal.component.js';
+import { CreateExerciseTemplateModalComponent } from '../pages/exercises/shared/create-exercise-template-modal/create-exercise-template-modal.component.js';
 import { websocketOrigin } from './api-origins';
 import {
     saveReconnectToken,
@@ -385,7 +388,8 @@ export class ExerciseService {
 
     public async createExercise(
         fileList?: FileList | object,
-        callback?: (exercise: GetExerciseResponseData) => void
+        callback?: (exercise: GetExerciseResponseData) => void,
+        organisationId?: OrganisationId
     ) {
         if (this.authService.authData().user) {
             const modalRef = this.ngbModalService.open(
@@ -396,6 +400,9 @@ export class ExerciseService {
             componentInstance.created.subscribe((exercise) => {
                 callback?.(exercise);
             });
+            if (organisationId) {
+                componentInstance.setOrganisation(organisationId);
+            }
             if (fileList) {
                 await componentInstance.importFile(fileList);
             }
@@ -411,6 +418,27 @@ export class ExerciseService {
                 .then((exercise) => {
                     callback?.(exercise);
                 });
+        }
+    }
+
+    public async createExerciseTemplate(
+        fileList?: FileList,
+        callback?: (exercise: GetExerciseTemplateResponseData) => void,
+        organisationId?: OrganisationId
+    ) {
+        const modalRef = this.ngbModalService.open(
+            CreateExerciseTemplateModalComponent
+        );
+        const componentInstance =
+            modalRef.componentInstance as CreateExerciseTemplateModalComponent;
+        componentInstance.created.subscribe((exerciseTemplate) => {
+            callback?.(exerciseTemplate);
+        });
+        if (organisationId) {
+            componentInstance.setOrganisation(organisationId);
+        }
+        if (fileList) {
+            await componentInstance.importFile(fileList);
         }
     }
 }

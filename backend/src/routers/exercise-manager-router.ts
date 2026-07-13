@@ -6,6 +6,7 @@ import {
     exerciseTemplateIdSchema,
     getExerciseTemplateResponseDataSchema,
     getExerciseResponseDataSchema,
+    organisationIdSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
@@ -20,9 +21,13 @@ export function createExerciseManagerRouter(
         .route('/exercise_templates/')
         .all(isAuthenticatedMiddleware)
         .get(async (req, res) => {
+            const orgIdRes = organisationIdSchema.safeParse(
+                req.query['organisationId']
+            );
             const templates =
                 await exerciseManagerService.getAllExerciseTemplatesForUser(
-                    req.session!
+                    req.session!,
+                    orgIdRes.success ? orgIdRes.data : undefined
                 );
             res.send(getExerciseTemplatesResponseDataSchema.encode(templates));
         })

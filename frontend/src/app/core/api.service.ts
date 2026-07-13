@@ -91,10 +91,33 @@ export class ApiService {
             parse: getExercisesResponseDataSchema.parse,
         });
     }
+
+    public async getExercises(params?: { organisationId: OrganisationId }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(`${httpOrigin}/api/exercises/?${queryParams}`)
+        ).then(getExercisesResponseDataSchema.parse);
+    }
+
     public getExerciseTemplatesResource() {
         return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
             parse: getExerciseTemplatesResponseDataSchema.parse,
         });
+    }
+
+    public async getExerciseTemplates(params?: {
+        organisationId: OrganisationId;
+    }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(
+                `${httpOrigin}/api/exercise_templates/?${queryParams}`
+            )
+        ).then(getExerciseTemplatesResponseDataSchema.parse);
     }
 
     public getExerciseConfigResource() {
@@ -117,16 +140,32 @@ export class ApiService {
             }
         );
     }
+
     public async getParallelExercise(id: ParallelExerciseId) {
         return lastValueFrom(
             this.httpClient.get(`${httpOrigin}/api/parallel_exercises/${id}`)
         ).then(getParallelExerciseResponseDataSchema.parse);
     }
+
     public getParallelExercisesResource() {
         return httpResource(() => `${httpOrigin}/api/parallel_exercises/`, {
             parse: getParallelExercisesResponseDataSchema.parse,
         });
     }
+
+    public async getParallelExercises(params?: {
+        organisationId: OrganisationId;
+    }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(
+                `${httpOrigin}/api/parallel_exercises/?${queryParams}`
+            )
+        ).then(getParallelExercisesResponseDataSchema.parse);
+    }
+
     public async getExerciseTemplateViewportsById(id: ExerciseTemplateId) {
         return lastValueFrom(
             this.httpClient.get(

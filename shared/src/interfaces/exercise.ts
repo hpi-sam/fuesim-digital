@@ -77,6 +77,7 @@ export const joinExerciseResponseDataSchema = z.object({
     exerciseTemplate: z.nullable(
         getExerciseTemplateDetailsResponseDataSchema.omit({
             organisation: true,
+            userRole: true,
         })
     ),
     parallelExerciseId: parallelExerciseIdSchema.nullable(),

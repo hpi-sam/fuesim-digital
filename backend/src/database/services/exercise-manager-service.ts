@@ -4,6 +4,7 @@ import type {
     StateExport,
     ParticipantKey,
     TrainerKey,
+    OrganisationId,
 } from 'fuesim-digital-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
@@ -30,8 +31,34 @@ export class ExerciseManagerService {
     ) {}
 
     public async getAllExerciseTemplatesForUser(
-        session: SessionInformation
+        session: SessionInformation,
+        organisationId?: OrganisationId
     ): Promise<ExerciseTemplateDetailsEntryWithUserRole[]> {
+        if (organisationId) {
+            const organisation =
+                await this.organisationRepository.getOrganisationById(
+                    organisationId
+                );
+            if (!organisation) {
+                throw new PermissionDeniedError();
+            }
+            const userRole =
+                await this.organisationRepository.getOrganisationMembershipRoleForUserById(
+                    organisationId,
+                    session.user.id
+                );
+            if (!userRole) {
+                throw new PermissionDeniedError();
+            }
+            return (
+                await this.exerciseRepository.getAllExerciseTemplatesForOrganisation(
+                    organisationId
+                )
+            ).map((template) => ({
+                ...template,
+                userRole,
+            }));
+        }
         return this.exerciseRepository.getAllExerciseTemplatesForUser(
             session.user.id
         );

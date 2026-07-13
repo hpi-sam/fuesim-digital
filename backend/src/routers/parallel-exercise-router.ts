@@ -8,6 +8,7 @@ import {
     patchParallelExerciseRequestDataSchema,
     isParallelExerciseKey,
     exerciseExistsResponseDataSchema,
+    organisationIdSchema,
 } from 'fuesim-digital-shared';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import {
@@ -34,9 +35,13 @@ export function createParallelExerciseRouter(
         .route('/')
         .all(areParallelExercisesEnabled, isAuthenticatedMiddleware)
         .get(async (req, res) => {
+            const orgIdRes = organisationIdSchema.safeParse(
+                req.query['organisationId']
+            );
             const parallelExercises =
                 await parallelExerciseService.getParallelExercisesForUser(
-                    req.session!
+                    req.session!,
+                    orgIdRes.success ? orgIdRes.data : undefined
                 );
             res.send(
                 getParallelExercisesResponseDataSchema.encode(parallelExercises)

@@ -1,5 +1,9 @@
 import { currentStateVersion } from 'fuesim-digital-shared';
-import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
+import type {
+    ExerciseId,
+    ExerciseTemplateId,
+    OrganisationId,
+} from 'fuesim-digital-shared';
 import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import {
     type ExerciseInsert,
@@ -10,6 +14,7 @@ import {
     type ExerciseTemplateDetailsEntry,
     type ExerciseTemplateDetailsEntryWithUserRole,
     type ExerciseDetailsEntryWithUserRole,
+    type ExerciseDetailsEntry,
 } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import { Config } from '../../config.js';
@@ -98,6 +103,33 @@ export class ExerciseRepository extends BaseRepository {
             .orderBy(desc(exerciseTable.lastUsedAt));
     }
 
+    public async getAllExercisesForOrganisation(
+        organisationId: OrganisationId
+    ): Promise<ExerciseDetailsEntry[]> {
+        return this.databaseConnection
+            .select({
+                ...getTableColumns(exerciseTable),
+                baseTemplate: getTableColumns(exerciseTemplateTable),
+                organisation: getTableColumns(organisationTable),
+            })
+            .from(exerciseTable)
+            .innerJoin(
+                organisationTable,
+                eq(organisationTable.id, exerciseTable.organisationId)
+            )
+            .leftJoin(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.id, exerciseTable.baseTemplateId)
+            )
+            .where(
+                and(
+                    isNull(exerciseTable.templateId),
+                    eq(exerciseTable.organisationId, organisationId)
+                )
+            )
+            .orderBy(desc(exerciseTable.lastUsedAt));
+    }
+
     public async getAllExerciseTemplatesForUser(
         userId: string
     ): Promise<ExerciseTemplateDetailsEntryWithUserRole[]> {
@@ -130,6 +162,33 @@ export class ExerciseRepository extends BaseRepository {
                     exerciseTemplateTable.organisationId
                 )
             )
+            .orderBy(
+                desc(
+                    sql<Date>`COALESCE("exercise_template"."lastExerciseCreatedAt", "exercise_template"."lastUpdatedAt")`
+                )
+            );
+    }
+
+    public async getAllExerciseTemplatesForOrganisation(
+        organisationId: OrganisationId
+    ): Promise<ExerciseTemplateDetailsEntry[]> {
+        return this.databaseConnection
+            .select({
+                ...getTableColumns(exerciseTemplateTable),
+                trainerKey: exerciseTable.trainerKey,
+                exercise: getTableColumns(exerciseTable),
+                organisation: getTableColumns(organisationTable),
+            })
+            .from(exerciseTemplateTable)
+            .innerJoin(
+                exerciseTable,
+                eq(exerciseTemplateTable.id, exerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(exerciseTemplateTable.organisationId, organisationTable.id)
+            )
+            .where(eq(exerciseTemplateTable.organisationId, organisationId))
             .orderBy(
                 desc(
                     sql<Date>`COALESCE("exercise_template"."lastExerciseCreatedAt", "exercise_template"."lastUpdatedAt")`

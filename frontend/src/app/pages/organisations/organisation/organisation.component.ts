@@ -20,7 +20,9 @@ import { InlineTextEditorComponent } from '../../../shared/components/inline-tex
 import { AuthService } from '../../../core/auth.service';
 import { OrganisationTabMembersComponent } from '../tabs/members/organisation-tab-members.component.js';
 import { OrganisationTabSettingsComponent } from '../tabs/settings/organisation-tab-settings.component.js';
-import { OrganisationTabContentComponent } from '../tabs/content/organisation-tab-content.component.js';
+import { OrganisationTabExercisesComponent } from '../tabs/exercises/organisation-tab-exercises.component.js';
+import { OrganisationTabExerciseTemplatesComponent } from '../tabs/exercise-templates/organisation-tab-exercise-templates.component.js';
+import { OrganisationTabParallelExercisesComponent } from '../tabs/parallel-exercises/organisation-tab-parallel-exercises.component.js';
 
 @Component({
     selector: 'app-organisation',
@@ -40,7 +42,9 @@ import { OrganisationTabContentComponent } from '../tabs/content/organisation-ta
         FormsModule,
         OrganisationTabMembersComponent,
         OrganisationTabSettingsComponent,
-        OrganisationTabContentComponent,
+        OrganisationTabExercisesComponent,
+        OrganisationTabExerciseTemplatesComponent,
+        OrganisationTabParallelExercisesComponent,
     ],
 })
 export class OrganisationComponent {

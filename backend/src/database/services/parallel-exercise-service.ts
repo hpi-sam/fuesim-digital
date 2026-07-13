@@ -2,6 +2,7 @@ import type {
     ParallelExerciseId,
     SetAutojoinViewportAction,
     ParallelExerciseKey,
+    OrganisationId,
 } from 'fuesim-digital-shared';
 import { parallelExerciseInstanceSummarySchema } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
@@ -41,8 +42,34 @@ export class ParallelExerciseService {
     ) {}
 
     public async getParallelExercisesForUser(
-        session: SessionInformation
+        session: SessionInformation,
+        organisationId?: OrganisationId
     ): Promise<ParallelExerciseDetailsEntryWithUserRole[]> {
+        if (organisationId) {
+            const organisation =
+                await this.organisationRepository.getOrganisationById(
+                    organisationId
+                );
+            if (!organisation) {
+                throw new PermissionDeniedError();
+            }
+            const userRole =
+                await this.organisationRepository.getOrganisationMembershipRoleForUserById(
+                    organisationId,
+                    session.user.id
+                );
+            if (!userRole) {
+                throw new PermissionDeniedError();
+            }
+            return (
+                await this.parallelExerciseRepository.getParallelExercisesForOrganisation(
+                    organisationId
+                )
+            ).map((parallelExercise) => ({
+                ...parallelExercise,
+                userRole,
+            }));
+        }
         return this.parallelExerciseRepository.getParallelExercisesForUser(
             session.user.id
         );

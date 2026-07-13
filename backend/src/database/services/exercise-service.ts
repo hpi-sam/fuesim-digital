@@ -7,6 +7,7 @@ import type {
     TrainerKey,
     ExerciseState,
     PostExerciseRequestData,
+    OrganisationId,
 } from 'fuesim-digital-shared';
 import {
     isTrainerKey,
@@ -77,8 +78,34 @@ export class ExerciseService {
     }
 
     public async getAllExercisesForUser(
-        session: SessionInformation
+        session: SessionInformation,
+        organisationId?: OrganisationId
     ): Promise<ExerciseDetailsEntryWithUserRole[]> {
+        if (organisationId) {
+            const organisation =
+                await this.organisationRepository.getOrganisationById(
+                    organisationId
+                );
+            if (!organisation) {
+                throw new PermissionDeniedError();
+            }
+            const userRole =
+                await this.organisationRepository.getOrganisationMembershipRoleForUserById(
+                    organisationId,
+                    session.user.id
+                );
+            if (!userRole) {
+                throw new PermissionDeniedError();
+            }
+            return (
+                await this.exerciseRepository.getAllExercisesForOrganisation(
+                    organisationId
+                )
+            ).map((exercise) => ({
+                ...exercise,
+                userRole,
+            }));
+        }
         return this.exerciseRepository.getAllExercisesForUser(session.user.id);
     }
 

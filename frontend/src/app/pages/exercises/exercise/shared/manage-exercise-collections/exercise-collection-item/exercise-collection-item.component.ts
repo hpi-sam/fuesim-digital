@@ -13,6 +13,9 @@ import {
     gatherAllVisibleCollectionElements,
     cloneDeepMutable,
     ExerciseKey,
+    ElementVersionId,
+    getElementDependencies,
+    ChangeDependencies,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -30,6 +33,8 @@ import { AppState } from '../../../../../../state/app.state';
 import { LoadingModalService } from '../../../../../../core/loading-modal/loading-modal.service';
 import { openChangeImpactModal } from '../../change-impact-modal/open-change-impact-modal';
 import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
+import { firstValueFrom } from 'rxjs';
+import { CollectionUpgradeImpactModalComponent } from '../../../../../marketplace/shared/modals/marketplace-collection-update-impact-modal/marketplace-collection-update-impact-modal.component';
 
 @Component({
     selector: 'app-exercise-collection-item-component',
@@ -217,6 +222,53 @@ export class ExerciseColletionItemComponent {
             );
 
             this.loadingModalService.closeLoading();
+
+
+            const currentCollectionDependencies: {
+                element: TemplateVersion;
+                dependsOn: ElementVersionId[];
+            }[] = [];
+            for (const currentElement of currentCollectionElements) {
+                currentCollectionDependencies.push({
+                    element: currentElement,
+                    dependsOn: getElementDependencies(currentElement.content),
+                });
+            }
+
+            // Calculate which elements of the current collection depend
+            // on changed elements of the dependency, to be able to
+            // show the impact of the update
+            const changeDependencies: ChangeDependencies = {};
+            for (const change of changes) {
+                if (change.type === 'create') continue;
+                const elementId = change.old.versionId;
+                if (!elementId) continue;
+
+                const dependingElements = currentCollectionDependencies
+                    .filter((dep) => dep.dependsOn.includes(elementId))
+                    .map((dep) => dep.element);
+                changeDependencies[elementId] = dependingElements;
+            }
+
+            this.loadingModalService.closeLoading();
+            const modal = this.ngbModalService.open(
+                CollectionUpgradeImpactModalComponent,
+                {
+                    size: 'xl',
+                }
+            );
+
+            const modalInstance =
+                modal.componentInstance as CollectionUpgradeImpactModalComponent;
+            modalInstance.changes = changes;
+            modalInstance.collectionElements =
+                gatherAllVisibleCollectionElements(newerCollectionElements);
+            modalInstance.changeDependencies = changeDependencies;
+            modalInstance.confirmationButtonText =
+                'Änderungen annehmen und Sammlung aktualisieren';
+
+            const result1 = await firstValueFrom(modalInstance.confirmationResult$);
+            if (!result1) return;
 
             const result = await openChangeImpactModal(this.ngbModalService, {
                 changeImpacts: changeImpacts.impact,

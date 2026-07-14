@@ -27,7 +27,7 @@ export const technicalChallengesMeasuresExtendedScoutables57: Migration = {
         } else if (typedAction.type === '[Scoutable] Update content') {
             const typedUpdateAction = action as {
                 scoutableId: UUID;
-                userGeneratedContent: UserGeneratedContent;
+                userGeneratedContent?: UserGeneratedContent;
             };
             if (
                 isEmptyContent(typedUpdateAction.userGeneratedContent?.content)

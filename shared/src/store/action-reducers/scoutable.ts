@@ -8,6 +8,7 @@ import {
 import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { uuidSchema } from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { ReducerError } from '../reducer-error.js';
 import { getElement } from './utils/get-element.js';
 import { logScoutableViewed } from './utils/log.js';
 
@@ -28,6 +29,15 @@ const makeElementScoutableActionSchema = z.strictObject({
 });
 export type MakeElementScoutableAction = z.infer<
     typeof makeElementScoutableActionSchema
+>;
+
+const removeElementScoutabilityActionSchema = z.strictObject({
+    type: z.literal('[Scoutable] Remove scoutability'),
+    elementType: scoutableElementTypeSchema,
+    elementId: uuidSchema,
+});
+export type RemoveElementScoutabilityAction = z.infer<
+    typeof removeElementScoutabilityActionSchema
 >;
 
 const setIsVisibleForParticipantsActionSchema = z.strictObject({
@@ -63,6 +73,23 @@ export namespace ScoutableActionReducers {
                 draftState.scoutables[scoutable.id] =
                     cloneDeepMutable(scoutable);
 
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+    export const removeElementScoutability: ActionReducer<RemoveElementScoutabilityAction> =
+        {
+            type: removeElementScoutabilityActionSchema.shape.type.value,
+            actionSchema: removeElementScoutabilityActionSchema,
+            reducer: (draftState, { elementType, elementId }) => {
+                const element = getElement(draftState, elementType, elementId);
+                const scoutableId = element.scoutableId;
+                if (!scoutableId)
+                    throw new ReducerError(
+                        'Cannot remove scoutability on an element that is not scoutable'
+                    );
+                delete draftState.scoutables[scoutableId];
+                element.scoutableId = null;
                 return draftState;
             },
             rights: 'trainer',

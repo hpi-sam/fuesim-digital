@@ -46,6 +46,7 @@ import {
 import {
     selectActiveClients,
     selectExerciseState,
+    selectParticipantKey,
 } from '../state/application/selectors/exercise.selectors';
 import {
     selectCurrentMainRole,
@@ -55,6 +56,7 @@ import {
 import { selectStateSnapshot } from '../state/get-state-snapshot';
 import { CreateExerciseModalComponent } from '../pages/exercises/shared/create-exercise-modal/create-exercise-modal.component.js';
 import { CreateExerciseTemplateModalComponent } from '../pages/exercises/shared/create-exercise-template-modal/create-exercise-template-modal.component.js';
+import { saveBlob } from '../shared/functions/save-blob.js';
 import { websocketOrigin } from './api-origins';
 import {
     saveReconnectToken,
@@ -440,5 +442,19 @@ export class ExerciseService {
         if (fileList) {
             await componentInstance.importFile(fileList);
         }
+    }
+
+    public async exportExercise(withHistory: boolean) {
+        const exerciseKey = selectStateSnapshot(selectExerciseKey, this.store)!;
+        const participantKey = selectStateSnapshot(
+            selectParticipantKey,
+            this.store
+        );
+        const exportData = await this.apiService.getExport(
+            exerciseKey,
+            withHistory
+        );
+        const blob = new Blob([JSON.stringify(exportData)]);
+        saveBlob(blob, `exercise-state-${participantKey}.json`);
     }
 }

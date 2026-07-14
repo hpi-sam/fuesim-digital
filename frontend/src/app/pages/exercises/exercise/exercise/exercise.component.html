@@ -106,14 +106,18 @@
                             <div ngbDropdownMenu class="position-absolute">
                                 <button
                                     ngbDropdownItem
-                                    (click)="exportExerciseWithHistory()"
+                                    (click)="
+                                        exerciseService.exportExercise(true)
+                                    "
                                 >
                                     <i class="bi-clock-history me-2"> </i>
                                     Kompletten Verlauf
                                 </button>
                                 <button
                                     ngbDropdownItem
-                                    (click)="exportExerciseState()"
+                                    (click)="
+                                        exerciseService.exportExercise(false)
+                                    "
                                 >
                                     <i class="bi-cloud-download me-2"> </i>
                                     Aktuellen Zustand

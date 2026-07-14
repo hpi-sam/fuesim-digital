@@ -1,12 +1,13 @@
 import type {
     GetExerciseTemplateResponseData,
+    GetExerciseTemplateWithTrainerKeyResponseData,
     OrganisationMembershipRole,
     PatchExerciseTemplateRequestData,
     PostExerciseTemplateRequestData,
     StateExport,
 } from 'fuesim-digital-shared';
 import {
-    exerciseKeysSchema,
+    getExerciseResponseDataSchema,
     getExercisesResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
@@ -14,14 +15,12 @@ import {
 } from 'fuesim-digital-shared';
 import {
     alternativeTestUserSessionData,
-    createExercise,
     createTestUserSession,
     createTestEnvironment,
     createExerciseTemplate,
     defaultTestUserSessionData,
 } from '../test/utils.js';
 import type { OrganisationEntry } from '../database/schema.js';
-import type { ExerciseTemplateDetailsEntry } from '../database/repositories/exercise-repository.js';
 import { createOrganisation } from '../test/organisation-utils.js';
 
 describe('exercise manager router', () => {
@@ -36,93 +35,7 @@ describe('exercise manager router', () => {
                 defaultTestUserSessionData
             );
     });
-    describe('GET /api/exercises', () => {
-        it('fails with 403 if not authenticated', async () => {
-            await environment.httpRequest('get', '/api/exercises').expect(403);
-        });
 
-        it('returns an empty list for no exercises', async () => {
-            const response = await environment
-                .httpRequest('get', '/api/exercises', session)
-                .expect(200);
-
-            const parsed = getExercisesResponseDataSchema.parse(response.body);
-            expect(parsed).toEqual([]);
-        });
-
-        it('returns only own exercises', async () => {
-            const ownExercise = await createExercise(environment, session);
-
-            // Create other exercises not to be shown for this user
-            const session2 = await createTestUserSession(environment, {
-                user: alternativeTestUserSessionData,
-            });
-            await createExercise(environment, session2);
-            await createExercise(environment);
-
-            const response = await environment
-                .httpRequest('get', '/api/exercises', session)
-                .expect(200);
-            const parsed = getExercisesResponseDataSchema.parse(response.body);
-
-            expect(parsed).toHaveLength(1);
-            expect(parsed[0]!.trainerKey).toBe(ownExercise.trainerKey);
-        });
-
-        it('returns correct data', async () => {
-            const beforeCreation = new Date();
-            const exercise = await createExercise(environment, session);
-
-            const response = await environment
-                .httpRequest('get', '/api/exercises', session)
-                .expect(200);
-            const parsed = getExercisesResponseDataSchema.parse(
-                response.body
-            )[0]!;
-
-            expect(parsed.participantKey).toBe(exercise.participantKey);
-            expect(parsed.trainerKey).toBe(exercise.trainerKey);
-            expect(parsed.baseTemplate).toBe(null);
-            expect(parsed.createdAt.getTime()).toBeGreaterThan(
-                beforeCreation.getTime()
-            );
-            expect(parsed.createdAt.getTime()).toBeLessThan(Date.now());
-            expect(parsed.lastUsedAt.getTime()).toBeGreaterThan(
-                beforeCreation.getTime()
-            );
-            expect(parsed.lastUsedAt.getTime()).toBeLessThan(Date.now());
-        });
-        it('works with deleted base templates', async () => {
-            const exerciseTemplate = await createExerciseTemplate(
-                environment,
-                session,
-                personalOrganisation.id
-            );
-            await environment
-                .httpRequest(
-                    'post',
-                    `/api/exercise_templates/${exerciseTemplate.id}/new`,
-                    session
-                )
-                .expect(201);
-            await environment
-                .httpRequest(
-                    'delete',
-                    `/api/exercise_templates/${exerciseTemplate.id}`,
-                    session
-                )
-                .expect(204);
-
-            const response = await environment
-                .httpRequest('get', '/api/exercises', session)
-                .expect(200);
-            const parsed = getExercisesResponseDataSchema.parse(
-                response.body
-            )[0]!;
-
-            expect(parsed.baseTemplate).toBe(null);
-        });
-    });
     describe('POST /api/exercise_templates', () => {
         let testData: PostExerciseTemplateRequestData;
         beforeEach(async () => {
@@ -181,7 +94,7 @@ describe('exercise manager router', () => {
                 .expect(403);
         });
 
-        it('succeeds creating an exercise template', async () => {
+        it('succeeds creating in personal organisation', async () => {
             const beforeCreation = new Date();
 
             const response = await environment
@@ -263,7 +176,9 @@ describe('exercise manager router', () => {
         it('succeeds creating an exercise template', async () => {
             const beforeCreation = new Date();
             const exercise =
-                await environment.services.exerciseService.createExerciseFromBlank();
+                await environment.services.exerciseService.createExerciseFromBlank(
+                    {}
+                );
             exercise.applyAction(
                 {
                     type: '[Viewport] Add viewport',
@@ -431,6 +346,114 @@ describe('exercise manager router', () => {
             expect(parsed.name).toBe(exerciseTemplate.name);
             expect(parsed.description).toBe(exerciseTemplate.description);
         });
+    });
+
+    describe('GET /api/exercise_templates/?organisationId=x', () => {
+        it('fails with 403 if not authenticated', async () => {
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercise_templates/?organisationId=${personalOrganisation.id}`
+                )
+                .expect(403);
+        });
+
+        it('fails with 403 if not member of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercise_templates/?organisationId=${organisation.id}`,
+                    session
+                )
+                .expect(403);
+        });
+
+        it('returns only exercise templates from organisation', async () => {
+            const ownExerciseTemplate = await createExerciseTemplate(
+                environment,
+                session,
+                personalOrganisation.id
+            );
+
+            const otherOrganisation = await createOrganisation(
+                environment,
+                session
+            );
+            await createExerciseTemplate(
+                environment,
+                session,
+                otherOrganisation.id
+            );
+
+            const response = await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercise_templates/?organisationId=${personalOrganisation.id}`,
+                    session
+                )
+                .expect(200);
+
+            const parsed = getExerciseTemplatesResponseDataSchema.parse(
+                response.body
+            );
+
+            expect(parsed).toHaveLength(1);
+            expect(parsed[0]!.id).toBe(ownExerciseTemplate.id);
+        });
+
+        it.each([
+            'viewer',
+            'editor',
+            'admin',
+        ] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+                const exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+                await createExerciseTemplate(
+                    environment,
+                    session,
+                    personalOrganisation.id
+                );
+
+                const response = await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise_templates/?organisationId=${organisation.id}`,
+                        session
+                    )
+                    .expect(200);
+
+                const parsed = getExerciseTemplatesResponseDataSchema.parse(
+                    response.body
+                );
+
+                expect(parsed).toHaveLength(1);
+                expect(parsed[0]!.id).toBe(exerciseTemplate.id);
+            }
+        );
     });
 
     describe('PATCH /api/exercise_templates/:id', () => {
@@ -774,7 +797,7 @@ describe('exercise manager router', () => {
     });
 
     describe('POST /api/exercise_templates/:id/new', () => {
-        let exerciseTemplate: ExerciseTemplateDetailsEntry;
+        let exerciseTemplate: GetExerciseTemplateWithTrainerKeyResponseData;
         beforeEach(async () => {
             exerciseTemplate = await createExerciseTemplate(
                 environment,
@@ -814,12 +837,10 @@ describe('exercise manager router', () => {
                     session
                 )
                 .expect(201);
-            const parsed = exerciseKeysSchema.parse(response.body);
+            const parsed = getExerciseResponseDataSchema.parse(response.body);
 
             // Ensure different trainer key
-            expect(parsed.trainerKey).not.toBe(
-                exerciseTemplate.exercise.trainerKey
-            );
+            expect(parsed.trainerKey).not.toBe(exerciseTemplate.trainerKey);
 
             // Ensure existence of exercise
             await environment
@@ -853,11 +874,7 @@ describe('exercise manager router', () => {
             ).toBeLessThan(Date.now());
         });
 
-        it.each([
-            'viewer',
-            'editor',
-            'admin',
-        ] satisfies OrganisationMembershipRole[])(
+        it.each(['editor', 'admin'] satisfies OrganisationMembershipRole[])(
             'succeeds with 200 if %s',
             async (role) => {
                 const session2 = await createTestUserSession(environment, {
@@ -886,12 +903,12 @@ describe('exercise manager router', () => {
                         session
                     )
                     .expect(201);
-                const parsed = exerciseKeysSchema.parse(response.body);
+                const parsed = getExerciseResponseDataSchema.parse(
+                    response.body
+                );
 
                 // Ensure different trainer key
-                expect(parsed.trainerKey).not.toBe(
-                    exerciseTemplate.exercise.trainerKey
-                );
+                expect(parsed.trainerKey).not.toBe(exerciseTemplate.trainerKey);
 
                 // Ensure existence of exercise
                 await environment

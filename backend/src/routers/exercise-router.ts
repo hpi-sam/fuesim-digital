@@ -1,14 +1,18 @@
 import {
     exerciseExistsResponseDataSchema,
     getExerciseConfigResponseDataSchema,
+    getExerciseResponseDataSchema,
+    getExercisesResponseDataSchema,
     isExerciseKey,
     isTrainerKey,
+    organisationIdSchema,
+    postExerciseRequestDataSchema,
 } from 'fuesim-digital-shared';
-import { isEmpty } from 'lodash-es';
 import { Router } from 'express';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ApiError, NotFoundError } from '../utils/http.js';
 import { Config } from '../config.js';
+import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 
 export function createExerciseRouter(exerciseService: ExerciseService): Router {
     const router = Router();
@@ -22,21 +26,28 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
         );
     });
 
-    router.post('/exercise', async (req, res) => {
-        const optionalData = req.session
-            ? { user: req.session.user.id }
-            : undefined;
-        const exercise = isEmpty(req.body)
-            ? await exerciseService.createExerciseFromBlank(optionalData)
-            : await exerciseService.createExerciseFromFile(
-                  req.body,
-                  optionalData
-              );
+    router.get('/exercises/', isAuthenticatedMiddleware, async (req, res) => {
+        const orgIdRes = organisationIdSchema.safeParse(
+            req.query['organisationId']
+        );
+        const exercises = await exerciseService.getAllExercisesForUser(
+            req.session!,
+            orgIdRes.success ? orgIdRes.data : undefined
+        );
 
-        res.status(201).send({
-            participantKey: exercise.participantKey,
-            trainerKey: exercise.trainerKey,
-        });
+        res.send(getExercisesResponseDataSchema.encode(exercises));
+    });
+
+    router.post('/exercise', async (req, res) => {
+        const data = postExerciseRequestDataSchema.parse(req.body);
+        const exercise = await exerciseService.createExercise(
+            data,
+            req.session
+        );
+
+        res.status(201).send(
+            getExerciseResponseDataSchema.encode(exercise.exercise)
+        );
     });
 
     router

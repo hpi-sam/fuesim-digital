@@ -16,8 +16,7 @@ import {
     currentStateVersion,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
-import { RouterLink } from '@angular/router';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, Location as NgLocation } from '@angular/common';
 import Package from '../../../../../../package.json';
 import { openPartialExportModal } from '../shared/partial-export/open-partial-export-selection-modal';
 import { ExerciseService } from '../../../../core/exercise.service';
@@ -58,7 +57,6 @@ import { MapOperatorMapComponent } from '../shared/map-operator-map/map-operator
     templateUrl: './exercise.component.html',
     styleUrls: ['./exercise.component.scss'],
     imports: [
-        RouterLink,
         ExerciseStateBadgeComponent,
         NgbTooltip,
         NgbDropdown,
@@ -84,6 +82,7 @@ export class ExerciseComponent implements OnDestroy {
     readonly exerciseService = inject(ExerciseService);
     private readonly messageService = inject(MessageService);
     private readonly modalService = inject(NgbModal);
+    readonly location = inject(NgLocation);
 
     private readonly destroy = new Subject<void>();
 

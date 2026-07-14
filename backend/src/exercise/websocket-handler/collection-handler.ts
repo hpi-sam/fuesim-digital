@@ -3,18 +3,21 @@ import type { Services } from '../../database/services/index.js';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { ClientWrapper, CollectionClientWrapper } from '../client-wrapper.js';
 import { clientMap } from '../client-map.js';
+import type { Repositories } from '../../database/repositories/index.js';
 import { secureOn } from './secure-on.js';
 
 export function registerCollectionHandler(
     io: ExerciseServer,
     socket: ExerciseSocket,
-    services: Services
+    services: Services,
+    repositories: Repositories
 ) {
     secureOn(socket, 'registerCollectionListenerClient', async (callback) => {
         const clientWrapper = ClientWrapper.init(
             CollectionClientWrapper,
             socket,
-            services
+            services,
+            repositories
         );
         if (!clientWrapper) {
             callback({

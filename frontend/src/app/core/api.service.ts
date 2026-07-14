@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import {
     exerciseExistsResponseDataSchema,
     ExerciseKey,
-    exerciseKeysSchema,
+    getExerciseResponseDataSchema,
     getExercisesResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     getOrganisationDetailsResponseDataSchema,
@@ -31,7 +31,7 @@ import {
     OrganisationMembershipId,
     OrganisationMembershipRole,
     getExerciseTemplateResponseDataSchema,
-    type StateExport,
+    PostExerciseRequestData,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -51,19 +51,11 @@ export class ApiService {
 
     readonly exerciseConfig = this.getExerciseConfigResource();
 
-    public async createExercise() {
+    public async createExercise(data: PostExerciseRequestData) {
         return lastValueFrom(
             this.httpClient
-                .post(`${httpOrigin}/api/exercise`, {})
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
-        );
-    }
-
-    public async importExercise(exportedState: StateExport) {
-        return lastValueFrom(
-            this.httpClient
-                .post(`${httpOrigin}/api/exercise`, exportedState)
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
+                .post(`${httpOrigin}/api/exercise`, data)
+                .pipe(map((v) => getExerciseResponseDataSchema.parse(v)))
         );
     }
 
@@ -99,10 +91,33 @@ export class ApiService {
             parse: getExercisesResponseDataSchema.parse,
         });
     }
+
+    public async getExercises(params?: { organisationId: OrganisationId }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(`${httpOrigin}/api/exercises/?${queryParams}`)
+        ).then(getExercisesResponseDataSchema.parse);
+    }
+
     public getExerciseTemplatesResource() {
         return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
             parse: getExerciseTemplatesResponseDataSchema.parse,
         });
+    }
+
+    public async getExerciseTemplates(params?: {
+        organisationId: OrganisationId;
+    }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(
+                `${httpOrigin}/api/exercise_templates/?${queryParams}`
+            )
+        ).then(getExerciseTemplatesResponseDataSchema.parse);
     }
 
     public getExerciseConfigResource() {
@@ -125,16 +140,32 @@ export class ApiService {
             }
         );
     }
+
     public async getParallelExercise(id: ParallelExerciseId) {
         return lastValueFrom(
             this.httpClient.get(`${httpOrigin}/api/parallel_exercises/${id}`)
         ).then(getParallelExerciseResponseDataSchema.parse);
     }
+
     public getParallelExercisesResource() {
         return httpResource(() => `${httpOrigin}/api/parallel_exercises/`, {
             parse: getParallelExercisesResponseDataSchema.parse,
         });
     }
+
+    public async getParallelExercises(params?: {
+        organisationId: OrganisationId;
+    }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(
+                `${httpOrigin}/api/parallel_exercises/?${queryParams}`
+            )
+        ).then(getParallelExercisesResponseDataSchema.parse);
+    }
+
     public async getExerciseTemplateViewportsById(id: ExerciseTemplateId) {
         return lastValueFrom(
             this.httpClient.get(
@@ -187,7 +218,7 @@ export class ApiService {
                     `${httpOrigin}/api/exercise_templates/${templateId}/new`,
                     {}
                 )
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
+                .pipe(map((v) => getExerciseResponseDataSchema.parse(v)))
         );
     }
 

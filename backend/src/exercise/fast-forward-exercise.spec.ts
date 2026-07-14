@@ -6,7 +6,9 @@ describe('fastForwardExercise', () => {
 
     it('advances currentTime and starts the exercise', async () => {
         const exercise =
-            await environment.services.exerciseService.createExerciseFromBlank();
+            await environment.services.exerciseService.createExerciseFromBlank(
+                {}
+            );
 
         fastForwardExercise(exercise, 5000, 'running');
 
@@ -20,7 +22,9 @@ describe('fastForwardExercise', () => {
 
     it('advances currentTime and leaves the exercise paused', async () => {
         const exercise =
-            await environment.services.exerciseService.createExerciseFromBlank();
+            await environment.services.exerciseService.createExerciseFromBlank(
+                {}
+            );
 
         fastForwardExercise(exercise, 3000, 'paused');
 

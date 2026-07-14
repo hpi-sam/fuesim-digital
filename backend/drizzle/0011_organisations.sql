@@ -38,6 +38,10 @@ INSERT INTO "organisation" ("name", "personalOrganisationOf")
 select 'Private Inhalte', "id"
 from users on conflict do nothing;
 --> statement-breakpoint
+INSERT INTO "organisation_membership" ("organisationId", "userId", "role")
+select "id", "personalOrganisationOf", 'admin'
+from "organisation" on conflict do nothing;
+--> statement-breakpoint
 UPDATE "exercise_template" SET "organisationId" = (select "id" from "organisation" where "personalOrganisationOf" = "exercise_template"."user" limit 1);
 --> statement-breakpoint
 ALTER TABLE "exercise_template" ALTER COLUMN "organisationId" SET NOT NULL;

@@ -1,12 +1,14 @@
 import type {
     ClientToServerEvents,
+    GetExerciseTemplateWithTrainerKeyResponseData,
     MergeIntersection,
     OrganisationId,
+    PostExerciseRequestData,
     PostExerciseTemplateRequestData,
     ServerToClientEvents,
 } from 'fuesim-digital-shared';
 import {
-    exerciseKeysSchema,
+    getExerciseResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     sleep,
     socketIoTransports,
@@ -174,7 +176,7 @@ export class TestEnvironment {
     public init(repositories: Repositories, services: Services) {
         this._repositories = repositories;
         this._services = services;
-        this.server = new FuesimServer(this.services);
+        this.server = new FuesimServer(this.services, this.repositories);
     }
 
     /**
@@ -277,7 +279,8 @@ export function createTestEnvironment(): TestEnvironment {
         parallelExerciseService = new ParallelExerciseService(
             parallelExerciseRepository,
             exerciseManagerService,
-            exerciseService
+            exerciseService,
+            organisationRepository
         );
 
         const repositories: Repositories = {
@@ -367,20 +370,25 @@ async function setupDatabase(): Promise<DatabaseService> {
 
 export async function createExercise(
     environment: TestEnvironment,
-    session?: string
+    session?: string,
+    organisationId?: OrganisationId
 ) {
     const response = await environment
         .httpRequest('post', '/api/exercise', session)
+        .send({
+            organisationId: organisationId ?? null,
+            importObject: null,
+        } satisfies PostExerciseRequestData)
         .expect(201);
 
-    return exerciseKeysSchema.parse(response.body);
+    return getExerciseResponseDataSchema.parse(response.body);
 }
 
 export async function createExerciseTemplate(
     environment: TestEnvironment,
     session: string,
     organisationId: OrganisationId
-) {
+): Promise<GetExerciseTemplateWithTrainerKeyResponseData> {
     const response = await environment
         .httpRequest('post', '/api/exercise_templates', session)
         .send({
@@ -392,9 +400,8 @@ export async function createExerciseTemplate(
         .expect(201);
 
     const parsed = getExerciseTemplateResponseDataSchema.parse(response.body);
-    const template =
-        (await environment.repositories.exerciseRepository.getExerciseTemplateById(
-            parsed.id
-        ))!;
-    return template;
+
+    return (await environment.repositories.exerciseRepository.getExerciseTemplateById(
+        parsed.id
+    ))!;
 }

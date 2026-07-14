@@ -1,18 +1,22 @@
 <div class="card">
     <div class="card-body">
         <h2 class="card-title h4 d-flex">
-            <app-inline-text-editor
-                class="flex-grow-1"
-                [required]="true"
-                [value]="parallelExercise().name"
-                name="Name der Parallelübung"
-                (update)="
-                    patchParallelExercise({
-                        name: $event,
-                    })
-                "
-                [singleLine]="true"
-            />
+            @if (parallelExercise().userRole !== 'viewer') {
+                <app-inline-text-editor
+                    class="flex-grow-1"
+                    [required]="true"
+                    [value]="parallelExercise().name"
+                    name="Name der Parallelübung"
+                    (update)="
+                        patchParallelExercise({
+                            name: $event,
+                        })
+                    "
+                    [singleLine]="true"
+                />
+            } @else {
+                {{ parallelExercise().name }}
+            }
         </h2>
         <p class="card-text">
             Teilnehmenden-PIN: {{ parallelExercise().participantKey }}
@@ -23,9 +27,9 @@
             ></button>
         </p>
     </div>
-    <ul class="list-group list-group-flush">
+    <ul class="list-group list-group-flush small">
         @if (parallelExercise().template) {
-            <li class="list-group-item">
+            <li class="list-group-item py-1">
                 <i class="bi bi-rocket me-2"></i>
                 basiert auf
                 <a [routerLink]="`/exercises/templates/`">{{
@@ -33,7 +37,13 @@
                 }}</a>
             </li>
         }
-        <li class="list-group-item">
+        <li class="list-group-item py-1">
+            <i class="bi bi-house me-2"></i>
+            <app-organisation-badge
+                [organisation]="parallelExercise().organisation"
+            />
+        </li>
+        <li class="list-group-item py-1">
             <i class="bi bi-plus-circle me-2"></i>
             erstellt am {{ parallelExercise().createdAt | date: 'medium' }}
         </li>
@@ -46,9 +56,11 @@
             Öffnen
         </a>
         <div class="flex-grow-1"></div>
-        <button class="btn btn-outline-danger" (click)="deleteExercise()">
-            <i class="bi bi-trash me-2"></i>
-            Löschen
-        </button>
+        @if (parallelExercise().userRole !== 'viewer') {
+            <button class="btn btn-outline-danger" (click)="deleteExercise()">
+                <i class="bi bi-trash me-2"></i>
+                Löschen
+            </button>
+        }
     </div>
 </div>

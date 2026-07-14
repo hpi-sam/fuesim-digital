@@ -168,7 +168,13 @@ describe('Exercise-Service', () => {
             [
                 'not anonymous',
                 async () =>
-                    (await createExercise(environment, session)).trainerKey,
+                    (
+                        await createExercise(
+                            environment,
+                            session,
+                            personalOrganisation.id
+                        )
+                    ).trainerKey,
             ],
             [
                 'template',

@@ -101,7 +101,10 @@ export function createExercise() {
 
     cy.get('@backendBaseUrl', { log: false }).then((backendBaseUrl) =>
         cy
-            .request('POST', `${backendBaseUrl}/api/exercise`)
+            .request('POST', `${backendBaseUrl}/api/exercise`, {
+                organisationId: null,
+                importObject: null,
+            })
             .its('body')
             .as('createBody')
     );

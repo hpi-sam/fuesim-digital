@@ -77,7 +77,8 @@ async function main() {
     const parallelExerciseService = new ParallelExerciseService(
         repositories.parallelExerciseRepository,
         exerciseManagerService,
-        exerciseService
+        exerciseService,
+        repositories.organisationRepository
     );
     const organisationService = new OrganisationService(
         repositories.organisationRepository,
@@ -150,7 +151,7 @@ async function main() {
     }
 
     // eslint-disable-next-line no-new
-    new FuesimServer(services);
+    new FuesimServer(services, repositories);
 }
 
 main();

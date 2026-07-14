@@ -6,6 +6,8 @@ import type {
     ParticipantKey,
     TrainerKey,
     ExerciseState,
+    PostExerciseRequestData,
+    OrganisationId,
 } from 'fuesim-digital-shared';
 import {
     isTrainerKey,
@@ -22,7 +24,10 @@ import { pushAll } from '../../utils/array.js';
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type { ExerciseInsert } from '../schema.js';
+import type {
+    ExerciseDetailsEntryWithUserRole,
+    ExerciseInsert,
+} from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
     ApiError,
@@ -72,6 +77,38 @@ export class ExerciseService {
         return new Set(this.exerciseMap.values());
     }
 
+    public async getAllExercisesForUser(
+        session: SessionInformation,
+        organisationId?: OrganisationId
+    ): Promise<ExerciseDetailsEntryWithUserRole[]> {
+        if (organisationId) {
+            const organisation =
+                await this.organisationRepository.getOrganisationById(
+                    organisationId
+                );
+            if (!organisation) {
+                throw new PermissionDeniedError();
+            }
+            const userRole =
+                await this.organisationRepository.getOrganisationMembershipRoleForUserById(
+                    organisationId,
+                    session.user.id
+                );
+            if (!userRole) {
+                throw new PermissionDeniedError();
+            }
+            return (
+                await this.exerciseRepository.getAllExercisesForOrganisation(
+                    organisationId
+                )
+            ).map((exercise) => ({
+                ...exercise,
+                userRole,
+            }));
+        }
+        return this.exerciseRepository.getAllExercisesForUser(session.user.id);
+    }
+
     public loadExercise(activeExercise: ActiveExercise) {
         this.exerciseMap.set(activeExercise.participantKey, activeExercise);
         this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
@@ -89,8 +126,48 @@ export class ExerciseService {
         this.exerciseMap.delete(exercise.exercise.id);
     }
 
+    public async createExercise(
+        data: PostExerciseRequestData,
+        session?: SessionInformation
+    ) {
+        const { importObject, ...parsedData } = data;
+
+        if (session) {
+            // Logged in user
+            if (!data.organisationId) {
+                throw new ApiError();
+            }
+            const isEditorOrAdmin =
+                await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                    data.organisationId,
+                    session.user.id,
+                    ['editor', 'admin']
+                );
+            if (!isEditorOrAdmin) {
+                throw new PermissionDeniedError();
+            }
+        } else {
+            // Anonymous exercise
+            if (data.organisationId) {
+                throw new PermissionDeniedError();
+            }
+        }
+
+        let exercise;
+        if (!importObject) {
+            exercise = await this.createExerciseFromBlank(parsedData);
+        } else {
+            exercise = await this.createExerciseFromFile(
+                parsedData,
+                importObject
+            );
+        }
+
+        return exercise;
+    }
+
     public async createExerciseFromBlank(
-        optionalData: Partial<ExerciseInsert> = {}
+        data: Partial<ExerciseInsert>
     ): Promise<ActiveExercise> {
         return this.exerciseRepository.transaction(
             async (exerciseRepository) => {
@@ -105,10 +182,10 @@ export class ExerciseService {
 
                 const initialState: ExerciseState = {
                     ...newExerciseState(participantKey),
-                    type: optionalData.templateId ? 'template' : 'standalone',
+                    type: data.templateId ? 'template' : 'standalone',
                 };
                 const exerciseInsert = {
-                    ...optionalData,
+                    ...data,
                     participantKey,
                     trainerKey,
                     initialStateString: initialState,
@@ -128,8 +205,8 @@ export class ExerciseService {
     }
 
     public async createExerciseFromFile(
-        file: StateExport,
-        optionalData: Partial<ExerciseInsert> = {}
+        data: Partial<ExerciseInsert>,
+        file: StateExport
     ): Promise<ActiveExercise> {
         return this.exerciseRepository.transaction(
             async (exerciseRepository) => {
@@ -158,14 +235,14 @@ export class ExerciseService {
                         participantKey,
                     };
 
-                    const exerciseType = optionalData.templateId
+                    const exerciseType = data.templateId
                         ? 'template'
                         : 'standalone';
                     newInitialState.type = exerciseType;
                     newCurrentState.type = exerciseType;
 
                     const exerciseInsert = {
-                        ...optionalData,
+                        ...data,
                         participantKey,
                         trainerKey,
                         initialStateString: newInitialState,
@@ -298,8 +375,19 @@ export class ExerciseService {
         if (exerciseEntry.template) {
             throw new PermissionDeniedError();
         }
-        if (exerciseEntry.user && exerciseEntry.user !== session?.user.id) {
-            throw new PermissionDeniedError();
+        if (exerciseEntry.organisationId) {
+            if (!session) {
+                throw new PermissionDeniedError();
+            }
+            const isEditorOrAdmin =
+                await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                    exerciseEntry.organisationId,
+                    session.user.id,
+                    ['editor', 'admin']
+                );
+            if (!isEditorOrAdmin) {
+                throw new PermissionDeniedError();
+            }
         }
 
         await this.deleteExerciseById(activeExercise.exercise.id);

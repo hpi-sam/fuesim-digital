@@ -3,5 +3,32 @@
         Art:
         {{ evalCriterionTypesNames.viewScoutableEvalCriterion }}
     </label>
-    <!-- TODO @JohannesPotzi @Jogius -->
+    <!-- TODO @JohannesPotzi @Jogius : Make this a select for the type of scoutable-->
+    <label> Patients</label>
+    @for (patient of this.patients(); track patient.id) {
+        <button
+            class="btn btn-outline-primary me-3"
+            (click)="selectScoutable(patient.scoutableId!)"
+        >
+            {{ patient.identifier }}
+        </button>
+    }
+    <label> Technical Challenge </label>
+    @for (tc of this.technicalChallenges(); track tc.id) {
+        <button
+            class="btn btn-outline-primary me-3"
+            (click)="selectScoutable(tc.id)"
+        >
+            {{ tc.name }}
+        </button>
+    }
+    <label> Map Images </label>
+    @for (image of this.mapImages(); track image.id) {
+        <button
+            class="btn btn-outline-primary me-3"
+            (click)="selectScoutable(image.scoutableId!)"
+        >
+            {{ image.image.url }}
+        </button>
+    }
 </form>

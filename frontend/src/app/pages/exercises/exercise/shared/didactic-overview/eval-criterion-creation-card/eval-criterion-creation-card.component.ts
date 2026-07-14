@@ -43,6 +43,7 @@ import {
     BoolEvalCriterionId,
     isBoolEvalCriterion,
     EvalCriterionId,
+    newViewScoutableEvalCriterion,
 } from '../../../../../../../../../shared/dist/models/eval-criterion';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { AppState } from '../../../../../../state/app.state';
@@ -134,6 +135,10 @@ export class EvalCriterionCreationCardComponent {
     public readonly criterionCreationType = signal<EvalCriterionType | null>(
         null
     );
+    public readonly criterionCreationTypeName = computed(() => {
+        const selectedType = this.criterionCreationType();
+        return selectedType ? this.evalCriterionTypesNames[selectedType] : '';
+    });
 
     /* TODO @JohannesPotzi : prune this for sub criteria selection to prevent circular input. */
     public readonly evalCriteria = computed(() =>
@@ -334,13 +339,24 @@ export class EvalCriterionCreationCardComponent {
             }
             case 'viewScoutableEvalCriterion': {
                 /* TODO @JohannesPotzi @Jogius */
+                const targetScoutableId = this.criterionForm
+                    .targetScoutableId()
+                    .value();
+                let name = this.criterionForm.name().value();
+                if (name === '') {
+                    name = 'Erkunde';
+                }
+                const criterion = targetScoutableId
+                    ? newViewScoutableEvalCriterion(name, targetScoutableId)
+                    : null;
+                if (criterion) this.addCriteriaToCart([criterion]);
                 break;
             }
             case 'countPatientsAtStatusEvalCriterion': {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }
-            case 'countMeasuresEvalCriterionn': {
+            case 'countMeasuresEvalCriterion': {
                 /* TODO @JohannesPotzi @Jogius */
                 break;
             }

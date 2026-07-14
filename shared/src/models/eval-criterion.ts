@@ -124,11 +124,11 @@ export type CountPatientsAtStatusEvalCriterion = z.infer<
 
 export const countMeasuresEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
-    criterionType: z.literal('countMeasuresEvalCriterionn'),
+    criterionType: z.literal('countMeasuresEvalCriterion'),
     targetMeasureTemplateId: uuidSchema,
 });
 
-export type CountMeasuresEvalCriterionn = z.infer<
+export type CountMeasuresEvalCriterion = z.infer<
     typeof countMeasuresEvalCriterionSchema
 >;
 
@@ -169,18 +169,9 @@ export const boolEvalCriterionLeafSchema = z.discriminatedUnion(
         reachTechnicalChallengeStateEvalCriterionSchema,
         patientAtStatusEvalCriterionSchema,
         viewScoutableEvalCriterionSchema,
-        countMeasuresEvalCriterionSchema,
     ]
 );
 export type BoolEvalCriterionLeaf = z.infer<typeof boolEvalCriterionLeafSchema>;
-
-export const targetCountCriterionSchema = z.discriminatedUnion(
-    'criterionType',
-    [countMeasuresEvalCriterionSchema]
-);
-export type TargetCountEvalCriterion = z.infer<
-    typeof targetCountCriterionSchema
->;
 
 export const boolEvalCriterionSchema = z.discriminatedUnion('criterionType', [
     boolEvalCriterionLeafSchema,
@@ -223,7 +214,6 @@ export const boolEvalCritrionTypes = [
     'andEvalCriterion',
     'orEvalCriterion',
     'notEvalCriterion',
-    'countMeasuresEvalCriterionn',
     'compareEvalCriterion',
     'patientAtStatusEvalCriterion',
     'reachTechnicalChallengeStateEvalCriterion',
@@ -235,6 +225,7 @@ export const numberEvalCriterionTypes = [
     'constNumEvalCriterion',
     'countPatientsAtStatusEvalCriterion',
     'countCompletedEvalCriterion',
+    'countMeasuresEvalCriterion',
     'firstTrueAtEvalCriterion',
     'timestampEvalCriterion',
 ] satisfies NumberEvalCriterionType[];
@@ -276,7 +267,7 @@ export type TemporalEvalCriterion = z.infer<typeof temporalEvalCriterionSchema>;
 export const evalCriterionTypesNames: {
     [key in EvalcriterionType]: string;
 } = {
-    countMeasuresEvalCriterionn: 'Maßnahme X Mal',
+    countMeasuresEvalCriterion: 'Anzahl Maßnahme',
     reachTechnicalChallengeStateEvalCriterion:
         'Zustand Technischer Herausforderung',
     patientAtStatusEvalCriterion: 'Patient mit SK',
@@ -429,19 +420,19 @@ export function newtimestampEvalCriterion(
         timestamp,
     };
 }
-export function newCountMeasuresEvalCriterionn(
+export function newcountMeasuresEvalCriterion(
     name: string,
     targetMeasureTemplateId: UUID,
     isVisibleForParticipants?: boolean,
     isDraft?: boolean
-): CountMeasuresEvalCriterionn {
+): CountMeasuresEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
         isDraft: isDraft ?? false,
-        criterionType: 'countMeasuresEvalCriterionn',
+        criterionType: 'countMeasuresEvalCriterion',
         targetMeasureTemplateId,
     };
 }

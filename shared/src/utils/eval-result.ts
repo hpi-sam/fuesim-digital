@@ -19,6 +19,7 @@ import type { TechnicalChallenge } from '../models/technical-challenge/technical
 import type { UUID } from './uuid.js';
 import { uuid, uuidSchema } from './uuid.js';
 import {
+    currentStateOf,
     Measure,
     MeasureTemplate,
     MeasureTemplateCategory,
@@ -105,8 +106,15 @@ export function getEvalResultFromCriterion(
         }
         case 'viewScoutableEvalCriterion': {
             const criterion = evalCriterion;
-            const scoutable = scoutables[criterion.targetScoutableId]!;
-            isCompleted = scoutable.viewedByParticipants;
+            const scoutableChallenge =
+                technicalChallenges[criterion.targetScoutableId];
+            if (scoutableChallenge) {
+                const currentState = currentStateOf(scoutableChallenge);
+                isCompleted = currentState.viewedByParticipants ?? false;
+            } else {
+                const scoutable = scoutables[criterion.targetScoutableId]!;
+                isCompleted = scoutable.viewedByParticipants;
+            }
             break;
         }
         case 'andEvalCriterion': {
@@ -215,10 +223,10 @@ export function getEvalResultFromCriterion(
             break;
         }
         /* ------------------------NUMBER CRITERIA------------------------ */
-        case 'countMeasuresEvalCriterionn': {
+        case 'countMeasuresEvalCriterion': {
             /* TODO @JohannesPotzi @Jogius : implementation*/
             console.log(
-                'TODO: implement evaluation of countMeasuresEvalCriterionn'
+                'TODO: implement evaluation of countMeasuresEvalCriterion'
             );
             num = -1;
             break;

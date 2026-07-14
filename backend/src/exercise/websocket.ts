@@ -62,7 +62,12 @@ export class ExerciseWebsocketServer {
             this.repositories
         );
         registerControlParallelExerciseHandler(this.exerciseServer, client);
-        registerCollectionHandler(this.exerciseServer, client, this.services);
+        registerCollectionHandler(
+            this.exerciseServer,
+            client,
+            this.services,
+            this.repositories
+        );
 
         // Register disconnect handler
         client.on('disconnect', () => {

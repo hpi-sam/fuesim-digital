@@ -5,7 +5,7 @@ import {
 } from 'fuesim-digital-shared';
 import type {
     GetExerciseResponseData,
-    GetExerciseTemplateDetailsResponseData,
+    GetExerciseTemplateWithTrainerKeyResponseData,
     OrganisationId,
     OrganisationMembershipRole,
     PostExerciseRequestData,
@@ -523,7 +523,7 @@ describe('exercise router', () => {
         });
 
         describe('exercise template', () => {
-            let exerciseTemplate: GetExerciseTemplateDetailsResponseData;
+            let exerciseTemplate: GetExerciseTemplateWithTrainerKeyResponseData;
             beforeEach(async () => {
                 exerciseTemplate = await createExerciseTemplate(
                     environment,
@@ -652,11 +652,13 @@ describe('exercise router', () => {
         });
 
         describe('user-related exercise', () => {
-            let session: string;
-            let exercise: ExerciseKeys;
+            let exercise: GetExerciseResponseData;
             beforeEach(async () => {
-                session = await createTestUserSession(environment);
-                exercise = await createExercise(environment, session);
+                exercise = await createExercise(
+                    environment,
+                    session,
+                    personalOrganisation.id
+                );
             });
 
             it('succeeds with 200 with a trainer key if not logged in', async () => {
@@ -699,13 +701,12 @@ describe('exercise router', () => {
         });
 
         describe('exercise template', () => {
-            let session: string;
-            let exerciseTemplate: GetExerciseTemplateResponseData;
+            let exerciseTemplate: GetExerciseTemplateWithTrainerKeyResponseData;
             beforeEach(async () => {
-                session = await createTestUserSession(environment);
                 exerciseTemplate = await createExerciseTemplate(
                     environment,
-                    session
+                    session,
+                    personalOrganisation.id
                 );
             });
 
@@ -965,7 +966,7 @@ describe('exercise router', () => {
         });
 
         describe('exercise template', () => {
-            let exerciseTemplate: GetExerciseTemplateDetailsResponseData;
+            let exerciseTemplate: GetExerciseTemplateWithTrainerKeyResponseData;
             beforeEach(async () => {
                 exerciseTemplate = await createExerciseTemplate(
                     environment,

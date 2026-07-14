@@ -1,5 +1,6 @@
 import type {
     ClientToServerEvents,
+    GetExerciseTemplateWithTrainerKeyResponseData,
     MergeIntersection,
     OrganisationId,
     PostExerciseRequestData,
@@ -387,7 +388,7 @@ export async function createExerciseTemplate(
     environment: TestEnvironment,
     session: string,
     organisationId: OrganisationId
-) {
+): Promise<GetExerciseTemplateWithTrainerKeyResponseData> {
     const response = await environment
         .httpRequest('post', '/api/exercise_templates', session)
         .send({

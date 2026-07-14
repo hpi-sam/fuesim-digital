@@ -7,6 +7,7 @@ import {
     getExerciseTemplateResponseDataSchema,
     getExerciseResponseDataSchema,
     organisationIdSchema,
+    getExerciseTemplateWithTrainerKeyResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
@@ -51,7 +52,9 @@ export function createExerciseManagerRouter(
             }
 
             res.status(201).send(
-                getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
+                getExerciseTemplateWithTrainerKeyResponseDataSchema.encode(
+                    exerciseTemplate
+                )
             );
         });
 

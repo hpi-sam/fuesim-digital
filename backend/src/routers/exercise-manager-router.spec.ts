@@ -1,5 +1,6 @@
 import type {
     GetExerciseTemplateResponseData,
+    GetExerciseTemplateWithTrainerKeyResponseData,
     OrganisationMembershipRole,
     PatchExerciseTemplateRequestData,
     PostExerciseTemplateRequestData,
@@ -20,7 +21,6 @@ import {
     defaultTestUserSessionData,
 } from '../test/utils.js';
 import type { OrganisationEntry } from '../database/schema.js';
-import type { ExerciseTemplateDetailsEntry } from '../database/repositories/exercise-repository.js';
 import { createOrganisation } from '../test/organisation-utils.js';
 
 describe('exercise manager router', () => {
@@ -797,7 +797,7 @@ describe('exercise manager router', () => {
     });
 
     describe('POST /api/exercise_templates/:id/new', () => {
-        let exerciseTemplate: ExerciseTemplateDetailsEntry;
+        let exerciseTemplate: GetExerciseTemplateWithTrainerKeyResponseData;
         beforeEach(async () => {
             exerciseTemplate = await createExerciseTemplate(
                 environment,
@@ -840,9 +840,7 @@ describe('exercise manager router', () => {
             const parsed = getExerciseResponseDataSchema.parse(response.body);
 
             // Ensure different trainer key
-            expect(parsed.trainerKey).not.toBe(
-                exerciseTemplate.exercise.trainerKey
-            );
+            expect(parsed.trainerKey).not.toBe(exerciseTemplate.trainerKey);
 
             // Ensure existence of exercise
             await environment
@@ -914,9 +912,7 @@ describe('exercise manager router', () => {
                 );
 
                 // Ensure different trainer key
-                expect(parsed.trainerKey).not.toBe(
-                    exerciseTemplate.exercise.trainerKey
-                );
+                expect(parsed.trainerKey).not.toBe(exerciseTemplate.trainerKey);
 
                 // Ensure existence of exercise
                 await environment

@@ -21,9 +21,17 @@ export type GetExerciseTemplateResponseData = z.infer<
 export type GetExerciseTemplateResponseDataInput = z.input<
     typeof getExerciseTemplateResponseDataSchema
 >;
-export const getExerciseTemplateDetailsResponseDataSchema = z.object({
+
+export const getExerciseTemplateWithTrainerKeyResponseDataSchema = z.object({
     ...getExerciseTemplateResponseDataSchema.shape,
     trainerKey: trainerKeySchema,
+});
+export type GetExerciseTemplateWithTrainerKeyResponseData = z.infer<
+    typeof getExerciseTemplateWithTrainerKeyResponseDataSchema
+>;
+
+export const getExerciseTemplateDetailsResponseDataSchema = z.object({
+    ...getExerciseTemplateWithTrainerKeyResponseDataSchema.shape,
     organisation: getOrganisationResponseDataSchema,
     userRole: organisationMembershipRoleSchema,
 });

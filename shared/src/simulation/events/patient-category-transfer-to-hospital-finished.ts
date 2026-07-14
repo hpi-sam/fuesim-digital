@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     type PatientStatus,
     patientStatusSchema,
@@ -16,8 +17,8 @@ export const patientCategoryTransferToHospitalFinishedEventSchema =
          */
         isRelatedOnlyToOwnRegion: z.boolean(),
     });
-export type PatientCategoryTransferToHospitalFinishedEvent = z.infer<
-    typeof patientCategoryTransferToHospitalFinishedEventSchema
+export type PatientCategoryTransferToHospitalFinishedEvent = Immutable<
+    z.infer<typeof patientCategoryTransferToHospitalFinishedEventSchema>
 >;
 
 export function newPatientCategoryTransferToHospitalFinishedEvent(

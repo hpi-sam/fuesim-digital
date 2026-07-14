@@ -58,14 +58,46 @@
         }
 
         <nav ngbNav #nav="ngbNav" class="nav-tabs">
-            <ng-container ngbNavItem="content">
+            <ng-container ngbNavItem="exercises">
                 <a ngbNavLink>
                     <i class="bi bi-box-seam me-1"></i>
-                    Inhalte
-                    <span class="badge text-bg-secondary">4</span>
+                    Übungen
+                    <span class="badge text-bg-secondary ms-1">{{
+                        org.exercisesCount
+                    }}</span>
                 </a>
                 <ng-template ngbNavContent>
-                    <app-organisation-tab-content
+                    <app-organisation-tab-exercises
+                        [organisation]="org"
+                        (update)="reload()"
+                    />
+                </ng-template>
+            </ng-container>
+            <ng-container ngbNavItem="exercise-templates">
+                <a ngbNavLink>
+                    <i class="bi bi-box-seam me-1"></i>
+                    Übungsvorlagen
+                    <span class="badge text-bg-secondary ms-1">{{
+                        org.exerciseTemplatesCount
+                    }}</span>
+                </a>
+                <ng-template ngbNavContent>
+                    <app-organisation-tab-exercise-templates
+                        [organisation]="org"
+                        (update)="reload()"
+                    />
+                </ng-template>
+            </ng-container>
+            <ng-container ngbNavItem="parallel-exercises">
+                <a ngbNavLink>
+                    <i class="bi bi-box-seam me-1"></i>
+                    Parallelübungen
+                    <span class="badge text-bg-secondary ms-1">{{
+                        org.parallelExercisesCount
+                    }}</span>
+                </a>
+                <ng-template ngbNavContent>
+                    <app-organisation-tab-parallel-exercises
                         [organisation]="org"
                         (update)="reload()"
                     />
@@ -76,8 +108,8 @@
                     <a ngbNavLink>
                         <i class="bi bi-people me-1"></i>
                         Mitglieder
-                        <span class="badge text-bg-secondary">
-                            {{ org.members.length }}
+                        <span class="badge text-bg-secondary ms-1">
+                            {{ org.membersCount }}
                         </span>
                     </a>
                     <ng-template ngbNavContent>
@@ -88,18 +120,20 @@
                     </ng-template>
                 </ng-container>
                 <div class="flex-grow-1"></div>
-                <ng-container ngbNavItem="settings">
-                    <a ngbNavLink>
-                        <i class="bi bi-gear me-1"></i>
-                        Einstellungen
-                    </a>
-                    <ng-template ngbNavContent>
-                        <app-organisation-tab-settings
-                            [organisation]="org"
-                            (update)="reload()"
-                        />
-                    </ng-template>
-                </ng-container>
+                @if (org.userRole === 'admin' && !org.personalOrganisationOf) {
+                    <ng-container ngbNavItem="settings">
+                        <a ngbNavLink>
+                            <i class="bi bi-gear me-1"></i>
+                            Einstellungen
+                        </a>
+                        <ng-template ngbNavContent>
+                            <app-organisation-tab-settings
+                                [organisation]="org"
+                                (update)="reload()"
+                            />
+                        </ng-template>
+                    </ng-container>
+                }
             }
         </nav>
         <div [ngbNavOutlet]="nav"></div>

@@ -15,6 +15,7 @@ export class AreParallelExercisesEnabledGuard {
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ) {
-        return this.apiService.getParallelExercisesEnabled();
+        return (await this.apiService.getExerciseConfig())
+            .parallelExercisesEnabled;
     }
 }

@@ -11,6 +11,7 @@ export * from './vehicle-templates.js';
 export * from './operational-section.js';
 export * from './restricted-zone.js';
 export * from './scoutable.js';
+export * from './configuration.js';
 export * from './technical-challenge.js';
 export * from './measure.js';
 export * from './measure-templates.js';

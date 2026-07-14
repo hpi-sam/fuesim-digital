@@ -2,7 +2,7 @@
 
 ## Übungen verwalten
 
-Wenn man mit einem [Benutzerkonto](../5_users/) angemeldet ist, werden sowohl über die Startseite als auch über die [Übungsliste](https://fuesim-manv.de/exercises) neu erstellte Übungen automatisch mit dem Benutzerkonto verknüpft und dort gespeichert. Sie sind dann über die eben erwähnte Übungsliste jederzeit wieder abrufbar.
+Wenn man mit einem [Benutzerkonto](../5_users/) angemeldet ist, werden sowohl über die Startseite als auch über die [Übungsliste](https://fuesim.digital/exercises) neu erstellte Übungen automatisch mit dem Benutzerkonto verknüpft und dort gespeichert. Sie sind dann über die eben erwähnte Übungsliste jederzeit wieder abrufbar.
 
 ![Liste der Übungen im Benutzerkonto](./exercises_list.png)
 
@@ -12,7 +12,7 @@ Für jede Übung werden neben der [Teilnehmenden-PIN](../2_exercises/1_general.m
 
 Um Übungen für wiederkehrende Verwendungen zu erstellen, bietet es sich an, eine Übungsvorlage einzusetzen. Übungsvorlagen sehen im Übungseditor genauso wie Übungen aus, können jedoch nicht gestartet werden. Darauf weist im Editor für Übungsvorlagen auch ein Warnhinweis hin.
 
-Die Liste der Übungsvorlagen kann unter dem Menüpunkt [<kbd>Übungsvorlagen</kbd>](https://fuesim-manv.de/exercises/templates) gefunden werden und ist zunächst leer. Neue Vorlagen können hier entweder direkt erstellt werden oder durch das Hochladen von alten [Übungsexports](../2_exercises/1_general.md#übungen-exportieren) erzeugt werden. Zum leichteren Wiederfinden kann ein Name und eine Beschreibung vergeben werden. In der Liste tauchen die Vorlagen dann mit Namen, Beschreibung, dem Erstellungsdatum, dem Datum der letzten Änderung und dem Zeitpunkt, zu dem die letzte Übung erstellt wurde, auf.
+Die Liste der Übungsvorlagen kann unter dem Menüpunkt [<kbd>Übungsvorlagen</kbd>](https://fuesim.digital/exercises/templates) gefunden werden und ist zunächst leer. Neue Vorlagen können hier entweder direkt erstellt werden oder durch das Hochladen von alten [Übungsexports](../2_exercises/1_general.md#übungen-exportieren) erzeugt werden. Zum leichteren Wiederfinden kann ein Name und eine Beschreibung vergeben werden. In der Liste tauchen die Vorlagen dann mit Namen, Beschreibung, dem Erstellungsdatum, dem Datum der letzten Änderung und dem Zeitpunkt, zu dem die letzte Übung erstellt wurde, auf.
 
 ![Liste der Übungsvorlagen im Benutzerkonto](./exercise_templates_list.png)
 

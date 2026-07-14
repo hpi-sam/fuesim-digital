@@ -1,16 +1,10 @@
-import { IsString, IsUUID } from 'class-validator';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import { z } from 'zod';
+import type { Immutable } from 'immer';
+import type { ActionReducer } from '../action-reducer.js';
 import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { transferPointSchema } from '../../models/transfer-point.js';
+import { uuidSchema } from '../../utils/uuid.js';
 import {
-    type TransferPoint,
-    transferPointSchema,
-} from '../../models/transfer-point.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
-import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import {
-    type ExerciseSimulationBehaviorState,
     exerciseSimulationBehaviorStateSchema,
     simulationBehaviorDictionary,
 } from '../../simulation/behaviors/exercise-simulation-behavior.js';
@@ -24,18 +18,12 @@ import { newVehicleArrivedEvent } from '../../simulation/events/vehicle-arrived.
 import { newNewPatientEvent } from '../../simulation/events/new-patient.js';
 import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
 import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
-import {
-    type SimulatedRegion,
-    simulatedRegionSchema,
-} from '../../models/simulated-region.js';
-import {
-    type MapCoordinates,
-    mapCoordinatesSchema,
-} from '../../models/utils/position/map-coordinates.js';
-import { type Size, sizeSchema } from '../../models/utils/size.js';
+import { simulatedRegionSchema } from '../../models/simulated-region.js';
+import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
 import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { simulationBehaviorStateSchema } from '../../simulation/behaviors/simulation-behavior.js';
 import { TransferPointActionReducers } from './transfer-point.js';
 import { isCompletelyLoaded } from './utils/completely-load-vehicle.js';
 import {
@@ -45,105 +33,90 @@ import {
     logSimulatedRegionNameChange,
 } from './utils/log.js';
 import { getElement, getElementByPredicate } from './utils/get-element.js';
+import { isVehicleLoading } from './vehicle.js';
 
-export class AddSimulatedRegionAction implements Action {
-    @IsValue('[SimulatedRegion] Add simulated region' as const)
-    readonly type = '[SimulatedRegion] Add simulated region';
+const addSimulatedRegionActionSchema = z.strictObject({
+    type: z.literal('[SimulatedRegion] Add simulated region'),
+    simulatedRegion: simulatedRegionSchema,
+    transferPoint: transferPointSchema,
+});
+export type AddSimulatedRegionAction = Immutable<
+    z.infer<typeof addSimulatedRegionActionSchema>
+>;
 
-    @IsZodSchema(simulatedRegionSchema)
-    public simulatedRegion!: SimulatedRegion;
+const removeSimulatedRegionActionSchema = z.strictObject({
+    type: z.literal('[SimulatedRegion] Remove simulated region'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+});
+export type RemoveSimulatedRegionAction = Immutable<
+    z.infer<typeof removeSimulatedRegionActionSchema>
+>;
 
-    @IsZodSchema(transferPointSchema)
-    public transferPoint!: TransferPoint;
-}
+const moveSimulatedRegionActionSchema = z.strictObject({
+    type: z.literal('[SimulatedRegion] Move simulated region'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    targetPosition: mapCoordinatesSchema,
+});
+export type MoveSimulatedRegionAction = Immutable<
+    z.infer<typeof moveSimulatedRegionActionSchema>
+>;
 
-export class RemoveSimulatedRegionAction implements Action {
-    @IsValue('[SimulatedRegion] Remove simulated region' as const)
-    public readonly type = '[SimulatedRegion] Remove simulated region';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-}
+const resizeSimulatedRegionActionSchema = z.strictObject({
+    type: z.literal('[SimulatedRegion] Resize simulated region'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    targetPosition: mapCoordinatesSchema,
+    newSize: simulatedRegionSchema.shape.size,
+});
+export type ResizeSimulatedRegionAction = Immutable<
+    z.infer<typeof resizeSimulatedRegionActionSchema>
+>;
 
-export class MoveSimulatedRegionAction implements Action {
-    @IsValue('[SimulatedRegion] Move simulated region' as const)
-    public readonly type = '[SimulatedRegion] Move simulated region';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-    @IsZodSchema(mapCoordinatesSchema)
-    public readonly targetPosition!: MapCoordinates;
-}
+const renameSimulatedRegionActionSchema = z.strictObject({
+    type: z.literal('[SimulatedRegion] Rename simulated region'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    newName: simulatedRegionSchema.shape.name,
+});
+export type RenameSimulatedRegionAction = Immutable<
+    z.infer<typeof renameSimulatedRegionActionSchema>
+>;
 
-export class ResizeSimulatedRegionAction implements Action {
-    @IsValue('[SimulatedRegion] Resize simulated region' as const)
-    public readonly type = '[SimulatedRegion] Resize simulated region';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
+const addElementToSimulatedRegionActionSchema = z.strictObject({
+    type: z.literal('[SimulatedRegion] Add Element'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    elementToBeAddedType: z.enum([
+        'material',
+        'patient',
+        'personnel',
+        'vehicle',
+    ]),
+    elementToBeAddedId: uuidSchema,
+});
+export type AddElementToSimulatedRegionAction = Immutable<
+    z.infer<typeof addElementToSimulatedRegionActionSchema>
+>;
 
-    @IsZodSchema(mapCoordinatesSchema)
-    public readonly targetPosition!: MapCoordinates;
-    @IsZodSchema(sizeSchema)
-    public readonly newSize!: Size;
-}
+const addBehaviorToSimulatedRegionActionSchema = z.strictObject({
+    type: z.literal('[SimulatedRegion] Add Behavior'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorState: exerciseSimulationBehaviorStateSchema,
+});
+export type AddBehaviorToSimulatedRegionAction = Immutable<
+    z.infer<typeof addBehaviorToSimulatedRegionActionSchema>
+>;
 
-export class RenameSimulatedRegionAction implements Action {
-    @IsValue('[SimulatedRegion] Rename simulated region' as const)
-    public readonly type = '[SimulatedRegion] Rename simulated region';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsString()
-    public readonly newName!: string;
-}
-
-export class AddElementToSimulatedRegionAction implements Action {
-    @IsValue('[SimulatedRegion] Add Element' as const)
-    public readonly type = '[SimulatedRegion] Add Element';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsLiteralUnion({
-        material: true,
-        patient: true,
-        personnel: true,
-        vehicle: true,
-    })
-    public readonly elementToBeAddedType!:
-        | 'material'
-        | 'patient'
-        | 'personnel'
-        | 'vehicle';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly elementToBeAddedId!: UUID;
-}
-
-export class AddBehaviorToSimulatedRegionAction implements Action {
-    @IsValue('[SimulatedRegion] Add Behavior' as const)
-    public readonly type = '[SimulatedRegion] Add Behavior';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsZodSchema(exerciseSimulationBehaviorStateSchema)
-    public readonly behaviorState!: ExerciseSimulationBehaviorState;
-}
-
-export class RemoveBehaviorFromSimulatedRegionAction implements Action {
-    @IsValue('[SimulatedRegion] Remove Behavior' as const)
-    public readonly type = '[SimulatedRegion] Remove Behavior';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-}
+const removeBehaviorFromSimulatedRegionActionSchema = z.strictObject({
+    type: z.literal('[SimulatedRegion] Remove Behavior'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+});
+export type RemoveBehaviorFromSimulatedRegionAction = Immutable<
+    z.infer<typeof removeBehaviorFromSimulatedRegionActionSchema>
+>;
 
 export namespace SimulatedRegionActionReducers {
     export const addSimulatedRegion: ActionReducer<AddSimulatedRegionAction> = {
-        action: AddSimulatedRegionAction,
+        type: addSimulatedRegionActionSchema.shape.type.value,
+        actionSchema: addSimulatedRegionActionSchema,
         reducer: (draftState, { simulatedRegion, transferPoint }) => {
             TransferPointActionReducers.addTransferPoint.reducer(draftState, {
                 type: '[TransferPoint] Add TransferPoint',
@@ -158,7 +131,8 @@ export namespace SimulatedRegionActionReducers {
 
     export const removeSimulatedRegion: ActionReducer<RemoveSimulatedRegionAction> =
         {
-            action: RemoveSimulatedRegionAction,
+            type: removeSimulatedRegionActionSchema.shape.type.value,
+            actionSchema: removeSimulatedRegionActionSchema,
             reducer: (draftState, { simulatedRegionId }) => {
                 const simulatedRegion = getElement(
                     draftState,
@@ -186,7 +160,8 @@ export namespace SimulatedRegionActionReducers {
 
     export const moveSimulatedRegion: ActionReducer<MoveSimulatedRegionAction> =
         {
-            action: MoveSimulatedRegionAction,
+            type: moveSimulatedRegionActionSchema.shape.type.value,
+            actionSchema: moveSimulatedRegionActionSchema,
             reducer: (draftState, { simulatedRegionId, targetPosition }) => {
                 changePositionWithId(
                     simulatedRegionId,
@@ -201,7 +176,8 @@ export namespace SimulatedRegionActionReducers {
 
     export const resizeSimulatedRegion: ActionReducer<ResizeSimulatedRegionAction> =
         {
-            action: ResizeSimulatedRegionAction,
+            type: resizeSimulatedRegionActionSchema.shape.type.value,
+            actionSchema: resizeSimulatedRegionActionSchema,
             reducer: (
                 draftState,
                 { simulatedRegionId, targetPosition, newSize }
@@ -224,7 +200,8 @@ export namespace SimulatedRegionActionReducers {
 
     export const renameSimulatedRegion: ActionReducer<RenameSimulatedRegionAction> =
         {
-            action: RenameSimulatedRegionAction,
+            type: renameSimulatedRegionActionSchema.shape.type.value,
+            actionSchema: renameSimulatedRegionActionSchema,
             reducer: (draftState, { simulatedRegionId, newName }) => {
                 const simulatedRegion = getElement(
                     draftState,
@@ -258,7 +235,8 @@ export namespace SimulatedRegionActionReducers {
 
     export const addElementToSimulatedRegion: ActionReducer<AddElementToSimulatedRegionAction> =
         {
-            action: AddElementToSimulatedRegionAction,
+            type: addElementToSimulatedRegionActionSchema.shape.type.value,
+            actionSchema: addElementToSimulatedRegionActionSchema,
             reducer: (
                 draftState,
                 { simulatedRegionId, elementToBeAddedId, elementToBeAddedType }
@@ -274,13 +252,22 @@ export namespace SimulatedRegionActionReducers {
                     elementToBeAddedId
                 );
 
-                if (
-                    element.type === 'vehicle' &&
-                    !isCompletelyLoaded(draftState, element)
-                ) {
-                    throw new ExpectedReducerError(
-                        'Das Fahrzeug kann nur in die simulierte Region verschoben werden, wenn Personal und Material eingestiegen sind.'
-                    );
+                if (element.type === 'vehicle') {
+                    if (!isCompletelyLoaded(draftState, element))
+                        throw new ExpectedReducerError(
+                            'Das Fahrzeug kann nur in die simulierte Region verschoben werden, wenn Personal und Material eingestiegen sind.'
+                        );
+
+                    if (
+                        isVehicleLoading(
+                            element,
+                            draftState.currentTime,
+                            draftState.configuration
+                        )
+                    )
+                        throw new ExpectedReducerError(
+                            'Das Fahrzeug wird gerade beladen und kann daher nicht bewegt werden'
+                        );
                 }
 
                 logSimulatedRegionAddElement(
@@ -333,7 +320,8 @@ export namespace SimulatedRegionActionReducers {
 
     export const addBehaviorToSimulatedRegion: ActionReducer<AddBehaviorToSimulatedRegionAction> =
         {
-            action: AddBehaviorToSimulatedRegionAction,
+            type: addBehaviorToSimulatedRegionActionSchema.shape.type.value,
+            actionSchema: addBehaviorToSimulatedRegionActionSchema,
             reducer: (draftState, { simulatedRegionId, behaviorState }) => {
                 const simulatedRegion = getElement(
                     draftState,
@@ -355,7 +343,9 @@ export namespace SimulatedRegionActionReducers {
 
     export const removeBehaviorFromSimulatedRegion: ActionReducer<RemoveBehaviorFromSimulatedRegionAction> =
         {
-            action: RemoveBehaviorFromSimulatedRegionAction,
+            type: removeBehaviorFromSimulatedRegionActionSchema.shape.type
+                .value,
+            actionSchema: removeBehaviorFromSimulatedRegionActionSchema,
             reducer: (draftState, { simulatedRegionId, behaviorId }) => {
                 const simulatedRegion = getElement(
                     draftState,

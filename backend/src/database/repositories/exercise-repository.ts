@@ -1,28 +1,24 @@
+import { currentStateVersion } from 'fuesim-digital-shared';
 import type {
     ExerciseId,
     ExerciseTemplateId,
-    TrainerKey,
+    OrganisationId,
 } from 'fuesim-digital-shared';
-import { ExerciseState } from 'fuesim-digital-shared';
 import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import {
-    type ExerciseEntry,
     type ExerciseInsert,
-    type ExerciseTemplateEntry,
     type ExerciseTemplateInsert,
-    type OrganisationEntry,
     organisationMembershipTable,
     organisationTable,
     actionTable,
+    type ExerciseTemplateDetailsEntry,
+    type ExerciseTemplateDetailsEntryWithUserRole,
+    type ExerciseDetailsEntryWithUserRole,
+    type ExerciseDetailsEntry,
 } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
+import { Config } from '../../config.js';
 import { BaseRepository } from './base-repository.js';
-
-export interface ExerciseTemplateDetailsEntry extends ExerciseTemplateEntry {
-    trainerKey: TrainerKey;
-    exercise: ExerciseEntry;
-    organisation: OrganisationEntry;
-}
 
 export class ExerciseRepository extends BaseRepository {
     private get exerciseTemplateQuery() {
@@ -48,9 +44,7 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .select({
                 ...getTableColumns(exerciseTable),
-                template: {
-                    ...getTableColumns(exerciseTemplateTable),
-                },
+                template: getTableColumns(exerciseTemplateTable),
                 ...(withActionsCount
                     ? {
                           actionsCount: this.databaseConnection.$count(
@@ -77,16 +71,52 @@ export class ExerciseRepository extends BaseRepository {
         return this.getExerciseQuery(true);
     }
 
-    public getAllExercisesOfOwner(userId: string) {
+    public async getAllExercisesForUser(
+        userId: string
+    ): Promise<ExerciseDetailsEntryWithUserRole[]> {
+        const subquery = this.databaseConnection
+            .select()
+            .from(organisationMembershipTable)
+            .where(eq(organisationMembershipTable.userId, userId))
+            .as('memberships');
         return this.databaseConnection
             .select({
                 ...getTableColumns(exerciseTable),
-                baseTemplate: {
-                    id: exerciseTemplateTable.id,
-                    name: exerciseTemplateTable.name,
-                },
+                baseTemplate: getTableColumns(exerciseTemplateTable),
+                organisation: getTableColumns(organisationTable),
+                userRole: subquery.role,
             })
             .from(exerciseTable)
+            .innerJoin(
+                subquery,
+                eq(subquery.organisationId, exerciseTable.organisationId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(organisationTable.id, exerciseTable.organisationId)
+            )
+            .leftJoin(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.id, exerciseTable.baseTemplateId)
+            )
+            .where(isNull(exerciseTable.templateId))
+            .orderBy(desc(exerciseTable.lastUsedAt));
+    }
+
+    public async getAllExercisesForOrganisation(
+        organisationId: OrganisationId
+    ): Promise<ExerciseDetailsEntry[]> {
+        return this.databaseConnection
+            .select({
+                ...getTableColumns(exerciseTable),
+                baseTemplate: getTableColumns(exerciseTemplateTable),
+                organisation: getTableColumns(organisationTable),
+            })
+            .from(exerciseTable)
+            .innerJoin(
+                organisationTable,
+                eq(organisationTable.id, exerciseTable.organisationId)
+            )
             .leftJoin(
                 exerciseTemplateTable,
                 eq(exerciseTemplateTable.id, exerciseTable.baseTemplateId)
@@ -94,7 +124,7 @@ export class ExerciseRepository extends BaseRepository {
             .where(
                 and(
                     isNull(exerciseTable.templateId),
-                    eq(exerciseTable.user, userId)
+                    eq(exerciseTable.organisationId, organisationId)
                 )
             )
             .orderBy(desc(exerciseTable.lastUsedAt));
@@ -102,13 +132,29 @@ export class ExerciseRepository extends BaseRepository {
 
     public async getAllExerciseTemplatesForUser(
         userId: string
-    ): Promise<ExerciseTemplateDetailsEntry[]> {
+    ): Promise<ExerciseTemplateDetailsEntryWithUserRole[]> {
         const subquery = this.databaseConnection
             .select()
             .from(organisationMembershipTable)
             .where(eq(organisationMembershipTable.userId, userId))
             .as('memberships');
-        return this.exerciseTemplateQuery
+        return this.databaseConnection
+            .select({
+                ...getTableColumns(exerciseTemplateTable),
+                trainerKey: exerciseTable.trainerKey,
+                exercise: getTableColumns(exerciseTable),
+                organisation: getTableColumns(organisationTable),
+                userRole: subquery.role,
+            })
+            .from(exerciseTemplateTable)
+            .innerJoin(
+                exerciseTable,
+                eq(exerciseTemplateTable.id, exerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(exerciseTemplateTable.organisationId, organisationTable.id)
+            )
             .innerJoin(
                 subquery,
                 eq(
@@ -116,6 +162,33 @@ export class ExerciseRepository extends BaseRepository {
                     exerciseTemplateTable.organisationId
                 )
             )
+            .orderBy(
+                desc(
+                    sql<Date>`COALESCE("exercise_template"."lastExerciseCreatedAt", "exercise_template"."lastUpdatedAt")`
+                )
+            );
+    }
+
+    public async getAllExerciseTemplatesForOrganisation(
+        organisationId: OrganisationId
+    ): Promise<ExerciseTemplateDetailsEntry[]> {
+        return this.databaseConnection
+            .select({
+                ...getTableColumns(exerciseTemplateTable),
+                trainerKey: exerciseTable.trainerKey,
+                exercise: getTableColumns(exerciseTable),
+                organisation: getTableColumns(organisationTable),
+            })
+            .from(exerciseTemplateTable)
+            .innerJoin(
+                exerciseTable,
+                eq(exerciseTemplateTable.id, exerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(exerciseTemplateTable.organisationId, organisationTable.id)
+            )
+            .where(eq(exerciseTemplateTable.organisationId, organisationId))
             .orderBy(
                 desc(
                     sql<Date>`COALESCE("exercise_template"."lastExerciseCreatedAt", "exercise_template"."lastUpdatedAt")`
@@ -175,12 +248,7 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .select()
             .from(exerciseTable)
-            .where(
-                lt(
-                    exerciseTable.stateVersion,
-                    ExerciseState.currentStateVersion
-                )
-            );
+            .where(lt(exerciseTable.stateVersion, currentStateVersion));
     }
 
     public async saveExerciseState(
@@ -217,5 +285,21 @@ export class ExerciseRepository extends BaseRepository {
                 .values(exercise)
                 .returning()
         );
+    }
+
+    public getUnusedExercises() {
+        const deadline = new Date();
+        deadline.setDate(deadline.getDate() - Config.autoDeleteDays);
+        return this.databaseConnection
+            .select()
+            .from(exerciseTable)
+            .where(
+                and(
+                    lt(exerciseTable.lastUsedAt, deadline),
+                    isNull(exerciseTable.organisationId),
+                    isNull(exerciseTable.parallelExerciseId),
+                    isNull(exerciseTable.templateId)
+                )
+            );
     }
 }

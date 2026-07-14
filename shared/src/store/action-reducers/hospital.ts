@@ -1,67 +1,65 @@
-import { IsNumber, IsString, IsUUID, Min } from 'class-validator';
-import { type Hospital, hospitalSchema } from '../../models/hospital.js';
+import { z } from 'zod';
+import { castDraft, type Immutable } from 'immer';
+import { hospitalSchema } from '../../models/hospital.js';
 import { newHospitalPatientFromPatient } from '../../models/hospital-patient.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { ExpectedReducerError } from '../reducer-error.js';
 import { catchAllHospitalId } from '../../data/default-state/catch-all-hospital.js';
 import { createHospitalTag } from '../../models/utils/tag-helpers.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { vehicleSchema } from '../../models/vehicle.js';
 import { isCompletelyLoaded } from './utils/completely-load-vehicle.js';
 import { getElement } from './utils/get-element.js';
-import { deleteVehicle } from './vehicle.js';
+import { deleteVehicle, isVehicleLoading } from './vehicle.js';
 import { logVehicle } from './utils/log.js';
 
-export class AddHospitalAction implements Action {
-    @IsValue('[Hospital] Add hospital' as const)
-    public readonly type = '[Hospital] Add hospital';
-    @IsZodSchema(hospitalSchema)
-    public readonly hospital!: Hospital;
-}
+export const addHospitalActionSchema = z.strictObject({
+    type: z.literal('[Hospital] Add hospital'),
+    hospital: hospitalSchema,
+});
+export type AddHospitalAction = Immutable<
+    z.infer<typeof addHospitalActionSchema>
+>;
 
-export class EditTransportDurationToHospitalAction implements Action {
-    @IsValue('[Hospital] Edit transportDuration to hospital' as const)
-    public readonly type = '[Hospital] Edit transportDuration to hospital';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly hospitalId!: UUID;
+export const editTransportDurationToHospitalActionSchema = z.strictObject({
+    type: z.literal('[Hospital] Edit transportDuration to hospital'),
+    hospitalId: hospitalSchema.shape.id,
+    transportDuration: z.number().nonnegative(),
+});
+export type EditTransportDurationToHospitalAction = Immutable<
+    z.infer<typeof editTransportDurationToHospitalActionSchema>
+>;
 
-    @IsNumber()
-    @Min(0)
-    public readonly transportDuration!: number;
-}
+export const renameHospitalActionSchema = z.strictObject({
+    type: z.literal('[Hospital] Rename hospital'),
+    hospitalId: hospitalSchema.shape.id,
+    name: z.string(),
+});
+export type RenameHospitalAction = Immutable<
+    z.infer<typeof renameHospitalActionSchema>
+>;
 
-export class RenameHospitalAction implements Action {
-    @IsValue('[Hospital] Rename hospital' as const)
-    public readonly type = '[Hospital] Rename hospital';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly hospitalId!: UUID;
+export const removeHospitalActionSchema = z.strictObject({
+    type: z.literal('[Hospital] Remove hospital'),
+    hospitalId: hospitalSchema.shape.id,
+});
+export type RemoveHospitalAction = Immutable<
+    z.infer<typeof removeHospitalActionSchema>
+>;
 
-    @IsString()
-    public readonly name!: string;
-}
-
-export class RemoveHospitalAction implements Action {
-    @IsValue('[Hospital] Remove hospital' as const)
-    public readonly type = '[Hospital] Remove hospital';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly hospitalId!: UUID;
-}
-
-export class TransportPatientToHospitalAction implements Action {
-    @IsValue('[Hospital] Transport patient to hospital' as const)
-    public readonly type = '[Hospital] Transport patient to hospital';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly hospitalId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId!: UUID;
-}
+export const transportPatientToHospitalActionSchema = z.strictObject({
+    type: z.literal('[Hospital] Transport patient to hospital'),
+    hospitalId: hospitalSchema.shape.id,
+    vehicleId: vehicleSchema.shape.id,
+});
+export type TransportPatientToHospitalAction = Immutable<
+    z.infer<typeof transportPatientToHospitalActionSchema>
+>;
 
 export namespace HospitalActionReducers {
     export const addHospital: ActionReducer<AddHospitalAction> = {
-        action: AddHospitalAction,
+        type: '[Hospital] Add hospital',
+        actionSchema: addHospitalActionSchema,
         reducer: (draftState, { hospital }) => {
             draftState.hospitals[hospital.id] = cloneDeepMutable(hospital);
             return draftState;
@@ -71,7 +69,8 @@ export namespace HospitalActionReducers {
 
     export const editTransportDurationToHospital: ActionReducer<EditTransportDurationToHospitalAction> =
         {
-            action: EditTransportDurationToHospitalAction,
+            type: '[Hospital] Edit transportDuration to hospital',
+            actionSchema: editTransportDurationToHospitalActionSchema,
             reducer: (draftState, { hospitalId, transportDuration }) => {
                 const hospital = getElement(draftState, 'hospital', hospitalId);
                 hospital.transportDuration = transportDuration;
@@ -81,7 +80,8 @@ export namespace HospitalActionReducers {
         };
 
     export const renameHospital: ActionReducer<RenameHospitalAction> = {
-        action: RenameHospitalAction,
+        type: '[Hospital] Rename hospital',
+        actionSchema: renameHospitalActionSchema,
         reducer: (draftState, { hospitalId, name }) => {
             const hospital = getElement(draftState, 'hospital', hospitalId);
             hospital.name = name;
@@ -91,7 +91,8 @@ export namespace HospitalActionReducers {
     };
 
     export const removeHospital: ActionReducer<RemoveHospitalAction> = {
-        action: RemoveHospitalAction,
+        type: '[Hospital] Remove hospital',
+        actionSchema: removeHospitalActionSchema,
         reducer: (draftState, { hospitalId }) => {
             if (hospitalId === catchAllHospitalId) {
                 throw new ExpectedReducerError(
@@ -117,10 +118,22 @@ export namespace HospitalActionReducers {
 
     export const transportPatientToHospital: ActionReducer<TransportPatientToHospitalAction> =
         {
-            action: TransportPatientToHospitalAction,
+            type: '[Hospital] Transport patient to hospital',
+            actionSchema: transportPatientToHospitalActionSchema,
             reducer: (draftState, { hospitalId, vehicleId }) => {
                 const hospital = getElement(draftState, 'hospital', hospitalId);
                 const vehicle = getElement(draftState, 'vehicle', vehicleId);
+
+                if (
+                    isVehicleLoading(
+                        vehicle,
+                        draftState.currentTime,
+                        draftState.configuration
+                    )
+                )
+                    throw new ExpectedReducerError(
+                        'Das Fahrzeug wird gerade beladen und kann daher nicht bewegt werden'
+                    );
 
                 if (!isCompletelyLoaded(draftState, vehicle)) {
                     throw new ExpectedReducerError(
@@ -141,13 +154,14 @@ export namespace HospitalActionReducers {
                         'patient',
                         patientId
                     );
-                    draftState.hospitalPatients[patientId] =
+                    draftState.hospitalPatients[patientId] = castDraft(
                         newHospitalPatientFromPatient(
                             patient,
                             vehicle.vehicleType,
                             draftState.currentTime,
                             hospital.transportDuration + draftState.currentTime
-                        );
+                        )
+                    );
                     hospital.patientIds[patientId] = true;
                 }
                 deleteVehicle(draftState, vehicleId);

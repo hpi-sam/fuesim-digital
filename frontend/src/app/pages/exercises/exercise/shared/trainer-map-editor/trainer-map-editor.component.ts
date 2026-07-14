@@ -11,12 +11,12 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
-    PartialExport,
     migratePartialExport,
     transferPointImage,
     validateExerciseExport,
     viewportImage,
     getDefaultTechnicalChallengeTemplate,
+    getBasementExplosionTechnicalChallenge,
     bystanderCategories,
     scoutableMapImageTemplate,
 } from 'fuesim-digital-shared';
@@ -128,7 +128,10 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public readonly technicalChallengeTemplates: Signal<
         TechnicalChallengeTemplate[]
-    > = signal([getDefaultTechnicalChallengeTemplate()]);
+    > = signal([
+        getDefaultTechnicalChallengeTemplate(),
+        getBasementExplosionTechnicalChallenge(),
+    ]);
 
     public patientCategories$?: Observable<{
         [key in FilterCategory]?: PatientCategory[];
@@ -213,19 +216,19 @@ export class TrainerMapEditorComponent implements OnInit {
                 // The file dialog has been aborted.
                 return;
             }
-            const importedPlainObject = JSON.parse(
-                importedText
-            ) as PartialExport;
+            const importedPlainObject = JSON.parse(importedText);
+
+            const partialExport = validateExerciseExport(importedPlainObject);
+            if (partialExport.type !== 'partial') {
+                this.messageService.postError({
+                    title: 'An dieser Stelle können keine vollständigen Übungsexports importiert werden.',
+                });
+                return;
+            }
             const migratedPartialExport = migratePartialExport(
-                importedPlainObject,
+                partialExport,
                 selectStateSnapshot(selectExerciseState, this.store)
             );
-            const validation = validateExerciseExport(migratedPartialExport);
-            if (validation.length > 0) {
-                throw Error(
-                    `PartialExport is invalid:\n${validation.join('\n')}`
-                );
-            }
             openPartialImportOverwriteModal(
                 this.ngbModalService,
                 migratedPartialExport

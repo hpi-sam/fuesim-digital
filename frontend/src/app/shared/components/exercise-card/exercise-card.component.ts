@@ -1,17 +1,23 @@
 import { Component, computed, input, output, inject } from '@angular/core';
-import type { GetExerciseResponseData } from 'fuesim-digital-shared';
+import type { GetExerciseDetailsResponseData } from 'fuesim-digital-shared';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
 import { CopyButtonComponent } from '../copy-button/copy-button.component';
+import { OrganisationBadgeComponent } from '../../../pages/organisations/shared/organisation-badge/organisation-badge.component.js';
 
 @Component({
     selector: 'app-exercise-card',
     templateUrl: './exercise-card.component.html',
     styleUrls: ['./exercise-card.component.scss'],
-    imports: [CopyButtonComponent, RouterLink, DatePipe],
+    imports: [
+        CopyButtonComponent,
+        RouterLink,
+        DatePipe,
+        OrganisationBadgeComponent,
+    ],
 })
 export class ExerciseCardComponent {
     private readonly apiService = inject(ApiService);
@@ -20,7 +26,7 @@ export class ExerciseCardComponent {
         ConfirmationModalService
     );
 
-    readonly exercise = input<GetExerciseResponseData>();
+    readonly exercise = input<GetExerciseDetailsResponseData>();
     readonly participantUrl = computed(
         () => `${location.origin}/exercises/${this.exercise()?.participantKey}`
     );

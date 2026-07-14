@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { resourceDescriptionSchema } from '../utils/resource-description.js';
 import type { UUID } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
@@ -9,8 +10,8 @@ export const vehicleOccupationsRadiogramSchema = z.strictObject({
     type: z.literal('vehicleOccupationsRadiogram'),
     occupations: resourceDescriptionSchema,
 });
-export type VehicleOccupationsRadiogram = z.infer<
-    typeof vehicleOccupationsRadiogramSchema
+export type VehicleOccupationsRadiogram = Immutable<
+    z.infer<typeof vehicleOccupationsRadiogramSchema>
 >;
 export function newVehicleOccupationsRadiogram(
     id: UUID,

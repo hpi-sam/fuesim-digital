@@ -1,11 +1,13 @@
 import {
-    getExercisesResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     postExerciseTemplateRequestDataSchema,
     getExerciseTemplateViewportsResponseDataSchema,
     patchExerciseTemplateRequestDataSchema,
     exerciseTemplateIdSchema,
     getExerciseTemplateResponseDataSchema,
+    getExerciseResponseDataSchema,
+    organisationIdSchema,
+    getExerciseTemplateWithTrainerKeyResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
@@ -16,21 +18,17 @@ export function createExerciseManagerRouter(
 ): Router {
     const router = Router();
 
-    router.get('/exercises/', isAuthenticatedMiddleware, async (req, res) => {
-        const exercises = await exerciseManagerService.getAllExercisesOfOwner(
-            req.session!
-        );
-
-        res.send(getExercisesResponseDataSchema.encode(exercises));
-    });
-
     router
         .route('/exercise_templates/')
         .all(isAuthenticatedMiddleware)
         .get(async (req, res) => {
+            const orgIdRes = organisationIdSchema.safeParse(
+                req.query['organisationId']
+            );
             const templates =
                 await exerciseManagerService.getAllExerciseTemplatesForUser(
-                    req.session!
+                    req.session!,
+                    orgIdRes.success ? orgIdRes.data : undefined
                 );
             res.send(getExerciseTemplatesResponseDataSchema.encode(templates));
         })
@@ -54,7 +52,9 @@ export function createExerciseManagerRouter(
             }
 
             res.status(201).send(
-                getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
+                getExerciseTemplateWithTrainerKeyResponseDataSchema.encode(
+                    exerciseTemplate
+                )
             );
         });
 
@@ -70,10 +70,9 @@ export function createExerciseManagerRouter(
                     req.session
                 );
 
-            res.status(201).send({
-                participantKey: newExercise.participantKey,
-                trainerKey: newExercise.trainerKey,
-            });
+            res.status(201).send(
+                getExerciseResponseDataSchema.encode(newExercise.exercise)
+            );
         });
 
     router.get('/exercise_templates/:id/viewports', async (req, res) => {

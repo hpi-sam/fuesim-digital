@@ -1,31 +1,25 @@
-import { IsInt, IsOptional, IsUUID } from 'class-validator';
-import { WritableDraft } from 'immer';
+import type { WritableDraft, Immutable } from 'immer';
+import { z } from 'zod';
 import {
     changePosition,
     offsetMapPositionBy,
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
+import type { ActionReducer } from '../action-reducer.js';
+import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import type { Vehicle } from '../../models/vehicle.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { transferPointImage } from '../../models/transfer-point.js';
+import {
+    transferPointImage,
+    transferPointSchema,
+} from '../../models/transfer-point.js';
 import { newVehicleArrivedEvent } from '../../simulation/events/vehicle-arrived.js';
 import {
     createTransferPointTag,
     createVehicleActionTag,
 } from '../../models/utils/tag-helpers.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import {
-    type AllowedValues,
-    IsLiteralUnion,
-} from '../../utils/validators/is-literal-union.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
-import {
-    type StartPoint,
-    startPointSchema,
-} from '../../models/utils/start-points.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { startPointSchema } from '../../models/utils/start-points.js';
 import {
     currentTransferOf,
     isInTransfer,
@@ -46,10 +40,12 @@ import {
     logVehicle,
 } from './utils/log.js';
 import { getElement } from './utils/get-element.js';
+import { isVehicleLoading } from './vehicle.js';
 
-export type TransferableElementType = 'personnel' | 'vehicle';
-const transferableElementTypeAllowedValues: AllowedValues<TransferableElementType> =
-    { personnel: true, vehicle: true };
+const transferableElementTypeSchema = z.enum(['personnel', 'vehicle']);
+export type TransferableElementType = z.infer<
+    typeof transferableElementTypeSchema
+>;
 
 /**
  * Personnel/Vehicle in transfer will arrive immediately at new targetTransferPoint
@@ -113,75 +109,56 @@ export function letElementArrive(
     }
 }
 
-export class AddToTransferAction implements Action {
-    @IsValue('[Transfer] Add to transfer' as const)
-    public readonly type = '[Transfer] Add to transfer';
+const addToTransferActionSchema = z.strictObject({
+    type: z.literal('[Transfer] Add to transfer'),
+    elementType: transferableElementTypeSchema,
+    elementId: uuidSchema,
+    startPoint: startPointSchema,
+    targetTransferPointId: transferPointSchema.shape.id,
+});
+export type AddToTransferAction = Immutable<
+    z.infer<typeof addToTransferActionSchema>
+>;
 
-    @IsLiteralUnion(transferableElementTypeAllowedValues)
-    elementType!: TransferableElementType;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly elementId!: UUID;
-
-    @IsZodSchema(startPointSchema)
-    public readonly startPoint!: StartPoint;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly targetTransferPointId!: UUID;
-}
-
-export class EditTransferAction implements Action {
-    @IsValue('[Transfer] Edit transfer' as const)
-    public readonly type = '[Transfer] Edit transfer';
-
-    @IsLiteralUnion(transferableElementTypeAllowedValues)
-    elementType!: TransferableElementType;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly elementId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    @IsOptional()
-    public readonly targetTransferPointId?: UUID;
-
-    @IsInt()
-    @IsOptional()
+const editTransferActionSchema = z.strictObject({
+    type: z.literal('[Transfer] Edit transfer'),
+    elementType: transferableElementTypeSchema,
+    elementId: uuidSchema,
+    targetTransferPointId: transferPointSchema.shape.id.optional(),
     /**
      * How much time in ms should be added to the transfer time.
      * If it is negative, the transfer time will be decreased.
      * If the time is set to a time in the past it will be set to the current time.
      */
-    public readonly timeToAdd?: number;
-}
+    timeToAdd: z.number().optional(),
+});
+export type EditTransferAction = Immutable<
+    z.infer<typeof editTransferActionSchema>
+>;
 
-export class FinishTransferAction implements Action {
-    @IsValue('[Transfer] Finish transfer' as const)
-    public readonly type = '[Transfer] Finish transfer';
+const finishTransferActionSchema = z.strictObject({
+    type: z.literal('[Transfer] Finish transfer'),
+    elementType: transferableElementTypeSchema,
+    elementId: uuidSchema,
+    targetTransferPointId: transferPointSchema.shape.id,
+});
+export type FinishTransferAction = Immutable<
+    z.infer<typeof finishTransferActionSchema>
+>;
 
-    @IsLiteralUnion(transferableElementTypeAllowedValues)
-    elementType!: TransferableElementType;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly elementId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly targetTransferPointId!: UUID;
-}
-
-export class TogglePauseTransferAction implements Action {
-    @IsValue('[Transfer] Toggle pause transfer' as const)
-    public readonly type = '[Transfer] Toggle pause transfer';
-
-    @IsLiteralUnion(transferableElementTypeAllowedValues)
-    elementType!: TransferableElementType;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly elementId!: UUID;
-}
+const togglePauseTransferActionSchema = z.strictObject({
+    type: z.literal('[Transfer] Toggle pause transfer'),
+    elementType: transferableElementTypeSchema,
+    elementId: uuidSchema,
+});
+export type TogglePauseTransferAction = Immutable<
+    z.infer<typeof togglePauseTransferActionSchema>
+>;
 
 export namespace TransferActionReducers {
     export const addToTransfer: ActionReducer<AddToTransferAction> = {
-        action: AddToTransferAction,
+        type: addToTransferActionSchema.shape.type.value,
+        actionSchema: addToTransferActionSchema,
         reducer: (
             draftState,
             { elementType, elementId, startPoint, targetTransferPointId }
@@ -195,6 +172,18 @@ export namespace TransferActionReducers {
                     `Element with id ${element.id} is already in transfer`
                 );
             }
+
+            if (
+                elementType === 'vehicle' &&
+                isVehicleLoading(
+                    element as Vehicle,
+                    draftState.currentTime,
+                    draftState.configuration
+                )
+            )
+                throw new ExpectedReducerError(
+                    'Das Fahrzeug wird gerade beladen und kann daher nicht bewegt werden'
+                );
 
             // Get the duration
             let duration: number;
@@ -250,7 +239,8 @@ export namespace TransferActionReducers {
     };
 
     export const editTransfer: ActionReducer<EditTransferAction> = {
-        action: EditTransferAction,
+        type: editTransferActionSchema.shape.type.value,
+        actionSchema: editTransferActionSchema,
         reducer: (
             draftState,
             { elementType, elementId, targetTransferPointId, timeToAdd }
@@ -294,7 +284,8 @@ export namespace TransferActionReducers {
     };
 
     export const finishTransfer: ActionReducer<FinishTransferAction> = {
-        action: FinishTransferAction,
+        type: finishTransferActionSchema.shape.type.value,
+        actionSchema: finishTransferActionSchema,
         reducer: (
             draftState,
             { elementType, elementId, targetTransferPointId }
@@ -319,7 +310,8 @@ export namespace TransferActionReducers {
 
     export const togglePauseTransfer: ActionReducer<TogglePauseTransferAction> =
         {
-            action: TogglePauseTransferAction,
+            type: togglePauseTransferActionSchema.shape.type.value,
+            actionSchema: togglePauseTransferActionSchema,
             reducer: (draftState, { elementType, elementId }) => {
                 const element = getElement(draftState, elementType, elementId);
                 if (!isInTransfer(element)) {

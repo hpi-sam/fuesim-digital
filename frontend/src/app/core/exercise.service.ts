@@ -4,15 +4,19 @@ import type {
     ClientToServerEvents,
     ExerciseAction,
     ExerciseKey,
+    GetExerciseResponseData,
     ExerciseState,
     JoinExerciseResponseData,
     ServerToClientEvents,
     SocketResponse,
     UUID,
+    OrganisationId,
+    GetExerciseTemplateResponseData,
 } from 'fuesim-digital-shared';
 import {
     joinExerciseResponseDataSchema,
     socketIoTransports,
+    validateExerciseExport,
 } from 'fuesim-digital-shared';
 import { freeze, WritableDraft } from 'immer';
 import {
@@ -26,6 +30,7 @@ import {
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ZodError } from 'zod';
 import { handleChanges } from '../shared/functions/handle-changes';
 import type { AppState } from '../state/app.state';
 import {
@@ -48,6 +53,8 @@ import {
     selectVisibleVehicles,
 } from '../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
+import { CreateExerciseModalComponent } from '../pages/exercises/shared/create-exercise-modal/create-exercise-modal.component.js';
+import { CreateExerciseTemplateModalComponent } from '../pages/exercises/shared/create-exercise-template-modal/create-exercise-template-modal.component.js';
 import { websocketOrigin } from './api-origins';
 import {
     saveReconnectToken,
@@ -57,6 +64,8 @@ import {
 import { MessageService } from './messages/message.service';
 import { OptimisticActionHandler } from './optimistic-action-handler';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
+import { AuthService } from './auth.service.js';
+import { ApiService } from './api.service.js';
 
 /**
  * This Service deals with the state synchronization of a live exercise.
@@ -72,6 +81,8 @@ export class ExerciseService {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly messageService = inject(MessageService);
     private readonly ngbModalService = inject(NgbModal);
+    private readonly authService = inject(AuthService);
+    private readonly apiService = inject(ApiService);
 
     private readonly socket: Socket<
         ServerToClientEvents,
@@ -330,5 +341,104 @@ export class ExerciseService {
 
     private stopNotifications() {
         this.stopNotifications$.next();
+    }
+
+    public async importExercise(fileList: FileList | object) {
+        try {
+            let importPlain;
+            let fileName = 'import.json';
+            if (fileList instanceof FileList) {
+                const file = fileList.item(0);
+                if (!file) return;
+                fileName = file.name;
+                const importString = await file.text();
+                importPlain = JSON.parse(importString);
+            } else {
+                importPlain = fileList;
+            }
+
+            const importObject = validateExerciseExport(importPlain);
+
+            if (importObject.type !== 'complete') {
+                this.messageService.postMessage({
+                    color: 'danger',
+                    title: 'Unerlaubter Importtyp',
+                    body: 'Nur vollständige Übungsexporte können als neue Übung importiert werden.',
+                });
+                return null;
+            }
+
+            return { fileName, importObject };
+        } catch (error: unknown) {
+            if (error instanceof ZodError) {
+                this.messageService.postMessage({
+                    color: 'danger',
+                    title: 'Fehlerhafte Datei',
+                    body: 'Die Datei hat das falsche Format.',
+                });
+                return null;
+            }
+            this.messageService.postError({
+                title: 'Fehler beim Importieren',
+                error,
+            });
+        }
+        return null;
+    }
+
+    public async createExercise(
+        fileList?: FileList | object,
+        callback?: (exercise: GetExerciseResponseData) => void,
+        organisationId?: OrganisationId
+    ) {
+        if (this.authService.authData().user) {
+            const modalRef = this.ngbModalService.open(
+                CreateExerciseModalComponent
+            );
+            const componentInstance =
+                modalRef.componentInstance as CreateExerciseModalComponent;
+            componentInstance.created.subscribe((exercise) => {
+                callback?.(exercise);
+            });
+            if (organisationId) {
+                componentInstance.setOrganisation(organisationId);
+            }
+            if (fileList) {
+                await componentInstance.importFile(fileList);
+            }
+        } else {
+            let importObject = null;
+            if (fileList) {
+                const result = await this.importExercise(fileList);
+                if (!result) return;
+                importObject = result.importObject;
+            }
+            await this.apiService
+                .createExercise({ organisationId: null, importObject })
+                .then((exercise) => {
+                    callback?.(exercise);
+                });
+        }
+    }
+
+    public async createExerciseTemplate(
+        fileList?: FileList,
+        callback?: (exercise: GetExerciseTemplateResponseData) => void,
+        organisationId?: OrganisationId
+    ) {
+        const modalRef = this.ngbModalService.open(
+            CreateExerciseTemplateModalComponent
+        );
+        const componentInstance =
+            modalRef.componentInstance as CreateExerciseTemplateModalComponent;
+        componentInstance.created.subscribe((exerciseTemplate) => {
+            callback?.(exerciseTemplate);
+        });
+        if (organisationId) {
+            componentInstance.setOrganisation(organisationId);
+        }
+        if (fileList) {
+            await componentInstance.importFile(fileList);
+        }
     }
 }

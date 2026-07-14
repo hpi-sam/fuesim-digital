@@ -1,6 +1,6 @@
 import type { WritableDraft } from 'immer';
-import type { ExerciseState } from '../state.js';
 import type { UUID } from '../utils/uuid.js';
+import type { ExerciseState } from '../state.js';
 import type { Migration } from './migration-functions.js';
 
 interface ImageProperties {

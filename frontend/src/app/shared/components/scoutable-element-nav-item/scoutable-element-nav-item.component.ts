@@ -1,13 +1,21 @@
 import {
     Component,
     computed,
+    effect,
     inject,
     input,
+    linkedSignal,
     OnInit,
     signal,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { newScoutable, ScoutableElement } from 'fuesim-digital-shared';
+import {
+    cloneDeepMutable,
+    newScoutable,
+    newUserGeneratedContent,
+    ScoutableElement,
+    userGeneratedContentSchema,
+} from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import type { UserGeneratedContent, Scoutable } from 'fuesim-digital-shared';
 import { form, validateStandardSchema } from '@angular/forms/signals';
@@ -44,42 +52,89 @@ export class ScoutableElementNavItemComponent implements OnInit {
     });
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
 
-    readonly model = signal<{ name: string }>({
-        name: '',
+    readonly model = linkedSignal<
+        Scoutable | null,
+        {
+            name: string;
+            content: UserGeneratedContent;
+            isVisibleForParticipants: boolean;
+        }
+    >({
+        source: this.scoutable,
+        computation: (scoutable, previous) => {
+            if (previous && this.hasLocalEdits()) return previous.value;
+
+            return {
+                name: scoutable?.name ?? '',
+                content:
+                    scoutable?.userGeneratedContent ??
+                    newUserGeneratedContent(),
+                isVisibleForParticipants:
+                    scoutable?.isVisibleForParticipants ?? true,
+            };
+        },
     });
     scoutableForm = form(this.model, (schemaPath) => {
-        validateStandardSchema(schemaPath, z.object({ name: z.string() }));
+        validateStandardSchema(
+            schemaPath,
+            z.object({
+                name: z.string(),
+                content: userGeneratedContentSchema,
+                isVisibleForParticipants: z.boolean(),
+            })
+        );
     });
+    readonly hasLocalEdits = signal<boolean>(false);
+
+    constructor() {
+        effect(() => {
+            const value = this.model();
+            const isValid = this.scoutableForm().valid();
+            const isDirty = this.scoutableForm().dirty();
+
+            if (isDirty && isValid) {
+                this.hasLocalEdits.set(false);
+                this.scoutableForm().reset();
+                if (
+                    value.name.trim() === '' &&
+                    (value.content.content.trim() === '' ||
+                        value.content.content === '<p></p>')
+                ) {
+                    if (this.element().scoutableId !== null)
+                        this.removeScoutability();
+                    return;
+                } else if (this.element().scoutableId === null) {
+                    const draftScoutable = cloneDeepMutable(newScoutable());
+                    draftScoutable.name = value.name;
+                    draftScoutable.userGeneratedContent = value.content;
+                    draftScoutable.isVisibleForParticipants =
+                        value.isVisibleForParticipants;
+                    this.makeScoutable(this.element(), draftScoutable);
+                    return;
+                }
+                const scoutable = this.scoutable()!;
+                if (value.name !== scoutable.name) this.rename(value.name);
+                if (
+                    value.content.content !==
+                    scoutable.userGeneratedContent.content
+                )
+                    this.updateContent(value.content);
+                if (
+                    value.isVisibleForParticipants !==
+                    scoutable.isVisibleForParticipants
+                )
+                    this.setVisibility(value.isVisibleForParticipants);
+            }
+        });
+    }
 
     ngOnInit() {
-        if (this.element().scoutableId === null) {
-            this.makeScoutable(this.element());
-        }
         if (this.currentRole() === 'participant') {
             this.markAsViewed();
         }
     }
 
-    makeScoutable(element: ScoutableElement) {
-        this.exerciseService.proposeAction(
-            {
-                type: '[Scoutable] Make scoutable',
-                elementId: element.id,
-                elementType: element.type,
-                scoutable: newScoutable(),
-            },
-            true
-        );
-    }
-
-    markAsViewed() {
-        this.exerciseService.proposeAction({
-            type: '[Scoutable] Mark as viewed',
-            scoutableId: this.scoutable()!.id,
-        });
-    }
-
-    rename(name: string) {
+    private rename(name: string) {
         this.exerciseService.proposeAction(
             {
                 type: '[Scoutable] Rename',
@@ -90,7 +145,15 @@ export class ScoutableElementNavItemComponent implements OnInit {
         );
     }
 
-    setVisibility(value: boolean) {
+    private updateContent(content: UserGeneratedContent) {
+        this.exerciseService.proposeAction({
+            type: '[Scoutable] Update content',
+            scoutableId: this.scoutable()!.id,
+            userGeneratedContent: content,
+        });
+    }
+
+    private setVisibility(value: boolean) {
         this.exerciseService.proposeAction({
             type: '[Scoutable] Set isVisibleForParticipants',
             scoutableId: this.scoutable()!.id,
@@ -98,11 +161,51 @@ export class ScoutableElementNavItemComponent implements OnInit {
         });
     }
 
-    updateContent(content: UserGeneratedContent) {
+    makeScoutable(element: ScoutableElement, scoutable: Scoutable) {
+        this.exerciseService.proposeAction(
+            {
+                type: '[Scoutable] Make scoutable',
+                elementId: element.id,
+                elementType: element.type,
+                scoutable,
+            },
+            true
+        );
+    }
+
+    removeScoutability() {
         this.exerciseService.proposeAction({
-            type: '[Scoutable] Update content',
-            scoutableId: this.scoutable()!.id,
-            userGeneratedContent: content,
+            type: '[Scoutable] Remove scoutability',
+            elementType: this.element().type,
+            elementId: this.element().id,
         });
+    }
+
+    markAsViewed() {
+        this.exerciseService.proposeAction({
+            type: '[Scoutable] Mark as viewed',
+            scoutableId: this.scoutable()!.id,
+        });
+    }
+
+    changeName(name: string) {
+        this.model.update(({ ...model }) => ({ ...model, name }));
+        this.scoutableForm.name().markAsDirty();
+        this.hasLocalEdits.set(true);
+    }
+
+    changeContent(content: UserGeneratedContent) {
+        this.model.update(({ ...model }) => ({ ...model, content }));
+        this.scoutableForm.content().markAsDirty();
+        this.hasLocalEdits.set(true);
+    }
+
+    changeVisibility(isVisibleForParticipants: boolean) {
+        this.model.update(({ ...model }) => ({
+            ...model,
+            isVisibleForParticipants,
+        }));
+        this.scoutableForm.isVisibleForParticipants().markAsDirty();
+        this.hasLocalEdits.set(true);
     }
 }

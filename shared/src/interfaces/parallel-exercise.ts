@@ -10,6 +10,10 @@ import { exerciseStatusSchema } from '../models/utils/exercise-status.js';
 import { logEntrySchema } from '../models/log-entry.js';
 import { getExerciseTemplateResponseDataSchema } from './exercise-template.js';
 import { stringToDate } from './utils.js';
+import {
+    getOrganisationResponseDataSchema,
+    organisationMembershipRoleSchema,
+} from './organisation.js';
 
 export const getParallelExerciseResponseDataSchema = z.object({
     id: parallelExerciseIdSchema,
@@ -18,6 +22,8 @@ export const getParallelExerciseResponseDataSchema = z.object({
     name: z.string(),
     joinViewportId: z.uuidv4(),
     template: getExerciseTemplateResponseDataSchema,
+    organisation: getOrganisationResponseDataSchema,
+    userRole: organisationMembershipRoleSchema,
 });
 export type GetParallelExerciseResponseData = z.infer<
     typeof getParallelExerciseResponseDataSchema

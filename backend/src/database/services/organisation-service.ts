@@ -54,7 +54,7 @@ export class OrganisationService {
         session: SessionInformation
     ) {
         const organisation =
-            await this.organisationRepository.getOrganisationById(id);
+            await this.organisationRepository.getOrganisationDetailsById(id);
         if (!organisation) {
             throw new NotFoundError();
         }
@@ -80,7 +80,6 @@ export class OrganisationService {
             ...organisation,
             userRole,
             members,
-            membersCount: members.length,
         };
     }
 

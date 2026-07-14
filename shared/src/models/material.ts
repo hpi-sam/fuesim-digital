@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { uuidSetSchema } from '../utils/uuid-set.js';
@@ -32,16 +33,17 @@ export const materialSchema = z.strictObject({
 
     image: imagePropertiesSchema,
 });
-export type Material = z.infer<typeof materialSchema>;
+export type Material = Immutable<z.infer<typeof materialSchema>>;
 
 export function newMaterialFromTemplate(
     materialTemplate: MaterialTemplate,
     vehicleId: UUID,
     vehicleName: string,
-    position: Position
+    position: Position,
+    id?: UUID
 ): Material {
     return {
-        id: uuid(),
+        id: id ?? uuid(),
         type: 'material',
         templateId: materialTemplate.id,
         typeName: materialTemplate.name,

@@ -4,10 +4,15 @@ import type {
     StateExport,
     ParticipantKey,
     TrainerKey,
+    OrganisationId,
 } from 'fuesim-digital-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import { type ExerciseInsert, type ExerciseTemplateInsert } from '../schema.js';
+import {
+    type ExerciseInsert,
+    type ExerciseTemplateDetailsEntryWithUserRole,
+    type ExerciseTemplateInsert,
+} from '../schema.js';
 import {
     ApiError,
     NotFoundError,
@@ -25,14 +30,58 @@ export class ExerciseManagerService {
         private readonly organisationRepository: OrganisationRepository
     ) {}
 
-    public async getAllExercisesOfOwner(session: SessionInformation) {
-        return this.exerciseRepository.getAllExercisesOfOwner(session.user.id);
-    }
-
-    public async getAllExerciseTemplatesForUser(session: SessionInformation) {
+    public async getAllExerciseTemplatesForUser(
+        session: SessionInformation,
+        organisationId?: OrganisationId
+    ): Promise<ExerciseTemplateDetailsEntryWithUserRole[]> {
+        if (organisationId) {
+            const organisation =
+                await this.organisationRepository.getOrganisationById(
+                    organisationId
+                );
+            if (!organisation) {
+                throw new PermissionDeniedError();
+            }
+            const userRole =
+                await this.organisationRepository.getOrganisationMembershipRoleForUserById(
+                    organisationId,
+                    session.user.id
+                );
+            if (!userRole) {
+                throw new PermissionDeniedError();
+            }
+            return (
+                await this.exerciseRepository.getAllExerciseTemplatesForOrganisation(
+                    organisationId
+                )
+            ).map((template) => ({
+                ...template,
+                userRole,
+            }));
+        }
         return this.exerciseRepository.getAllExerciseTemplatesForUser(
             session.user.id
         );
+    }
+
+    public async getExerciseTemplateById(
+        id: ExerciseTemplateId,
+        session: SessionInformation
+    ) {
+        const exerciseTemplate =
+            await this.exerciseRepository.getExerciseTemplateById(id);
+        if (!exerciseTemplate) {
+            throw new NotFoundError();
+        }
+        const isMember =
+            await this.organisationRepository.isMemberOfOrganisationById(
+                exerciseTemplate.organisation.id,
+                session.user.id
+            );
+        if (!isMember) {
+            throw new PermissionDeniedError();
+        }
+        return exerciseTemplate;
     }
 
     public async createExerciseTemplateFromBlank(
@@ -85,10 +134,10 @@ export class ExerciseManagerService {
             throw new ApiError();
         }
         const newExercise = await this.exerciseService.createExerciseFromFile(
-            importObject,
             {
                 templateId: exerciseTemplate.id,
-            }
+            },
+            importObject
         );
         newExercise.template = exerciseTemplate;
         return {
@@ -148,9 +197,10 @@ export class ExerciseManagerService {
 
             const isNotMember =
                 session &&
-                !(await this.organisationRepository.isMemberOfOrganisationById(
+                !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                     exerciseTemplate.organisationId,
-                    session.user.id
+                    session.user.id,
+                    ['editor', 'admin']
                 ));
             if (isNotMember) {
                 throw new PermissionDeniedError();
@@ -168,7 +218,9 @@ export class ExerciseManagerService {
             };
             const exerciseInsert = {
                 ...optionalData,
-                user: session ? session.user.id : null,
+                organisationId: session
+                    ? exerciseTemplate.organisationId
+                    : null,
                 trainerKey,
                 participantKey,
                 stateVersion: exerciseTemplate.exercise.stateVersion,

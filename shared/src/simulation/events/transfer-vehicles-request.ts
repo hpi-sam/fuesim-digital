@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
 import {
@@ -23,8 +24,8 @@ export const transferVehiclesRequestEventSchema = z.strictObject({
     key: z.string().optional(),
 });
 
-export type TransferVehiclesRequestEvent = z.infer<
-    typeof transferVehiclesRequestEventSchema
+export type TransferVehiclesRequestEvent = Immutable<
+    z.infer<typeof transferVehiclesRequestEventSchema>
 >;
 
 export function newTransferVehiclesRequestEvent(

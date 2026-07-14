@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
@@ -8,7 +9,9 @@ export const tryToDistributeEventSchema = z.strictObject({
     behaviorId: uuidSchema,
 });
 
-export type TryToDistributeEvent = z.infer<typeof tryToDistributeEventSchema>;
+export type TryToDistributeEvent = Immutable<
+    z.infer<typeof tryToDistributeEventSchema>
+>;
 
 export function newTryToDistributeEvent(
     behaviorId: UUID

@@ -3,6 +3,7 @@ import type {
     GetParallelExerciseResponseData,
     ExerciseState,
     SetAutojoinViewportAction,
+    OrganisationMembershipRole,
 } from 'fuesim-digital-shared';
 import {
     exerciseExistsResponseDataSchema,
@@ -24,11 +25,14 @@ import {
     joinParallelExercise,
 } from '../test/parallel-exercise-utils.js';
 import type { OrganisationEntry } from '../database/schema.js';
+import { MAX_FAST_FORWARD_DURATION_MS } from '../exercise/fast-forward-exercise.js';
+import { createOrganisation } from '../test/organisation-utils.js';
 
 describe('parallel exercise router', () => {
     const environment = createTestEnvironment();
     let session: string;
     let personalOrganisation: OrganisationEntry;
+
     beforeEach(async () => {
         environment.services.exerciseService.TESTING_getExerciseMap().clear();
         session = await createTestUserSession(environment);
@@ -37,6 +41,7 @@ describe('parallel exercise router', () => {
                 defaultTestUserSessionData
             );
     });
+
     describe('GET /api/parallel_exercises', () => {
         it('fails with 403 if not authenticated', async () => {
             await environment
@@ -65,7 +70,16 @@ describe('parallel exercise router', () => {
             const session2 = await createTestUserSession(environment, {
                 user: alternativeTestUserSessionData,
             });
-            await createParallelExercise(environment, session2);
+            const personalOrganisation2 =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    alternativeTestUserSessionData
+                );
+            const template = await createExerciseTemplate(
+                environment,
+                session2,
+                personalOrganisation2.id
+            );
+            await createParallelExercise(environment, session2, template);
 
             const response = await environment
                 .httpRequest('get', '/api/parallel_exercises', session)
@@ -78,6 +92,49 @@ describe('parallel exercise router', () => {
             expect(parsed[0]!.id).toBe(ownExercise.id);
         });
 
+        it.each([
+            'viewer',
+            'editor',
+            'admin',
+        ] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+
+                const exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+                const parallelExercise = await createParallelExercise(
+                    environment,
+                    session2,
+                    exerciseTemplate
+                );
+
+                const response = await environment
+                    .httpRequest('get', '/api/parallel_exercises', session)
+                    .expect(200);
+                const parsed = getParallelExercisesResponseDataSchema.parse(
+                    response.body
+                );
+
+                expect(parsed).toHaveLength(1);
+                expect(parsed[0]!.id).toBe(parallelExercise.id);
+            }
+        );
+
         it('returns correct data', async () => {
             const exercise = await createParallelExercise(environment, session);
 
@@ -89,6 +146,156 @@ describe('parallel exercise router', () => {
             )[0]!;
 
             expect(parsed).toMatchObject(exercise);
+        });
+    });
+
+    describe('GET /api/parallel_exercises/?organisationId=x', () => {
+        it('fails with 403 if not authenticated', async () => {
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/?organisationId=${personalOrganisation.id}`
+                )
+                .expect(403);
+        });
+
+        it('fails with 403 if not member of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+            await createParallelExercise(
+                environment,
+                session2,
+                exerciseTemplate
+            );
+
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/?organisationId=${organisation.id}`,
+                    session
+                )
+                .expect(403);
+        });
+
+        it('returns only parallel exercises from organisation', async () => {
+            const ownExerciseTemplate = await createExerciseTemplate(
+                environment,
+                session,
+                personalOrganisation.id
+            );
+            const ownParallelExercise = await createParallelExercise(
+                environment,
+                session,
+                ownExerciseTemplate
+            );
+
+            const otherOrganisation = await createOrganisation(
+                environment,
+                session
+            );
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session,
+                otherOrganisation.id
+            );
+            await createParallelExercise(
+                environment,
+                session,
+                exerciseTemplate
+            );
+
+            const response = await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/?organisationId=${personalOrganisation.id}`,
+                    session
+                )
+                .expect(200);
+
+            const parsed = getParallelExercisesResponseDataSchema.parse(
+                response.body
+            );
+
+            expect(parsed).toHaveLength(1);
+            expect(parsed[0]!.id).toBe(ownParallelExercise.id);
+        });
+
+        it.each([
+            'viewer',
+            'editor',
+            'admin',
+        ] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+                const exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+                const parallelExercise = await createParallelExercise(
+                    environment,
+                    session2,
+                    exerciseTemplate
+                );
+
+                const otherExerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session,
+                    personalOrganisation.id
+                );
+                await createParallelExercise(
+                    environment,
+                    session,
+                    otherExerciseTemplate
+                );
+
+                const response = await environment
+                    .httpRequest(
+                        'get',
+                        `/api/parallel_exercises/?organisationId=${organisation.id}`,
+                        session
+                    )
+                    .expect(200);
+                const parsed = getParallelExercisesResponseDataSchema.parse(
+                    response.body
+                );
+
+                expect(parsed).toHaveLength(1);
+                expect(parsed[0]!.id).toBe(parallelExercise.id);
+            }
+        );
+
+        it('fails creating a parallel exercise with invalid data', async () => {
+            const testData = {
+                name: '',
+            };
+            await environment
+                .httpRequest('post', '/api/parallel_exercises', session)
+                .send(testData)
+                .expect(400);
         });
     });
 
@@ -133,7 +340,35 @@ describe('parallel exercise router', () => {
                 .expect(403);
         });
 
-        it('returns own parallel exercises', async () => {
+        it('fails with 403 if not member of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+            parallelExercise = await createParallelExercise(
+                environment,
+                session2,
+                exerciseTemplate
+            );
+
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/${parallelExercise.id}`,
+                    session
+                )
+                .expect(403);
+        });
+
+        it('succeeds with personal organisation', async () => {
             const response = await environment
                 .httpRequest(
                     'get',
@@ -146,12 +381,99 @@ describe('parallel exercise router', () => {
             );
             expect(parsed).toMatchObject(parallelExercise);
         });
+
+        it.each([
+            'viewer',
+            'editor',
+            'admin',
+        ] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+
+                const exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+                parallelExercise = await createParallelExercise(
+                    environment,
+                    session2,
+                    exerciseTemplate
+                );
+
+                const response = await environment
+                    .httpRequest(
+                        'get',
+                        `/api/parallel_exercises/${parallelExercise.id}`,
+                        session
+                    )
+                    .expect(200);
+                const parsed = getParallelExerciseResponseDataSchema.parse(
+                    response.body
+                );
+                expect(parsed.id).toBe(parallelExercise.id);
+            }
+        );
     });
 
     describe('POST /api/parallel_exercises', () => {
         it('fails with 403 if not authenticated', async () => {
             await environment
                 .httpRequest('post', '/api/parallel_exercises')
+                .expect(403);
+        });
+
+        it('fails with 403 if viewer of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            await environment.repositories.organisationRepository.addMemberToOrganisation(
+                organisation.id,
+                defaultTestUserSessionData.id,
+                'viewer'
+            );
+
+            const template = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+
+            const exerciseId =
+                (await environment.repositories.exerciseRepository.getExerciseTemplateById(
+                    template.id
+                ))!.exercise.id;
+
+            const viewport = createViewport(
+                environment.services.exerciseService
+                    .TESTING_getExerciseMap()
+                    .get(exerciseId)!
+            );
+            const testData = {
+                name: 'Test Parallel Exercise',
+                templateId: template.id,
+                joinViewportId: viewport.id,
+            } satisfies PostParallelExerciseRequestData;
+
+            await environment
+                .httpRequest('post', '/api/parallel_exercises', session)
+                .send(testData)
                 .expect(403);
         });
 
@@ -193,7 +515,59 @@ describe('parallel exercise router', () => {
             expect(parsed.createdAt.getTime()).toBeLessThan(Date.now());
             expect(parsed.joinViewportId).toBe(testData.joinViewportId);
             expect(parsed.template.id).toBe(testData.templateId);
+            expect(parsed.organisation.id).toBe(personalOrganisation.id);
         });
+
+        it.each(['editor', 'admin'] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+
+                const template = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+
+                const exerciseId =
+                    (await environment.repositories.exerciseRepository.getExerciseTemplateById(
+                        template.id
+                    ))!.exercise.id;
+
+                const viewport = createViewport(
+                    environment.services.exerciseService
+                        .TESTING_getExerciseMap()
+                        .get(exerciseId)!
+                );
+                const testData = {
+                    name: 'Test Parallel Exercise',
+                    templateId: template.id,
+                    joinViewportId: viewport.id,
+                } satisfies PostParallelExerciseRequestData;
+
+                const response = await environment
+                    .httpRequest('post', '/api/parallel_exercises', session)
+                    .send(testData)
+                    .expect(201);
+                const parsed = getParallelExerciseResponseDataSchema.parse(
+                    response.body
+                );
+                expect(parsed.template.id).toBe(template.id);
+                expect(parsed.organisation.id).toBe(organisation.id);
+            }
+        );
+
         it('fails creating a parallel exercise with invalid data', async () => {
             const testData = {
                 name: '',
@@ -238,6 +612,69 @@ describe('parallel exercise router', () => {
                 .expect(403);
         });
 
+        it('fails with 403 if not member of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+            parallelExercise = await createParallelExercise(
+                environment,
+                session2,
+                exerciseTemplate
+            );
+
+            await environment
+                .httpRequest(
+                    'patch',
+                    `/api/parallel_exercises/${parallelExercise.id}`,
+                    session
+                )
+                .send({ name: 'Other name' })
+                .expect(403);
+        });
+
+        it('fails with 403 if viewer of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            await environment.repositories.organisationRepository.addMemberToOrganisation(
+                organisation.id,
+                defaultTestUserSessionData.id,
+                'viewer'
+            );
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+            parallelExercise = await createParallelExercise(
+                environment,
+                session2,
+                exerciseTemplate
+            );
+
+            await environment
+                .httpRequest(
+                    'patch',
+                    `/api/parallel_exercises/${parallelExercise.id}`,
+                    session
+                )
+                .send({ name: 'Other name' })
+                .expect(403);
+        });
+
         it('fails with 400 if wrong data', async () => {
             await environment
                 .httpRequest(
@@ -265,6 +702,50 @@ describe('parallel exercise router', () => {
                 ))!;
             expect(parallelExerciseEntry.name).toBe(newData.name);
         });
+
+        it.each(['editor', 'admin'] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+
+                const exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+                parallelExercise = await createParallelExercise(
+                    environment,
+                    session2,
+                    exerciseTemplate
+                );
+
+                const newData = { name: 'Other name' };
+                await environment
+                    .httpRequest(
+                        'patch',
+                        `/api/parallel_exercises/${parallelExercise.id}`,
+                        session
+                    )
+                    .send(newData)
+                    .expect(200);
+                const parallelExerciseEntry =
+                    (await environment.repositories.parallelExerciseRepository.getParallelExerciseById(
+                        parallelExercise.id
+                    ))!;
+                expect(parallelExerciseEntry.name).toBe(newData.name);
+            }
+        );
     });
 
     describe('DELETE /api/parallel_exercises/:id', () => {
@@ -298,6 +779,67 @@ describe('parallel exercise router', () => {
                 .expect(403);
         });
 
+        it('fails with 403 if not member of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+            parallelExercise = await createParallelExercise(
+                environment,
+                session2,
+                exerciseTemplate
+            );
+
+            await environment
+                .httpRequest(
+                    'delete',
+                    `/api/parallel_exercises/${parallelExercise.id}`,
+                    session
+                )
+                .expect(403);
+        });
+
+        it('fails with 403 if viewer of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            await environment.repositories.organisationRepository.addMemberToOrganisation(
+                organisation.id,
+                defaultTestUserSessionData.id,
+                'viewer'
+            );
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+            parallelExercise = await createParallelExercise(
+                environment,
+                session2,
+                exerciseTemplate
+            );
+
+            await environment
+                .httpRequest(
+                    'delete',
+                    `/api/parallel_exercises/${parallelExercise.id}`,
+                    session
+                )
+                .expect(403);
+        });
+
         it('succeeds deleting', async () => {
             await joinParallelExercise(environment, parallelExercise);
             expect(
@@ -326,6 +868,49 @@ describe('parallel exercise router', () => {
                     .size
             ).toBe(3);
         });
+
+        it.each(['editor', 'admin'] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+
+                const exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+                parallelExercise = await createParallelExercise(
+                    environment,
+                    session2,
+                    exerciseTemplate
+                );
+
+                await environment
+                    .httpRequest(
+                        'delete',
+                        `/api/parallel_exercises/${parallelExercise.id}`,
+                        session
+                    )
+                    .expect(204);
+
+                const parallelExerciseEntry =
+                    await environment.repositories.parallelExerciseRepository.getParallelExerciseById(
+                        parallelExercise.id
+                    );
+                expect(parallelExerciseEntry).toBe(null);
+            }
+        );
     });
 
     describe('GET /api/parallel_exercises/join/:key', () => {
@@ -436,6 +1021,132 @@ describe('parallel exercise router', () => {
             expect(
                 newExercise.temporaryActionHistory[0]!.getAction().actionString
             ).toMatchObject(action);
+        });
+
+        it('fast-forwards a new instance to match a running instance', async () => {
+            const firstJoin = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const firstParticipant =
+                postJoinParallelExerciseResponseDataSchema.parse(
+                    firstJoin.body
+                );
+            const firstInstance = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(firstParticipant.participantKey)!;
+
+            firstInstance.exercise.currentStateString = {
+                ...firstInstance.exercise.currentStateString,
+                currentStatus: 'running',
+                currentTime: 10 * 60 * 1000,
+            };
+
+            const secondJoin = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const secondParticipant =
+                postJoinParallelExerciseResponseDataSchema.parse(
+                    secondJoin.body
+                );
+            const secondInstance = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(secondParticipant.participantKey)!;
+
+            expect(
+                secondInstance.exercise.currentStateString.currentStatus
+            ).toBe('running');
+            expect(secondInstance.exercise.currentStateString.currentTime).toBe(
+                10 * 60 * 1000
+            );
+
+            secondInstance.pause();
+        });
+
+        it('fast-forwards a new instance to match a paused instance', async () => {
+            const firstJoin = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const firstParticipant =
+                postJoinParallelExerciseResponseDataSchema.parse(
+                    firstJoin.body
+                );
+            const firstInstance = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(firstParticipant.participantKey)!;
+
+            firstInstance.exercise.currentStateString = {
+                ...firstInstance.exercise.currentStateString,
+                currentStatus: 'paused',
+                currentTime: 15 * 60 * 1000,
+            };
+
+            const secondJoin = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const secondParticipant =
+                postJoinParallelExerciseResponseDataSchema.parse(
+                    secondJoin.body
+                );
+            const secondInstance = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(secondParticipant.participantKey)!;
+
+            expect(
+                secondInstance.exercise.currentStateString.currentStatus
+            ).toBe('paused');
+            expect(secondInstance.exercise.currentStateString.currentTime).toBe(
+                15 * 60 * 1000
+            );
+        });
+
+        it('rejects joining when the reference instance is too far along', async () => {
+            const firstJoin = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const firstParticipant =
+                postJoinParallelExerciseResponseDataSchema.parse(
+                    firstJoin.body
+                );
+            const firstInstance = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(firstParticipant.participantKey)!;
+
+            firstInstance.exercise.currentStateString = {
+                ...firstInstance.exercise.currentStateString,
+                currentStatus: 'running',
+                currentTime: MAX_FAST_FORWARD_DURATION_MS + 1000,
+            };
+
+            const sizeBefore =
+                environment.services.exerciseService.TESTING_getExerciseMap()
+                    .size;
+
+            await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(409);
+
+            expect(
+                environment.services.exerciseService.TESTING_getExerciseMap()
+                    .size
+            ).toBe(sizeBefore);
         });
     });
 });

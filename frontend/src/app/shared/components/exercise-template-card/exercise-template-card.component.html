@@ -2,18 +2,22 @@
     <div class="card" id="exerciseTemplate.id">
         <div class="card-body pt-2">
             <h2 class="card-title h4 d-flex mt-2">
-                <app-inline-text-editor
-                    class="flex-grow-1"
-                    [required]="true"
-                    [value]="exerciseTemplate.name"
-                    name="Name der Übungsvorlage"
-                    (update)="
-                        patchExerciseTemplate({
-                            name: $event,
-                        })
-                    "
-                    [singleLine]="true"
-                />
+                @if (exerciseTemplate.userRole !== 'viewer') {
+                    <app-inline-text-editor
+                        class="flex-grow-1"
+                        [required]="true"
+                        [value]="exerciseTemplate.name"
+                        name="Name der Übungsvorlage"
+                        (update)="
+                            patchExerciseTemplate({
+                                name: $event,
+                            })
+                        "
+                        [singleLine]="true"
+                    />
+                } @else {
+                    {{ exerciseTemplate.name }}
+                }
             </h2>
         </div>
         <ul class="list-group list-group-flush small">
@@ -43,70 +47,75 @@
                 }
             </li>
             <li class="list-group-item d-flex py-1">
-                <app-inline-text-editor
-                    class="flex-grow-1"
-                    [value]="exerciseTemplate.description"
-                    name="Beschreibung der Übungsvorlage"
-                    (update)="
-                        patchExerciseTemplate({
-                            description: $event,
-                        })
-                    "
-                />
+                @if (exerciseTemplate.userRole !== 'viewer') {
+                    <app-inline-text-editor
+                        class="flex-grow-1"
+                        [value]="exerciseTemplate.description"
+                        name="Beschreibung der Übungsvorlage"
+                        (update)="
+                            patchExerciseTemplate({
+                                description: $event,
+                            })
+                        "
+                    />
+                } @else {
+                    {{ exerciseTemplate.description }}
+                }
             </li>
         </ul>
         <div class="card-body d-flex flex-wrap">
-            <a
-                [routerLink]="`/exercises/${exerciseTemplate.trainerKey}`"
-                class="btn btn-primary me-2 mb-1"
-            >
-                Öffnen
-            </a>
-
-            @if (parallelExercisesEnabled()) {
-                <div ngbDropdown autoClose="outside" class="mb-1">
+            @if (exerciseTemplate.userRole !== 'viewer') {
+                <a
+                    [routerLink]="`/exercises/${exerciseTemplate.trainerKey}`"
+                    class="btn btn-primary me-2 mb-1"
+                >
+                    Öffnen
+                </a>
+                @if (exerciseConfig()?.parallelExercisesEnabled) {
+                    <div ngbDropdown autoClose="outside" class="mb-1">
+                        <button
+                            ngbDropdownToggle
+                            type="button"
+                            class="btn btn-primary"
+                        >
+                            Neue Übung
+                        </button>
+                        <div ngbDropdownMenu>
+                            <button
+                                ngbDropdownItem
+                                class="btn btn-primary"
+                                (click)="createExercise()"
+                            >
+                                Einzelübung
+                            </button>
+                            <button
+                                ngbDropdownItem
+                                class="btn btn-primary"
+                                (click)="createParallelExercise()"
+                            >
+                                Parallelübung
+                            </button>
+                        </div>
+                    </div>
+                } @else {
                     <button
-                        ngbDropdownToggle
                         type="button"
                         class="btn btn-primary"
+                        (click)="createExercise()"
                     >
                         Neue Übung
                     </button>
-                    <div ngbDropdownMenu>
-                        <button
-                            ngbDropdownItem
-                            class="btn btn-primary"
-                            (click)="createExercise()"
-                        >
-                            Einzelübung
-                        </button>
-                        <button
-                            ngbDropdownItem
-                            class="btn btn-primary"
-                            (click)="createParallelExercise()"
-                        >
-                            Parallelübung
-                        </button>
-                    </div>
-                </div>
-            } @else {
+                }
+
+                <div class="flex-grow-1"></div>
                 <button
-                    type="button"
-                    class="btn btn-primary"
-                    (click)="createExercise()"
+                    class="btn btn-outline-danger"
+                    (click)="deleteExerciseTemplate()"
                 >
-                    Neue Übung
+                    <i class="bi bi-trash me-2"></i>
+                    Löschen
                 </button>
             }
-
-            <div class="flex-grow-1"></div>
-            <button
-                class="btn btn-outline-danger"
-                (click)="deleteExerciseTemplate()"
-            >
-                <i class="bi bi-trash me-2"></i>
-                Löschen
-            </button>
         </div>
     </div>
 }

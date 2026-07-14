@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuidSchema } from '../../utils/uuid.js';
 import { startPointSchema } from './start-points.js';
 
@@ -9,4 +10,4 @@ export const transferSchema = z.strictObject({
     isPaused: z.boolean(),
 });
 
-export type Transfer = z.infer<typeof transferSchema>;
+export type Transfer = Immutable<z.infer<typeof transferSchema>>;

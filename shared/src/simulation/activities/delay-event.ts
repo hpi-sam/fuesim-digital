@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { sendSimulationEvent } from '../events/utils.js';
 import type { ExerciseSimulationEvent } from '../events/exercise-simulation-event.js';
 import { exerciseSimulationEventSchema } from '../events/exercise-simulation-event.js';
@@ -12,8 +13,8 @@ export const delayEventActivityStateSchema = z.strictObject({
     event: exerciseSimulationEventSchema,
     endTime: z.int().nonnegative(),
 });
-export type DelayEventActivityState = z.infer<
-    typeof delayEventActivityStateSchema
+export type DelayEventActivityState = Immutable<
+    z.infer<typeof delayEventActivityStateSchema>
 >;
 
 export function newDelayEventActivityState(

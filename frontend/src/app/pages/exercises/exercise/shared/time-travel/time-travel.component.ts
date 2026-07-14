@@ -2,7 +2,7 @@ import type { OnDestroy } from '@angular/core';
 import { Component, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { cloneDeepMutable, StateExport } from 'fuesim-digital-shared';
+import { currentStateVersion, StateExport } from 'fuesim-digital-shared';
 import { throttle } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
@@ -20,6 +20,7 @@ import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { FormatDurationPipe } from '../../../../../shared/pipes/format-duration.pipe';
 import { HelpButtonComponent } from '../../../../../help-button/help-button.component.js';
+import { ExerciseService } from '../../../../../core/exercise.service.js';
 
 @Component({
     selector: 'app-time-travel',
@@ -39,6 +40,7 @@ export class TimeTravelComponent implements OnDestroy {
     private readonly timeTravelService = inject(TimeTravelService);
     private readonly store = inject<Store<AppState>>(Store);
     private readonly messageService = inject(MessageService);
+    private readonly exerciseService = inject(ExerciseService);
 
     public timeConstraints$ = this.store.select(selectTimeConstraints);
 
@@ -149,21 +151,34 @@ export class TimeTravelComponent implements OnDestroy {
     }
 
     public async createNewExerciseFromTheCurrentState() {
-        const currentExerciseState = selectStateSnapshot(
+        const currentState = selectStateSnapshot(
             selectExerciseState,
             this.store
         );
-        const { trainerKey } = await this.apiService.importExercise(
-            new StateExport(cloneDeepMutable(currentExerciseState))
+        const stateExport = {
+            type: 'complete',
+            fileVersion: 1,
+            dataVersion: currentStateVersion,
+            currentState,
+            history: undefined,
+        } satisfies StateExport;
+
+        await this.exerciseService.createExercise(
+            stateExport,
+            ({ trainerKey }) => {
+                this.messageService.postMessage({
+                    color: 'success',
+                    title: 'Neue Übung erstellt',
+                    body: `Übungsleitungs-PIN: ${trainerKey}`,
+                });
+                window
+                    .open(
+                        `${location.origin}/exercises/${trainerKey}`,
+                        '_blank'
+                    )
+                    ?.focus();
+            }
         );
-        this.messageService.postMessage({
-            color: 'success',
-            title: 'Neue Übung erstellt',
-            body: `Übungsleitungs-PIN: ${trainerKey}`,
-        });
-        window
-            .open(`${location.origin}/exercises/${trainerKey}`, '_blank')
-            ?.focus();
     }
 
     ngOnDestroy() {

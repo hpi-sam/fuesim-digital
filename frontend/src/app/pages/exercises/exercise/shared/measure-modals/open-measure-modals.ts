@@ -22,8 +22,8 @@ export function openEocLogModal(
 
 export function openAlarmModal(
     ngbModalService: NgbModal,
-    alarmGroupIds: UUID[],
-    targetTransferPointIds: UUID[],
+    alarmGroupIds: readonly UUID[],
+    targetTransferPointIds: readonly UUID[],
     templateName?: string
 ) {
     const modalRef = ngbModalService.open(AlarmModalComponent, {

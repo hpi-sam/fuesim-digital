@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { intermediateOccupationSchema } from './intermediate-occupation.js';
 import { noOccupationSchema } from './no-occupation.js';
 import { loadOccupationSchema } from './load-occupation.js';
@@ -15,7 +16,9 @@ export const exerciseOccupationSchema = z.union([
     patientTransferOccupation,
 ]);
 
-export type ExerciseOccupation = z.infer<typeof exerciseOccupationSchema>;
+export type ExerciseOccupation = Immutable<
+    z.infer<typeof exerciseOccupationSchema>
+>;
 
 export type ExerciseOccupationType = ExerciseOccupation['type'];
 

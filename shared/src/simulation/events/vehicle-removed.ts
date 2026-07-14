@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
@@ -7,7 +8,9 @@ export const vehicleRemovedEventSchema = z.strictObject({
     type: z.literal('vehicleRemovedEvent'),
     vehicleId: uuidSchema,
 });
-export type VehicleRemovedEvent = z.infer<typeof vehicleRemovedEventSchema>;
+export type VehicleRemovedEvent = Immutable<
+    z.infer<typeof vehicleRemovedEventSchema>
+>;
 
 export function newVehicleRemovedEvent(vehicleId: UUID): VehicleRemovedEvent {
     return {

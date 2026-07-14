@@ -1,11 +1,18 @@
 import { createSelector, type Store } from '@ngrx/store';
-import { getPatientVisibleStatus, normalZoom } from 'fuesim-digital-shared';
+import {
+    getPatientVisibleStatus,
+    getRemainingVehicleLoadSeconds,
+    isVehicleLoading,
+    newExerciseConfiguration,
+    normalZoom,
+} from 'fuesim-digital-shared';
 import type {
     UUID,
     Vehicle,
     // eslint-disable-next-line @typescript-eslint/no-shadow
     Element,
     PatientStatus,
+    Patient,
 } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type Point from 'ol/geom/Point';
@@ -25,8 +32,8 @@ import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
     selectConfiguration,
-    selectVehicles,
-    selectExerciseState,
+    selectCurrentTime,
+    createSelectPatient,
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectVisibleVehicles } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
@@ -90,44 +97,57 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             mapInteractionsManager
         );
 
-        // Register change handlers to show/hide vehicle status indicators if configuration was changed
+        // Register change handlers to
+        // - show/hide vehicle status indicators if configuration was changed
+        // - update the timer for loading vehicles
         this.store
             .select(
                 createSelector(
                     selectConfiguration,
-                    selectVehicles,
-                    (configuration, vehicles) => ({
-                        vehicleStatusHighlight:
-                            configuration.vehicleStatusHighlight,
-                        vehicleStatusInPatientStatusColor:
-                            configuration.vehicleStatusInPatientStatusColor,
+                    selectVisibleVehicles,
+                    selectCurrentTime,
+                    (configuration, vehicles, currentTime) => ({
+                        configuration,
                         vehicles,
+                        currentTime,
                     })
                 )
             )
             .pipe(
                 startWith({
-                    vehicleStatusHighlight: false,
-                    vehicleStatusInPatientStatusColor: false,
+                    configuration: newExerciseConfiguration(),
                     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                     vehicles: {} as { [key: UUID]: Vehicle },
+                    currentTime: -1,
                 }),
                 pairwise(),
                 takeUntil(destroy$)
             )
             .subscribe(([oldData, newData]) => {
-                if (
-                    oldData.vehicleStatusHighlight !==
-                        newData.vehicleStatusHighlight ||
-                    oldData.vehicleStatusInPatientStatusColor !==
-                        newData.vehicleStatusInPatientStatusColor
-                ) {
-                    Object.values(newData.vehicles).forEach((newVehicle) => {
-                        const oldVehicle = oldData.vehicles[newVehicle.id];
-                        if (oldVehicle)
-                            this.onElementChanged(oldVehicle, newVehicle);
-                    });
-                }
+                const statusConfigChanged =
+                    oldData.configuration.vehicleStatusHighlight !==
+                        newData.configuration.vehicleStatusHighlight ||
+                    oldData.configuration.vehicleStatusInPatientStatusColor !==
+                        newData.configuration.vehicleStatusInPatientStatusColor;
+
+                Object.values(newData.vehicles).forEach((newVehicle) => {
+                    const oldVehicle = oldData.vehicles[newVehicle.id];
+                    if (
+                        oldVehicle &&
+                        (statusConfigChanged ||
+                            isVehicleLoading(
+                                newVehicle,
+                                newData.currentTime,
+                                newData.configuration
+                            ) ||
+                            isVehicleLoading(
+                                oldVehicle,
+                                oldData.currentTime,
+                                oldData.configuration
+                            ))
+                    )
+                        this.onElementChanged(oldVehicle, newVehicle);
+                });
             });
     }
     private readonly imageStyleHelper = new ImageStyleHelper(
@@ -288,18 +308,41 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
     private readonly statusBarStyleHelper = (
         feature: Feature<any>
     ): Style[] | undefined => {
+        const vehicle = this.getElementFromFeature(feature) as Vehicle;
+        const currentTime = selectStateSnapshot(selectCurrentTime, this.store);
         const config = selectStateSnapshot(selectConfiguration, this.store);
-        if (!config.vehicleStatusHighlight) {
+
+        const isLoading = isVehicleLoading(vehicle, currentTime, config);
+
+        // We also use the status bar to show loading times
+        if (!config.vehicleStatusHighlight && !isLoading) {
             return undefined;
         }
 
-        const vehicle = this.getElementFromFeature(feature) as Vehicle;
+        // Vehicles that cannot carry patients never need a status display, since loading times are also not applicable
         if (vehicle.patientCapacity <= 0) {
             return undefined;
         }
 
         const patientCount = Object.keys(vehicle.patientIds).length;
-        const text = `${patientCount}/${vehicle.patientCapacity}`;
+        const remainingLoadFullSeconds = getRemainingVehicleLoadSeconds(
+            vehicle,
+            currentTime,
+            config
+        );
+        const remainingLoadMinutes = Math.floor(remainingLoadFullSeconds / 60);
+        const remainingLoadSeconds =
+            remainingLoadFullSeconds - remainingLoadMinutes * 60;
+
+        const capacityText = `${patientCount}/${vehicle.patientCapacity}`;
+        const timeText = `${remainingLoadMinutes.toString().padStart(2, '0')}:${remainingLoadSeconds.toString().padStart(2, '0')}`;
+
+        let label = '';
+
+        if (config.vehicleStatusHighlight && !isLoading) label = capacityText;
+        else if (config.vehicleStatusHighlight && isLoading)
+            label = `${capacityText} (${timeText})`;
+        else if (!config.vehicleStatusHighlight && isLoading) label = timeText;
 
         let statusbarColor: StatusbarColor = {
             backgroundColor: 'rgba(255, 255, 255, 0.85)',
@@ -307,10 +350,19 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             color: 'black',
         };
 
-        if (config.vehicleStatusInPatientStatusColor && patientCount > 0) {
-            const state = selectStateSnapshot(selectExerciseState, this.store);
+        if (
+            config.vehicleStatusHighlight &&
+            config.vehicleStatusInPatientStatusColor &&
+            patientCount > 0
+        ) {
             const patients = Object.keys(vehicle.patientIds)
-                .map((id) => state.patients[id])
+                .map(
+                    (id) =>
+                        selectStateSnapshot(
+                            createSelectPatient(id),
+                            this.store
+                        ) as Patient | undefined
+                )
                 .filter(Boolean);
 
             const vehicleStatusColor = statusPriorities.find((s) =>
@@ -319,8 +371,8 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
                         p &&
                         getPatientVisibleStatus(
                             p,
-                            state.configuration.pretriageEnabled,
-                            state.configuration.bluePatientsEnabled
+                            config.pretriageEnabled,
+                            config.bluePatientsEnabled
                         ) === s
                 )
             );
@@ -335,7 +387,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
 
         const textStyle = new Style({
             text: new OlText({
-                text,
+                text: label,
                 font: `${fontPx}px sans-serif`,
                 fill: new Fill({ color: statusbarColor.color }),
                 backgroundFill: new Fill({

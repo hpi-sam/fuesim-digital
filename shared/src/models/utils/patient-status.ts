@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const patientStatusAllowedValues = [
     'black',
@@ -9,7 +10,7 @@ export const patientStatusAllowedValues = [
     'yellow',
 ] as const;
 export const patientStatusSchema = z.literal(patientStatusAllowedValues);
-export type PatientStatus = z.infer<typeof patientStatusSchema>;
+export type PatientStatus = Immutable<z.infer<typeof patientStatusSchema>>;
 
 export const statusNames: {
     [key in PatientStatus]: string;
@@ -30,6 +31,6 @@ export const patientStatusForTransportAllowedValues = [
 export const patientStatusForTransportSchema = z.literal(
     patientStatusForTransportAllowedValues
 );
-export type PatientStatusForTransport = z.infer<
-    typeof patientStatusForTransportSchema
+export type PatientStatusForTransport = Immutable<
+    z.infer<typeof patientStatusForTransportSchema>
 >;

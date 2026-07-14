@@ -5,28 +5,35 @@ import type {
     ExerciseTimeline,
     ParticipantKey,
     TrainerKey,
+    ExerciseState,
+    PostExerciseRequestData,
+    OrganisationId,
 } from 'fuesim-digital-shared';
 import {
     isTrainerKey,
-    ExerciseState,
     migrateStateExport,
     validateExerciseExport,
     ReducerError,
+    newExerciseState,
+    currentStateVersion,
 } from 'fuesim-digital-shared';
+import { ZodError } from 'zod';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { ActiveExercise } from '../../exercise/active-exercise.js';
 import { pushAll } from '../../utils/array.js';
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type { ExerciseInsert } from '../schema.js';
+import type {
+    ExerciseDetailsEntryWithUserRole,
+    ExerciseInsert,
+} from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
     ApiError,
     NotFoundError,
     PermissionDeniedError,
 } from '../../utils/http.js';
-import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
 import type { OrganisationRepository } from '../repositories/organisation-repository.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 
@@ -70,6 +77,38 @@ export class ExerciseService {
         return new Set(this.exerciseMap.values());
     }
 
+    public async getAllExercisesForUser(
+        session: SessionInformation,
+        organisationId?: OrganisationId
+    ): Promise<ExerciseDetailsEntryWithUserRole[]> {
+        if (organisationId) {
+            const organisation =
+                await this.organisationRepository.getOrganisationById(
+                    organisationId
+                );
+            if (!organisation) {
+                throw new PermissionDeniedError();
+            }
+            const userRole =
+                await this.organisationRepository.getOrganisationMembershipRoleForUserById(
+                    organisationId,
+                    session.user.id
+                );
+            if (!userRole) {
+                throw new PermissionDeniedError();
+            }
+            return (
+                await this.exerciseRepository.getAllExercisesForOrganisation(
+                    organisationId
+                )
+            ).map((exercise) => ({
+                ...exercise,
+                userRole,
+            }));
+        }
+        return this.exerciseRepository.getAllExercisesForUser(session.user.id);
+    }
+
     public loadExercise(activeExercise: ActiveExercise) {
         this.exerciseMap.set(activeExercise.participantKey, activeExercise);
         this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
@@ -87,8 +126,48 @@ export class ExerciseService {
         this.exerciseMap.delete(exercise.exercise.id);
     }
 
+    public async createExercise(
+        data: PostExerciseRequestData,
+        session?: SessionInformation
+    ) {
+        const { importObject, ...parsedData } = data;
+
+        if (session) {
+            // Logged in user
+            if (!data.organisationId) {
+                throw new ApiError();
+            }
+            const isEditorOrAdmin =
+                await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                    data.organisationId,
+                    session.user.id,
+                    ['editor', 'admin']
+                );
+            if (!isEditorOrAdmin) {
+                throw new PermissionDeniedError();
+            }
+        } else {
+            // Anonymous exercise
+            if (data.organisationId) {
+                throw new PermissionDeniedError();
+            }
+        }
+
+        let exercise;
+        if (!importObject) {
+            exercise = await this.createExerciseFromBlank(parsedData);
+        } else {
+            exercise = await this.createExerciseFromFile(
+                parsedData,
+                importObject
+            );
+        }
+
+        return exercise;
+    }
+
     public async createExerciseFromBlank(
-        optionalData: Partial<ExerciseInsert> = {}
+        data: Partial<ExerciseInsert>
     ): Promise<ActiveExercise> {
         return this.exerciseRepository.transaction(
             async (exerciseRepository) => {
@@ -102,16 +181,16 @@ export class ExerciseService {
                     await accessKeyRepository.generateKey<TrainerKey>(8);
 
                 const initialState: ExerciseState = {
-                    ...ExerciseState.create(participantKey),
-                    type: optionalData.templateId ? 'template' : 'standalone',
+                    ...newExerciseState(participantKey),
+                    type: data.templateId ? 'template' : 'standalone',
                 };
                 const exerciseInsert = {
-                    ...optionalData,
+                    ...data,
                     participantKey,
                     trainerKey,
                     initialStateString: initialState,
                     currentStateString: initialState,
-                    stateVersion: ExerciseState.currentStateVersion,
+                    stateVersion: currentStateVersion,
                 } satisfies ExerciseInsert;
 
                 const exerciseEntry =
@@ -126,8 +205,8 @@ export class ExerciseService {
     }
 
     public async createExerciseFromFile(
-        file: StateExport,
-        optionalData: Partial<ExerciseInsert> = {}
+        data: Partial<ExerciseInsert>,
+        file: StateExport
     ): Promise<ActiveExercise> {
         return this.exerciseRepository.transaction(
             async (exerciseRepository) => {
@@ -144,34 +223,31 @@ export class ExerciseService {
                         await accessKeyRepository.generateKey<TrainerKey>(8);
 
                     const migratedImportObject = migrateStateExport(file);
-                    const validationErrors =
-                        validateExerciseExport(migratedImportObject);
-                    if (validationErrors.length > 0) {
-                        throw new ValidationErrorWrapper(validationErrors);
-                    }
+                    validateExerciseExport(migratedImportObject);
 
-                    const newInitialState =
-                        migratedImportObject.history?.initialState ??
-                        migratedImportObject.currentState;
-                    const newCurrentState = migratedImportObject.currentState;
+                    const newInitialState = {
+                        ...(migratedImportObject.history?.initialState ??
+                            migratedImportObject.currentState),
+                        participantKey,
+                    };
+                    const newCurrentState = {
+                        ...migratedImportObject.currentState,
+                        participantKey,
+                    };
 
-                    // Set new participant id
-                    newInitialState.participantKey = participantKey;
-                    newCurrentState.participantKey = participantKey;
-
-                    const exerciseType = optionalData.templateId
+                    const exerciseType = data.templateId
                         ? 'template'
                         : 'standalone';
                     newInitialState.type = exerciseType;
                     newCurrentState.type = exerciseType;
 
                     const exerciseInsert = {
-                        ...optionalData,
+                        ...data,
                         participantKey,
                         trainerKey,
                         initialStateString: newInitialState,
                         currentStateString: newCurrentState,
-                        stateVersion: ExerciseState.currentStateVersion,
+                        stateVersion: currentStateVersion,
                     } satisfies ExerciseInsert;
                     const exerciseEntry =
                         await exerciseRepository.createExercise(exerciseInsert);
@@ -202,9 +278,9 @@ export class ExerciseService {
 
                     return activeExercise;
                 } catch (err) {
-                    if (err instanceof ValidationErrorWrapper) {
+                    if (err instanceof ZodError) {
                         throw new ApiError(
-                            `The validation of the import failed: ${err.errors}`
+                            `The validation of the import failed: ${err.message}`
                         );
                     }
                     if (err instanceof ReducerError) {
@@ -299,15 +375,31 @@ export class ExerciseService {
         if (exerciseEntry.template) {
             throw new PermissionDeniedError();
         }
-        if (exerciseEntry.user && exerciseEntry.user !== session?.user.id) {
-            throw new PermissionDeniedError();
+        if (exerciseEntry.organisationId) {
+            if (!session) {
+                throw new PermissionDeniedError();
+            }
+            const isEditorOrAdmin =
+                await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                    exerciseEntry.organisationId,
+                    session.user.id,
+                    ['editor', 'admin']
+                );
+            if (!isEditorOrAdmin) {
+                throw new PermissionDeniedError();
+            }
         }
 
-        this.unloadExercise(activeExercise);
+        await this.deleteExerciseById(activeExercise.exercise.id);
+    }
 
-        await this.exerciseRepository.deleteExerciseById(
-            activeExercise.exercise.id
-        );
+    public async deleteExerciseById(exerciseId: ExerciseId) {
+        const activeExercise = this.exerciseMap.get(exerciseId);
+        if (activeExercise) {
+            this.unloadExercise(activeExercise);
+        }
+
+        await this.exerciseRepository.deleteExerciseById(exerciseId);
     }
 
     public async saveUnsavedExercises() {
@@ -335,6 +427,27 @@ export class ExerciseService {
                     })
             );
         });
+    }
+
+    public async deleteUnusedExercises() {
+        try {
+            const exerciseToDelete =
+                await this.exerciseRepository.getUnusedExercises();
+
+            await Promise.all(
+                exerciseToDelete.map(async (exercise) => {
+                    await this.deleteExerciseById(exercise.id);
+                })
+            );
+
+            if (exerciseToDelete.length > 0) {
+                console.log(
+                    `Successfully deleted ${exerciseToDelete.length} unused exercises.`
+                );
+            }
+        } catch (error) {
+            console.error('Error during deletion of unused exercises:', error);
+        }
     }
 
     public async getTimeline(

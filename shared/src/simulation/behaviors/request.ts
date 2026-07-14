@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import type { ExerciseState } from '../../state.js';
 import { addActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
@@ -49,7 +49,9 @@ export const requestBehaviorStateSchema = z.strictObject({
     requestTarget: exerciseRequestTargetConfigurationSchema,
 });
 
-export type RequestBehaviorState = z.infer<typeof requestBehaviorStateSchema>;
+export type RequestBehaviorState = Immutable<
+    z.infer<typeof requestBehaviorStateSchema>
+>;
 
 export function newRequestBehaviorState(): RequestBehaviorState {
     return {

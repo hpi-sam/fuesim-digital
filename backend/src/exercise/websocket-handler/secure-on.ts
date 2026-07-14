@@ -1,5 +1,7 @@
 import type { ClientToServerEvents } from 'fuesim-digital-shared';
+// eslint-disable-next-line no-restricted-imports
 import type { SocketReservedEventsMap } from '../../../node_modules/socket.io/dist/socket-types.js';
+// eslint-disable-next-line no-restricted-imports
 import type {
     ReservedOrUserEventNames,
     ReservedOrUserListener,

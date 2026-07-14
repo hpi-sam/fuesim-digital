@@ -36,3 +36,9 @@ export const elementSchema = z.discriminatedUnion('type', [
     scoutableSchema,
 ]);
 export type Element = Immutable<z.infer<typeof elementSchema>>;
+
+export const elementTypeSchema = z.union(
+    elementSchema.options.map((option) => z.literal(option.shape.type.value))
+);
+
+export type ElementType = z.infer<typeof elementTypeSchema>;

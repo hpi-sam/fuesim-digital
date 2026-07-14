@@ -145,7 +145,15 @@ export function applyMigrations<H extends StateHistoryCompound | undefined>(
             migrationsToApply,
             history.initialState
         );
+        const cannotMigrateHistory = migrationsToApply.some(
+            (migration) => migration.unmigratableActions
+        );
         try {
+            if (cannotMigrateHistory) {
+                throw new ReducerError(
+                    'Migrating history from this version is not possible'
+                );
+            }
             const migratedActionHistory: ExerciseAction[] = [];
             const migratedCurrentState = produce(
                 migratedInitialState,

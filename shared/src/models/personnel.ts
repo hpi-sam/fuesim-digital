@@ -45,10 +45,11 @@ export function newPersonnelFromTemplate(
     personnelTemplate: PersonnelTemplate,
     vehicleId: UUID,
     vehicleName: string,
-    position: Position
+    position: Position,
+    id?: UUID
 ): Personnel {
     return {
-        id: uuid(),
+        id: id ?? uuid(),
         type: 'personnel',
         vehicleId,
         vehicleName,

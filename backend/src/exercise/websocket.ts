@@ -14,6 +14,7 @@ import {
 } from './websocket-handler/index.js';
 import { registerJoinParallelExerciseHandler } from './websocket-handler/join-parallel-exercise-handler.js';
 import { registerControlParallelExerciseHandler } from './websocket-handler/control-parallel-exercise-handler.js';
+import { registerCollectionHandler } from './websocket-handler/collection-handler.js';
 
 export class ExerciseWebsocketServer {
     public readonly exerciseServer: ExerciseServer;
@@ -61,6 +62,7 @@ export class ExerciseWebsocketServer {
             this.repositories
         );
         registerControlParallelExerciseHandler(this.exerciseServer, client);
+        registerCollectionHandler(this.exerciseServer, client, this.services);
 
         // Register disconnect handler
         client.on('disconnect', () => {

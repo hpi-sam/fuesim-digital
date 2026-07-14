@@ -16,6 +16,7 @@ import { healthRouter } from './routers/health-router.js';
 import type { Services } from './database/services/index.js';
 import { createParallelExerciseRouter } from './routers/parallel-exercise-router.js';
 import { createOrganisationRouter } from './routers/organisation-router.js';
+import { createCollectionsRouter } from './routers/collections-router.js';
 
 declare global {
     namespace Express {
@@ -64,6 +65,11 @@ export class ApiHttpServer {
         );
 
         app.use('/api/auth', createAuthRouter(services.authService));
+
+        app.use(
+            '/api/collections',
+            createCollectionsRouter(services.collectionService)
+        );
 
         app.use(errorHandler);
 

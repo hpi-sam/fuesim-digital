@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import {
     ClientToServerEvents,
@@ -25,6 +25,7 @@ import { httpOrigin, websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
 import { LoadingModalService } from './loading-modal/loading-modal.service';
+import { preventStatusErrorToastContext } from '../shared/functions/http';
 
 export interface CollectionSubscriptionData {
     collection: CollectionVersion;
@@ -286,9 +287,10 @@ export class CollectionService {
             this.httpClient.get<
                 typeof Marketplace.Collection.GetByEntityId.Response
             >(
-                `${this.ENDPOINT}/${entityId}?allowdraftstate=${
-                    opts.allowDraftState
-                }`
+                `${this.ENDPOINT}/${entityId}?allowdraftstate=${opts.allowDraftState}`,
+                {
+                    context: preventStatusErrorToastContext(),
+                }
             )
         );
 
@@ -645,7 +647,10 @@ export class CollectionService {
             this.httpClient.get<
                 typeof Marketplace.Collection.GetElementsOfCollectionVersion.Response
             >(
-                `${this.ENDPOINT}/${collection.entityId}/version/${collection.versionId}/elements`
+                `${this.ENDPOINT}/${collection.entityId}/version/${collection.versionId}/elements`,
+                {
+                    context: preventStatusErrorToastContext(),
+                }
             )
         );
 
@@ -658,20 +663,30 @@ export class CollectionService {
     }
 
     public async getCollectionVersion(collection: VersionedCollectionPartial) {
-        const data = await lastValueFrom(
-            this.httpClient.get<
-                typeof Marketplace.Collection.GetCollectionVersion.Response
-            >(
-                `${this.ENDPOINT}/${collection.entityId}/version/${collection.versionId}`
-            )
-        );
-
-        const typedData =
-            Marketplace.Collection.GetCollectionVersion.responseSchema.parse(
-                data
+        try {
+            const data = await lastValueFrom(
+                this.httpClient.get<
+                    typeof Marketplace.Collection.GetCollectionVersion.Response
+                >(
+                    `${this.ENDPOINT}/${collection.entityId}/version/${collection.versionId}`,
+                    {
+                        context: preventStatusErrorToastContext(),
+                    }
+                )
             );
 
-        return typedData.result;
+            const typedData =
+                Marketplace.Collection.GetCollectionVersion.responseSchema.parse(
+                    data
+                );
+
+            return typedData.result;
+        } catch (error) {
+            if (error instanceof HttpErrorResponse && error.status === 404) {
+                return null;
+            }
+            throw error;
+        }
     }
 
     public async getDependentElements(
@@ -709,6 +724,10 @@ export class CollectionService {
                 { allowDraftState: false }
             );
         const currentCollection = await this.getCollectionVersion(collection);
+
+        if (currentCollection === null) {
+            return { newerVersionAvailable: false };
+        }
 
         if (latestCollection.version < currentCollection.version) {
             console.error(

@@ -1,9 +1,10 @@
-import type {
+import {
     HttpHandlerFn,
     HttpRequest,
     HttpEvent,
+    HttpContext,
 } from '@angular/common/http';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse } from '@angular/common/http';
 import type { Observable } from 'rxjs';
 import { catchError } from 'rxjs';
 import { inject } from '@angular/core';
@@ -17,6 +18,12 @@ export function withCredentialsInterceptor(
     return next(clonedReq);
 }
 
+/*
+ * INFO: The error toast message can easily be
+ * prevented for 4xx-5xx status codes
+ * by adding the `preventNetworkErrorToastContext`
+ * to the request context.
+ */
 export function errorHandlingInterceptor(
     req: HttpRequest<unknown>,
     next: HttpHandlerFn
@@ -24,7 +31,13 @@ export function errorHandlingInterceptor(
     const messageService = inject(MessageService);
     return next(req).pipe(
         catchError((error: unknown) => {
-            if (error instanceof HttpErrorResponse) {
+            if (
+                error instanceof HttpErrorResponse &&
+                !(
+                    error.status !== 0 &&
+                    req.context.get(PREVENT_NETWORK_ERROR_TOAST)
+                )
+            ) {
                 let message = 'Die Netzwerkanfrage ist fehlgeschlagen.';
                 if (error.error?.message) {
                     message = error.error.message;
@@ -39,3 +52,9 @@ export function errorHandlingInterceptor(
         })
     );
 }
+
+const PREVENT_NETWORK_ERROR_TOAST = new HttpContextToken(() => false);
+
+export const preventStatusErrorToastContext = (
+    httpContext: HttpContext = new HttpContext()
+): HttpContext => httpContext.set(PREVENT_NETWORK_ERROR_TOAST, true);

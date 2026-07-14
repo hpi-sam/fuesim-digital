@@ -17,7 +17,7 @@ import {
     newExerciseState,
     currentStateVersion,
 } from 'fuesim-digital-shared';
-import { ZodError } from 'zod';
+import { z, ZodError } from 'zod';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { ActiveExercise } from '../../exercise/active-exercise.js';
 import { pushAll } from '../../utils/array.js';
@@ -280,12 +280,12 @@ export class ExerciseService {
                 } catch (err) {
                     if (err instanceof ZodError) {
                         throw new ApiError(
-                            `The validation of the import failed: ${err.message}`
+                            `Die Importdatei hat ein ungültiges Format: \n ${z.prettifyError(err)}`
                         );
                     }
                     if (err instanceof ReducerError) {
                         throw new ApiError(
-                            `Error importing exercise: ${err.message}`
+                            `Es ist ein Fehler beim Importieren aufgetreten: ${err.message}`
                         );
                     }
                     throw err;

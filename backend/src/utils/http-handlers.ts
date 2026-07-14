@@ -55,7 +55,7 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
             res.status(err.statusCode).send({ message: err.message });
         } else if (err instanceof ZodError) {
             // Input validation failed
-            res.status(400).send({ message: z.treeifyError(err) });
+            res.status(400).send({ message: z.prettifyError(err) });
         } else {
             warnError(req, err);
             res.status(500).send({

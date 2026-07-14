@@ -1,6 +1,6 @@
 <app-show-more defaultHeight="100px">
     @if (message().config.body; as body) {
-        {{ body }}
+        <div class="message-body">{{ body }}</div>
     }
     @if (message().config.button; as button) {
         <button

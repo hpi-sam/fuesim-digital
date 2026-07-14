@@ -29,7 +29,8 @@ export function registerControlParallelExerciseHandler(
                             success: true,
                         });
                     })
-                    .catch(() => {
+                    .catch((e) => {
+                        console.warn(e);
                         callback({
                             success: false,
                             message: 'Starting the exercise failed.',
@@ -45,7 +46,8 @@ export function registerControlParallelExerciseHandler(
                             success: true,
                         });
                     })
-                    .catch(() => {
+                    .catch((e) => {
+                        console.warn(e);
                         callback({
                             success: false,
                             message: 'Pausing the exercise failed.',

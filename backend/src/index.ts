@@ -139,7 +139,7 @@ async function main() {
     }
 
     // eslint-disable-next-line no-new
-    new FuesimServer(services);
+    new FuesimServer(services, repositories);
 }
 
 main();

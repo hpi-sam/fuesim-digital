@@ -35,14 +35,15 @@ export abstract class ClientWrapper {
     public static init<T extends typeof ClientWrapper>(
         wrapperClass: T,
         socket: ExerciseSocket,
-        services: Services
+        services: Services,
+        repositories: Repositories
     ): InstanceType<T> | undefined {
         if (clientMap.get(socket)) {
             // Already registered
             return;
         }
         // @ts-expect-error typing
-        const wrapper = new wrapperClass(socket, services);
+        const wrapper = new wrapperClass(socket, services, repositories);
         clientMap.set(socket, wrapper);
         return wrapper;
     }
@@ -237,6 +238,7 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
                 this.session!.user.id,
                 ['editor', 'admin']
             );
+        console.log('e', isEditorOrAdmin);
         if (!isEditorOrAdmin) {
             throw new PermissionDeniedError();
         }

@@ -171,7 +171,7 @@ export class TestEnvironment {
     public init(repositories: Repositories, services: Services) {
         this._repositories = repositories;
         this._services = services;
-        this.server = new FuesimServer(this.services);
+        this.server = new FuesimServer(this.services, this.repositories);
     }
 
     /**

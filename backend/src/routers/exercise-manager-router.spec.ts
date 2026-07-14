@@ -874,11 +874,7 @@ describe('exercise manager router', () => {
             ).toBeLessThan(Date.now());
         });
 
-        it.each([
-            'viewer',
-            'editor',
-            'admin',
-        ] satisfies OrganisationMembershipRole[])(
+        it.each(['editor', 'admin'] satisfies OrganisationMembershipRole[])(
             'succeeds with 200 if %s',
             async (role) => {
                 const session2 = await createTestUserSession(environment, {

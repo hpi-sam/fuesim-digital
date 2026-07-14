@@ -1,9 +1,10 @@
 import { eq, asc } from 'drizzle-orm';
-import type { ExerciseId } from 'fuesim-digital-shared';
+import type { ExerciseId, ExerciseTimeline } from 'fuesim-digital-shared';
 import { type ActionEntry, actionTable } from '../schema.js';
 import type { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { BaseRepository } from './base-repository.js';
 import { DatabaseService } from './../services/database-service.js';
+import type { SessionInformation } from '../../auth/auth-service.js';
 
 export class ActionRepository extends BaseRepository {
     public async getActionsForExerciseId(exerciseId: ExerciseId) {
@@ -12,13 +13,6 @@ export class ActionRepository extends BaseRepository {
             .from(actionTable)
             .where(eq(actionTable.exerciseId, exerciseId))
             .orderBy(asc(actionTable.index));
-    }
-
-    public async getActionsCountForExerciseId(exerciseId: ExerciseId) {
-        return this.databaseConnection.$count(
-            actionTable,
-            eq(actionTable.exerciseId, exerciseId)
-        );
     }
 
     public async deleteAllForExercise(exerciseId: ExerciseId) {

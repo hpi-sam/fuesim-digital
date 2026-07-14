@@ -7,8 +7,10 @@ import {
     isTrainerKey,
     organisationIdSchema,
     postExerciseRequestDataSchema,
+    stateExportSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
+import { castDraft } from 'immer';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ApiError, NotFoundError } from '../utils/http.js';
 import { Config } from '../config.js';
@@ -89,6 +91,19 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
             );
             res.status(204).send();
         });
+
+    router.get('/exercise/:exerciseKey/export', async (req, res) => {
+        if (!isExerciseKey(req.params.exerciseKey)) {
+            throw new ApiError();
+        }
+        const withHistory = 'withHistory' in req.query;
+        const stateExport = await exerciseService.getExport(
+            req.params.exerciseKey,
+            withHistory,
+            req.session
+        );
+        res.send(stateExportSchema.encode(castDraft(stateExport)));
+    });
 
     router.get('/exercise/:exerciseKey/history', async (req, res) => {
         if (!isExerciseKey(req.params.exerciseKey)) {

@@ -24,9 +24,9 @@ import { pushAll } from '../../utils/array.js';
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type {
-    ExerciseDetailsEntryWithUserRole,
-    ExerciseInsert,
+import {
+    type ExerciseDetailsEntryWithUserRole,
+    type ExerciseInsert,
 } from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
@@ -450,15 +450,11 @@ export class ExerciseService {
         }
     }
 
-    public async getTimeline(
-        exerciseKey: ExerciseKey,
-        session?: SessionInformation
-    ): Promise<ExerciseTimeline> {
-        const activeExercise = await this.getExerciseByKey(
-            exerciseKey,
-            session
-        );
-        const completeHistory: ExerciseTimeline['actionsWrappers'] = [
+    public async getActionHistoryForExerciseId(
+        exerciseKey: ExerciseKey
+    ): Promise<ExerciseTimeline['actionsWrappers']> {
+        const activeExercise = await this.getExerciseByKey(exerciseKey);
+        return [
             ...(
                 await this.actionRepository.getActionsForExerciseId(
                     activeExercise.exercise.id
@@ -473,14 +469,51 @@ export class ExerciseService {
                 emitterId: actionWrapper.getAction().emitterId,
                 time: actionWrapper.getAction().index,
             })),
-        ]
-            // TODO: Is this necessary?
-            .sort((a, b) => a.time - b.time);
+        ].sort((a, b) => a.time - b.time);
+    }
+
+    public async getTimeline(
+        exerciseKey: ExerciseKey,
+        session?: SessionInformation
+    ): Promise<ExerciseTimeline> {
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
 
         return {
             initialState: activeExercise.exercise.initialStateString,
-            actionsWrappers: completeHistory,
+            actionsWrappers:
+                await this.getActionHistoryForExerciseId(exerciseKey),
         };
+    }
+
+    public async getExport(
+        exerciseKey: ExerciseKey,
+        withHistory: boolean = false,
+        session?: SessionInformation
+    ): Promise<StateExport> {
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
+
+        const history = withHistory
+            ? {
+                  actionHistory: (
+                      await this.getActionHistoryForExerciseId(exerciseKey)
+                  ).map((actionWrapper) => actionWrapper.action),
+                  initialState: activeExercise.exercise.initialStateString,
+              }
+            : undefined;
+
+        return {
+            type: 'complete',
+            fileVersion: 1,
+            dataVersion: currentStateVersion,
+            currentState: activeExercise.exercise.currentStateString,
+            history,
+        } satisfies StateExport;
     }
 
     public getExercisesViewportsById(id: ExerciseId) {

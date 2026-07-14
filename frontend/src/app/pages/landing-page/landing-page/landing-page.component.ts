@@ -112,22 +112,25 @@ export class LandingPageComponent {
         if (fileList) {
             this.importingExercise.set(true);
         }
-        await this.exerciseService.createExercise(
-            fileList,
-            (exerciseKeys: GetExerciseResponseData) => {
-                this.trainerKey = exerciseKeys.trainerKey;
-                this.model.set({ joinKey: this.trainerKey });
-                this.participantKey = exerciseKeys.participantKey;
-                this.exerciseHasBeenCreated = true;
+        try {
+            await this.exerciseService.createExercise(
+                fileList,
+                (exerciseKeys: GetExerciseResponseData) => {
+                    this.trainerKey = exerciseKeys.trainerKey;
+                    this.model.set({ joinKey: this.trainerKey });
+                    this.participantKey = exerciseKeys.participantKey;
+                    this.exerciseHasBeenCreated = true;
 
-                this.messageService.postMessage({
-                    title: 'Übung erstellt',
-                    body: 'Sie können nun der Übung beitreten.',
-                    color: 'success',
-                });
-            }
-        );
-        this.importingExercise.set(false);
+                    this.messageService.postMessage({
+                        title: 'Übung erstellt',
+                        body: 'Sie können nun der Übung beitreten.',
+                        color: 'success',
+                    });
+                }
+            );
+        } finally {
+            this.importingExercise.set(false);
+        }
     }
 
     public pasteExerciseKey(event: ClipboardEvent) {

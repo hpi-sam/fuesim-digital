@@ -197,9 +197,10 @@ export class ExerciseManagerService {
 
             const isNotMember =
                 session &&
-                !(await this.organisationRepository.isMemberOfOrganisationById(
+                !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                     exerciseTemplate.organisationId,
-                    session.user.id
+                    session.user.id,
+                    ['editor', 'admin']
                 ));
             if (isNotMember) {
                 throw new PermissionDeniedError();

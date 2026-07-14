@@ -253,7 +253,6 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
                 this.session!.user.id,
                 ['editor', 'admin']
             );
-        console.log('e', isEditorOrAdmin);
         if (!isEditorOrAdmin) {
             throw new PermissionDeniedError();
         }

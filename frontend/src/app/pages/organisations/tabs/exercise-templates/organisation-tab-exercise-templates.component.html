@@ -1,24 +1,26 @@
-<div class="d-flex align-items-center mt-2 mb-3 gap-2">
-    <button class="btn btn-primary" (click)="createExerciseTemplate()">
-        Neue Übungsvorlage erstellen
-    </button>
+@if (organisation().userRole !== 'viewer') {
+    <div class="d-flex align-items-center mt-2 gap-2">
+        <button class="btn btn-primary" (click)="createExerciseTemplate()">
+            Neue Übungsvorlage erstellen
+        </button>
 
-    <app-help-button url="4_editing/index.html#übungsvorlagen-verwalten" />
-    <div class="flex-grow-1"></div>
+        <app-help-button url="4_editing/index.html#übungsvorlagen-verwalten" />
+        <div class="flex-grow-1"></div>
 
-    <label class="btn btn-outline-primary my-2">
-        <i class="bi-cloud-upload me-2"> </i>
-        Vorlage importieren
-        <input
-            (appFileInput)="createExerciseTemplate($event)"
-            type="file"
-            accept="application/json"
-            class="d-none"
-        />
-    </label>
-</div>
+        <label class="btn btn-outline-primary my-2">
+            <i class="bi-cloud-upload me-2"> </i>
+            Vorlage importieren
+            <input
+                (appFileInput)="createExerciseTemplate($event)"
+                type="file"
+                accept="application/json"
+                class="d-none"
+            />
+        </label>
+    </div>
+}
 @if (exerciseTemplates()) {
-    <div class="row row-cols-3">
+    <div class="row row-cols-3 mt-2">
         @for (template of exerciseTemplates(); track template.id) {
             <div class="col mb-4">
                 <app-exercise-template-card
@@ -35,7 +37,7 @@
         }
     </div>
 } @else {
-    <div class="row row-cols-3">
+    <div class="row row-cols-3 mt-2">
         @for (_ of [1, 2, 3]; track $index) {
             <div class="col">
                 <div class="card" aria-hidden="true">

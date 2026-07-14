@@ -45,6 +45,7 @@ export class OrganisationTabExerciseTemplatesComponent implements OnInit {
             fileList,
             () => {
                 this.reload();
+                this.update.emit(true);
             },
             this.organisation().id
         );

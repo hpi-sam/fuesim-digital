@@ -8,6 +8,10 @@ INSERT INTO "organisation" ("name", "personalOrganisationOf")
 select 'Private Inhalte', "id"
 from users on conflict do nothing;
 --> statement-breakpoint
+INSERT INTO "organisation_membership" ("organisationId", "userId", "role")
+select "id", "personalOrganisationOf", 'admin'
+from "organisation" on conflict do nothing;
+--> statement-breakpoint
 UPDATE "exercise_entity" SET "organisationId" = (select "id" from "organisation" where "personalOrganisationOf" = "exercise_entity"."user" limit 1) WHERE "exercise_entity"."user" IS NOT NULL;
 --> statement-breakpoint
 UPDATE "parallel_exercise" SET "organisationId" = (select "id" from "organisation" where "personalOrganisationOf" = "parallel_exercise"."user" limit 1);

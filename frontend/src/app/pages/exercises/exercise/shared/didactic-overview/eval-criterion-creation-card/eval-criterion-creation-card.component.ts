@@ -49,8 +49,8 @@ import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/ap
 import { AppState } from '../../../../../../state/app.state';
 import {
     selectCurrentTime,
+    selectDraftEvalResults,
     selectEvalCriteria,
-    selectEvalResults,
     selectPatients,
     selectScoutables,
     selectTechnicalChallenges,
@@ -88,6 +88,10 @@ export class EvalCriterionCreationCardComponent {
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
     public readonly patientStatusAllowedValues = patientStatusAllowedValues;
     public readonly statusNames = statusNames;
+
+    public readonly draftEvalResults = computed(() =>
+        Object.values(this.store.selectSignal(selectDraftEvalResults)())
+    );
 
     constructor() {
         /* TODO @JohannesPotzi : instead do this: add a draft marker to eval criteria in the state.
@@ -184,6 +188,7 @@ export class EvalCriterionCreationCardComponent {
     readonly inputModel = signal<InputData>({
         name: '',
         countInput: 0,
+        timestampInput: 0,
         patientStatusInput: 'black',
         patientTargetStatusMap: {},
         technicalChallengeId: '',
@@ -274,11 +279,10 @@ export class EvalCriterionCreationCardComponent {
     }
     public submit() {
         this.submitCriterion();
-        if (!this.createFurtherCriteraOption()) {
-            this.checkoutShoppingCart();
-        }
+        this.checkoutShoppingCart();
     }
-    public submitCriterion() {
+    public submitCriterion(isVisisbleForParticipants?: boolean) {
+        const asDraft = this.createFurtherCriteraOption();
         const criterionType = this.criterionCreationType();
         const criterionCategory = this.criterionCreationCategory();
         if (criterionCategory === 'combinedEvalCriterion') {
@@ -293,7 +297,9 @@ export class EvalCriterionCreationCardComponent {
                             obj = [...obj, entry.id as BoolEvalCriterionId];
                         }
                         return obj;
-                    }, [])
+                    }, []),
+                isVisisbleForParticipants,
+                asDraft
             );
             this.addCriteriaToCart([criterion]);
         }
@@ -312,7 +318,9 @@ export class EvalCriterionCreationCardComponent {
                         ? newReachTechnicalChallengeStateEvalCriterion(
                               'TH',
                               technicalChallengeId,
-                              stateId
+                              stateId,
+                              isVisisbleForParticipants,
+                              asDraft
                           )
                         : null;
                     if (criterion) this.addCriteriaToCart([criterion]);
@@ -331,7 +339,9 @@ export class EvalCriterionCreationCardComponent {
                                 statusNames[status]
                             }`,
                             pat.id,
-                            status
+                            status,
+                            isVisisbleForParticipants,
+                            asDraft
                         );
                     });
                 this.addCriteriaToCart(criteria);
@@ -347,7 +357,12 @@ export class EvalCriterionCreationCardComponent {
                     name = 'Erkunde';
                 }
                 const criterion = targetScoutableId
-                    ? newViewScoutableEvalCriterion(name, targetScoutableId)
+                    ? newViewScoutableEvalCriterion(
+                          name,
+                          targetScoutableId,
+                          isVisisbleForParticipants,
+                          asDraft
+                      )
                     : null;
                 if (criterion) this.addCriteriaToCart([criterion]);
                 break;

@@ -262,9 +262,9 @@
             style="min-width: 600px"
         >
             <!-- TODO @JohannesPotzi : shopping cart -->
-            @if (this.shoppingCartResults().length > 0) {
+            @if (this.draftEvalResults().length > 0) {
                 <app-didactic-overview-results-table
-                    [rootResults]="this.shoppingCartResults()"
+                    [rootResults]="this.draftEvalResults()"
                     [isInSelectionModeInput]="
                         this.areResultsTablesInSelectionMode()
                     "

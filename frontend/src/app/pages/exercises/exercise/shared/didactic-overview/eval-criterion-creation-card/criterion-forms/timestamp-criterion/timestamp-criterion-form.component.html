@@ -1,0 +1,9 @@
+<form class="ms-2">
+    <label> Zeitpunkt: </label>
+    <input
+        [ngModel]="this.criterionForm.timestampInput().value()"
+        (appSaveOnTyping)="criterionForm.timestampInput().value.set($event)"
+        type="number"
+        [formField]="criterionForm.timestampInput"
+    />
+</form>

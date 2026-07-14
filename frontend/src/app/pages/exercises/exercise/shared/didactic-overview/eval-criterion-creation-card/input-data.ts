@@ -10,6 +10,7 @@ import {
 export interface InputData {
     name: string;
     countInput: number;
+    timestampInput: number;
     patientStatusInput: PatientStatus;
     patientTargetStatusMap: { [id: UUID]: PatientStatus };
     technicalChallengeId: TechnicalChallengeId | '';

@@ -1,6 +1,8 @@
 import type { MemoizedSelector } from '@ngrx/store';
 import { createSelector } from '@ngrx/store';
 import type {
+    EvalCriterion,
+    EvalCriterionId,
     ExerciseRadiogram,
     ExerciseSimulationActivityState,
     ExerciseSimulationActivityType,
@@ -471,25 +473,22 @@ export const selectWorkingPersonnel = createSelector(
     }
 );
 
-export const selectEvalResults = createSelector(
-    selectEvalCriteria,
-    selectTechnicalChallenges,
-    selectPatients,
-    selectScoutables,
-    selectMeasures,
-    selectMeasureTemplateCategories,
-    selectCurrentTime,
-    (
-        evalCriteria,
-        technicalChallenges,
-        patients,
-        scoutables,
-        measures,
-        measureTemplates,
-        currentTime
-    ) =>
-        getEvalResultsFromCriteria(
-            evalCriteria,
+function getEvalResultsSelectorBySubset(
+    evalCriteriaSelector: MemoizedSelector<
+        AppState,
+        { [criterionId: EvalCriterionId]: EvalCriterion },
+        any
+    >
+) {
+    return createSelector(
+        evalCriteriaSelector,
+        selectTechnicalChallenges,
+        selectPatients,
+        selectScoutables,
+        selectMeasures,
+        selectMeasureTemplateCategories,
+        selectCurrentTime,
+        (
             evalCriteria,
             technicalChallenges,
             patients,
@@ -497,5 +496,53 @@ export const selectEvalResults = createSelector(
             measures,
             measureTemplates,
             currentTime
-        )
+        ) =>
+            getEvalResultsFromCriteria(
+                evalCriteria,
+                evalCriteria,
+                technicalChallenges,
+                patients,
+                scoutables,
+                measures,
+                measureTemplates,
+                currentTime
+            )
+    );
+}
+
+export const selectNonDraftEvalCriteria = createSelector(
+    selectEvalCriteria,
+    (criteria) =>
+        Object.values(criteria)
+            .filter((crit) => !crit.isDraft)
+            .reduce<{ [criterionId: EvalCriterionId]: EvalCriterion }>(
+                (obj, criterion) => {
+                    obj[criterion.id] = criterion;
+                    return obj;
+                },
+                {}
+            )
+);
+
+export const selectDraftEvalCriteria = createSelector(
+    selectEvalCriteria,
+    (criteria) =>
+        Object.values(criteria)
+            .filter((crit) => crit.isDraft)
+            .reduce<{ [criterionId: EvalCriterionId]: EvalCriterion }>(
+                (obj, criterion) => {
+                    obj[criterion.id] = criterion;
+                    return obj;
+                },
+                {}
+            )
+);
+
+export const selectEvalResults =
+    getEvalResultsSelectorBySubset(selectEvalCriteria);
+export const selectNonDraftEvalResults = getEvalResultsSelectorBySubset(
+    selectNonDraftEvalCriteria
+);
+export const selectDraftEvalResults = getEvalResultsSelectorBySubset(
+    selectDraftEvalCriteria
 );

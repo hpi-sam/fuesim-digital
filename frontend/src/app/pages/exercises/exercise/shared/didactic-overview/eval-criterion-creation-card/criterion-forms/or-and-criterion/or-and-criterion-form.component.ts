@@ -10,7 +10,6 @@ import {
 
 interface LocalInputData {
     subCriteria: (EvalCriterion | null)[];
-    logicalOperator: LogicalOperator;
 }
 
 @Component({
@@ -21,20 +20,15 @@ interface LocalInputData {
 })
 export class OrAndEvalCriterionFormComponent {
     public readonly subCriteriaOut = output<(EvalCriterion | null)[]>();
-    public readonly logicalOperatorOut = output<LogicalOperator>();
 
     readonly inputModel = signal<LocalInputData>({
         subCriteria: [],
-        logicalOperator: 'and',
     });
     criterionForm = form(this.inputModel);
 
     constructor() {
         effect(() => {
             this.subCriteriaOut.emit(this.criterionForm.subCriteria().value());
-            this.logicalOperatorOut.emit(
-                this.criterionForm.logicalOperator().value()
-            );
         });
     }
 

@@ -132,6 +132,7 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
         parentId?: UUID
     ) {
         const crit = result.criterion;
+        console.log(crit ? 'found crit' : 'crit not found');
         const critType = crit.criterionType;
         let subResults: EvalResult[] = [];
         if (

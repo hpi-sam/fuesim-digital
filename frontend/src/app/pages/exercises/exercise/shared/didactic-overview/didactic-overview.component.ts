@@ -25,6 +25,7 @@ import {
 import {
     selectEvalCriteria,
     selectEvalResults,
+    selectNonDraftEvalResults,
     selectTechnicalChallenges,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { AppState } from '../../../../../state/app.state';
@@ -49,6 +50,7 @@ import { DidacticOverViewResultsTableComponent } from './result-table/didactic-o
 export class DidacticOverviewComponent {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
+    /* TODO @JohannesPotzi @Jogius : drop this? */
     public readonly resultsCache = this.exerciseService.evalResultsCache;
 
     public readonly tableWidth = input.required<number>();
@@ -58,7 +60,7 @@ export class DidacticOverviewComponent {
         this.getRootCriteriaMap(this.store.selectSignal(selectEvalCriteria)())
     );
     public readonly results = computed(() =>
-        Object.values(this.store.selectSignal(selectEvalResults)()).map(
+        Object.values(this.store.selectSignal(selectNonDraftEvalResults)()).map(
             (res) => {
                 if (isTemporalEvalCriterionType(res.criterion.criterionType)) {
                     const cacheHit = this.resultsCache()[res.criterionId];

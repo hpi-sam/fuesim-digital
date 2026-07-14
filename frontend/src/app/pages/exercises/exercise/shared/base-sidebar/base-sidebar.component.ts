@@ -11,6 +11,7 @@ import { selectExerciseStateMode } from '../../../../../state/application/select
     imports: [MapOperatorToolbarComponent, TrainerMapEditorComponent],
     templateUrl: './base-sidebar.component.html',
     styleUrl: './base-sidebar.component.scss',
+    host: { class: 'h-100' },
 })
 export class BaseSidebarComponent {
     private readonly store = inject<Store<AppState>>(Store);

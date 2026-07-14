@@ -1,4 +1,4 @@
-<ng-container>
+<div class="card h-100">
     <div class="card-header text-center">
         <h5 class="mb-0 d-flex align-items-center">
             Editor
@@ -20,8 +20,11 @@
         </h5>
     </div>
     <!-- We want the editor panel to overflow, if it is too high -->
-    <!-- TODO: Fix overflow -->
-    <div ngbAccordion [closeOthers]="true" style="flex: auto; overflow-y: auto">
+    <div
+        ngbAccordion
+        [closeOthers]="true"
+        style="flex: auto; height: 0; overflow-y: auto"
+    >
         <div ngbAccordionItem="viewports" [collapsed]="false">
             <h5 ngbAccordionHeader>
                 <button
@@ -502,4 +505,4 @@
             </div>
         </div>
     </div>
-</ng-container>
+</div>

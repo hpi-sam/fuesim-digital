@@ -149,6 +149,156 @@ describe('parallel exercise router', () => {
         });
     });
 
+    describe('GET /api/parallel_exercises/?organisationId=x', () => {
+        it('fails with 403 if not authenticated', async () => {
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/?organisationId=${personalOrganisation.id}`
+                )
+                .expect(403);
+        });
+
+        it('fails with 403 if not member of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+            await createParallelExercise(
+                environment,
+                session2,
+                exerciseTemplate
+            );
+
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/?organisationId=${organisation.id}`,
+                    session
+                )
+                .expect(403);
+        });
+
+        it('returns only parallel exercises from organisation', async () => {
+            const ownExerciseTemplate = await createExerciseTemplate(
+                environment,
+                session,
+                personalOrganisation.id
+            );
+            const ownParallelExercise = await createParallelExercise(
+                environment,
+                session,
+                ownExerciseTemplate
+            );
+
+            const otherOrganisation = await createOrganisation(
+                environment,
+                session
+            );
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session,
+                otherOrganisation.id
+            );
+            await createParallelExercise(
+                environment,
+                session,
+                exerciseTemplate
+            );
+
+            const response = await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/?organisationId=${personalOrganisation.id}`,
+                    session
+                )
+                .expect(200);
+
+            const parsed = getParallelExercisesResponseDataSchema.parse(
+                response.body
+            );
+
+            expect(parsed).toHaveLength(1);
+            expect(parsed[0]!.id).toBe(ownParallelExercise.id);
+        });
+
+        it.each([
+            'viewer',
+            'editor',
+            'admin',
+        ] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+                const exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+                const parallelExercise = await createParallelExercise(
+                    environment,
+                    session2,
+                    exerciseTemplate
+                );
+
+                const otherExerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session,
+                    personalOrganisation.id
+                );
+                await createParallelExercise(
+                    environment,
+                    session,
+                    otherExerciseTemplate
+                );
+
+                const response = await environment
+                    .httpRequest(
+                        'get',
+                        `/api/parallel_exercises/?organisationId=${organisation.id}`,
+                        session
+                    )
+                    .expect(200);
+                const parsed = getParallelExercisesResponseDataSchema.parse(
+                    response.body
+                );
+
+                expect(parsed).toHaveLength(1);
+                expect(parsed[0]!.id).toBe(parallelExercise.id);
+            }
+        );
+
+        it('fails creating a parallel exercise with invalid data', async () => {
+            const testData = {
+                name: '',
+            };
+            await environment
+                .httpRequest('post', '/api/parallel_exercises', session)
+                .send(testData)
+                .expect(400);
+        });
+    });
+
     describe('GET /api/parallel_exercises/:id', () => {
         let parallelExercise: GetParallelExerciseResponseData;
         beforeEach(async () => {

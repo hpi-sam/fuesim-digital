@@ -178,6 +178,122 @@ describe('exercise router', () => {
         });
     });
 
+    describe('GET /api/exercises/?organisationId=x', () => {
+        it('fails with 403 if not authenticated', async () => {
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercises/?organisationId=${personalOrganisation.id}`
+                )
+                .expect(403);
+        });
+
+        it('fails with 403 if not member of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercises/?organisationId=${organisation.id}`,
+                    session
+                )
+                .expect(403);
+        });
+
+        it('returns an empty list for no exercises', async () => {
+            const response = await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercises/?organisationId=${personalOrganisation.id}`,
+                    session
+                )
+                .expect(200);
+
+            const parsed = getExercisesResponseDataSchema.parse(response.body);
+            expect(parsed).toEqual([]);
+        });
+
+        it('returns only exercises from organisation', async () => {
+            const ownExercise = await createExercise(
+                environment,
+                session,
+                personalOrganisation.id
+            );
+
+            const otherOrganisation = await createOrganisation(
+                environment,
+                session
+            );
+            await createExercise(environment, session, otherOrganisation.id);
+            await createExercise(environment);
+
+            const response = await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercises/?organisationId=${personalOrganisation.id}`,
+                    session
+                )
+                .expect(200);
+            const parsed = getExercisesResponseDataSchema.parse(response.body);
+
+            expect(parsed).toHaveLength(1);
+            expect(parsed[0]!.trainerKey).toBe(ownExercise.trainerKey);
+        });
+
+        it.each([
+            'viewer',
+            'editor',
+            'admin',
+        ] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+                const exercise = await createExercise(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+                await createExercise(
+                    environment,
+                    session,
+                    personalOrganisation.id
+                );
+                await createExercise(environment);
+
+                const response = await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercises/?organisationId=${organisation.id}`,
+                        session
+                    )
+                    .expect(200);
+
+                const parsed = getExercisesResponseDataSchema.parse(
+                    response.body
+                );
+
+                expect(parsed).toHaveLength(1);
+                expect(parsed[0]!.trainerKey).toBe(exercise.trainerKey);
+            }
+        );
+    });
+
     describe('POST /api/exercise', () => {
         it('succeeds creating anonymously', async () => {
             const response = await environment

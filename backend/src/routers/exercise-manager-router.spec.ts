@@ -348,6 +348,114 @@ describe('exercise manager router', () => {
         });
     });
 
+    describe('GET /api/exercise_templates/?organisationId=x', () => {
+        it('fails with 403 if not authenticated', async () => {
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercise_templates/?organisationId=${personalOrganisation.id}`
+                )
+                .expect(403);
+        });
+
+        it('fails with 403 if not member of organisation', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercise_templates/?organisationId=${organisation.id}`,
+                    session
+                )
+                .expect(403);
+        });
+
+        it('returns only exercise templates from organisation', async () => {
+            const ownExerciseTemplate = await createExerciseTemplate(
+                environment,
+                session,
+                personalOrganisation.id
+            );
+
+            const otherOrganisation = await createOrganisation(
+                environment,
+                session
+            );
+            await createExerciseTemplate(
+                environment,
+                session,
+                otherOrganisation.id
+            );
+
+            const response = await environment
+                .httpRequest(
+                    'get',
+                    `/api/exercise_templates/?organisationId=${personalOrganisation.id}`,
+                    session
+                )
+                .expect(200);
+
+            const parsed = getExerciseTemplatesResponseDataSchema.parse(
+                response.body
+            );
+
+            expect(parsed).toHaveLength(1);
+            expect(parsed[0]!.id).toBe(ownExerciseTemplate.id);
+        });
+
+        it.each([
+            'viewer',
+            'editor',
+            'admin',
+        ] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+                const exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+                await createExerciseTemplate(
+                    environment,
+                    session,
+                    personalOrganisation.id
+                );
+
+                const response = await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise_templates/?organisationId=${organisation.id}`,
+                        session
+                    )
+                    .expect(200);
+
+                const parsed = getExerciseTemplatesResponseDataSchema.parse(
+                    response.body
+                );
+
+                expect(parsed).toHaveLength(1);
+                expect(parsed[0]!.id).toBe(exerciseTemplate.id);
+            }
+        );
+    });
+
     describe('PATCH /api/exercise_templates/:id', () => {
         let exerciseTemplate: GetExerciseTemplateResponseData;
         beforeEach(async () => {

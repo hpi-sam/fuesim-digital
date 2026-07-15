@@ -6,12 +6,12 @@ import type { ChangeImpact } from '../exercise-collection-upgrade/exercise-colle
 import { alarmGroupSchema } from '../../models/alarm-group.js';
 import { vehicleTemplateSchema } from '../../models/vehicle-template.js';
 import type { ImmutableInfer } from '../../utils/infer.js';
-import type { VersionedElementModel } from '../models/versioned-element-model.js';
-import { versionedElementModelSchema } from '../models/versioned-element-model.js';
 import { personnelTemplateSchema } from '../../models/personnel-template.js';
 import { materialTemplateSchema } from '../../models/material-template.js';
 import { mapImageTemplateSchema } from '../../models/map-image-template.js';
 import type { ChangedTemplateVersion } from '../collection-element-diff.js';
+import type { VersionedElementModel } from '../models/versioned-element-content.js';
+import { versionedElementModelSchema } from '../models/versioned-element-content.js';
 import { marketplaceAlarmGroup } from './alarm-group.marketplace.js';
 import { marketplaceVehicleTemplate } from './vehicle-template.marketplace.js';
 import { marketplacePersonnel } from './personnel.marketplace.js';

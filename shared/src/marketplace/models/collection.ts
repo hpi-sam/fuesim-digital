@@ -6,6 +6,7 @@ import {
 } from './versioned-id-schema.js';
 import { collectionVisibilitySchema } from './collection-visibility.js';
 import { collectionOrganisationRelationshipTypeSchema } from './collection-relationship.js';
+import { templateVersionSchema } from './versioned-elements.js';
 
 export const collectionVersionSchema = z.object({
     ...stateVersionedEntitySchema.shape,
@@ -29,3 +30,9 @@ export const extendedCollectionVersionSchema = z.object({
 export type ExtendedCollectionVersion = z.infer<
     typeof extendedCollectionVersionSchema
 >;
+
+export const collectionFullDataSchema = z.object({
+    ...extendedCollectionVersionSchema.shape,
+    dependsOn: z.array(collectionVersionSchema),
+    elements: z.array(templateVersionSchema),
+});

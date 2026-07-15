@@ -270,17 +270,25 @@ export class ExerciseService {
     }
 
     public async addCollection(collection: VersionedCollectionPartial) {
-        const elements =
+        const collectionData =
+            await this.collectionService.getCollectionVersion(collection);
+        const collectionElements =
             await this.collectionService.getElementsOfCollectionVersion(
                 collection
             );
+
+        if (collectionData === null) {
+            this.messageService.postError({
+                title: 'Sammlung konnte nicht hinzugefügt werden',
+                body: 'Die Sammlung konnte nicht geladen werden. Möglicherweise haben Sie keinen Zugriff auf die Sammlung.',
+            });
+            return;
+        }
+
         await this.proposeAction({
             type: '[Collection] Add Collection',
-            elements,
-            collectionVersion: {
-                versionId: collection.versionId,
-                entityId: collection.entityId,
-            },
+            elements: collectionElements,
+            collection: collectionData,
         });
         this.messageService.postMessage({
             title: 'Sammlung wurde hinzugefügt.',

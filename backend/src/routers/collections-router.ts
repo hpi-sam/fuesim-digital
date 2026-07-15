@@ -754,16 +754,45 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     );
 
     publicRouter.get(
-        '/:collectionEntityId/version/:collectionVersionId/elements',
+        '/:collectionEntityId/version/:collectionVersionId/dependencies',
         otherAccess,
         async (req, res) => {
             const collectionVersionId = getCollectionVersionId(req);
 
+            const data =
+                await collectionService.getCollectionDependencies(
+                    collectionVersionId
+                );
+
+            res.send(
+                Marketplace.Collection.GetCollectionDependencies.responseSchema.encode(
+                    {
+                        result: data,
+                    }
+                )
+            );
+        }
+    );
+
+    publicRouter.get(
+        '/:collectionEntityId/version/:collectionVersionId/elements',
+        otherAccess,
+        async (req, res) => {
+            console.log('Getting elements of collection version');
+            const collectionVersionId = getCollectionVersionId(req);
+            console.log('yes,daddy :3');
             const data = await collectionService.getElementsOfCollectionVersion(
                 collectionVersionId,
                 { allowDraftState: false }
             );
 
+            console.log('----------------------------------------------');
+            console.log('data: ', JSON.stringify(data, null, 2));
+            console.log(
+                Marketplace.Collection.GetElementsOfCollectionVersion.responseSchema.safeEncode(
+                    cloneDeepMutable(data)
+                )
+            );
             res.send(
                 Marketplace.Collection.GetElementsOfCollectionVersion.responseSchema.encode(
                     cloneDeepMutable(data)

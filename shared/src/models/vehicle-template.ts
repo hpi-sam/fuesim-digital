@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { uuidSchema } from '../utils/uuid.js';
-import { versionedElementModelStateExtension } from '../marketplace/models/versioned-element-model.js';
 import { cloneDeepMutable } from '../utils/clone-deep.js';
 import type { ElementVersionId } from '../marketplace/models/versioned-id-schema.js';
+import { versionedElementModelStateExtension } from '../marketplace/models/versioned-element-model.js';
 import { imagePropertiesSchema } from './utils/image-properties.js';
 import { registerEditableValue } from './utils/editable-values-registry.js';
 import { registerDependency } from './utils/dependency-registry.js';

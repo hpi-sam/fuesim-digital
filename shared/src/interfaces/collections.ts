@@ -6,6 +6,7 @@ import {
     collectionVersionIdSchema,
     elementEntityIdSchema,
     elementVersionIdSchema,
+    versionedCollectionPartialSchema,
 } from '../marketplace/models/versioned-id-schema.js';
 import {
     collectionVersionSchema,
@@ -174,6 +175,12 @@ export namespace Marketplace {
             }),
         });
 
+        export const GetCollectionDependencies = new Route({
+            response: z.object({
+                result: z.array(versionedCollectionPartialSchema),
+            }),
+        });
+
         export const GetInviteCode = new Route({
             response: z.object({
                 result: inviteCodeSchema.nullable(),
@@ -244,7 +251,7 @@ export namespace Marketplace {
 
         export const GetCollectionVersion = new Route({
             response: z.object({
-                result: collectionVersionSchema,
+                result: collectionVersionSchema.nullable(),
             }),
         });
 

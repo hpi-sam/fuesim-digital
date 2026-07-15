@@ -1,10 +1,13 @@
-import {
+import type {
     HttpHandlerFn,
     HttpRequest,
     HttpEvent,
-    HttpContext,
 } from '@angular/common/http';
-import { HttpContextToken, HttpErrorResponse } from '@angular/common/http';
+import {
+    HttpContext,
+    HttpContextToken,
+    HttpErrorResponse,
+} from '@angular/common/http';
 import type { Observable } from 'rxjs';
 import { catchError } from 'rxjs';
 import { inject } from '@angular/core';
@@ -53,8 +56,11 @@ export function errorHandlingInterceptor(
     );
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const PREVENT_NETWORK_ERROR_TOAST = new HttpContextToken(() => false);
 
-export const preventStatusErrorToastContext = (
+export function preventStatusErrorToastContext(
     httpContext: HttpContext = new HttpContext()
-): HttpContext => httpContext.set(PREVENT_NETWORK_ERROR_TOAST, true);
+): HttpContext {
+    return httpContext.set(PREVENT_NETWORK_ERROR_TOAST, true);
+}

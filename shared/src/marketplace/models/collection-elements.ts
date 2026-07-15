@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { collectionVersionSchema } from './collection.js';
-import type { TemplateVersion } from './versioned-elements.js';
 import { templateVersionSchema } from './versioned-elements.js';
 import type { CollectionElementType } from './collection-element-type.js';
 
@@ -63,36 +62,60 @@ export const collectionElementsSchema = z.strictObject({
 
 export type CollectionElements = z.infer<typeof collectionElementsSchema>;
 
-export function gatherAllDirectCollectionElements(
-    elements: CollectionElements
-): TemplateVersion[] {
+export interface CollectionElementsAny<T = any, C = any> {
+    direct: T[];
+    imported: {
+        collection: C;
+        elements: T[];
+    }[];
+    references: {
+        collection: C;
+        elements: T[];
+    }[];
+}
+
+/* export const miniCollectionElementsSingleSchema = z.strictObject({
+    collection: collectionVersionSchema,
+    elements: z.array(miniTemplateVersionSchema),
+})
+export const miniCollectionElementsSchema = z.strictObject({
+    direct: z.array(miniTemplateVersionSchema),
+    imported: z.array(miniCollectionElementsSingleSchema),
+    references: z.array(miniCollectionElementsSingleSchema),
+} satisfies { [T in CollectionElementType]: unknown });
+
+export type MiniCollectionElements = z.infer<typeof miniCollectionElementsSchema>;*/
+
+export function gatherAllDirectCollectionElements<T = any>(
+    elements: CollectionElementsAny<T>
+): T[] {
     return elements.direct;
 }
 
-export function gatherAllReferencedCollectionElements(
-    elements: CollectionElements
-): TemplateVersion[] {
+export function gatherAllReferencedCollectionElements<T = any>(
+    elements: CollectionElementsAny<T>
+): T[] {
     return elements.references.flatMap((reference) => reference.elements);
 }
 
-export function gatherAllImportedCollectionElements(
-    elements: CollectionElements
-): TemplateVersion[] {
+export function gatherAllImportedCollectionElements<T = any>(
+    elements: CollectionElementsAny<T>
+): T[] {
     return elements.imported.flatMap((imported) => imported.elements);
 }
 
-export function gatherAllVisibleCollectionElements(
-    elements: CollectionElements
-): TemplateVersion[] {
+export function gatherAllVisibleCollectionElements<T = any>(
+    elements: CollectionElementsAny<T>
+): T[] {
     return [
         ...elements.direct,
         ...elements.imported.flatMap((imported) => imported.elements),
     ];
 }
 
-export function gatherAllCollectionElements(
-    elements: CollectionElements
-): TemplateVersion[] {
+export function gatherAllCollectionElements<T = any>(
+    elements: CollectionElementsAny<T>
+): T[] {
     return [
         ...gatherAllVisibleCollectionElements(elements),
         ...elements.references.flatMap((reference) => reference.elements),

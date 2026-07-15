@@ -1,14 +1,14 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
-import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
+import { versionedElementModelStateExtension } from '../marketplace/models/versioned-element-model.js';
 import {
     type ImageProperties,
     imagePropertiesSchema,
 } from './utils/image-properties.js';
 
 export const mapImageTemplateSchema = z.strictObject({
-    ...versionedElementModelSchema.partial().shape,
+    ...versionedElementModelStateExtension,
     id: uuidSchema,
     type: z.literal('mapImageTemplate'),
     name: z.string(),

@@ -21,11 +21,11 @@ import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
+import { preventStatusErrorToastContext } from '../shared/functions/http';
 import { httpOrigin, websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
 import { LoadingModalService } from './loading-modal/loading-modal.service';
-import { preventStatusErrorToastContext } from '../shared/functions/http';
 
 export interface CollectionSubscriptionData {
     collection: CollectionVersion;
@@ -598,6 +598,25 @@ export class CollectionService {
         return typedData.result;
     }
 
+    public async getCollectionDependencies(
+        collection: VersionedCollectionPartial
+    ) {
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Collection.GetCollectionDependencies.Response
+            >(
+                `${this.ENDPOINT}/${collection.entityId}/version/${collection.versionId}/dependencies`
+            )
+        );
+
+        const typedData =
+            Marketplace.Collection.GetCollectionDependencies.responseSchema.parse(
+                data
+            );
+
+        return typedData.result;
+    }
+
     public async saveDraftState(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.post<
@@ -662,7 +681,12 @@ export class CollectionService {
         return typedData;
     }
 
-    public async getCollectionVersion(collection: VersionedCollectionPartial) {
+    public async getCollectionVersion(
+        collection: VersionedCollectionPartial
+    ): Promise<
+        | (typeof Marketplace.Collection.GetCollectionVersion.Response)['result']
+        | null
+    > {
         try {
             const data = await lastValueFrom(
                 this.httpClient.get<

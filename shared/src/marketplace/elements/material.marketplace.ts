@@ -53,6 +53,12 @@ export const marketplaceMaterial: MarketplaceRegistryEntry = {
                                     ? {
                                           versionId: change.new.versionId,
                                           entityId: change.new.entityId,
+                                          createdAt: change.new.createdAt,
+                                          description: change.new.description,
+                                          editedAt: change.new.editedAt,
+                                          stateVersion: change.new.stateVersion,
+                                          title: change.new.title,
+                                          version: change.new.version,
                                           type: f.entity.type,
                                       }
                                     : undefined,

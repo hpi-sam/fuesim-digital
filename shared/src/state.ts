@@ -46,8 +46,8 @@ import { taskTypeSchema } from './models/task-type.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
-import { versionedCollectionPartialSchema } from './marketplace/models/versioned-id-schema.js';
 import { templateSchema } from './models/template.js';
+import { collectionStateReferenceSchema } from './marketplace/models/collection-state-reference.js';
 
 /**
  * **Important**
@@ -70,7 +70,7 @@ export const exerciseStateSchema = z.strictObject({
     currentStatus: exerciseStatusSchema,
     randomState: randomStateSchema,
 
-    selectedCollections: z.array(versionedCollectionPartialSchema),
+    selectedCollections: z.array(collectionStateReferenceSchema),
 
     viewports: z.record(uuidSchema, viewportSchema),
     autojoinViewportId: uuidSchema.nullable(),

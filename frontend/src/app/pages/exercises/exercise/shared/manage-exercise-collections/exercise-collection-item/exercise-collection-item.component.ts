@@ -16,12 +16,15 @@ import {
     ElementVersionId,
     getElementDependencies,
     ChangeDependencies,
+    CollectionStateReference,
+    CollectionElements,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
 import { RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { DatePipe, JsonPipe } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import {
@@ -33,27 +36,29 @@ import { AppState } from '../../../../../../state/app.state';
 import { LoadingModalService } from '../../../../../../core/loading-modal/loading-modal.service';
 import { openChangeImpactModal } from '../../change-impact-modal/open-change-impact-modal';
 import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
-import { firstValueFrom } from 'rxjs';
 import { CollectionUpgradeImpactModalComponent } from '../../../../../marketplace/shared/modals/marketplace-collection-update-impact-modal/marketplace-collection-update-impact-modal.component';
+import { MessageService } from '../../../../../../core/messages/message.service';
+import { selectTemplatesFromCollectionEntity } from '../../../../../../state/application/selectors/marketplace.selectors';
 
 @Component({
     selector: 'app-exercise-collection-item-component',
     templateUrl: './exercise-collection-item.component.html',
     styleUrl: './exercise-collection-item.component.scss',
-    imports: [RouterLink, DatePipe],
+    imports: [RouterLink, DatePipe, JsonPipe],
 })
 export class ExerciseColletionItemComponent {
     private readonly exerciseService = inject(ExerciseService);
     private readonly collectionService = inject(CollectionService);
     private readonly store = inject<Store<AppState>>(Store);
     private readonly ngbModalService = inject(NgbModal);
+    private readonly messageService = inject(MessageService);
     private readonly loadingModalService = inject(LoadingModalService);
     private readonly confirmationModal = inject(ConfirmationModalService);
 
     public readonly exerciseKey = input.required<ExerciseKey>();
-    public readonly collection = input.required<VersionedCollectionPartial>();
+    public readonly collection = input.required<CollectionStateReference>();
 
-    public readonly collectionData = resource({
+    public readonly collectionDataRes = resource({
         params: () => ({
             collection: this.collection(),
         }),
@@ -79,7 +84,7 @@ export class ExerciseColletionItemComponent {
         return gatherAllVisibleCollectionElements(collectionElements);
     }
 
-    public async removeCollection(collection: CollectionVersion) {
+    public async removeCollection(collection: VersionedCollectionPartial) {
         try {
             this.loadingModalService.showLoading({
                 title: 'Neue Version wird geladen',
@@ -99,17 +104,23 @@ export class ExerciseColletionItemComponent {
             const currentElements = await getAllCollectionElements(
                 cloneDeepMutable(currentSelectedCollections),
                 async (c) =>
-                    this.collectionService.getElementsOfCollectionVersion(c)
+                    selectStateSnapshot(
+                        selectTemplatesFromCollectionEntity(c.entityId),
+                        this.store
+                    )
             );
-            const newElements = await getAllCollectionElements(
-                filteredCollections,
-                async (c) =>
-                    this.collectionService.getElementsOfCollectionVersion(c)
-            );
+
+            const newFilteredElementsList: CollectionElements =
+                await getAllCollectionElements(filteredCollections, async (c) =>
+                    selectStateSnapshot(
+                        selectTemplatesFromCollectionEntity(c.entityId),
+                        this.store
+                    )
+                );
 
             const elementsChanges = getCollectionElementDiff(
                 gatherAllVisibleCollectionElements(currentElements),
-                gatherAllVisibleCollectionElements(newElements)
+                gatherAllVisibleCollectionElements(newFilteredElementsList)
             );
 
             const currentState = selectStateSnapshot(
@@ -122,18 +133,13 @@ export class ExerciseColletionItemComponent {
                 elementsChanges
             );
 
-            const newTemplates = await getAllCollectionElements(
-                filteredCollections,
-                async (c) =>
-                    this.collectionService.getElementsOfCollectionVersion(c)
-            );
-
             this.loadingModalService.closeLoading();
 
             const result = await openChangeImpactModal(this.ngbModalService, {
                 changeImpacts: changeImpacts.impact,
-                visibleAvailableElements:
-                    gatherAllVisibleCollectionElements(newTemplates),
+                visibleAvailableElements: gatherAllVisibleCollectionElements(
+                    newFilteredElementsList
+                ),
             });
 
             if (!result.apply) return;
@@ -141,7 +147,7 @@ export class ExerciseColletionItemComponent {
                 const confirmationResult = await this.confirmationModal.confirm(
                     {
                         title: 'Sammlung entfernen',
-                        description: `Die Sammlung "${collection.title}" wird aus der Übung entfernt. Es werden auch alle Elemente entfernt, die nur über diese Sammlung verfügbar sind. Möchten Sie die Sammlung trotzdem entfernen?`,
+                        description: `Die Sammlung wird aus der Übung entfernt. Es werden auch alle Elemente entfernt, die nur über diese Sammlung verfügbar sind. Möchten Sie die Sammlung trotzdem entfernen?`,
                         confirmationButtonText: 'Sammlung entfernen',
                     }
                 );
@@ -152,7 +158,7 @@ export class ExerciseColletionItemComponent {
                 type: '[Collection] Remove Collection',
                 changeApplies: [...result.changes, ...changeImpacts.apply],
                 collectionVersion: this.collection(),
-                overwriteTemplates: newTemplates,
+                overwriteTemplates: newFilteredElementsList,
             });
         } catch (error) {
             this.loadingModalService.closeLoading();
@@ -205,6 +211,19 @@ export class ExerciseColletionItemComponent {
                 gatherAllVisibleCollectionElements(newerCollectionElements)
             );
 
+            const newCollectionData =
+                await this.collectionService.getCollectionVersion(
+                    newerCollectionVersionAvailable.latestVersion
+                );
+            if (newCollectionData === null) {
+                this.messageService.postError({
+                    title: 'Fehler beim Laden der neuen Version',
+                    body: 'Die neue Version der Sammlung konnte nicht geladen werden.',
+                });
+                this.loadingModalService.closeLoading();
+                return;
+            }
+
             const newTemplates = await getAllCollectionElements(
                 currentSelectedCollections.map((c) => {
                     if (c.entityId === selectedCollection.entityId) {
@@ -222,7 +241,6 @@ export class ExerciseColletionItemComponent {
             );
 
             this.loadingModalService.closeLoading();
-
 
             const currentCollectionDependencies: {
                 element: TemplateVersion;
@@ -267,7 +285,9 @@ export class ExerciseColletionItemComponent {
             modalInstance.confirmationButtonText =
                 'Änderungen annehmen und Sammlung aktualisieren';
 
-            const result1 = await firstValueFrom(modalInstance.confirmationResult$);
+            const result1 = await firstValueFrom(
+                modalInstance.confirmationResult$
+            );
             if (!result1) return;
 
             const result = await openChangeImpactModal(this.ngbModalService, {
@@ -290,9 +310,9 @@ export class ExerciseColletionItemComponent {
 
             this.exerciseService.proposeAction({
                 type: '[Collection] Upgrade Collection',
+                collection,
+                collectionElements: newerCollectionElements,
                 changeApplies: [...result.changes, ...changeImpacts.apply],
-                collectionVersion:
-                    newerCollectionVersionAvailable.latestVersion,
                 overwriteTemplates: newTemplates,
             });
         } catch (error) {

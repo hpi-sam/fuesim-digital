@@ -4,14 +4,14 @@ import type {
     RouterStateSnapshot,
 } from '@angular/router';
 import { RedirectCommand, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../core/exercise-element.service';
+import { MessageService } from '../../../core/messages/message.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ViewCollectionGuard {
-    private readonly ngbModalService = inject(NgbModal);
+    private readonly messageService = inject(MessageService);
     private readonly router = inject(Router);
     private readonly collectionService = inject(CollectionService);
 
@@ -28,11 +28,15 @@ export class ViewCollectionGuard {
             .then(() => true)
             .catch(() => false);
 
-        console.log({ canAccessCollection, collectionEntityId });
-
         if (canAccessCollection) {
             return true;
         }
+
+        this.messageService.postError({
+            title: 'Zugriff verweigert',
+            body: 'Sie haben keinen Zugriff auf diese Sammlung.',
+        });
+
         return new RedirectCommand(this.router.parseUrl('/collections'));
     }
 }

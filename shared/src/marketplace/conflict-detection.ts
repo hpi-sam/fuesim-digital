@@ -53,8 +53,6 @@ export function getCollectionElementDiff(
         currentElementEntityIds.has(element.entityId)
     );
 
-    // TODO: @Quixelation -> we should also do a content diff, to see if the content was actually significantly changed
-    // But this is something for a later point (ba-thesis?)
     overlappingNew
         .map((newElement) => {
             const matchingCurrentElement = currentElements.find(

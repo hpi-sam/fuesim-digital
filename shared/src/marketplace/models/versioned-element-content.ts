@@ -6,6 +6,12 @@ import { personnelTemplateSchema } from '../../models/personnel-template.js';
 import { materialTemplateSchema } from '../../models/material-template.js';
 import { mapImageTemplateSchema } from '../../models/map-image-template.js';
 import { versionedElementModelSchema } from './versioned-element-model.js';
+export {
+    getEntityIdFromElement,
+    type VersionedElementModel,
+    versionedElementModelSchema,
+    versionedElementModelStateExtension,
+} from './versioned-element-model.js';
 
 export const versionedElementContentSchema = z.discriminatedUnion('type', [
     vehicleTemplateSchema,

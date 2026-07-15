@@ -15,11 +15,11 @@ import {
     collectionElementsSchema,
 } from '../../marketplace/models/collection-elements.js';
 import type { TemplateVersion } from '../../marketplace/models/versioned-elements.js';
-import { versionedCollectionPartialSchema } from './../../marketplace/models/versioned-id-schema.js';
+import { collectionVersionSchema } from '../../marketplace/models/collection.js';
 
 export const addCollectionActionSchema = z.strictObject({
     type: z.literal('[Collection] Add Collection'),
-    collectionVersion: versionedCollectionPartialSchema,
+    collection: collectionVersionSchema,
     elements: collectionElementsSchema,
 });
 export type AddCollectionAction = Immutable<
@@ -28,7 +28,8 @@ export type AddCollectionAction = Immutable<
 
 export const upgradeCollectionActionSchema = z.strictObject({
     type: z.literal('[Collection] Upgrade Collection'),
-    collectionVersion: versionedCollectionPartialSchema,
+    collection: collectionVersionSchema,
+    collectionElements: collectionElementsSchema,
     overwriteTemplates: collectionElementsSchema,
     changeApplies: z.array(changeApplySchema),
 });
@@ -39,7 +40,7 @@ export type UpgradeCollectionAction = Immutable<
 
 export const removeCollectionActionSchema = z.strictObject({
     type: z.literal('[Collection] Remove Collection'),
-    collectionVersion: versionedCollectionPartialSchema,
+    collectionVersion: collectionVersionSchema,
     overwriteTemplates: collectionElementsSchema,
     changeApplies: z.array(changeApplySchema),
 });
@@ -63,6 +64,12 @@ function addElement(
         entity: {
             entityId: element.entityId,
             versionId: element.versionId,
+            createdAt: element.createdAt,
+            description: element.description,
+            editedAt: element.editedAt,
+            stateVersion: element.stateVersion,
+            title: element.title,
+            version: element.version,
             type,
         },
     };
@@ -90,7 +97,27 @@ export namespace CollectionReducers {
         actionSchema: addCollectionActionSchema,
         reducer: (draftState, data) => {
             addCollectionElements(draftState, data.elements);
-            draftState.selectedCollections.push(data.collectionVersion);
+
+            draftState.selectedCollections.push(
+                cloneDeepMutable({
+                    ...data.collection,
+                    elements: {
+                        direct: data.elements.direct.map((element) => ({
+                            entityId: element.entityId,
+                            versionId: element.versionId,
+                        })),
+                        imported: data.elements.imported.map((element) => ({
+                            collection: element.collection,
+                            elements: element.elements,
+                        })),
+                        references: data.elements.references.map((element) => ({
+                            collection: element.collection,
+                            elements: element.elements,
+                        })),
+                    },
+                })
+            );
+
             return draftState;
         },
         rights: 'trainer',
@@ -102,15 +129,36 @@ export namespace CollectionReducers {
             overwriteStateTemplates(draftState, data.overwriteTemplates);
             applyAllChangeApplies(draftState, data.changeApplies);
 
-            draftState.selectedCollections = draftState.selectedCollections.map(
-                (collection) => {
-                    if (
-                        collection.entityId === data.collectionVersion.entityId
-                    ) {
-                        return data.collectionVersion;
+            draftState.selectedCollections = cloneDeepMutable(
+                draftState.selectedCollections.map((collection) => {
+                    if (collection.entityId === data.collection.entityId) {
+                        return cloneDeepMutable({
+                            ...data.collection,
+                            elements: {
+                                direct: data.collectionElements.direct.map(
+                                    (element) => ({
+                                        entityId: element.entityId,
+                                        versionId: element.versionId,
+                                    })
+                                ),
+                                imported: data.collectionElements.imported.map(
+                                    (element) => ({
+                                        collection: element.collection,
+                                        elements: element.elements,
+                                    })
+                                ),
+                                references:
+                                    data.collectionElements.references.map(
+                                        (element) => ({
+                                            collection: element.collection,
+                                            elements: element.elements,
+                                        })
+                                    ),
+                            },
+                        });
                     }
                     return collection;
-                }
+                })
             );
 
             return draftState;
@@ -130,6 +178,8 @@ export namespace CollectionReducers {
                     (collection) =>
                         collection.entityId !== data.collectionVersion.entityId
                 );
+
+            // TODO: IMplement handlling addImportedCollections
             return draftState;
         },
         rights: 'trainer',

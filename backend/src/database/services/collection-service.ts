@@ -843,9 +843,17 @@ export class CollectionService {
      * where we do not want to show the user all dependencies, but still need to know about them.
      */
     private async getUsedElementsDeep(
-        elements: TemplateVersion[]
+        elements: TemplateVersion[],
+        ignoreCollections: CollectionEntityId[]
     ): Promise<CollectionElementsSingle[]> {
-        const foundElements: CollectionElementsSingle[] = [];
+        console.log({ elements });
+        const foundElements: {
+            [collectionVersionId: CollectionEntityId]: {
+                collection: CollectionVersion;
+                elements: TemplateVersion[];
+            };
+        } = {};
+
         await Promise.all(
             elements.map(async (element) => {
                 const elementVersions = getElementDependencies(element.content);
@@ -860,41 +868,55 @@ export class CollectionService {
                     )
                 ).filter((f) => f !== null);
 
-                const elementCollections: CollectionElementsSingle[] =
-                    await Promise.all(
-                        foundSubElements.map(async (m) => ({
-                            elements: [m],
-                            collection: this.exists(
-                                await this.collectionRepository.getLatestCollectionOfElementEntity(
-                                    m.entityId
-                                )
-                            ),
-                        }))
-                    );
+                await Promise.all(
+                    foundSubElements.map(async (foundSubElement) => {
+                        const collection =
+                            await this.collectionRepository.getLatestCollectionOfElementEntity(
+                                foundSubElement.entityId
+                            );
 
-                foundElements.push(
-                    ...elementCollections,
-                    ...(await this.getUsedElementsDeep(foundSubElements))
+                        if (collection === null) {
+                            console.warn(
+                                'Collection for Element not found in getUsedElementsDeep',
+                                { element: foundSubElement }
+                            );
+                            return;
+                        }
+
+                        foundElements[collection.entityId] ??= {
+                            collection: this.exists(collection),
+                            elements: [],
+                        };
+
+                        foundElements[collection.entityId]!.elements.push(
+                            foundSubElement
+                        );
+                    })
                 );
+
+                const deeperResults = await this.getUsedElementsDeep(
+                    foundSubElements,
+                    ignoreCollections
+                );
+
+                for (const deeperResult of deeperResults) {
+                    foundElements[deeperResult.collection.entityId] ??= {
+                        collection: deeperResult.collection,
+                        elements: [],
+                    };
+                    // TODO: @Quixelation, we need deduplication
+                    foundElements[
+                        deeperResult.collection.entityId
+                    ]!.elements.push(...deeperResult.elements);
+                }
             })
         );
 
-        const result: CollectionElementsSingle[] = [];
-
-        for (const foundElement of foundElements) {
-            const sameCollectionVersion = foundElements.filter(
-                (f) => f.collection.versionId
-            );
-            result.push({
-                collection: foundElement.collection,
-                elements: [
-                    ...foundElement.elements,
-                    ...sameCollectionVersion.flatMap((m) => m.elements),
-                ],
-            });
+        for (const ignoredCollection of ignoreCollections) {
+            delete foundElements[ignoredCollection];
         }
 
-        return result;
+        return Object.values(foundElements);
     }
 
     public async getDirectDependencyElements(
@@ -959,7 +981,13 @@ export class CollectionService {
             await this.getDirectDependencyElements(collectionVersionId);
 
         const furtherElementReferences = await this.getUsedElementsDeep(
-            directDependencyElements.flatMap((m) => m.elements)
+            directDependencyElements.flatMap((m) => m.elements),
+            [
+                baseCollection.entityId,
+                ...directDependencyElements.flatMap(
+                    (m) => m.collection.entityId
+                ),
+            ]
         );
 
         return cloneDeepMutable({
@@ -1833,10 +1861,13 @@ export class CollectionService {
                             // THIS causes this feature-flag to be named EXPERIMENTAL!
                             changeApplies: [],
                             // we want to keep the same exercise version, since we do NOT work with versioning in this configuration
-                            collectionVersion: {
-                                entityId: collection.entityId,
-                                versionId: collection.versionId,
-                            },
+                            // TODO: @Quixelation
+                            collection,
+                            collectionElements:
+                                await this.getElementsOfCollectionVersion(
+                                    collection.versionId,
+                                    { allowDraftState: true }
+                                ),
                             overwriteTemplates: await getAllCollectionElements(
                                 cloneDeepMutable(
                                     exerciseEntry.currentStateString

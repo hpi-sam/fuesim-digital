@@ -3,8 +3,8 @@ import type { Immutable } from 'immer';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { uuidSetSchema } from '../utils/uuid-set.js';
-import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
 import { hybridIdSchema } from '../utils/hybrid-id.js';
+import { versionedElementModelStateExtension } from '../marketplace/models/versioned-element-model.js';
 import type { PersonnelTemplate } from './personnel-template.js';
 import { canCaterForSchema } from './utils/cater-for.js';
 import { imagePropertiesSchema } from './utils/image-properties.js';
@@ -12,7 +12,7 @@ import { type Position, positionSchema } from './utils/position/position.js';
 import { registerEditableValue } from './utils/editable-values-registry.js';
 
 export const personnelSchema = z.strictObject({
-    ...versionedElementModelSchema.partial().shape,
+    ...versionedElementModelStateExtension,
     id: uuidSchema,
     type: z.literal('personnel'),
     vehicleId: uuidSchema,

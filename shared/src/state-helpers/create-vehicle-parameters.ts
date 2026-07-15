@@ -16,7 +16,7 @@ import { newMapPositionAt } from '../models/utils/position/map-position.js';
 import { newNoOccupation } from '../models/utils/occupations/no-occupation.js';
 import type { MaterialTemplate } from '../models/material-template.js';
 import type { PersonnelTemplate } from '../models/personnel-template.js';
-import type { VersionedElementModel } from '../marketplace/models/versioned-element-model.js';
+import type { VersionedElementModel } from '../marketplace/models/versioned-element-content.js';
 
 /**
  * @returns a vehicle with personnel and materials to be added to the map

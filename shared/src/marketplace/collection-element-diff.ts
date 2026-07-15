@@ -2,8 +2,10 @@ import { z } from 'zod';
 import type { Immutable } from 'immer';
 import type { ElementVersionId } from './models/versioned-id-schema.js';
 import { elementVersionIdSchema } from './models/versioned-id-schema.js';
-import type { TemplateVersion } from './models/versioned-elements.js';
-import { templateVersionSchema } from './models/versioned-elements.js';
+import {
+    templateVersionSchema,
+    type TemplateVersion,
+} from './models/versioned-elements.js';
 
 const deletedTemplateVersionSchema = z.object({
     id: elementVersionIdSchema,

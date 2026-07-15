@@ -170,7 +170,6 @@ export const generalizeMaterialsPersonnel44: Migration = {
             templates: { [Key in UUID]: MapImageTemplate | VehicleTemplate };
         }>;
 
-        console.log(mutableIntermediaryState);
         const { mapImageTemplateIds, vehicleTemplateIds } = getTemplateIds(
             Object.values(
                 castDraft(

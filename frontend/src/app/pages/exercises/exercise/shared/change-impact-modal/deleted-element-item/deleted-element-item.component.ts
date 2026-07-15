@@ -156,8 +156,7 @@ export class DeletedElementChangeApplyItemComponent {
                 // we need to set the uuid here bc we cant in the reducer
                 id: uuid(),
                 entity: {
-                    entityId: entity.entityId,
-                    versionId: entity.versionId,
+                    ...entity,
                     type:
                         replacingElementContentEntity?.entity?.type ?? 'direct',
                 },

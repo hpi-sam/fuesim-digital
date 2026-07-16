@@ -28,6 +28,7 @@ import {
     logTechnicalChallengePersonnelUnassigned,
 } from '../store/action-reducers/utils/log.js';
 import { TypeAssertedObject } from '../utils/type-asserted-object.js';
+import { benchmark } from '../benchmark.js';
 import { insert, modify, peek, pop, removeByStateMachineId } from './events.js';
 
 export function getTaskProgress(
@@ -656,6 +657,15 @@ function simulateStateMachine(
 }
 
 export function simulateAllTechnicalChallenges(
+    draftState: WritableDraft<ExerciseState>,
+    tickInterval: number
+) {
+    benchmark(draftState.participantKey, 'simulateAllTechnicalChallenges', () =>
+        _simulateAllTechnicalChallenges(draftState, tickInterval)
+    );
+}
+
+function _simulateAllTechnicalChallenges(
     draftState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {

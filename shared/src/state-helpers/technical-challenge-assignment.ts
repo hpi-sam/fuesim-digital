@@ -11,6 +11,8 @@ import type { TechnicalChallenge } from '../models/technical-challenge/technical
 import type { TaskType } from '../models/task-type.js';
 import { TypeAssertedObject } from '../utils/type-asserted-object.js';
 import { type StateMachine } from '../models/technical-challenge/state-machine.js';
+import { benchmark } from '../benchmark.js';
+import type { TechnicalChallengeId } from '../models/technical-challenge/ids.js';
 import {
     updateEventQueueAfterTaskChange,
     updateTaskProgress,
@@ -38,10 +40,28 @@ export function getAssignmentsOnTechnicalChallenge(
 
 export function unassignPersonnelFromTechnicalChallenge(
     exerciseState: WritableDraft<ExerciseState>,
-    technicalChallenge: WritableDraft<TechnicalChallenge>,
+    technicalChallengeId: TechnicalChallengeId,
     personnelId: Personnel['id'],
     currentTime: ExerciseState['currentTime']
 ): void {
+    benchmark(exerciseState.participantKey, 'unassignPersonnel', () =>
+        _unassignPersonnelFromTechnicalChallenge(
+            exerciseState,
+            technicalChallengeId,
+            personnelId,
+            currentTime
+        )
+    );
+}
+
+function _unassignPersonnelFromTechnicalChallenge(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallengeId: TechnicalChallengeId,
+    personnelId: Personnel['id'],
+    currentTime: ExerciseState['currentTime']
+): void {
+    const technicalChallenge =
+        exerciseState.technicalChallenges[technicalChallengeId]!;
     const result = getAssignmentsOnTechnicalChallenge(technicalChallenge).find(
         (assignment) => assignment.personnelId === personnelId
     );
@@ -117,7 +137,7 @@ export function removeInvalidAssignments(
     invalidChallenges.forEach((challenge) => {
         unassignPersonnelFromTechnicalChallenge(
             draftState,
-            challenge,
+            challenge.id,
             personnelId,
             draftState.currentTime
         );

@@ -22,6 +22,7 @@ import {
     updateEventQueue,
     updateTaskProgress,
 } from '../../state-helpers/state-machine.js';
+import { benchmark } from '../../benchmark.js';
 import { getElement } from './utils/get-element.js';
 import {
     logTechnicalChallenge,
@@ -135,42 +136,53 @@ export namespace TechnicalChallengeActionReducers {
                 stateMachineId,
             }
         ) => {
-            const technicalChallenge = getElement(
-                draftState,
-                'technicalChallenge',
-                technicalChallengeId
-            );
-            const stateMachine =
-                technicalChallenge.stateMachines[stateMachineId];
-            if (!stateMachine) {
-                throw new ReducerError(
-                    `StateMachine ${stateMachineId} not found in technical challenge ${technicalChallenge.id}.`
+            benchmark(draftState.participantKey, 'assignPersonnel', () => {
+                const technicalChallenge = getElement(
+                    draftState,
+                    'technicalChallenge',
+                    technicalChallengeId
                 );
-            }
 
-            if (!(taskId in currentStateOf(stateMachine).possibleTasks)) {
-                throw new ReducerError(
-                    `Task ${taskId} is not possible in current state ${stateMachine.currentStateId}`
+                const stateMachine =
+                    technicalChallenge.stateMachines[stateMachineId];
+                if (!stateMachine) {
+                    throw new ReducerError(
+                        `StateMachine ${stateMachineId} not found in technical challenge ${technicalChallenge.id}.`
+                    );
+                }
+
+                if (!(taskId in currentStateOf(stateMachine).possibleTasks)) {
+                    throw new ReducerError(
+                        `Task ${taskId} is not possible in current state ${stateMachine.currentStateId}`
+                    );
+                }
+
+                updateTaskProgress(
+                    stateMachine,
+                    draftState.currentTime,
+                    taskId
                 );
-            }
 
-            updateTaskProgress(stateMachine, draftState.currentTime, taskId);
+                stateMachine.assignedPersonnel[personnelId] = taskId;
 
-            stateMachine.assignedPersonnel[personnelId] = taskId;
+                updateEventQueue(
+                    draftState,
+                    technicalChallengeId,
+                    stateMachine
+                );
 
-            updateEventQueue(draftState, technicalChallengeId, stateMachine);
+                logTechnicalChallengePersonnelAssigned(
+                    draftState,
+                    technicalChallengeId,
+                    personnelId,
+                    taskId
+                );
 
-            logTechnicalChallengePersonnelAssigned(
-                draftState,
-                technicalChallengeId,
-                personnelId,
-                taskId
-            );
-
-            PersonnelActionReducers.movePersonnel.reducer(draftState, {
-                type: '[Personnel] Move personnel',
-                personnelId,
-                targetPosition,
+                PersonnelActionReducers.movePersonnel.reducer(draftState, {
+                    type: '[Personnel] Move personnel',
+                    personnelId,
+                    targetPosition,
+                });
             });
 
             return draftState;

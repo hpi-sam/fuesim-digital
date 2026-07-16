@@ -32,7 +32,7 @@ interface LocalInputData {
     selector: 'app-view-scoutable-criterion-form',
     templateUrl: './view-scoutable-criterion-form.component.html',
     styleUrls: ['./view-scoutable-criterion-form.component.scss'],
-    imports: [FormField, FormsModule],
+    imports: [FormsModule],
 })
 export class ViewScoutableEvalCriterionFormComponent {
     private readonly store = inject<Store<AppState>>(Store);

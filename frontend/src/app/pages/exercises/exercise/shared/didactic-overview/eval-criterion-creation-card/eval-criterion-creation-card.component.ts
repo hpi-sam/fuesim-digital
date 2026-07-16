@@ -44,6 +44,9 @@ import {
     isBoolEvalCriterion,
     EvalCriterionId,
     newViewScoutableEvalCriterion,
+    boolEvalCriterionLeafTypes,
+    newCountCompletedEvalCriterion,
+    newOrEvalCriterion,
 } from '../../../../../../../../../shared/dist/models/eval-criterion';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { AppState } from '../../../../../../state/app.state';
@@ -88,6 +91,11 @@ export class EvalCriterionCreationCardComponent {
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
     public readonly patientStatusAllowedValues = patientStatusAllowedValues;
     public readonly statusNames = statusNames;
+    public readonly boolEvalCriterionLeafTypes = boolEvalCriterionLeafTypes;
+    public readonly numberEvalCriterionTypes = numberEvalCriterionTypes;
+    public readonly combinedEvalCriterionTypes = combinedEvalCriterionTypes;
+
+    public readonly selectedSubResultsIn = input.required<EvalResult[]>();
 
     public readonly draftEvalResults = computed(() =>
         Object.values(this.store.selectSignal(selectDraftEvalResults)())
@@ -113,29 +121,27 @@ export class EvalCriterionCreationCardComponent {
         });
         this.tickSubscribtion = sub;
         effect(() => {
+            this.criterionForm
+                .subCriteria()
+                .value.set([
+                    ...this.selectedSubResultsIn().map((res) => res.criterion),
+                    ...this.selectedTempSubResults().map(
+                        (res) => res.criterion
+                    ),
+                ]);
             this.areResultsTablesInSelectionModeOut.emit(
                 this.areResultsTablesInSelectionMode()
             );
         });
     }
 
-    public readonly areResultsTablesInSelectionMode = signal<boolean>(false);
+    public readonly areResultsTablesInSelectionMode = computed(() => {
+        return this.criterionCreationCategory() === 'combinedEvalCriterion';
+    });
     public readonly areResultsTablesInSelectionModeOut = output<boolean>();
     public readonly criterionCreationCategory =
-        input.required<EvalCriterionCategory>();
-    public readonly criterionTypeOptions = computed(() => {
-        switch (this.criterionCreationCategory()) {
-            case 'boolEvalCriterion': {
-                return boolEvalCritrionTypes;
-            }
-            case 'numberEvalCriterion': {
-                return numberEvalCriterionTypes;
-            }
-            case 'combinedEvalCriterion': {
-                return combinedEvalCriterionTypes;
-            }
-        }
-    });
+        signal<EvalCriterionCategory | null>(null);
+
     public readonly criterionCreationType = signal<EvalCriterionType | null>(
         null
     );
@@ -196,6 +202,7 @@ export class EvalCriterionCreationCardComponent {
         targetPatients: [],
         targetScoutableId: '',
         subCriteria: [],
+        singleSubCriterion: '',
     });
     criterionForm = form(this.inputModel);
     public addPatients(patients: Patient[]) {
@@ -246,19 +253,8 @@ export class EvalCriterionCreationCardComponent {
             }
         }
     }
-    public readonly selectableSubCriteria = computed(() => {
-        this.evalCriteria().filter((crit) => isBoolEvalCriterion(crit));
-    });
+    public readonly selectedTempSubResults = signal<EvalResult[]>([]);
 
-    public updateSelectedSubCriteria(
-        newCriterion: EvalCriterion | null,
-        index: number
-    ) {
-        this.criterionForm.subCriteria().value.update((value) => {
-            value[index] = newCriterion;
-            return value;
-        });
-    }
     private async createCriteria(criteria: EvalCriterion[]) {
         await this.exerciseService.proposeAction({
             type: '[EvalCriterion] New Criterions',
@@ -287,21 +283,6 @@ export class EvalCriterionCreationCardComponent {
         const criterionCategory = this.criterionCreationCategory();
         if (criterionCategory === 'combinedEvalCriterion') {
             /* TODO @JohannesPotzi @Jogius : implements for all combined criteria types*/
-            const criterion = newAndEvalCriterion(
-                'new AND eval crit',
-                this.criterionForm
-                    .subCriteria()
-                    .value()
-                    .reduce<BoolEvalCriterionId[]>((obj, entry) => {
-                        if (entry && isBoolEvalCriterion(entry)) {
-                            obj = [...obj, entry.id as BoolEvalCriterionId];
-                        }
-                        return obj;
-                    }, []),
-                isVisisbleForParticipants,
-                asDraft
-            );
-            this.addCriteriaToCart([criterion]);
         }
         switch (criterionType) {
             case 'reachTechnicalChallengeStateEvalCriterion': {
@@ -316,7 +297,7 @@ export class EvalCriterionCreationCardComponent {
 
                     const criterion = technicalChallengeId
                         ? newReachTechnicalChallengeStateEvalCriterion(
-                              'TH',
+                              this.criterionForm.name().value(),
                               technicalChallengeId,
                               stateId,
                               isVisisbleForParticipants,
@@ -334,10 +315,13 @@ export class EvalCriterionCreationCardComponent {
                     .map((pat) => {
                         const status =
                             this.selectedPatientStatusMap()[pat.id] ?? 'black';
+                        const name = this.criterionForm.name().value();
                         return newPatientAtStatusEvalCriterion(
-                            `Patient ${pat.identifier} erreicht Status ${
-                                statusNames[status]
-                            }`,
+                            name === ''
+                                ? `Patient ${pat.identifier} erreicht Status ${
+                                      statusNames[status]
+                                  }`
+                                : name,
                             pat.id,
                             status,
                             isVisisbleForParticipants,
@@ -396,15 +380,45 @@ export class EvalCriterionCreationCardComponent {
                 break;
             }
             case 'andEvalCriterion': {
-                /* TODO @JohannesPotzi @Jogius */
+                const criterion = newAndEvalCriterion(
+                    this.criterionForm.name().value(),
+                    this.criterionForm
+                        .subCriteria()
+                        .value()
+                        .filter((crit) => isBoolEvalCriterion(crit))
+                        .map((crit) => crit.id as BoolEvalCriterionId),
+                    isVisisbleForParticipants,
+                    asDraft
+                );
+                this.addCriteriaToCart([criterion]);
                 break;
             }
             case 'countCompletedEvalCriterion': {
-                /* TODO @JohannesPotzi @Jogius */
+                const criterion = newCountCompletedEvalCriterion(
+                    this.criterionForm.name().value(),
+                    this.criterionForm
+                        .subCriteria()
+                        .value()
+                        .filter((crit) => isBoolEvalCriterion(crit))
+                        .map((crit) => crit.id as BoolEvalCriterionId),
+                    isVisisbleForParticipants,
+                    asDraft
+                );
+                this.addCriteriaToCart([criterion]);
                 break;
             }
             case 'orEvalCriterion': {
-                /* TODO @JohannesPotzi @Jogius */
+                const criterion = newOrEvalCriterion(
+                    this.criterionForm.name().value(),
+                    this.criterionForm
+                        .subCriteria()
+                        .value()
+                        .filter((crit) => isBoolEvalCriterion(crit))
+                        .map((crit) => crit.id as BoolEvalCriterionId),
+                    isVisisbleForParticipants,
+                    asDraft
+                );
+                this.addCriteriaToCart([criterion]);
                 break;
             }
             default:

@@ -5,6 +5,7 @@ import {
     inject,
     input,
     OnInit,
+    output,
     signal,
     WritableSignal,
 } from '@angular/core';
@@ -53,6 +54,8 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
     public readonly isInSelectionModeInput = input<boolean>(true);
     public readonly rootResults = input.required<EvalResult[]>();
 
+    public readonly selectedResultsOut = output<EvalResult[]>();
+
     public readonly isInSelectionMode = signal<boolean>(false);
     public getChildResultsOfResult = getChildResultsOfResult;
     public readonly results = this.store.selectSignal(selectEvalResults);
@@ -86,7 +89,26 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
         effect(async () => {
             this.updateSubTables();
             this.isInSelectionMode.set(this.isInSelectionModeInput());
+            if (this.isInSelectionMode()) {
+                this.selectedResultsOut.emit(
+                    this.rootResults().filter(
+                        (res) => this.selectedResults()[res.criterionId]
+                    )
+                );
+                console.log('emitting selected subResults.');
+            }
         });
+    }
+
+    public emitSelectedSubResults() {
+        if (this.isInSelectionMode()) {
+            this.selectedResultsOut.emit(
+                this.rootResults().filter(
+                    (res) => this.selectedResults()[res.criterionId]
+                )
+            );
+            console.log('emitting selected subResults.');
+        }
     }
 
     public async updateSubTables() {

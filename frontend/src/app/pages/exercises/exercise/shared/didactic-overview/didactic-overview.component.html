@@ -1,6 +1,9 @@
 @if (this.enableCriterionCreation()) {
     <div>
-        <div ngbDropdown class="d-inline-block">
+        <button class="btn btn-primary" (click)="this.creatingcriterion = true">
+            Auswertungskriterium Erstellen
+        </button>
+        <!-- <div ngbDropdown class="d-inline-block">
             <button
                 type="button"
                 ngbDropdownToggle
@@ -40,11 +43,11 @@
                     Kombiniertes Kriterium
                 </button>
             </div>
-        </div>
+        </div> -->
     </div>
-    @if (creatingcriterion && this.criterionCreationCategory()) {
+    @if (creatingcriterion) {
         <app-eval-criterion-creation-card
-            [criterionCreationCategory]="this.criterionCreationCategory()!"
+            [selectedSubResultsIn]="this.selectedSubResults()"
         />
     }
 }
@@ -72,6 +75,9 @@
         <!-- TODO @JohannesPotzi @Jogius : integrate the creation form into the list. -->
         <app-didactic-overview-results-table
             [rootResults]="this.rootResults()"
+            (selectedResultsOut)="
+                this.selectedSubResults.set($event); logSubResults($event)
+            "
         />
     }
 </div>

@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    output,
+    signal,
+} from '@angular/core';
 import {
     NgbDropdown,
     NgbDropdownToggle,
@@ -39,11 +46,7 @@ import { DidacticOverViewResultsTableComponent } from './result-table/didactic-o
     styleUrls: ['./didactic-overview.component.scss'],
     imports: [
         EvalCriterionCreationCardComponent,
-        NgbDropdown,
-        NgbDropdownToggle,
-        NgbDropdownMenu,
-        NgbDropdownButtonItem,
-        NgbDropdownItem,
+
         DidacticOverViewResultsTableComponent,
     ],
 })
@@ -55,6 +58,8 @@ export class DidacticOverviewComponent {
 
     public readonly tableWidth = input.required<number>();
     public readonly enableCriterionCreation = input<boolean>(true);
+
+    public readonly selectedSubResults = signal<EvalResult[]>([]);
 
     public readonly rootCriteriaMap = computed(() =>
         this.getRootCriteriaMap(this.store.selectSignal(selectEvalCriteria)())
@@ -93,6 +98,13 @@ export class DidacticOverviewComponent {
         }
         return count;
     });
+    public logSubResults(results: EvalResult[]) {
+        console.log(
+            'selecting sub results from main list.' +
+                ' count: ' +
+                results.length
+        );
+    }
     private readonly tcs = this.store.selectSignal(selectTechnicalChallenges);
     public readonly technicalChallenges = signal(Object.values(this.tcs()));
     creatingcriterion = false;

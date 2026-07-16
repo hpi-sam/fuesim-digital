@@ -220,6 +220,12 @@ export const boolEvalCritrionTypes = [
     'viewScoutableEvalCriterion',
 ] satisfies BoolEvalCriterionType[];
 
+export const boolEvalCriterionLeafTypes = [
+    'patientAtStatusEvalCriterion',
+    'reachTechnicalChallengeStateEvalCriterion',
+    'viewScoutableEvalCriterion',
+] satisfies BoolEvalCriterionType[];
+
 export type NumberEvalCriterionType = NumberEvalCriterion['criterionType'];
 export const numberEvalCriterionTypes = [
     'constNumEvalCriterion',
@@ -282,6 +288,7 @@ export const evalCriterionTypesNames: {
     firstTrueAtEvalCriterion: 'Zeitpunkt von Kriterium Erfüllung',
     countPatientsAtStatusEvalCriterion: 'Anzahl von Patienten mit Status',
 } as const;
+
 export function newAndEvalCriterion(
     name: string,
     children?: BoolEvalCriterionId[],

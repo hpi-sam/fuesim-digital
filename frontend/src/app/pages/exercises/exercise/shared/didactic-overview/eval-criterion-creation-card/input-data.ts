@@ -1,4 +1,5 @@
 import {
+    EvalCriterionId,
     type EvalCriterion,
     type Patient,
     type PatientStatus,
@@ -17,5 +18,6 @@ export interface InputData {
     targetTechnicalChallengeState: TechnicalChallengeStateId | '';
     targetPatients: Patient[];
     targetScoutableId: UUID | '';
-    subCriteria: (EvalCriterion | null)[];
+    subCriteria: EvalCriterion[];
+    singleSubCriterion: EvalCriterionId | '';
 }

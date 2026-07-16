@@ -1,12 +1,103 @@
 <div class="container-fluid d-flex flex-column h-100 mt-3 ms-1">
-    <div class="card rounded-2" style="min-width: 600px; max-width: 700px">
+    <div class="card rounded-2" style="min-width: 600px; max-width: 850px">
         <div class="card-header text-center">
             <h5 class="mb-0 ms-0 d-flex align-items-center">
                 Neues
                 {{
-                    evalCriterionCategoryNames[this.criterionCreationCategory()]
+                    this.criterionCreationCategory()
+                        ? evalCriterionCategoryNames[
+                              this.criterionCreationCategory()!
+                          ]
+                        : 'Kriterium'
                 }}
                 <div ngbDropdown class="d-inline-block">
+                    <button
+                        type="button"
+                        ngbDropdownToggle
+                        class="btn btn-outline-primary ms-3"
+                        data-cy="didacticOverviewAddEvalCriterionButton"
+                    >
+                        <i class="bi bi-plus"></i>
+                        Erfüllbares Kriterium
+                    </button>
+                    <div ngbDropdownMenu class="position-absolute">
+                        @for (
+                            option of this.boolEvalCriterionLeafTypes;
+                            track $index
+                        ) {
+                            <button
+                                ngbDropdownItem
+                                (click)="
+                                    this.criterionCreationType.set(option);
+                                    this.criterionCreationCategory.set(
+                                        'boolEvalCriterion'
+                                    )
+                                "
+                            >
+                                {{ evalCriterionTypesNames[option] }}
+                            </button>
+                        }
+                    </div>
+                </div>
+                <div ngbDropdown class="d-inline-block">
+                    <button
+                        type="button"
+                        ngbDropdownToggle
+                        class="btn btn-outline-primary ms-3"
+                        data-cy="didacticOverviewAddEvalCriterionButton"
+                    >
+                        <i class="bi bi-plus"></i>
+                        Zähl Kriterium
+                    </button>
+                    <div ngbDropdownMenu class="position-absolute">
+                        @for (
+                            option of this.numberEvalCriterionTypes;
+                            track $index
+                        ) {
+                            <button
+                                ngbDropdownItem
+                                (click)="
+                                    this.criterionCreationType.set(option);
+                                    this.criterionCreationCategory.set(
+                                        'boolEvalCriterion'
+                                    )
+                                "
+                            >
+                                {{ evalCriterionTypesNames[option] }}
+                            </button>
+                        }
+                    </div>
+                </div>
+                <div ngbDropdown class="d-inline-block">
+                    <button
+                        type="button"
+                        ngbDropdownToggle
+                        class="btn btn-outline-primary ms-3"
+                        data-cy="didacticOverviewAddEvalCriterionButton"
+                    >
+                        <i class="bi bi-plus"></i>
+                        Kombiniertes Kriterium
+                    </button>
+                    <div ngbDropdownMenu class="position-absolute">
+                        @for (
+                            option of this.combinedEvalCriterionTypes;
+                            track $index
+                        ) {
+                            <button
+                                ngbDropdownItem
+                                (click)="
+                                    this.criterionCreationType.set(option);
+                                    this.criterionCreationCategory.set(
+                                        'boolEvalCriterion'
+                                    )
+                                "
+                            >
+                                {{ evalCriterionTypesNames[option] }}
+                            </button>
+                        }
+                    </div>
+                </div>
+                <!-- <div ngbDropdown class="d-inline-block">
                     <button
                         type="button"
                         ngbDropdownToggle
@@ -35,13 +126,15 @@
                             </button>
                         }
                     </div>
-                </div>
+                </div> -->
             </h5>
         </div>
         <div class="card-body" p-4>
             <form class="ms-2">
                 <!-- TODO @JohannesPotzi : add computed value for crit type name -->
                 <label>Typ: {{ this.criterionCreationTypeName() }}</label>
+            </form>
+            <form class="ms-2">
                 <label
                     >name:
                     <input
@@ -53,7 +146,8 @@
                     />
                 </label>
             </form>
-            @if (criterionCreationCategory() === 'combinedEvalCriterion') {
+
+            <!-- @if (criterionCreationCategory() === 'combinedEvalCriterion') {
                 <form class="ms-2">
                     <label>
                         <button
@@ -98,7 +192,17 @@
                         </label>
                     }
                 </form>
+            } -->
+            @if (
+                criterionCreationCategory() === 'combinedEvalCriterion' &&
+                this.criterionForm.subCriteria().value().length === 0
+            ) {
+                <span class="text-muted"
+                    >Wählen sie die gewünschten Unterkriterien unten aus den
+                    Listen.</span
+                >
             }
+
             @switch (criterionCreationType()) {
                 @case (null) {
                     <span class="text-muted"
@@ -267,6 +371,9 @@
                     [rootResults]="this.draftEvalResults()"
                     [isInSelectionModeInput]="
                         this.areResultsTablesInSelectionMode()
+                    "
+                    (selectedResultsOut)="
+                        this.selectedTempSubResults.set($event)
                     "
                 />
             }

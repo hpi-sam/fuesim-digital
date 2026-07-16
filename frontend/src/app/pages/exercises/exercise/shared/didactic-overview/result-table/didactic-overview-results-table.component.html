@@ -30,7 +30,12 @@
                             @let result = subTable.result;
                             @let criterion = result.criterion;
 
-                            <tr (click)="this.toggleSelectResult(result)">
+                            <tr
+                                (click)="
+                                    this.toggleSelectResult(result);
+                                    emitSelectedSubResults()
+                                "
+                            >
                                 @if (isInSelectionMode()) {
                                     <td
                                         [class.selected]="

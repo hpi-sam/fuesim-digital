@@ -12,6 +12,10 @@ export const countCompletedEvalCriterionSchema = z.strictObject({
     criterionType: z.literal('countCompletedEvalCriterion'),
     children: z.array(boolEvalCriterionIdSchema).min(1),
 });
+/** This is a combined number eval criterion with an array of bool children by id;
+ * The respecive EvalResult holds the count of fullfilled child criteria.
+ * This synergises with the compare criterion and allows trainers to compare its dynamic value against a number of another number criterion.
+ */
 export type CountCompletedEvalCriterion = z.infer<
     typeof countCompletedEvalCriterionSchema
 >;

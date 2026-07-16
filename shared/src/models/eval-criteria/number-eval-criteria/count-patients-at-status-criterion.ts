@@ -14,6 +14,10 @@ export const countPatientsAtStatusEvalCriterionSchema = z.strictObject({
     targetStatus: patientStatusSchema,
     criterionType: z.literal('countPatientsAtStatusEvalCriterion'),
 });
+/** This is a number eval criterion with a target PatientStatus;
+ * The respective EvalResult holds the count of patients with the specified status as real status.
+ * This synergises with the compare criterion and allows trainers to compare its dynamic value against a number of another number criterion.
+ */
 export type CountPatientsAtStatusEvalCriterion = z.infer<
     typeof countPatientsAtStatusEvalCriterionSchema
 >;

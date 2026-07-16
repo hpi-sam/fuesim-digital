@@ -10,6 +10,9 @@ export const viewScoutableEvalCriterionSchema = z.strictObject({
     criterionType: z.literal('viewScoutableEvalCriterion'),
     targetScoutableId: uuidSchema,
 });
+/**
+ * This is a bool leaf eval criterion which should evaluate as true, precisely when the target scoutable has been viewed by participants.
+ */
 export type ViewScoutableEvalCriterion = z.infer<
     typeof viewScoutableEvalCriterionSchema
 >;

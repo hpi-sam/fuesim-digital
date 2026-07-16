@@ -12,6 +12,11 @@ export const orEvalCriterionSchema = z.strictObject({
     criterionType: z.literal('orEvalCriterion'),
     children: z.array(boolEvalCriterionIdSchema).min(1),
 });
+/**
+ * This is a combined bool criterion with an array of bool critrion children by id;
+ * Precisely when any children are fullfilled, this should be fullfilled.
+ * This is motivated by a diversity of possible solutions of a given exercise scenario.
+ */
 export type OrEvalCriterion = z.infer<typeof orEvalCriterionSchema>;
 export function newOrEvalCriterion(
     name: string,

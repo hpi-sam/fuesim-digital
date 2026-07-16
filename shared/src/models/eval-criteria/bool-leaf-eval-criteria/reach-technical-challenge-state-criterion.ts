@@ -19,6 +19,9 @@ export const reachTechnicalChallengeStateEvalCriterionSchema = z.strictObject({
     targetTechnicalChallengeId: technicalChallengeIdSchema,
     targetTechnicalChallengeStateId: technicalChallengeStateIdSchema,
 });
+/**
+ * This is a bool leaf eval criterion which should evaluate as true, precisely when the target technical challenge's state is the target state.
+ */
 export type ReachTechnicalChallengeStateEvalCriterion = z.infer<
     typeof reachTechnicalChallengeStateEvalCriterionSchema
 >;

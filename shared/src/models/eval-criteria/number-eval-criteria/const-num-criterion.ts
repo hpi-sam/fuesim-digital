@@ -10,6 +10,9 @@ export const constNumEvalCriterionSchema = z.strictObject({
     criterionType: z.literal('constNumEvalCriterion'),
     num: z.number(),
 });
+/** This is a number eval criterion, which holds a constant number, specified on creation.
+ * This synergises with the compare criterion and allows trainers to compare dynamic values from number criteria against constant expected value.
+ */
 export type ConstNumEvalCriterion = z.infer<typeof constNumEvalCriterionSchema>;
 
 export function newConstNumEvalCriterion(

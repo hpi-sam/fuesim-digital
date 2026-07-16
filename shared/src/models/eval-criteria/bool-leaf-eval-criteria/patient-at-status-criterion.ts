@@ -15,6 +15,9 @@ export const patientAtStatusEvalCriterionSchema = z.strictObject({
     targetPatientId: uuidSchema,
     targetStatus: patientStatusSchema,
 });
+/**
+ * This is a bool leaf eval criterion which should evaluate as true, precisely when the target patient's real status is the target status.
+ */
 export type PatientAtStatusEvalCriterion = z.infer<
     typeof patientAtStatusEvalCriterionSchema
 >;

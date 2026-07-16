@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { uuidSchema } from '../../utils/uuid.js';
-import { patientAtStatusEvalCriterionSchema } from './bool-eval-criterion-leaves/patient-at-status-criterion.js';
-import { viewScoutableEvalCriterionSchema } from './bool-eval-criterion-leaves/view-scoutable-criterion.js';
-import { reachTechnicalChallengeStateEvalCriterionSchema } from './bool-eval-criterion-leaves/reach-technical-challenge-state-criterion.js';
+import { patientAtStatusEvalCriterionSchema } from './bool-leaf-eval-criteria/patient-at-status-criterion.js';
+import { viewScoutableEvalCriterionSchema } from './bool-leaf-eval-criteria/view-scoutable-criterion.js';
+import { reachTechnicalChallengeStateEvalCriterionSchema } from './bool-leaf-eval-criteria/reach-technical-challenge-state-criterion.js';
 import { compareEvalCriterionSchema } from './bool-combined-criteria/compare-criterion.js';
 import { constNumEvalCriterionSchema } from './number-eval-criteria/const-num-criterion.js';
 import { countCompletedEvalCriterionSchema } from './number-eval-criteria/count-completed-criterion.js';

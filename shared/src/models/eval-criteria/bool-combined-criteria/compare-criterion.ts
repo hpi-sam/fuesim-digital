@@ -25,6 +25,9 @@ export const compareEvalCriterionSchema = z.strictObject({
     yellowThreshold: z.number(),
     redThreshold: z.number(),
 });
+/* TODO @JohannesPotzi : add motivation */
+/** This is a combined bool criterion with two child number criteria by id and a ComparativeOperator;
+ * Precisely, when the expression (leftChild operator rightChild) is true, this should be fullfilled.*/
 export type CompareEvalCriterion = z.infer<typeof compareEvalCriterionSchema>;
 
 export function newCompareEvalCriterion(

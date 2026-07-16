@@ -12,6 +12,11 @@ export const andEvalCriterionSchema = z.strictObject({
     criterionType: z.literal('andEvalCriterion'),
     children: z.array(boolEvalCriterionIdSchema).min(1),
 });
+/**
+ * This is a combined bool criterion with an array of bool critrion children by id;
+ * Precisely when all children fullfilled, this should be fullfilled.
+ * This is motivated by compactness of the results table.
+ */
 export type AndEvalCriterion = z.infer<typeof andEvalCriterionSchema>;
 
 export function newAndEvalCriterion(

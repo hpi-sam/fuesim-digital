@@ -1,21 +1,6 @@
-import {
-    Component,
-    computed,
-    inject,
-    input,
-    output,
-    signal,
-} from '@angular/core';
-import {
-    NgbDropdown,
-    NgbDropdownToggle,
-    NgbDropdownMenu,
-    NgbDropdownButtonItem,
-    NgbDropdownItem,
-} from '@ng-bootstrap/ng-bootstrap';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
-    boolEvalCritrionTypes,
     numberEvalCriterionTypes,
     combinedEvalCriterionTypes,
     evalCriterionTypesNames,
@@ -31,7 +16,6 @@ import {
 } from 'fuesim-digital-shared';
 import {
     selectEvalCriteria,
-    selectEvalResults,
     selectNonDraftEvalResults,
     selectTechnicalChallenges,
 } from '../../../../../state/application/selectors/exercise.selectors';
@@ -108,7 +92,6 @@ export class DidacticOverviewComponent {
     private readonly tcs = this.store.selectSignal(selectTechnicalChallenges);
     public readonly technicalChallenges = signal(Object.values(this.tcs()));
     creatingcriterion = false;
-    public readonly boolEvalCriterionTypes = boolEvalCritrionTypes;
     public readonly numberEvalCriterionTypes = numberEvalCriterionTypes;
     public readonly combinedEvalCriterionTypes = combinedEvalCriterionTypes;
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;

@@ -3,7 +3,7 @@ import type { ActionReducer } from '../action-reducer.js';
 import {
     evalCriterionIdSchema,
     evalCriterionSchema,
-} from '../../models/eval-criterion.js';
+} from '../../models/eval-criteria/criterion-categories.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { ReducerError } from '../reducer-error.js';
 import { getElement } from './utils/get-element.js';

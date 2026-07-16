@@ -5,6 +5,7 @@ export * from './export-import/file-format/index.js';
 export * from './models/index.js';
 export * from './models/utils/index.js';
 export * from './models/radiogram/index.js';
+export * from './models/eval-criteria/index.js';
 export * from './models/utils/role.js';
 export * from './utils/index.js';
 export * from './simulation/index.js';

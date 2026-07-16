@@ -1,34 +1,29 @@
 import { z } from 'zod';
-import type {
+import {
     BoolEvalCriterion,
     EvalCriterion,
     EvalCriterionId,
     NumberEvalCriterion,
-} from '../models/eval-criterion.js';
-import {
     boolEvalCriterionSchema,
     evalCriterionIdSchema,
-    getChildrenOfEvalCriterion,
-    isNumberEvalCriterion,
     isTemporalEvalCriterionType,
     numberEvalCriterionSchema,
-} from '../models/eval-criterion.js';
-import type { Patient } from '../models/patient.js';
-import type { Scoutable } from '../models/scoutable.js';
-import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
-import type { UUID } from './uuid.js';
-import { uuid, uuidSchema } from './uuid.js';
-import {
+    getChildrenOfEvalCriterion,
+    isNumberEvalCriterion,
+    Patient,
+    Scoutable,
+    TechnicalChallenge,
+    UUID,
+    uuid,
+    uuidSchema,
     currentStateOf,
     Measure,
-    MeasureTemplate,
     MeasureTemplateCategory,
-} from '../models/index.js';
-import { ExerciseTimeline } from './exercise-time-line.js';
-import { ExerciseState } from '../state.js';
+    ExerciseState,
+    applyAction,
+    ExerciseAction,
+} from 'fuesim-digital-shared';
 import { produce } from 'immer';
-import { applyAction } from '../store/reduce-exercise-state.js';
-import { ExerciseAction } from '../store/index.js';
 
 export const evalResultBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -58,12 +53,29 @@ export const evalResultSchema = z.discriminatedUnion('type', [
 ]);
 export type EvalResult = z.infer<typeof evalResultSchema>;
 
+/**
+ * Recursively evaluates subcriteria to get the result of a given root criterion; Called in getEvalResultsFromCriteria
+ * @param evalCriterion the criterion for wich the result is specified
+ * @param evalCriteria needed for sub-criteria
+ * @param technicalChallenges needed for reach technical challenge state criteria
+ * @param patients needed for count patients at status and patient at status criteria
+ * @param scoutables needed for view scoutable
+ * @param currentTime needed for timestamp of result
+ * @param cache contains previously calculated results.
+ * Reduces unnecessary evaluation of criteria, as criteria might be sub-criteria of other criteria and therefore are referenced multiple times in the state.
+ * @param previousResult for first true at criteria.
+ * This is only helpful for criteria in the exercise template and for clients which were active when the criteria first should be true.
+ * In other cases the calculation needs to be done via the action history.
+ * @returns The EvalResult of the given EvalCriterion
+ */
 export function getEvalResultFromCriterion(
     evalCriterion: EvalCriterion,
     evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
     technicalChallenges: { [key: string]: TechnicalChallenge },
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
+    measures: { [key: string]: Measure },
+    measureTemplates: { [key: string]: MeasureTemplateCategory },
     currentTime: number,
     cache: { [key: string]: EvalResult },
     previousResult?: EvalResult
@@ -75,6 +87,8 @@ export function getEvalResultFromCriterion(
             technicalChallenges,
             patients,
             scoutables,
+            measures,
+            measureTemplates,
             currentTime,
             cache
         );
@@ -339,6 +353,8 @@ export function getEvalResultsFromCriteria(
                     technicalChallenges,
                     patients,
                     scoutables,
+                    measures,
+                    measureTemplates,
                     currentTime,
                     cache
                 )
@@ -365,6 +381,8 @@ export function updateEvalResultsMap(
     technicalChallenges: { [key: string]: TechnicalChallenge },
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
+    measures: { [key: string]: Measure },
+    measureTemplates: { [key: string]: MeasureTemplateCategory },
     currentTime: number,
     temporalOnly: boolean
 ): { [criterionId: string]: EvalResult } {
@@ -388,6 +406,8 @@ export function updateEvalResultsMap(
                     technicalChallenges,
                     patients,
                     scoutables,
+                    measures,
+                    measureTemplates,
                     currentTime,
                     tmpCache,
                     previousRes

@@ -9,14 +9,30 @@ import {
 } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import {
-    EvalResult,
+    type EvalResult,
     getEvalResultFromCriterion,
-    getEvalResultsFromCriteria,
     type Patient,
     type PatientStatus,
     patientStatusAllowedValues,
     statusNames,
     type UUID,
+    combinedEvalCriterionTypes,
+    type EvalCriterionCategory,
+    type EvalCriterionType,
+    evalCriterionTypesNames,
+    numberEvalCriterionTypes,
+    evalCriterionCategoryNames,
+    type EvalCriterion,
+    newReachTechnicalChallengeStateEvalCriterion,
+    newPatientAtStatusEvalCriterion,
+    newAndEvalCriterion,
+    type BoolEvalCriterionId,
+    isBoolEvalCriterion,
+    type EvalCriterionId,
+    newViewScoutableEvalCriterion,
+    boolEvalCriterionLeafTypes,
+    newCountCompletedEvalCriterion,
+    newOrEvalCriterion,
 } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -28,38 +44,21 @@ import {
     NgbDropdownToggle,
 } from '@ng-bootstrap/ng-bootstrap';
 import { ExerciseService } from '../../../../../../core/exercise.service';
-import {
-    boolEvalCritrionTypes,
-    combinedEvalCriterionTypes,
-    EvalCriterionCategory,
-    type EvalCriterionType,
-    evalCriterionTypesNames,
-    numberEvalCriterionTypes,
-    evalCriterionCategoryNames,
-    EvalCriterion,
-    newReachTechnicalChallengeStateEvalCriterion,
-    newPatientAtStatusEvalCriterion,
-    newAndEvalCriterion,
-    BoolEvalCriterionId,
-    isBoolEvalCriterion,
-    EvalCriterionId,
-    newViewScoutableEvalCriterion,
-    boolEvalCriterionLeafTypes,
-    newCountCompletedEvalCriterion,
-    newOrEvalCriterion,
-} from '../../../../../../../../../shared/dist/models/eval-criterion';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { AppState } from '../../../../../../state/app.state';
 import {
     selectCurrentTime,
     selectDraftEvalResults,
     selectEvalCriteria,
+    selectMeasures,
+    selectMeasureTemplateCategories,
+    selectMeasureTemplates,
     selectPatients,
     selectScoutables,
     selectTechnicalChallenges,
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { PatientAtStatusCriterionComponent } from './criterion-forms/patient-at-status-criterion/patient-at-status-criterion.component';
-import { InputData } from './input-data';
+import { type InputData } from './input-data';
 import { ReachTechnicalChallengeStateEvalCriterionFormComponent } from './criterion-forms/reach-technical-challenge-state-criterion/reach-technical-challenge-state-criterion-form.component';
 import { ViewScoutableEvalCriterionFormComponent } from './criterion-forms/view-scoutable-criterion/view-scoutable-criterion-form.component';
 import { DidacticOverViewResultsTableComponent } from '../result-table/didactic-overview-results-table.component';
@@ -435,6 +434,10 @@ export class EvalCriterionCreationCardComponent {
         const patients = this.store.selectSignal(selectPatients)();
         const scoutables = this.store.selectSignal(selectScoutables)();
         const currentTime = this.store.selectSignal(selectCurrentTime)();
+        const measures = this.store.selectSignal(selectMeasures)();
+        const measureTemplates = this.store.selectSignal(
+            selectMeasureTemplateCategories
+        )();
 
         return getEvalResultFromCriterion(
             criterion,
@@ -442,6 +445,8 @@ export class EvalCriterionCreationCardComponent {
             tcs,
             patients,
             scoutables,
+            measures,
+            measureTemplates,
             currentTime,
             cache ?? {}
         );

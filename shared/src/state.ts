@@ -100,7 +100,7 @@ import {
     EvalCriterion,
     evalCriterionBaseSchema,
     evalCriterionSchema,
-} from './models/eval-criterion.js';
+} from './models/eval-criteria/criterion-categories.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)

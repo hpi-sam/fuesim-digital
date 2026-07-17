@@ -1,3 +1,4 @@
+import type { StateMachineId } from '../../models/technical-challenge/ids.js';
 import {
     type StateMachine,
     type StateMachineState,
@@ -75,8 +76,8 @@ function buildKellerexplosionTemplate(): TechnicalChallengeTemplate {
         ].map<[StateMachineState['id'], StateMachineState]>((s) => [s.id, s])
     ) as { [key: StateMachineState['id']]: StateMachineState };
 
-    const sm1Id = 'c9d0e1f2-a3b4-4678-8345-789012345678' as StateMachine['id'];
-    const sm2Id = 'd0e1f2a3-b4c5-4789-9456-890123456789' as StateMachine['id'];
+    const sm1Id = 'c9d0e1f2-a3b4-4678-8345-789012345678' as StateMachineId;
+    const sm2Id = 'd0e1f2a3-b4c5-4789-9456-890123456789' as StateMachineId;
 
     return {
         id: 'e1f2a3b4-c5d6-4890-a567-901234567890',

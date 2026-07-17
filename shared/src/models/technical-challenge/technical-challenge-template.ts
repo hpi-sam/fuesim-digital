@@ -5,11 +5,9 @@ import { uuid, uuidSchema } from '../../utils/uuid.js';
 import { imagePropertiesSchema } from '../utils/image-properties.js';
 import { newNoPosition } from '../utils/position/no-position.js';
 import { newSize } from '../utils/size.js';
-import type {
-    TechnicalChallenge,
-    TechnicalChallengeId,
-} from './technical-challenge.js';
-import { type StateMachine, stateMachineSchema } from './state-machine.js';
+import type { TechnicalChallenge } from './technical-challenge.js';
+import { stateMachineSchema } from './state-machine.js';
+import type { StateMachineId, TechnicalChallengeId } from './ids.js';
 
 export const technicalChallengeTemplateSchema = z.strictObject({
     stateMachines: z
@@ -32,7 +30,7 @@ export function newTechnicalChallengeFromTemplate(
 
     for (const stateMachine of Object.values(stateMachines)) {
         stateMachine.simulationStartTime = creationTime;
-        stateMachine.id = uuid() as StateMachine['id'];
+        stateMachine.id = uuid() as StateMachineId;
     }
 
     return {

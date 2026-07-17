@@ -4,10 +4,7 @@ import { personnelSchema } from '../../models/personnel.js';
 import type { ActionReducer } from '../action-reducer.js';
 import { uuidSchema } from '../../utils/uuid.js';
 import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
-import {
-    technicalChallengeIdSchema,
-    technicalChallengeSchema,
-} from '../../models/technical-challenge/technical-challenge.js';
+import { technicalChallengeSchema } from '../../models/technical-challenge/technical-challenge.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { sizeSchema } from '../../models/utils/size.js';
 import { ReducerError } from '../reducer-error.js';
@@ -20,6 +17,8 @@ import { taskTypeSchema } from '../../models/task-type.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { createScoutableTag } from '../../models/utils/tag-helpers.js';
+import { benchmark } from '../../benchmark.js';
+import { technicalChallengeIdSchema } from '../../models/technical-challenge/ids.js';
 import { getElement } from './utils/get-element.js';
 import {
     logTechnicalChallenge,
@@ -123,40 +122,41 @@ export namespace TechnicalChallengeActionReducers {
                 stateMachineId,
             }
         ) => {
-            const technicalChallenge = getElement(
-                draftState,
-                'technicalChallenge',
-                technicalChallengeId
-            );
-            const stateMachine =
-                technicalChallenge.stateMachines[stateMachineId];
-            if (!stateMachine) {
-                throw new ReducerError(
-                    `StateMachine ${stateMachineId} not found in technical challenge ${technicalChallenge.id}.`
+            benchmark(draftState.participantKey, 'assignPersonnel', () => {
+                const technicalChallenge = getElement(
+                    draftState,
+                    'technicalChallenge',
+                    technicalChallengeId
                 );
-            }
+                const stateMachine =
+                    technicalChallenge.stateMachines[stateMachineId];
+                if (!stateMachine) {
+                    throw new ReducerError(
+                        `StateMachine ${stateMachineId} not found in technical challenge ${technicalChallenge.id}.`
+                    );
+                }
 
-            if (!(taskId in currentStateOf(stateMachine).possibleTasks)) {
-                throw new ReducerError(
-                    `Task ${taskId} is not possible in current state ${stateMachine.currentStateId}`
+                if (!(taskId in currentStateOf(stateMachine).possibleTasks)) {
+                    throw new ReducerError(
+                        `Task ${taskId} is not possible in current state ${stateMachine.currentStateId}`
+                    );
+                }
+
+                stateMachine.assignedPersonnel[personnelId] = taskId;
+
+                logTechnicalChallengePersonnelAssigned(
+                    draftState,
+                    technicalChallengeId,
+                    personnelId,
+                    taskId
                 );
-            }
 
-            stateMachine.assignedPersonnel[personnelId] = taskId;
-
-            logTechnicalChallengePersonnelAssigned(
-                draftState,
-                technicalChallengeId,
-                personnelId,
-                taskId
-            );
-
-            PersonnelActionReducers.movePersonnel.reducer(draftState, {
-                type: '[Personnel] Move personnel',
-                personnelId,
-                targetPosition,
+                PersonnelActionReducers.movePersonnel.reducer(draftState, {
+                    type: '[Personnel] Move personnel',
+                    personnelId,
+                    targetPosition,
+                });
             });
-
             return draftState;
         },
         rights: 'participant',

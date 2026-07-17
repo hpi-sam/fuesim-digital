@@ -12,7 +12,7 @@ import type {
     UUID,
     Vehicle,
     WithPosition,
-    StateMachine,
+    StateMachineId,
 } from 'fuesim-digital-shared';
 import {
     currentStateOf,
@@ -437,7 +437,7 @@ export function createSelectActivityStatesByType<
 
 export function createSelectCurrentStateOf(
     technicalChallengeId: TechnicalChallengeId,
-    stateMachineId: StateMachine['id']
+    stateMachineId: StateMachineId
 ) {
     return createSelector(
         createSelectTechnicalChallenge(technicalChallengeId),

@@ -18,3 +18,4 @@ export * from './ids.js';
 export * from './validation-messages.js';
 export * from './marketplace/index.js';
 export * from './data/index.js';
+export * from './benchmark.js';

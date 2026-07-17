@@ -5,7 +5,7 @@ import {
     newSize,
 } from 'fuesim-digital-shared';
 import type {
-    StateMachine,
+    StateMachineId,
     StateMachineState,
     TechnicalChallenge,
     TechnicalChallengeId,
@@ -195,7 +195,7 @@ export class TechnicalChallengeFeatureManager
             );
         };
         const assignTaskCallback = async (
-            stateMachineId: StateMachine['id'],
+            stateMachineId: StateMachineId,
             taskId: TaskType['id']
         ) => {
             const response = await this.exerciseService.proposeAction(

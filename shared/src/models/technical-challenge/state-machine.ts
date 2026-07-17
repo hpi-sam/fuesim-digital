@@ -18,7 +18,10 @@ import {
     logTechnicalChallengePersonnelUnassigned,
     logTechnicalChallengeStateTransition,
 } from '../../store/action-reducers/utils/log.js';
+import { benchmark } from '../../benchmark.js';
 import type { TechnicalChallenge } from './technical-challenge.js';
+import type { GuardId } from './ids.js';
+import { guardIdSchema, transitionIdSchema } from './ids.js';
 
 const taskSchema = z.object({
     /**
@@ -34,9 +37,14 @@ const timerSchema = z.object({
     name: z.string(),
     totalDuration: z.number().nonnegative(),
 });
-type Timer = z.infer<typeof timerSchema>;
+export type Timer = z.infer<typeof timerSchema>;
+
+const baseGuardSchema = z.strictObject({
+    id: guardIdSchema,
+});
 
 const taskGuardSchema = z.object({
+    ...baseGuardSchema.shape,
     type: z.literal('taskGuard'),
     /** Percentage of Task.totalDuration */
     minProgress: z.number().min(0).max(1),
@@ -45,6 +53,7 @@ const taskGuardSchema = z.object({
 export type TaskGuard = Immutable<z.infer<typeof taskGuardSchema>>;
 
 const timerGuardSchema = z.object({
+    ...baseGuardSchema.shape,
     type: z.literal('timerGuard'),
     /** Percentage of Timer.totalDuration past */
     minProgress: z.number().min(0).max(1),
@@ -62,23 +71,27 @@ export type TimerGuard = Immutable<z.infer<typeof timerGuardSchema>>;
  */
 
 const andGuardSchema = z.object({
+    ...baseGuardSchema.shape,
     type: z.literal('andGuard'),
     get guards() {
         return z.array(guardSchema);
     },
 });
 export interface AndGuard {
+    id: GuardId;
     type: 'andGuard';
     guards: Immutable<_Guard[]>;
 }
 
 const notGuardSchema = z.strictObject({
+    ...baseGuardSchema.shape,
     type: z.literal('notGuard'),
     get guard() {
         return guardSchema;
     },
 });
 export interface NotGuard {
+    id: GuardId;
     type: 'notGuard';
     guard: Immutable<_Guard>;
 }
@@ -97,6 +110,7 @@ export type Guard = Immutable<z.infer<typeof guardSchema>>;
 
 const stateMachineStateIdSchema = uuidSchema.brand<'StateMachineStateId'>();
 export const transitionSchema = z.object({
+    id: transitionIdSchema,
     targetState: stateMachineStateIdSchema,
     guard: guardSchema,
 });
@@ -380,7 +394,7 @@ function simulateStateMachine(
 
     // the next transition is not necessarily the first one to have its guard
     // fulfilled
-    const nextTransition = state.outgoingTransitions.find(guardFulfilled);
+    const nextTransition = Object.values(state.outgoingTransitions).find(guardFulfilled);
 
     if (!nextTransition) return;
 
@@ -429,6 +443,15 @@ export function simulateTechnicalChallenge(
 }
 
 export function simulateAllTechnicalChallenges(
+    draftState: WritableDraft<ExerciseState>,
+    tickInterval: number
+) {
+    benchmark(draftState.participantKey, 'simulateAllTechnicalChallenges', () =>
+        _simulateAllTechnicalChallenges(draftState, tickInterval)
+    );
+}
+
+export function _simulateAllTechnicalChallenges(
     draftState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, Signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { TaskType, TechnicalChallengeId, UUID } from 'fuesim-digital-shared';
-import type { StateMachine } from 'fuesim-digital-shared';
+import type { StateMachine, StateMachineId } from 'fuesim-digital-shared';
 import { PopupService } from '../../utility/popup.service';
 import { AppState } from '../../../../../../../state/app.state';
 import { createSelectAvailableTasks } from '../../../../../../../state/application/selectors/exercise.selectors';
@@ -20,7 +20,7 @@ export class ChooseTaskPopupComponent implements OnInit {
     public technicalChallengeId!: TechnicalChallengeId;
     public personnelId!: UUID;
     public assignTaskCallback!: (
-        stateMachineId: StateMachine['id'],
+        stateMachineId: StateMachineId,
         taskTypeId: TaskType['id']
     ) => void;
 
@@ -30,7 +30,7 @@ export class ChooseTaskPopupComponent implements OnInit {
     >;
 
     public assignTask(
-        stateMachineId: StateMachine['id'],
+        stateMachineId: StateMachineId,
         taskTypeId: TaskType['id']
     ) {
         this.assignTaskCallback(stateMachineId, taskTypeId);

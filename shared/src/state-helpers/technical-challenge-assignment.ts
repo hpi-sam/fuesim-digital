@@ -10,14 +10,15 @@ import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
 import type { TaskType } from '../models/task-type.js';
 import { TypeAssertedObject } from '../utils/type-asserted-object.js';
-import type { StateMachine } from '../models/technical-challenge/state-machine.js';
+import { benchmark } from '../benchmark.js';
+import type { StateMachineId } from '../models/technical-challenge/ids.js';
 
 // TODO: maybe only remove personnelId
 export function getAssignmentsOnTechnicalChallenge(
     technicalChallenge: TechnicalChallenge
 ): {
     personnelId: Personnel['id'];
-    stateMachineId: StateMachine['id'];
+    stateMachineId: StateMachineId;
     taskTypeId: TaskType['id'];
 }[] {
     return Object.values(technicalChallenge.stateMachines).flatMap(
@@ -33,9 +34,26 @@ export function getAssignmentsOnTechnicalChallenge(
 }
 
 export function unassignPersonnelFromTechnicalChallenge(
-    personnelId: Personnel['id'],
-    technicalChallenge: WritableDraft<TechnicalChallenge>
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallengeId: TechnicalChallenge['id'],
+    personnelId: Personnel['id']
 ): void {
+    benchmark(exerciseState.participantKey, 'unassignPersonnel', () =>
+        _unassignPersonnelFromTechnicalChallenge(
+            exerciseState,
+            technicalChallengeId,
+            personnelId
+        )
+    );
+}
+
+export function _unassignPersonnelFromTechnicalChallenge(
+    exerciseState: WritableDraft<ExerciseState>,
+    technicalChallengeId: TechnicalChallenge['id'],
+    personnelId: Personnel['id']
+): void {
+    const technicalChallenge =
+        exerciseState.technicalChallenges[technicalChallengeId]!;
     const result = getAssignmentsOnTechnicalChallenge(technicalChallenge).find(
         (assignment) => assignment.personnelId === personnelId
     );
@@ -97,6 +115,10 @@ export function removeInvalidAssignments(
         (c) => !isValidAssignment(personnel, c)
     );
     invalidChallenges.forEach((challenge) => {
-        unassignPersonnelFromTechnicalChallenge(personnelId, challenge);
+        unassignPersonnelFromTechnicalChallenge(
+            draftState,
+            challenge.id,
+            personnelId
+        );
     });
 }

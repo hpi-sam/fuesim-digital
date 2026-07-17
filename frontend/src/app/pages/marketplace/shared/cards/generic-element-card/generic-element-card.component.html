@@ -32,6 +32,7 @@
                 <span
                     class="card-subtitle mb-2 text-body-secondary"
                     [class.h6]="!small()"
+                    data-cy="elementCardSubtitle"
                 >
                     {{ subtitle }}
                 </span>
@@ -54,6 +55,7 @@
                             class="btn btn-outline-primary btn-sm"
                             ngbTooltip="Bearbeiten"
                             placement="bottom"
+                            data-cy="editElementButton"
                         >
                             <i class="bi bi-pencil"></i>
                         </button>
@@ -67,6 +69,7 @@
                             (click)="$event.stopPropagation()"
                             ngbTooltip="Duplizieren"
                             placement="bottom"
+                            data-cy="duplicateElementButton"
                         >
                             <i class="bi bi-copy"></i>
                         </button>
@@ -76,6 +79,7 @@
                                 (click)="
                                     $event.stopPropagation(); duplicate.emit()
                                 "
+                                data-cy="duplicateInSameCollectionButton"
                             >
                                 <i class="bi bi-arrow-right-square me-1"></i>
                                 Diese Sammlung
@@ -97,6 +101,7 @@
                         (click)="$event.stopPropagation(); delete.emit()"
                         ngbTooltip="Löschen"
                         placement="bottom"
+                        data-cy="deleteElementButton"
                     >
                         <i class="bi bi-trash"></i>
                     </button>

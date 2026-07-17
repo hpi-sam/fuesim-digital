@@ -13,6 +13,7 @@
             [placeholder]="placeholder"
             class="form-control"
             type="text"
+            data-cy="promptModalInput"
         />
         <app-display-validation
             [ngModelInput]="confirmationInput"
@@ -28,7 +29,12 @@
     >
         Abbrechen
     </button>
-    <button type="button" class="btn btn-primary" (click)="confirm(true)">
+    <button
+        type="button"
+        class="btn btn-primary"
+        (click)="confirm(true)"
+        data-cy="promptModalConfirmButton"
+    >
         {{ confirmationButtonText }}
     </button>
 </div>

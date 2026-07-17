@@ -15,7 +15,9 @@
     @if (selectedCollectionData(); as collectionData) {
         <div class="d-flex flex-row justify-content-between container w-100">
             <h2>
-                {{ collectionData.collection.title }}
+                <span data-cy="collectionDetailsTitle">{{
+                    collectionData.collection.title
+                }}</span>
                 @if (
                     collectionData.collection.title !==
                     collectionData.publishedCollection.title
@@ -150,6 +152,7 @@
                         <button
                             class="btn btn-primary btn-sm"
                             (click)="saveDraftState()"
+                            data-cy="saveDraftStateButton"
                         >
                             Als neue Version speichern
                         </button>
@@ -162,6 +165,7 @@
                 <button
                     ngbNavLink
                     class="d-flex flex-row align-items-center gap-2"
+                    data-cy="collectionElementsTabButton"
                 >
                     <i class="bi bi-grid me-1"></i>
                     <span> Übungselemente </span>
@@ -179,6 +183,7 @@
                 <button
                     ngbNavLink
                     class="d-flex flex-row align-items-center gap-2"
+                    data-cy="collectionUsedCollectionsTabButton"
                 >
                     <i class="bi bi-folder-symlink me-1"></i>
                     <span> Verwendete Sammlungen </span>

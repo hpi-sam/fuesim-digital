@@ -26,6 +26,7 @@
                             type="button"
                             class="btn btn-outline-primary"
                             (click)="type.create()"
+                            [attr.data-cy]="'create_' + type.type + '_button'"
                         >
                             {{
                                 (type.type | versionedElementDisplayName)
@@ -43,6 +44,7 @@
                     [class.row-cols-2]="!smallCards()"
                     [class.row-cols-md-3]="!smallCards()"
                     [class.row-cols-lg-6]="!smallCards()"
+                    [attr.data-cy]="type.type + '_elements_list'"
                 >
                     @for (
                         exerciseObject of elementsOfType;

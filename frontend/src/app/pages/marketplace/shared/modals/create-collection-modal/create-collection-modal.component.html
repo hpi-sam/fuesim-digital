@@ -34,6 +34,7 @@
                 [formField]="collectionCreationForm.title"
                 class="form-control"
                 [appAutofocus]="true"
+                data-cy="collectionCreationModalTitleInput"
                 type="text"
             />
             <app-display-model-validation
@@ -43,6 +44,7 @@
 
         <button
             class="btn btn-primary"
+            data-cy="collectionCreationModalSubmitBtn"
             [disabled]="collectionCreationForm().invalid()"
         >
             Sammlung erstellen

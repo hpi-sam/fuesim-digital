@@ -4,9 +4,14 @@
         noLink() ? undefined : '/collections/' + collection().entityId
     "
     [queryParams]="{ from: fromLocation() }"
+    data-cy="collectionCard"
+    data-title="{{ collection().title }}"
+    [attr.data-entity]="collection().entityId"
 >
     <div class="card-body">
-        <h5 class="mb-0 card-title">{{ collection().title }}</h5>
+        <h5 class="mb-0 card-title" data-cy="collectionCardTitle">
+            {{ collection().title }}
+        </h5>
     </div>
     <ul class="list-group list-group-flush small">
         <li class="list-group-item py-1">

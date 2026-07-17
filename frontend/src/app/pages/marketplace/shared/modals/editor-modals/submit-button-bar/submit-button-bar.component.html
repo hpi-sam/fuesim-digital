@@ -4,6 +4,7 @@
             class="btn btn-primary"
             [disabled]="form()().invalid()"
             (click)="submitData.emit()"
+            data-cy="submitTemplateFormButton"
         >
             {{ submitButtonText() }}
         </button>

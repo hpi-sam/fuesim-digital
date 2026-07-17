@@ -48,6 +48,7 @@
                     <button
                         class="btn btn-primary ml-auto pulsating"
                         (click)="close(collection)"
+                        data-cy="confirmCollectionSelectionButton"
                     >
                         Diese Elemente verwenden
                         <i class="bi bi-arrow-right"></i>
@@ -140,7 +141,10 @@
         }
         @if (userAvailableCollections.hasValue()) {
             <div class="card">
-                <ul class="list-group list-group-flush">
+                <ul
+                    class="list-group list-group-flush"
+                    data-cy="availableCollectionsList"
+                >
                     @for (
                         collection of userAvailableCollections.value();
                         track collection.versionId
@@ -151,6 +155,9 @@
                             [class.disabled]="
                                 isDisallowedCollection(collection)
                             "
+                            data-cy="availableCollectionItem"
+                            [attr.data-entity]="collection.entityId"
+                            [attr.data-visibility]="collection.visibility"
                         >
                             <div class="d-flex flex-column">
                                 <span>{{ collection.title }}</span>
@@ -162,12 +169,16 @@
                                 <button
                                     class="btn btn-outline-secondary"
                                     ngbTooltip="Diese Sammlung kann nicht ausgewählt werden, da sie bereits in der Übung verwendet wird oder sonstige Konflikte auftreten würden."
+                                    disabled
                                 >
                                     Kann nicht ausgewählt werden
                                     <i class="bi bi-x-octagon ms-1"></i>
                                 </button>
                             } @else {
-                                <button class="btn btn-outline-primary">
+                                <button
+                                    class="btn btn-outline-primary"
+                                    data-cy="selectCollectionButton"
+                                >
                                     Auswählen
                                     <i class="bi bi-chevron-right ms-1"></i>
                                 </button>

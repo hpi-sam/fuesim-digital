@@ -5,6 +5,7 @@
         type="text"
         class="form-control"
         placeholder="z.B. MANV-25"
+        data-cy="alarmGroupNameInput"
     />
     <app-display-model-validation
         [field]="agForm.name()"
@@ -34,10 +35,11 @@
                     ngbDropdownToggle
                     type="button"
                     class="btn btn-outline-primary ms-3"
+                    data-cy="addVehicleButton"
                 >
                     Fahrzeug hinzufügen
                 </button>
-                <div ngbDropdownMenu>
+                <div ngbDropdownMenu data-cy="addVehicleDropdown">
                     @for (
                         availableVehicle of availableVehicles();
                         track availableVehicle.versionId
@@ -47,6 +49,9 @@
                             (click)="addVehicle(availableVehicle)"
                             type="button"
                             class="btn"
+                            [attr.data-vehicle-type]="
+                                availableVehicle.content.vehicleType
+                            "
                         >
                             <i class="bi bi-plus"></i>
                             {{ availableVehicle.content.vehicleType }}

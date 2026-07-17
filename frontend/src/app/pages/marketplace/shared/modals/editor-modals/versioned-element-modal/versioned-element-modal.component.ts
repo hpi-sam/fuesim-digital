@@ -25,6 +25,9 @@ import { ConfirmationModalService } from '../../../../../../core/confirmation-mo
     imports: [DatePipe, VersionedElementFormComponent],
     templateUrl: './versioned-element-modal.component.html',
     styleUrl: './versioned-element-modal.component.scss',
+    host: {
+        'data-cy': 'versionedElementModal',
+    },
 })
 export class VersionedElementModalComponent implements OnInit {
     private readonly collectionService = inject(CollectionService);

@@ -17,6 +17,9 @@ import { DisplayValidationComponent } from '../../shared/validation/display-vali
         ExactMatchValidatorDirective,
         DisplayValidationComponent,
     ],
+    host: {
+        'data-cy': 'confirmationModal',
+    },
 })
 export class ConfirmationModalComponent implements OnDestroy {
     readonly activeModal = inject(NgbActiveModal);

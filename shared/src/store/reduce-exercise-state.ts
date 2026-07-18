@@ -4,6 +4,7 @@ import {
     type ExerciseAction,
     lookupReducerFor,
 } from './action-reducers/action-reducers.js';
+import { benchmark } from 'fuesim-digital-shared';
 
 /**
  * A pure reducer function that applies the action on the state without mutating it.
@@ -30,5 +31,7 @@ export function applyAction(
     draftState: WritableDraft<ExerciseState>,
     action: ExerciseAction
 ): void {
-    lookupReducerFor(action.type).reducer(draftState, action);
+    benchmark(draftState.participantKey, 'anyReducer', () =>
+        lookupReducerFor(action.type).reducer(draftState, action)
+    );
 }

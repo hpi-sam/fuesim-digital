@@ -1,3 +1,5 @@
+import { GuardIndex } from "./models/index.js";
+
 export interface BenchmarkValue<T> {
     /**
      * The value returned by the benchmarked function
@@ -50,6 +52,7 @@ export function finishMeasurement(exerciseKey: string): any {
     if (!benchmarkResults[exerciseKey]) return;
     const results = benchmarkResults[exerciseKey];
     delete benchmarkResults[exerciseKey];
+    GuardIndex.nukeIndex();
     return results;
 }
 

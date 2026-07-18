@@ -16,7 +16,7 @@ export interface CurrentValue {
 }
 
 export class GuardIndex {
-    private static readonly indices: Map<StateMachineId, GuardIndex> =
+    private static indices: Map<StateMachineId, GuardIndex> =
         new Map();
 
     private readonly guards: Map<GuardId, GuardIndexEntry>;
@@ -33,6 +33,10 @@ export class GuardIndex {
             this.indices.set(stateMachine.id, index);
         }
         return index;
+    }
+
+    public static nukeIndex(): void {
+        this.indices = new Map();
     }
 
     public static invalidateIndex(stateMachineId: StateMachineId): void {

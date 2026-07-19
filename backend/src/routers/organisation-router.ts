@@ -12,9 +12,11 @@ import {
 import { Router } from 'express';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import type { OrganisationService } from '../database/services/organisation-service.js';
+import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 
 export function createOrganisationRouter(
-    organisationService: OrganisationService
+    organisationService: OrganisationService,
+    exerciseManagerService: ExerciseManagerService
 ): Router {
     const router = Router();
 
@@ -108,6 +110,38 @@ export function createOrganisationRouter(
             res.status(201).send(
                 postOrganisationInviteLinkResponseDataSchema.encode(inviteLink)
             );
+        });
+
+    router
+        .route('/:id/export_exercises')
+        .all(isAuthenticatedMiddleware)
+        .get(async (req, res) => {
+            const id = organisationIdSchema.parse(req.params.id);
+
+            const archive =
+                await exerciseManagerService.exportAllExercisesForOrganisation(
+                    id,
+                    req.session!
+                );
+
+            res.attachment(`exercises-${id}.zip`);
+            archive.pipe(res);
+        });
+
+    router
+        .route('/:id/export_exercise_templates')
+        .all(isAuthenticatedMiddleware)
+        .get(async (req, res) => {
+            const id = organisationIdSchema.parse(req.params.id);
+
+            const archive =
+                await exerciseManagerService.exportAllExerciseTemplatesForOrganisation(
+                    id,
+                    req.session!
+                );
+
+            res.attachment(`exercise-templates-${id}.zip`);
+            archive.pipe(res);
         });
 
     router

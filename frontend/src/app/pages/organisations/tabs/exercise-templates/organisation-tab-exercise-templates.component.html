@@ -17,6 +17,15 @@
                 class="d-none"
             />
         </label>
+
+        <a
+            class="btn btn-outline-secondary my-2"
+            [href]="`${httpOrigin}/api/organisations/${organisation().id}/export_exercise_templates`"
+            target="_blank"
+        >
+            <i class="bi-cloud-download me-2"> </i>
+            Alle exportieren
+        </a>
     </div>
 }
 @if (exerciseTemplates()) {

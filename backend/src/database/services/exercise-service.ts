@@ -451,9 +451,8 @@ export class ExerciseService {
     }
 
     public async getActionHistoryForExerciseId(
-        exerciseKey: ExerciseKey
+        activeExercise: ActiveExercise
     ): Promise<ExerciseTimeline['actionsWrappers']> {
-        const activeExercise = await this.getExerciseByKey(exerciseKey);
         return [
             ...(
                 await this.actionRepository.getActionsForExerciseId(
@@ -484,7 +483,7 @@ export class ExerciseService {
         return {
             initialState: activeExercise.exercise.initialStateString,
             actionsWrappers:
-                await this.getActionHistoryForExerciseId(exerciseKey),
+                await this.getActionHistoryForExerciseId(activeExercise),
         };
     }
 
@@ -501,7 +500,7 @@ export class ExerciseService {
         const history = withHistory
             ? {
                   actionHistory: (
-                      await this.getActionHistoryForExerciseId(exerciseKey)
+                      await this.getActionHistoryForExerciseId(activeExercise)
                   ).map((actionWrapper) => actionWrapper.action),
                   initialState: activeExercise.exercise.initialStateString,
               }

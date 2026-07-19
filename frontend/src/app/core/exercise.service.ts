@@ -12,6 +12,7 @@ import type {
     UUID,
     OrganisationId,
     GetExerciseTemplateResponseData,
+    ParticipantKey,
 } from 'fuesim-digital-shared';
 import {
     joinExerciseResponseDataSchema,
@@ -46,7 +47,6 @@ import {
 import {
     selectActiveClients,
     selectExerciseState,
-    selectParticipantKey,
 } from '../state/application/selectors/exercise.selectors';
 import {
     selectCurrentMainRole,
@@ -444,17 +444,18 @@ export class ExerciseService {
         }
     }
 
-    public async exportExercise(withHistory: boolean) {
-        const exerciseKey = selectStateSnapshot(selectExerciseKey, this.store)!;
-        const participantKey = selectStateSnapshot(
-            selectParticipantKey,
-            this.store
-        );
+    public async exportExercise(
+        exerciseKey: ExerciseKey,
+        withHistory: boolean
+    ) {
         const exportData = await this.apiService.getExport(
             exerciseKey,
             withHistory
         );
         const blob = new Blob([JSON.stringify(exportData)]);
+        const participantKey = exportData.currentState[
+            'participantKey'
+        ] as ParticipantKey;
         saveBlob(blob, `exercise-state-${participantKey}.json`);
     }
 }

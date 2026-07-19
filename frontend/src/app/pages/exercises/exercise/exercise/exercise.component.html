@@ -107,7 +107,10 @@
                                 <button
                                     ngbDropdownItem
                                     (click)="
-                                        exerciseService.exportExercise(true)
+                                        exerciseService.exportExercise(
+                                            exerciseKey()!,
+                                            true
+                                        )
                                     "
                                 >
                                     <i class="bi-clock-history me-2"> </i>
@@ -116,7 +119,10 @@
                                 <button
                                     ngbDropdownItem
                                     (click)="
-                                        exerciseService.exportExercise(false)
+                                        exerciseService.exportExercise(
+                                            exerciseKey()!,
+                                            false
+                                        )
                                     "
                                 >
                                     <i class="bi-cloud-download me-2"> </i>

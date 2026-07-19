@@ -16,6 +16,7 @@ import { ExerciseService } from '../../../../core/exercise.service.js';
 import { FileInputDirective } from '../../../../shared/directives/file-input.directive.js';
 import { HelpButtonComponent } from '../../../../help-button/help-button.component.js';
 import { ExerciseTemplateCardComponent } from '../../../../shared/components/exercise-template-card/exercise-template-card.component.js';
+import { httpOrigin } from '../../../../core/api-origins.js';
 
 @Component({
     selector: 'app-organisation-tab-exercise-templates',
@@ -61,4 +62,6 @@ export class OrganisationTabExerciseTemplatesComponent implements OnInit {
     ngOnInit() {
         this.reload();
     }
+
+    protected readonly httpOrigin = httpOrigin;
 }

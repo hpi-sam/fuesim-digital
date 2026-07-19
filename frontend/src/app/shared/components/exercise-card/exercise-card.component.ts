@@ -2,11 +2,19 @@ import { Component, computed, input, output, inject } from '@angular/core';
 import type { GetExerciseDetailsResponseData } from 'fuesim-digital-shared';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import {
+    NgbDropdown,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
+} from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
 import { CopyButtonComponent } from '../copy-button/copy-button.component';
 import { OrganisationBadgeComponent } from '../../../pages/organisations/shared/organisation-badge/organisation-badge.component.js';
+import { ExerciseService } from '../../../core/exercise.service.js';
 
 @Component({
     selector: 'app-exercise-card',
@@ -17,6 +25,11 @@ import { OrganisationBadgeComponent } from '../../../pages/organisations/shared/
         RouterLink,
         DatePipe,
         OrganisationBadgeComponent,
+        NgbDropdownItem,
+        NgbDropdownMenu,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownButtonItem,
     ],
 })
 export class ExerciseCardComponent {
@@ -25,6 +38,7 @@ export class ExerciseCardComponent {
     private readonly confirmationModalService = inject(
         ConfirmationModalService
     );
+    readonly exerciseService = inject(ExerciseService);
 
     readonly exercise = input<GetExerciseDetailsResponseData>();
     readonly participantUrl = computed(

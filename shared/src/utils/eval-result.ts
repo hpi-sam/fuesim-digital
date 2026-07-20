@@ -22,6 +22,19 @@ import {
     ExerciseState,
     applyAction,
     ExerciseAction,
+    BoolEvalCriterionId,
+    NumberEvalCriterionId,
+    evalCriterionSchema,
+    technicalChallengeIdSchema,
+    technicalChallengeSchema,
+    patientSchema,
+    scoutableSchema,
+    measureSchema,
+    measureTemplateCategorySchema,
+    getEvalResultOfFirstTrueAtCriterion,
+    isBoolEvalCriterion,
+    boolCriterionTypeEvaluatorMap,
+    numberCriterionTypeEvaluatorMap,
 } from 'fuesim-digital-shared';
 import { produce } from 'immer';
 
@@ -53,6 +66,70 @@ export const evalResultSchema = z.discriminatedUnion('type', [
 ]);
 export type EvalResult = z.infer<typeof evalResultSchema>;
 
+export const evalResultContextSchema = z.strictObject({
+    evalCriteria: z.record(evalCriterionIdSchema, evalCriterionSchema),
+    technicalChallenges: z.record(uuidSchema, technicalChallengeSchema),
+    patients: z.record(uuidSchema, patientSchema),
+    scoutables: z.record(uuidSchema, scoutableSchema),
+    measures: z.record(uuidSchema, measureSchema),
+    measureTemplates: z.record(uuidSchema, measureTemplateCategorySchema),
+    currentTime: z.number(),
+});
+export type EvalResultContext = z.infer<typeof evalResultContextSchema>;
+
+export function newEvalResultContext(
+    evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
+    technicalChallenges: { [key: string]: TechnicalChallenge },
+    patients: { [key: string]: Patient },
+    scoutables: { [key: string]: Scoutable },
+    measures: { [key: string]: Measure },
+    measureTemplates: { [key: string]: MeasureTemplateCategory },
+    currentTime: number
+): EvalResultContext {
+    return {
+        evalCriteria,
+        technicalChallenges,
+        patients,
+        scoutables,
+        measures,
+        measureTemplates,
+        currentTime,
+    };
+}
+
+export function newBoolEvalResult(
+    criterionId: BoolEvalCriterionId,
+    timestamp: number,
+    criterion: BoolEvalCriterion,
+    isCompleted: boolean,
+    isYellow: boolean
+): BoolEvalResult {
+    return {
+        id: uuid(),
+        type: 'boolEvalResult',
+        criterionId,
+        timestamp,
+        criterion,
+        isCompleted,
+        isYellow,
+    };
+}
+export function newNumberEvalResult(
+    criterionId: NumberEvalCriterionId,
+    timestamp: number,
+    criterion: NumberEvalCriterion,
+    num: number
+): NumberEvalResult {
+    return {
+        id: uuid(),
+        type: 'numberEvalResult',
+        criterionId,
+        timestamp,
+        criterion,
+        num,
+    };
+}
+
 /**
  * Recursively evaluates subcriteria to get the result of a given root criterion; Called in getEvalResultsFromCriteria
  * @param evalCriterion the criterion for wich the result is specified
@@ -70,267 +147,34 @@ export type EvalResult = z.infer<typeof evalResultSchema>;
  */
 export function getEvalResultFromCriterion(
     evalCriterion: EvalCriterion,
-    evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
-    technicalChallenges: { [key: string]: TechnicalChallenge },
-    patients: { [key: string]: Patient },
-    scoutables: { [key: string]: Scoutable },
-    measures: { [key: string]: Measure },
-    measureTemplates: { [key: string]: MeasureTemplateCategory },
-    currentTime: number,
-    cache: { [key: string]: EvalResult },
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult },
     previousResult?: EvalResult
 ): EvalResult {
-    function shortCritToRes(criterion: EvalCriterion): EvalResult {
-        return getEvalResultFromCriterion(
-            criterion,
-            evalCriteria,
-            technicalChallenges,
-            patients,
-            scoutables,
-            measures,
-            measureTemplates,
-            currentTime,
+    /* TODO @JohannesPotzi @Jogius : This reduces redundant visits to criteria in the tree. Can we do Better? */
+    if (cache && cache[evalCriterion.id] !== undefined) {
+        return cache[evalCriterion.id]!;
+    }
+    if (evalCriterion.criterionType === 'firstTrueAtEvalCriterion') {
+        return getEvalResultOfFirstTrueAtCriterion(
+            evalCriterion,
+            context,
+            cache,
+            previousResult
+        );
+    } else if (isBoolEvalCriterion(evalCriterion)) {
+        return boolCriterionTypeEvaluatorMap[evalCriterion.criterionType](
+            evalCriterion,
+            context,
+            cache
+        );
+    } else {
+        return numberCriterionTypeEvaluatorMap[evalCriterion.criterionType](
+            evalCriterion,
+            context,
             cache
         );
     }
-    /* TODO @JohannesPotzi @Jogius : This reduces redundant visits to criteria in the tree. Can we do Better? */
-    if (cache[evalCriterion.id] !== undefined) {
-        return cache[evalCriterion.id]!;
-    }
-
-    let isCompleted = false;
-    let isYellow = false;
-    let num = null;
-    switch (evalCriterion.criterionType) {
-        /* ------------------------BOOL CRITERIA------------------------ */
-        case 'reachTechnicalChallengeStateEvalCriterion': {
-            const criterion = evalCriterion;
-            const targetChallengeId = criterion.targetTechnicalChallengeId;
-            const targetStateId = criterion.targetTechnicalChallengeStateId;
-            const technicalChallenge = technicalChallenges[targetChallengeId]!;
-            isCompleted = technicalChallenge.currentStateId === targetStateId;
-            break;
-        }
-        case 'patientAtStatusEvalCriterion': {
-            const criterion = evalCriterion;
-            const targetId = criterion.targetPatientId;
-            const patient = patients[targetId]!;
-            isCompleted = patient.realStatus === criterion.targetStatus;
-            break;
-        }
-        case 'viewScoutableEvalCriterion': {
-            const criterion = evalCriterion;
-            const scoutableChallenge =
-                technicalChallenges[criterion.targetScoutableId];
-            if (scoutableChallenge) {
-                const currentState = currentStateOf(scoutableChallenge);
-                isCompleted = currentState.viewedByParticipants ?? false;
-            } else {
-                const scoutable = scoutables[criterion.targetScoutableId]!;
-                isCompleted = scoutable.viewedByParticipants;
-            }
-            break;
-        }
-        case 'andEvalCriterion': {
-            const criterion = evalCriterion;
-            let isIncomplete = false;
-            let atLeastOneCompleted = false;
-            for (const childId of criterion.children) {
-                const res = shortCritToRes(evalCriteria[childId]!);
-                if (res.type !== 'boolEvalResult' || !res.isCompleted) {
-                    isIncomplete = true;
-                } else if (!atLeastOneCompleted) {
-                    atLeastOneCompleted = true;
-                }
-            }
-            isCompleted = !isIncomplete;
-            isYellow = isIncomplete && atLeastOneCompleted;
-            break;
-        }
-        case 'orEvalCriterion': {
-            const criterion = evalCriterion;
-            isCompleted = false;
-            for (let i = 0; i < criterion.children.length; i += 1) {
-                const res = shortCritToRes(
-                    evalCriteria[criterion.children.at(i)!]!
-                );
-                if (res.type !== 'boolEvalResult') {
-                    break;
-                } else if (res.isCompleted) {
-                    isCompleted = true;
-                    break;
-                }
-            }
-            break;
-        }
-        case 'notEvalCriterion': {
-            const criterion = evalCriterion;
-            const res = shortCritToRes(criterion);
-            isCompleted =
-                res.type === 'boolEvalResult' ? res.isCompleted : true;
-            break;
-        }
-        case 'compareEvalCriterion': {
-            /* TODO @JohannesPotzi: implement ealuation by new generelized comarison */
-            const criterion = evalCriterion;
-            const leftCrit = evalCriteria[criterion.leftChild];
-            const rightCrit = evalCriteria[criterion.rightChild];
-            if (!leftCrit || !rightCrit) {
-                console.log(
-                    `[logic Error] comparing criteria but some are missing with ids: ${
-                        leftCrit ? '' : criterion.leftChild
-                    }${
-                        !leftCrit && !rightCrit ? ', ' : ''
-                    }${rightCrit ? '' : criterion.rightChild}`
-                );
-                break;
-            }
-            let leftVal = 0;
-            let rightVal = 0;
-            const leftRes = shortCritToRes(leftCrit);
-            const rightRes = shortCritToRes(rightCrit);
-            const isLeftNum = leftRes.type === 'numberEvalResult';
-            const isRightNum = rightRes.type === 'numberEvalResult';
-            if (!isLeftNum || !isRightNum) {
-                console.log(
-                    `[logic Error] comparing criteria but some are not numberCriteria with ids: ${
-                        isLeftNum ? '' : criterion.leftChild
-                    }${
-                        !isLeftNum && !isRightNum ? ', ' : ''
-                    }${isRightNum ? '' : criterion.rightChild}`
-                );
-            }
-            /* boolean are converted to numbers appropiately */
-            if (!isLeftNum) {
-                leftVal = leftRes.isCompleted ? 1 : 0;
-            } else {
-                leftVal = leftRes.num;
-            }
-            if (!isRightNum) {
-                rightVal = rightRes.isCompleted ? 1 : 0;
-            } else {
-                rightVal = rightRes.num;
-            }
-            /* the comparison */
-            switch (criterion.operator) {
-                case 'greaterThanOrEqual': {
-                    if (leftVal >= rightVal) {
-                        isCompleted = true;
-                    } else {
-                    }
-                    break;
-                }
-                case 'greaterThan': {
-                    break;
-                }
-                case 'lessThanOrEqual': {
-                    break;
-                }
-                case 'lessThan': {
-                    break;
-                }
-                case 'equal': {
-                    break;
-                }
-            }
-            isCompleted = leftVal > rightVal;
-            break;
-        }
-        /* ------------------------NUMBER CRITERIA------------------------ */
-        case 'countMeasuresEvalCriterion': {
-            /* TODO @JohannesPotzi @Jogius : implementation*/
-            console.log(
-                'TODO: implement evaluation of countMeasuresEvalCriterion'
-            );
-            num = -1;
-            break;
-        }
-        case 'countPatientsAtStatusEvalCriterion': {
-            /* TODO @JohannesPotzi @Jogius : implementation*/
-            num = -1;
-            break;
-        }
-        case 'constNumEvalCriterion': {
-            num = evalCriterion.num;
-            break;
-        }
-        case 'timestampEvalCriterion': {
-            num = evalCriterion.timestamp;
-            break;
-        }
-        case 'countCompletedEvalCriterion': {
-            const criterion = evalCriterion;
-            num = 0;
-            for (let i = 0; i < criterion.children.length; i += 1) {
-                const res = shortCritToRes(
-                    evalCriteria[criterion.children.at(i)!]!
-                );
-                if (res.type === 'numberEvalResult') {
-                    console.log(
-                        `[logic Error] countCompletedEvalCriterion ${
-                            criterion.id
-                        } contains numberEvalCriterion ${res.criterionId}`
-                    );
-                } else if (res.isCompleted) {
-                    num += 1;
-                }
-            }
-            break;
-        }
-        case 'firstTrueAtEvalCriterion': {
-            const criterion = evalCriterion;
-            /* -1 === num means, that the child criterion has not been true yet */
-            num = -1;
-            if (
-                previousResult?.criterionId === criterion.id &&
-                previousResult.type === 'numberEvalResult' &&
-                previousResult.num !== -1
-            ) {
-                num = previousResult.num;
-            } else if (evalCriteria[criterion.child]) {
-                const childRes = shortCritToRes(evalCriteria[criterion.child]!);
-                num =
-                    childRes.type === 'boolEvalResult' && childRes.isCompleted
-                        ? currentTime
-                        : -1;
-            }
-            break;
-        }
-        default:
-            break;
-    }
-    const id = uuid();
-    if (isNumberEvalCriterion(evalCriterion)) {
-        if (!num) {
-            console.log(
-                `[logic Error]: trying to return result of numberCriterion${
-                    evalCriterion.id
-                } without calculating the number value.`
-            );
-            num = 0;
-        }
-        const res: NumberEvalResult = {
-            id,
-            type: 'numberEvalResult',
-            criterionId: evalCriterion.id,
-            criterion: evalCriterion as NumberEvalCriterion,
-            num,
-            timestamp: currentTime,
-        };
-        cache[evalCriterion.id] = res;
-        return res;
-    }
-    const critRes: BoolEvalResult = {
-        id: uuid(),
-        criterionId: evalCriterion.id,
-        criterion: evalCriterion as BoolEvalCriterion,
-        type: 'boolEvalResult',
-        isCompleted,
-        isYellow,
-        timestamp: currentTime,
-    };
-    cache[evalCriterion.id] = critRes;
-    return critRes;
 }
 export function getEvalResultsFromCriteria(
     wantedEvalCriteria: { [key: EvalCriterionId]: EvalCriterion },
@@ -344,20 +188,19 @@ export function getEvalResultsFromCriteria(
 ): { [evalCriterionId: UUID]: EvalResult } {
     const criteria = Object.values(wantedEvalCriteria);
     const cache: { [key: string]: EvalResult } = {};
+    const context = newEvalResultContext(
+        allEvalCriteria,
+        technicalChallenges,
+        patients,
+        scoutables,
+        measures,
+        measureTemplates,
+        currentTime
+    );
     return criteria
         .flatMap(
             (criterion: EvalCriterion): EvalResult =>
-                getEvalResultFromCriterion(
-                    criterion,
-                    allEvalCriteria,
-                    technicalChallenges,
-                    patients,
-                    scoutables,
-                    measures,
-                    measureTemplates,
-                    currentTime,
-                    cache
-                )
+                getEvalResultFromCriterion(criterion, context, cache)
         )
         .reduce<{ [evalCriterionId: UUID]: EvalResult }>(
             (evalResultObject, evalResult) => {
@@ -386,6 +229,15 @@ export function updateEvalResultsMap(
     currentTime: number,
     temporalOnly: boolean
 ): { [criterionId: string]: EvalResult } {
+    const context = newEvalResultContext(
+        evalCriteria,
+        technicalChallenges,
+        patients,
+        scoutables,
+        measures,
+        measureTemplates,
+        currentTime
+    );
     const tmpCache: { [criterionId: string]: EvalResult } = {};
     return (
         Object.values(evalCriteria)
@@ -402,13 +254,7 @@ export function updateEvalResultsMap(
                 const previousRes = evalResultsMap[criterion.id];
                 return getEvalResultFromCriterion(
                     criterion,
-                    evalCriteria,
-                    technicalChallenges,
-                    patients,
-                    scoutables,
-                    measures,
-                    measureTemplates,
-                    currentTime,
+                    context,
                     tmpCache,
                     previousRes
                 );

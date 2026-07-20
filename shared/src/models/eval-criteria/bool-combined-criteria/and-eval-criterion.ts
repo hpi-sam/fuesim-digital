@@ -1,11 +1,18 @@
 import z from 'zod';
 import {
+    BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
     BoolEvalCriterionId,
     boolEvalCriterionIdSchema,
     EvalCriterionId,
-} from '../criterion-categories.js';
-import { uuid } from '../../../utils/uuid.js';
+    BoolEvalResult,
+    EvalResult,
+    EvalResultContext,
+    getEvalResultFromCriterion,
+    newBoolEvalResult,
+    uuid,
+    EvalCriterion,
+} from 'fuesim-digital-shared';
 
 export const andEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -34,4 +41,44 @@ export function newAndEvalCriterion(
         criterionType: 'andEvalCriterion',
         children: children ?? [],
     };
+}
+/** TODO @JohannesPotzi
+ *
+ * @param criterion
+ * @param context
+ * @param cache
+ * @returns
+ */
+export function getEvalResultOfAndCriterion(
+    evalCriterion: EvalCriterion,
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult }
+): BoolEvalResult {
+    const criterion = evalCriterion as AndEvalCriterion;
+    let isCompleted = false;
+    let isYellow = false;
+    let isIncomplete = false;
+    let atLeastOneCompleted = false;
+    for (const childId of criterion.children) {
+        const res = getEvalResultFromCriterion(
+            context.evalCriteria[childId]!,
+            context,
+            cache
+        );
+        if (res.type !== 'boolEvalResult' || !res.isCompleted) {
+            isIncomplete = true;
+        } else if (!atLeastOneCompleted) {
+            atLeastOneCompleted = true;
+        }
+    }
+    isCompleted = !isIncomplete;
+    isYellow = isIncomplete && atLeastOneCompleted;
+
+    return newBoolEvalResult(
+        criterion.id as BoolEvalCriterionId,
+        context.currentTime,
+        criterion as BoolEvalCriterion,
+        isCompleted,
+        isYellow
+    );
 }

@@ -1,13 +1,17 @@
 import z from 'zod';
 import {
+    EvalCriterion,
+    EvalResult,
+    EvalResultContext,
+    newNumberEvalResult,
+    NumberEvalCriterion,
     numberEvalCriterionBaseSchema,
     NumberEvalCriterionId,
-} from '../criterion-categories.js';
-import {
+    NumberEvalResult,
     PatientStatus,
     patientStatusSchema,
-} from '../../utils/patient-status.js';
-import { uuid } from '../../../utils/uuid.js';
+    uuid,
+} from 'fuesim-digital-shared';
 
 export const countPatientsAtStatusEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -36,4 +40,39 @@ export function newCountPatientsAtStatusEvalCriterion(
         isVisibleForParticipants: isVisibleForParticipants ?? false,
         isDraft: isDraft ?? false,
     };
+}
+/** TODO @JohannesPotzi
+ *
+ * @param criterion
+ * @param context
+ * @param cache
+ * @returns
+ */
+export function getEvalResultOfCountPatientsAtStatusCriterion(
+    evalCriterion: EvalCriterion,
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult }
+): NumberEvalResult {
+    const criterion = evalCriterion as CountPatientsAtStatusEvalCriterion;
+    let num = null;
+
+    if (!num) {
+        console.log(
+            `[logic Error]: trying to return result of numberCriterion${
+                criterion.id
+            } without calculating the number value. The critrerionType is : ${criterion.criterionType}`
+        );
+        num = -1;
+    }
+    /* TODO @JohannesPotzi @Jogius : implementation*/
+    console.log(
+        'TODO: Implementation of CountPatientsAtStatusCriterion evaluation.'
+    );
+    num = -1;
+    return newNumberEvalResult(
+        criterion.id as NumberEvalCriterionId,
+        context.currentTime,
+        criterion as NumberEvalCriterion,
+        num
+    );
 }

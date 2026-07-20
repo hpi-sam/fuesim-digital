@@ -2,10 +2,18 @@ import z from 'zod';
 import {
     BoolEvalCriterionId,
     boolEvalCriterionIdSchema,
+    EvalCriterion,
     EvalCriterionId,
+    EvalResult,
+    EvalResultContext,
+    getEvalResultFromCriterion,
+    newNumberEvalResult,
+    NumberEvalCriterion,
     numberEvalCriterionBaseSchema,
-} from '../criterion-categories.js';
-import { uuid } from '../../../utils/uuid.js';
+    NumberEvalCriterionId,
+    NumberEvalResult,
+    uuid,
+} from 'fuesim-digital-shared';
 
 export const countCompletedEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -34,4 +42,47 @@ export function newCountCompletedEvalCriterion(
         criterionType: 'countCompletedEvalCriterion',
         children,
     };
+}
+/** TODO @JohannesPotzi
+ *
+ * @param criterion
+ * @param context
+ * @param cache
+ * @returns
+ */
+export function getEvalResultOfCountCompletedCriterion(
+    evalCriterion: EvalCriterion,
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult }
+): NumberEvalResult {
+    const criterion = evalCriterion as CountCompletedEvalCriterion;
+    let num = null;
+
+    if (!num) {
+        console.log(
+            `[logic Error]: trying to return result of numberCriterion${
+                criterion.id
+            } without calculating the number value. The critrerionType is : ${criterion.criterionType}`
+        );
+        num = -1;
+    }
+
+    num = 0;
+    for (let i = 0; i < criterion.children.length; i += 1) {
+        const res = getEvalResultFromCriterion(
+            context.evalCriteria[criterion.children.at(i)!]!,
+            context,
+            cache
+        );
+        if (res.type === 'boolEvalResult' && res.isCompleted) {
+            num += 1;
+        }
+    }
+
+    return newNumberEvalResult(
+        criterion.id as NumberEvalCriterionId,
+        context.currentTime,
+        criterion as NumberEvalCriterion,
+        num
+    );
 }

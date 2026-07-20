@@ -1,5 +1,10 @@
-import { UUID } from '../../utils/uuid.js';
 import {
+    BoolEvalResult,
+    EvalResult,
+    EvalResultContext,
+    NumberEvalResult,
+    UUID,
+    getEvalResultOfCompareCriterion,
     BoolEvalCriterion,
     combinedEvalCriterionTypes,
     EvalCriterion,
@@ -8,7 +13,21 @@ import {
     NumberEvalCriterion,
     numberEvalCriterionTypes,
     temporalEvalCriterionTypes,
-} from './criterion-categories.js';
+    getEvalResultOfAndCriterion,
+    getEvalResultOfTimestampCriterion,
+    getEvalResultOfCountCompletedCriterion,
+    getEvalResultOfFirstTrueAtCriterion,
+    getEvalResultOfNotCriterion,
+    getEvalResultOfOrCriterion,
+    getEvalResultOfPatientAtStatusCriterion,
+    getEvalResultOfReachTechnicalChallengeStateCriterion,
+    getEvalResultOfViewScoutableCriterion,
+    getEvalResultOfConstNumCriterion,
+    newCountCompletedEvalCriterion,
+    getEvalResultOfCountPatientsAtStatusCriterion,
+    BoolEvalCriterionType,
+    NumberEvalCriterionType,
+} from 'fuesim-digital-shared';
 
 export function isNumberEvalCriterion(
     criterion: EvalCriterion
@@ -40,6 +59,38 @@ export function isTemporalEvalCriterionType(
     }
     return false;
 }
+
+export const boolCriterionTypeEvaluatorMap: {
+    [key in BoolEvalCriterionType]: (
+        criterion: EvalCriterion,
+        context: EvalResultContext,
+        cache?: { [key: string]: EvalResult }
+    ) => BoolEvalResult;
+} = {
+    andEvalCriterion: getEvalResultOfAndCriterion,
+    compareEvalCriterion: getEvalResultOfCompareCriterion,
+    notEvalCriterion: getEvalResultOfNotCriterion,
+    orEvalCriterion: getEvalResultOfOrCriterion,
+    patientAtStatusEvalCriterion: getEvalResultOfPatientAtStatusCriterion,
+    reachTechnicalChallengeStateEvalCriterion:
+        getEvalResultOfReachTechnicalChallengeStateCriterion,
+    viewScoutableEvalCriterion: getEvalResultOfViewScoutableCriterion,
+};
+export const numberCriterionTypeEvaluatorMap: {
+    [key in NumberEvalCriterionType]: (
+        criterion: EvalCriterion,
+        context: EvalResultContext,
+        cache?: { [key: string]: EvalResult }
+    ) => NumberEvalResult;
+} = {
+    constNumEvalCriterion: getEvalResultOfConstNumCriterion,
+    countCompletedEvalCriterion: getEvalResultOfCountCompletedCriterion,
+    countMeasuresEvalCriterion: getEvalResultOfCountCompletedCriterion,
+    countPatientsAtStatusEvalCriterion:
+        getEvalResultOfCountPatientsAtStatusCriterion,
+    firstTrueAtEvalCriterion: getEvalResultOfFirstTrueAtCriterion,
+    timestampEvalCriterion: getEvalResultOfTimestampCriterion,
+};
 /**
  * recursively removes the childCriteria of an initial eval criterion from the input map
  * @param criteriaMap

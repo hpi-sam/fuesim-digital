@@ -1,11 +1,18 @@
 import z from 'zod';
-import { uuid } from '../../../utils/uuid.js';
 import {
+    BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
     BoolEvalCriterionId,
     boolEvalCriterionIdSchema,
     EvalCriterionId,
-} from '../criterion-categories.js';
+    BoolEvalResult,
+    EvalResult,
+    EvalResultContext,
+    getEvalResultFromCriterion,
+    newBoolEvalResult,
+    uuid,
+    EvalCriterion,
+} from 'fuesim-digital-shared';
 
 export const notEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -33,4 +40,32 @@ export function newNotEvalCriterion(
         criterionType: 'notEvalCriterion',
         child,
     };
+}
+/** TODO @JohannesPotzi
+ *
+ * @param criterion
+ * @param context
+ * @param cache
+ * @returns
+ */
+export function getEvalResultOfNotCriterion(
+    evalCriterion: EvalCriterion,
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult }
+): BoolEvalResult {
+    const criterion = evalCriterion as NotEvalCriterion;
+    let isCompleted = false;
+    /* TODO @Johannes Potzi : Can we just say, that the negation of yellow is always yellow? */
+    let isYellow = false;
+
+    const res = getEvalResultFromCriterion(criterion, context, cache);
+    isCompleted = res.type === 'boolEvalResult' ? res.isCompleted : true;
+
+    return newBoolEvalResult(
+        criterion.id as BoolEvalCriterionId,
+        context.currentTime,
+        criterion as BoolEvalCriterion,
+        isCompleted,
+        isYellow
+    );
 }

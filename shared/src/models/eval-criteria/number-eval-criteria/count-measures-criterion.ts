@@ -1,9 +1,18 @@
 import z from 'zod';
 import {
+    EvalCriterion,
     EvalCriterionId,
+    EvalResult,
+    EvalResultContext,
+    newNumberEvalResult,
+    NumberEvalCriterion,
     numberEvalCriterionBaseSchema,
-} from '../criterion-categories.js';
-import { uuid, UUID, uuidSchema } from '../../../utils/uuid.js';
+    NumberEvalCriterionId,
+    NumberEvalResult,
+    uuid,
+    UUID,
+    uuidSchema,
+} from 'fuesim-digital-shared';
 
 export const countMeasuresEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -32,4 +41,36 @@ export function newcountMeasuresEvalCriterion(
         criterionType: 'countMeasuresEvalCriterion',
         targetMeasureTemplateId,
     };
+}
+/** TODO @JohannesPotzi
+ *
+ * @param criterion
+ * @param context
+ * @param cache
+ * @returns
+ */
+export function getEvalResultOfCountMeasuresCriterion(
+    evalCriterion: EvalCriterion,
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult }
+): NumberEvalResult {
+    const criterion = evalCriterion as CountMeasuresEvalCriterion;
+    let num = null;
+    /* TODO @JohannesPotzi @Jogius : implementation*/
+    console.log('TODO: implement evaluation of countMeasuresEvalCriterion');
+    num = -1;
+    if (!num) {
+        console.log(
+            `[logic Error]: trying to return result of numberCriterion${
+                criterion.id
+            } without calculating the number value. The critrerionType is : ${criterion.criterionType}`
+        );
+        num = -1;
+    }
+    return newNumberEvalResult(
+        criterion.id as NumberEvalCriterionId,
+        context.currentTime,
+        criterion as NumberEvalCriterion,
+        num
+    );
 }

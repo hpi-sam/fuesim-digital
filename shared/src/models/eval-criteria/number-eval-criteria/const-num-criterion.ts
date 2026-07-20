@@ -1,8 +1,15 @@
 import z from 'zod';
 import {
+    EvalCriterion,
     EvalCriterionId,
+    EvalResult,
+    EvalResultContext,
+    newNumberEvalResult,
+    NumberEvalCriterion,
     numberEvalCriterionBaseSchema,
-} from '../criterion-categories.js';
+    NumberEvalCriterionId,
+    NumberEvalResult,
+} from 'fuesim-digital-shared';
 import { uuid } from '../../../utils/uuid.js';
 
 export const constNumEvalCriterionSchema = z.strictObject({
@@ -30,4 +37,36 @@ export function newConstNumEvalCriterion(
         criterionType: 'constNumEvalCriterion',
         num,
     };
+}
+/** TODO @JohannesPotzi
+ *
+ * @param criterion
+ * @param context
+ * @param cache
+ * @returns
+ */
+export function getEvalResultOfConstNumCriterion(
+    evalCriterion: EvalCriterion,
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult }
+): NumberEvalResult {
+    const criterion = evalCriterion as ConstNumEvalCriterion;
+    let num = null;
+    if (!num) {
+        console.log(
+            `[logic Error]: trying to return result of numberCriterion${
+                criterion.id
+            } without calculating the number value. The critrerionType is : ${criterion.criterionType}`
+        );
+        num = -1;
+    }
+
+    num = criterion.num;
+
+    return newNumberEvalResult(
+        criterion.id as NumberEvalCriterionId,
+        context.currentTime,
+        criterion as NumberEvalCriterion,
+        num
+    );
 }

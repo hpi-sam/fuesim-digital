@@ -2,8 +2,15 @@ import z from 'zod';
 import {
     EvalCriterionId,
     numberEvalCriterionBaseSchema,
-} from '../criterion-categories.js';
-import { uuid } from '../../../utils/uuid.js';
+    NumberEvalResult,
+    EvalResult,
+    EvalResultContext,
+    uuid,
+    newNumberEvalResult,
+    NumberEvalCriterionId,
+    NumberEvalCriterion,
+    EvalCriterion,
+} from 'fuesim-digital-shared';
 
 export const timestampEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -13,15 +20,15 @@ export const timestampEvalCriterionSchema = z.strictObject({
 /** This is a number eval criterion, which holds a constant number, specified on creation;
  *  The number is processed as a timestamp.
  * This synergises with the compare criterion and allows trainers to compare dynamic timestamps from (timesstamp-)number criteria against a constant expected value.*/
-export type timestampEvalCriterion = z.infer<
+export type TimestampEvalCriterion = z.infer<
     typeof timestampEvalCriterionSchema
 >;
-export function newtimestampEvalCriterion(
+export function newTimestampEvalCriterion(
     name: string,
     timestamp: number,
     isVisibleForParticipants?: boolean,
     isDraft?: boolean
-): timestampEvalCriterion {
+): TimestampEvalCriterion {
     return {
         id: uuid() as EvalCriterionId,
         name,
@@ -31,4 +38,41 @@ export function newtimestampEvalCriterion(
         criterionType: 'timestampEvalCriterion',
         timestamp,
     };
+}
+/** TODO @JohannesPotzi
+ *
+ * @param criterion
+ * @param context
+ * @param cache
+ * @returns
+ */
+export function getEvalResultOfTimestampCriterion(
+    evalCriterion: EvalCriterion,
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult }
+): NumberEvalResult {
+    if (evalCriterion.criterionType !== 'timestampEvalCriterion') {
+        console.log(
+            `[Bad Input] Trying to evaluate a ${evalCriterion.criterionType} as a timestampEvalCriterion.`
+        );
+    }
+    const criterion = evalCriterion as TimestampEvalCriterion;
+    let num = null;
+
+    if (!num) {
+        console.log(
+            `[logic Error]: trying to return result of numberCriterion${
+                criterion.id
+            } without calculating the number value. The critrerionType is : ${criterion.criterionType}`
+        );
+        num = -1;
+    }
+    num = criterion.timestamp;
+
+    return newNumberEvalResult(
+        criterion.id as NumberEvalCriterionId,
+        context.currentTime,
+        criterion as NumberEvalCriterion,
+        num
+    );
 }

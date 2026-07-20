@@ -1,8 +1,16 @@
 import z from 'zod';
 import {
+    BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
+    BoolEvalCriterionId,
+    BoolEvalResult,
+    currentStateOf,
+    EvalCriterion,
     EvalCriterionId,
-} from '../criterion-categories.js';
+    EvalResult,
+    EvalResultContext,
+    newBoolEvalResult,
+} from 'fuesim-digital-shared';
 import { uuid, UUID, uuidSchema } from '../../../utils/uuid.js';
 
 export const viewScoutableEvalCriterionSchema = z.strictObject({
@@ -31,4 +39,37 @@ export function newViewScoutableEvalCriterion(
         criterionType: 'viewScoutableEvalCriterion',
         targetScoutableId,
     };
+}
+/** TODO @JohannesPotzi
+ *
+ * @param criterion
+ * @param context
+ * @param cache
+ * @returns
+ */
+export function getEvalResultOfViewScoutableCriterion(
+    evalCriterion: EvalCriterion,
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult }
+): BoolEvalResult {
+    const criterion = evalCriterion as ViewScoutableEvalCriterion;
+    let isCompleted = false;
+    let isYellow = false;
+    const scoutableChallenge =
+        context.technicalChallenges[criterion.targetScoutableId];
+    if (scoutableChallenge) {
+        const currentState = currentStateOf(scoutableChallenge);
+        isCompleted = currentState.viewedByParticipants ?? false;
+    } else {
+        const scoutable = context.scoutables[criterion.targetScoutableId]!;
+        isCompleted = scoutable.viewedByParticipants;
+    }
+
+    return newBoolEvalResult(
+        criterion.id as BoolEvalCriterionId,
+        context.currentTime,
+        criterion as BoolEvalCriterion,
+        isCompleted,
+        isYellow
+    );
 }

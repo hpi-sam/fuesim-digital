@@ -1,11 +1,18 @@
 import z from 'zod';
 import {
+    BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
     BoolEvalCriterionId,
     boolEvalCriterionIdSchema,
     EvalCriterionId,
-} from '../criterion-categories.js';
-import { uuid } from '../../../utils/uuid.js';
+    uuid,
+    BoolEvalResult,
+    EvalResult,
+    EvalResultContext,
+    getEvalResultFromCriterion,
+    newBoolEvalResult,
+    EvalCriterion,
+} from 'fuesim-digital-shared';
 
 export const orEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -18,6 +25,7 @@ export const orEvalCriterionSchema = z.strictObject({
  * This is motivated by a diversity of possible solutions of a given exercise scenario.
  */
 export type OrEvalCriterion = z.infer<typeof orEvalCriterionSchema>;
+
 export function newOrEvalCriterion(
     name: string,
     children?: BoolEvalCriterionId[],
@@ -33,4 +41,40 @@ export function newOrEvalCriterion(
         criterionType: 'orEvalCriterion',
         children: children ?? [],
     };
+}
+/** TODO @JohannesPotzi
+ *
+ * @param criterion
+ * @param context
+ * @param cache
+ * @returns
+ */
+export function getEvalResultOfOrCriterion(
+    evalCriterion: EvalCriterion,
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult }
+): BoolEvalResult {
+    const criterion = evalCriterion as OrEvalCriterion;
+    let isCompleted = false;
+    let isYellow = false;
+    for (let i = 0; i < criterion.children.length; i += 1) {
+        const res = getEvalResultFromCriterion(
+            context.evalCriteria[criterion.children.at(i)!]!,
+            context,
+            cache
+        );
+        if (res.type !== 'boolEvalResult') {
+            break;
+        } else if (res.isCompleted) {
+            isCompleted = true;
+            break;
+        }
+    }
+    return newBoolEvalResult(
+        criterion.id as BoolEvalCriterionId,
+        context.currentTime,
+        criterion as BoolEvalCriterion,
+        isCompleted,
+        isYellow
+    );
 }

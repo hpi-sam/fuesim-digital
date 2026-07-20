@@ -1,17 +1,20 @@
 import z from 'zod';
 import {
+    BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
+    BoolEvalCriterionId,
+    BoolEvalResult,
+    EvalCriterion,
     EvalCriterionId,
-} from '../criterion-categories.js';
-import {
+    EvalResult,
+    EvalResultContext,
+    newBoolEvalResult,
     TechnicalChallengeId,
     technicalChallengeIdSchema,
-} from '../../technical-challenge/technical-challenge.js';
-import {
     TechnicalChallengeStateId,
     technicalChallengeStateIdSchema,
-} from '../../technical-challenge/state-machine.js';
-import { uuid } from '../../../utils/uuid.js';
+    uuid,
+} from 'fuesim-digital-shared';
 
 export const reachTechnicalChallengeStateEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -42,4 +45,33 @@ export function newReachTechnicalChallengeStateEvalCriterion(
         targetTechnicalChallengeId,
         targetTechnicalChallengeStateId,
     };
+}
+/** TODO @JohannesPotzi
+ *
+ * @param criterion
+ * @param context
+ * @param cache
+ * @returns
+ */
+export function getEvalResultOfReachTechnicalChallengeStateCriterion(
+    evalCriterion: EvalCriterion,
+    context: EvalResultContext,
+    cache?: { [key: string]: EvalResult }
+): BoolEvalResult {
+    const criterion =
+        evalCriterion as ReachTechnicalChallengeStateEvalCriterion;
+    /* TODO @JohannesPotzi : implement logic for yellow result. */
+    let isCompleted = false;
+    let isYellow = false;
+    const targetChallengeId = criterion.targetTechnicalChallengeId;
+    const targetStateId = criterion.targetTechnicalChallengeStateId;
+    const technicalChallenge = context.technicalChallenges[targetChallengeId]!;
+    isCompleted = technicalChallenge.currentStateId === targetStateId;
+    return newBoolEvalResult(
+        criterion.id as BoolEvalCriterionId,
+        context.currentTime,
+        criterion as BoolEvalCriterion,
+        isCompleted,
+        isYellow
+    );
 }

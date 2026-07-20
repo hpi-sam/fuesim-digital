@@ -108,6 +108,46 @@ Note the database requirements depicted in [the installation section](#installat
 
 - All available Docker ENVs are listed with their default values in [.env.example](./.env.example) file. Copy this file and name it `.env` (under Linux, this would be e.g. `cp .env.example .env`)
 
+## Administration
+
+Users are able to download all user-related data directly when logged in. For the deletion however, manual intervention by a server administrator is necessary. For this, two scripts ([find-user](./backend/src/database/find-user.ts), [delete-user-data](./backend/src/database/scripts/delete-user-data.ts)) are provided and can be used as follows.
+
+### Inside the docker container
+
+```bash
+
+```
+
+### Natively
+
+```bash
+$ cd backend
+$ npm run db:find-user demo // or "John"
+[
+  {
+    username: 'demo1',
+    displayName: 'John Doe',
+    id: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+  }
+]
+$ npm run db:delete-user-data xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Found user 'John Doe (demo1)'. Is this correct? (yes|no): y
+Found organisations of which 'John Doe' is the only admin.
+	- Private Inhalte (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+	- ... (...)
+If you continue, THESE AND ALL THEIR CONTENTS WILL BE DELETED!
+Continue? (yes|no): y
+This operation will delete:
+	Sessions: xx
+	Organisations: xx
+	Collections: xx
+	Exercises: xx
+	Exercise Templates: xx
+	Parallel Exercises: xx
+Are you sure? (yes|no): y
+Success
+```
+
 ## Before you commit
 
 - We are using [prettier](https://prettier.io/) as our code formatter. Run it via `npm run prettier` or `npm run prettier:windows` in the root to format all files and make the CI happy. Please use the [vscode extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode).

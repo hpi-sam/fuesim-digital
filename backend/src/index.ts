@@ -20,6 +20,7 @@ import { OrganisationService } from './database/services/organisation-service.js
 import { OrganisationRepository } from './database/repositories/organisation-repository.js';
 import { CollectionRepository } from './database/repositories/collection-repository.js';
 import { CollectionService } from './database/services/collection-service.js';
+import { UserDataService } from './database/services/userdata-service.js';
 
 async function main() {
     Config.initialize();
@@ -89,6 +90,13 @@ async function main() {
         organisationService,
         repositories.collectionRepository
     );
+    const userDataService = new UserDataService(
+        repositories.exerciseRepository,
+        repositories.sessionRepository,
+        repositories.userRepository,
+        repositories.parallelExerciseRepository,
+        repositories.organisationRepository
+    );
 
     await collectionService.initialize();
 
@@ -112,6 +120,7 @@ async function main() {
         databaseService,
         organisationService,
         collectionService,
+        userDataService,
     };
 
     if (Config.useDb) {

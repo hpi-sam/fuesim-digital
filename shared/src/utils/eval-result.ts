@@ -9,14 +9,12 @@ import {
     isTemporalEvalCriterionType,
     numberEvalCriterionSchema,
     getChildrenOfEvalCriterion,
-    isNumberEvalCriterion,
     Patient,
     Scoutable,
     TechnicalChallenge,
     UUID,
     uuid,
     uuidSchema,
-    currentStateOf,
     Measure,
     MeasureTemplateCategory,
     ExerciseState,
@@ -25,7 +23,6 @@ import {
     BoolEvalCriterionId,
     NumberEvalCriterionId,
     evalCriterionSchema,
-    technicalChallengeIdSchema,
     technicalChallengeSchema,
     patientSchema,
     scoutableSchema,
@@ -36,7 +33,7 @@ import {
     boolCriterionTypeEvaluatorMap,
     numberCriterionTypeEvaluatorMap,
 } from 'fuesim-digital-shared';
-import { produce } from 'immer';
+import { Immutable, produce, WritableDraft } from 'immer';
 
 export const evalResultBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -75,7 +72,9 @@ export const evalResultContextSchema = z.strictObject({
     measureTemplates: z.record(uuidSchema, measureTemplateCategorySchema),
     currentTime: z.number(),
 });
-export type EvalResultContext = z.infer<typeof evalResultContextSchema>;
+export type EvalResultContext = Immutable<
+    z.infer<typeof evalResultContextSchema>
+>;
 
 export function newEvalResultContext(
     evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
@@ -220,27 +219,12 @@ export function getIsCompletedFromEvalResult(
 }
 export function updateEvalResultsMap(
     evalResultsMap: { [criterionId: string]: EvalResult },
-    evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
-    technicalChallenges: { [key: string]: TechnicalChallenge },
-    patients: { [key: string]: Patient },
-    scoutables: { [key: string]: Scoutable },
-    measures: { [key: string]: Measure },
-    measureTemplates: { [key: string]: MeasureTemplateCategory },
-    currentTime: number,
+    context: EvalResultContext,
     temporalOnly: boolean
 ): { [criterionId: string]: EvalResult } {
-    const context = newEvalResultContext(
-        evalCriteria,
-        technicalChallenges,
-        patients,
-        scoutables,
-        measures,
-        measureTemplates,
-        currentTime
-    );
     const tmpCache: { [criterionId: string]: EvalResult } = {};
     return (
-        Object.values(evalCriteria)
+        Object.values(context.evalCriteria as WritableDraft<EvalCriterion>)
             /* For non parallel exercises we only care to cache results
             for temporal criteria, because the rest is selected via
             the exercise selector selectEvalResults. */

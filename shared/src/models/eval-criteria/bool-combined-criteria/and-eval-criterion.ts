@@ -13,6 +13,7 @@ import {
     uuid,
     EvalCriterion,
 } from 'fuesim-digital-shared';
+import { WritableDraft } from 'immer';
 
 export const andEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -61,7 +62,7 @@ export function getEvalResultOfAndCriterion(
     let atLeastOneCompleted = false;
     for (const childId of criterion.children) {
         const res = getEvalResultFromCriterion(
-            context.evalCriteria[childId]!,
+            context.evalCriteria[childId]! as WritableDraft<EvalCriterion>,
             context,
             cache
         );

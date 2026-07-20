@@ -14,6 +14,7 @@ import {
     NumberEvalResult,
     uuid,
 } from 'fuesim-digital-shared';
+import { WritableDraft } from 'immer';
 
 export const countCompletedEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -70,7 +71,9 @@ export function getEvalResultOfCountCompletedCriterion(
     num = 0;
     for (let i = 0; i < criterion.children.length; i += 1) {
         const res = getEvalResultFromCriterion(
-            context.evalCriteria[criterion.children.at(i)!]!,
+            context.evalCriteria[
+                criterion.children.at(i)!
+            ]! as WritableDraft<EvalCriterion>,
             context,
             cache
         );

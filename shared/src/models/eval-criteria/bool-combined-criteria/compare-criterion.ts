@@ -16,6 +16,7 @@ import {
     EvalResultContext,
     newBoolEvalResult,
 } from '../../../utils/eval-result.js';
+import { WritableDraft } from 'immer';
 export const comparativeOperatorSubSchema = z.union([
     z.literal('greaterThan'),
     z.literal('greaterThanOrEqual'),
@@ -77,8 +78,12 @@ export function getEvalResultOfCompareCriterion(
     const criterion = evalCriterion as CompareEvalCriterion;
     let isCompleted = false;
     let isYellow = false;
-    const leftCrit = context.evalCriteria[criterion.leftChild];
-    const rightCrit = context.evalCriteria[criterion.rightChild];
+    const leftCrit = context.evalCriteria[
+        criterion.leftChild
+    ] as WritableDraft<EvalCriterion>;
+    const rightCrit = context.evalCriteria[
+        criterion.rightChild
+    ] as WritableDraft<EvalCriterion>;
     if (!leftCrit || !rightCrit) {
         console.log(
             `[logic Error] comparing criteria but some are missing with ids: ${

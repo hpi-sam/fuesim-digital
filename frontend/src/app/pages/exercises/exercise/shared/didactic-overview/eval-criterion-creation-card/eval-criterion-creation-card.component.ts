@@ -33,6 +33,7 @@ import {
     boolEvalCriterionLeafTypes,
     newCountCompletedEvalCriterion,
     newOrEvalCriterion,
+    newEvalResultContext,
 } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -82,6 +83,7 @@ import { Subscription } from 'rxjs';
         DidacticOverViewResultsTableComponent,
     ],
 })
+/* TODO @JohannesPotzi : Make this indepentent of the didactic overview component. */
 export class EvalCriterionCreationCardComponent {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
@@ -439,16 +441,16 @@ export class EvalCriterionCreationCardComponent {
             selectMeasureTemplateCategories
         )();
 
-        return getEvalResultFromCriterion(
-            criterion,
+        const context = newEvalResultContext(
             criteria,
             tcs,
             patients,
             scoutables,
             measures,
             measureTemplates,
-            currentTime,
-            cache ?? {}
+            currentTime
         );
+
+        return getEvalResultFromCriterion(criterion, context, cache ?? {});
     }
 }

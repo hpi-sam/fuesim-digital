@@ -49,6 +49,7 @@ interface subTable {
         FormsModule,
     ],
 })
+/* TODO @JohannesPotzi : Sub component for combined criteria. */
 export class DidacticOverViewResultsTableComponent implements OnInit {
     public readonly store = inject<Store<AppState>>(Store);
     public readonly isInSelectionModeInput = input<boolean>(true);
@@ -138,6 +139,7 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
         this.subTables.set(subTableUpdate);
     }
 
+    /* TODO @JohannesPotzi :  */
     /**
      * Recursively fills the cache with all subTables from the tree of results
      * @param cache This is the cache for subTables

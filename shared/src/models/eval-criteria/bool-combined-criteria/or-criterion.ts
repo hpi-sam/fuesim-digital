@@ -13,6 +13,7 @@ import {
     newBoolEvalResult,
     EvalCriterion,
 } from 'fuesim-digital-shared';
+import { WritableDraft } from 'immer';
 
 export const orEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -59,7 +60,9 @@ export function getEvalResultOfOrCriterion(
     let isYellow = false;
     for (let i = 0; i < criterion.children.length; i += 1) {
         const res = getEvalResultFromCriterion(
-            context.evalCriteria[criterion.children.at(i)!]!,
+            context.evalCriteria[
+                criterion.children.at(i)!
+            ]! as WritableDraft<EvalCriterion>,
             context,
             cache
         );

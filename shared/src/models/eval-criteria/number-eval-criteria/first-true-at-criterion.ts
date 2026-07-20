@@ -14,6 +14,7 @@ import {
     NumberEvalResult,
     uuid,
 } from 'fuesim-digital-shared';
+import { WritableDraft } from 'immer';
 
 export const firstTrueAtEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -77,7 +78,9 @@ export function getEvalResultOfFirstTrueAtCriterion(
         num = previousResult.num;
     } else if (context.evalCriteria[criterion.child]) {
         const childRes = getEvalResultFromCriterion(
-            context.evalCriteria[criterion.child]!,
+            context.evalCriteria[
+                criterion.child
+            ]! as WritableDraft<EvalCriterion>,
             context,
             cache
         );

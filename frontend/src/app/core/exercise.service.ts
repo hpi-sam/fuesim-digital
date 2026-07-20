@@ -14,6 +14,7 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     joinExerciseResponseDataSchema,
+    newEvalResultContext,
     socketIoTransports,
     updateEvalResultsMap,
 } from 'fuesim-digital-shared';
@@ -46,6 +47,9 @@ import {
     selectCurrentTime,
     selectEvalCriteria,
     selectExerciseState,
+    selectMeasures,
+    selectMeasureTemplateCategories,
+    selectMeasureTemplates,
     selectPatients,
     selectScoutables,
     selectTechnicalChallenges,
@@ -109,14 +113,19 @@ export class ExerciseService {
             freeze(action, true);
             this.optimisticActionHandler?.performAction(action);
             if (action.type === '[Exercise] Tick') {
+                const resultContext = newEvalResultContext(
+                    this.store.selectSignal(selectEvalCriteria)(),
+                    this.store.selectSignal(selectTechnicalChallenges)(),
+                    this.store.selectSignal(selectPatients)(),
+                    this.store.selectSignal(selectScoutables)(),
+                    this.store.selectSignal(selectMeasures)(),
+                    this.store.selectSignal(selectMeasureTemplateCategories)(),
+                    this.store.selectSignal(selectCurrentTime)()
+                );
                 this.evalResultsCache.set(
                     updateEvalResultsMap(
                         this.evalResultsCache(),
-                        this.store.selectSignal(selectEvalCriteria)(),
-                        this.store.selectSignal(selectTechnicalChallenges)(),
-                        this.store.selectSignal(selectPatients)(),
-                        this.store.selectSignal(selectScoutables)(),
-                        this.store.selectSignal(selectCurrentTime)(),
+                        resultContext,
                         true
                     )
                 );

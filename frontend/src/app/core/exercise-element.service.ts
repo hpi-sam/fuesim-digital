@@ -155,6 +155,10 @@ export class CollectionService {
             }
 
             case 'element:delete': {
+                console.log(
+                    'old value length',
+                    subject.getValue()?.objects.direct.length
+                );
                 const currentValue = subject.getValue();
                 if (!currentValue) return;
                 const newValue = {
@@ -168,6 +172,10 @@ export class CollectionService {
                     },
                 };
                 subject.next(newValue);
+                console.log(
+                    'new value length',
+                    subject.getValue()?.objects.direct.length
+                );
                 break;
             }
 

@@ -3,7 +3,6 @@ import type { Immutable } from 'immer';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { uuidSetSchema } from '../utils/uuid-set.js';
-import { hybridIdSchema } from '../utils/hybrid-id.js';
 import { versionedElementModelStateExtension } from '../marketplace/models/versioned-element-model.js';
 import type { PersonnelTemplate } from './personnel-template.js';
 import { canCaterForSchema } from './utils/cater-for.js';
@@ -21,7 +20,7 @@ export const personnelSchema = z.strictObject({
      * @deprecated This will be refactored into a capability-based system. Please already consider using {@link templateId} if you only need an opaque identifier of the type and you don't assert any properties of the personnel.
      */
     personnelType: z.string(),
-    templateId: hybridIdSchema,
+    templateId: uuidSchema,
     typeName: z.string(),
     typeAbbreviation: z.string(),
     assignedPatientIds: uuidSetSchema,

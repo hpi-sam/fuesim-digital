@@ -83,7 +83,14 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
     ngOnInit() {
         this.collection.subject
             .pipe(takeUntil(this.destroy$))
-            .subscribe((data) => this.selectedCollectionData.set(data));
+            .subscribe((data) => {
+                console.log('collection subject update', data);
+                this.selectedCollectionData.set(data);
+                console.log(
+                    'new colletion data',
+                    this.selectedCollectionData()
+                );
+            });
     }
 
     constructor() {
@@ -93,10 +100,6 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
             .pipe(takeUntil(this.destroy$))
             .subscribe((params) => {
                 const fromLocation = params.get('from');
-                console.log({
-                    fromLocation,
-                    parse: exerciseKeySchema.safeParse(fromLocation),
-                });
                 switch (fromLocation) {
                     case 'archive':
                         this.routerBackLink = {

@@ -5,10 +5,9 @@ import type {
     ElementVersionId,
     ExerciseState,
     TemplateVersion,
-    VersionedElementContent} from 'fuesim-digital-shared';
-import {
-    cloneDeepMutable,
+    VersionedElementContent,
 } from 'fuesim-digital-shared';
+import { cloneDeepMutable } from 'fuesim-digital-shared';
 import { selectExerciseState } from './exercise.selectors';
 
 function getTemplateFromExerciseState(

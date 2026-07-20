@@ -1,7 +1,7 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { elementSchema } from '../../models/element.js';
 import { alarmGroupVehicleSchema } from '../../models/utils/alarm-group-vehicle.js';
-import type { ImmutableInfer } from './../../utils/infer.js';
 
 export const collectionUpgradeChangeElementSchema = z.discriminatedUnion(
     'type',
@@ -14,6 +14,6 @@ export const collectionUpgradeChangeElementTypesSchema = z.union(
     )
 );
 
-export type CollectionUpgradeChangeElement = ImmutableInfer<
-    typeof collectionUpgradeChangeElementSchema
+export type CollectionUpgradeChangeElement = Immutable<
+    z.infer<typeof collectionUpgradeChangeElementSchema>
 >;

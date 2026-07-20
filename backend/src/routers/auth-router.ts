@@ -4,27 +4,29 @@ import type { AuthService } from '../auth/auth-service.js';
 import { toFrontend } from '../utils/frontend-http-helper.js';
 import { warnError } from '../utils/http-handlers.js';
 import { isDevelopment } from '../config.js';
-import { OrganisationService } from '../database/services/organisation-service.js';
-import { OidcService } from '../auth/oidc-service.js';
+import type { OrganisationService } from '../database/services/organisation-service.js';
+import type { OidcService } from '../auth/oidc-service.js';
 
-export function createAuthRouter(authService: AuthService, organisationService: OrganisationService) {
+export function createAuthRouter(
+    authService: AuthService,
+    organisationService: OrganisationService
+) {
     const router = Router();
 
     if (isDevelopment()) {
         router.get('/indev-generate-token', async (req, res) => {
             try {
-
                 const user: OidcService.UserInfo = {
                     id: 'indev',
                     displayName: 'InDev User',
                     username: 'indev-user',
-                }
+                };
                 const sessionToken = await authService.createNewSession({
                     user,
-                    accessToken: user.id
+                    accessToken: user.id,
                 });
 
-                organisationService.ensurePersonalOrganisation(user)
+                organisationService.ensurePersonalOrganisation(user);
 
                 res.cookie(authService.SESSION_COOKIE_NAME, sessionToken, {
                     httpOnly: true,

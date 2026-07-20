@@ -5,7 +5,6 @@ import type { ChangeApply } from '../exercise-collection-upgrade/exercise-collec
 import type { ChangeImpact } from '../exercise-collection-upgrade/exercise-collection-change-impact.js';
 import { alarmGroupSchema } from '../../models/alarm-group.js';
 import { vehicleTemplateSchema } from '../../models/vehicle-template.js';
-import type { ImmutableInfer } from '../../utils/infer.js';
 import { personnelTemplateSchema } from '../../models/personnel-template.js';
 import { materialTemplateSchema } from '../../models/material-template.js';
 import { mapImageTemplateSchema } from '../../models/map-image-template.js';
@@ -26,8 +25,8 @@ export const marketplaceElementContentSchema = z.discriminatedUnion('type', [
     mapImageTemplateSchema,
 ]);
 
-export type MarketplaceElementContent = ImmutableInfer<
-    typeof marketplaceElementContentSchema
+export type MarketplaceElementContent = Immutable<
+    z.infer<typeof marketplaceElementContentSchema>
 >;
 
 export const marketplaceElementsDefinitions: {

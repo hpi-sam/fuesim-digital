@@ -21,7 +21,6 @@ import { CreatingVersionedElementModalData } from '../modals/editor-modals/base-
 import { CollectionService } from '../../../../core/exercise-element.service';
 import { GenericElementCardIndicator } from '../cards/generic-element-card/generic-element-card.component';
 import { FileInputDirective } from '../../../../shared/directives/file-input.directive';
-import { MessageService } from '../../../../core/messages/message.service';
 import { openVersionedElementModal } from '../modals/editor-modals/versioned-element-modal/open-versioned-element-model';
 import { ConfirmationModalService } from '../../../../core/confirmation-modal/confirmation-modal.service';
 
@@ -36,7 +35,6 @@ import { ConfirmationModalService } from '../../../../core/confirmation-modal/co
     ],
 })
 export class CollectionElementsListComponent {
-    private readonly messageService = inject(MessageService);
     private readonly confirmationService = inject(ConfirmationModalService);
     public readonly ngbModalService = inject(NgbModal);
     public readonly collectionService = inject(CollectionService);

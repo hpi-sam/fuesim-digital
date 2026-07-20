@@ -1,8 +1,8 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { collectionElementTypeSchema } from '../models/collection-element-type.js';
 import { marketplaceElementContentSchema } from '../elements/marketplace-elements.js';
 import { templateVersionSchema } from '../models/versioned-elements.js';
-import type { ImmutableInfer } from './../../utils/infer.js';
 import { changeTargetSchema } from './exercise-collection-change-target.js';
 
 export const sharedChangeApplySchema = z.object({
@@ -17,8 +17,8 @@ export const removeReplaceChangeApplySchema = z.object({
     ...sharedChangeApplySchema.shape,
 });
 
-export type RemoveReplaceChangeApply = ImmutableInfer<
-    typeof removeReplaceChangeApplySchema
+export type RemoveReplaceChangeApply = Immutable<
+    z.infer<typeof removeReplaceChangeApplySchema>
 >;
 
 export const removeChangeApplySchema = z.discriminatedUnion('action', [
@@ -36,7 +36,9 @@ export const removeChangeApplySchema = z.discriminatedUnion('action', [
     removeReplaceChangeApplySchema,
 ]);
 
-export type RemoveChangeApply = ImmutableInfer<typeof removeChangeApplySchema>;
+export type RemoveChangeApply = Immutable<
+    z.infer<typeof removeChangeApplySchema>
+>;
 
 export const editableChangeApplyActionSchema = z.literal(['keep', 'update']);
 
@@ -58,8 +60,8 @@ export const editableChangeApplySchema = z.discriminatedUnion('action', [
     editableCustomChangeApplySchema,
 ]);
 
-export type EditableChangeApply = ImmutableInfer<
-    typeof editableChangeApplySchema
+export type EditableChangeApply = Immutable<
+    z.infer<typeof editableChangeApplySchema>
 >;
 
 export const addedChangeApplySchema = z.object({
@@ -69,7 +71,9 @@ export const addedChangeApplySchema = z.object({
     ...sharedChangeApplySchema.shape,
 });
 
-export type AddedChangeApply = ImmutableInfer<typeof addedChangeApplySchema>;
+export type AddedChangeApply = Immutable<
+    z.infer<typeof addedChangeApplySchema>
+>;
 
 export const changeApplySchema = z.discriminatedUnion('type', [
     removeChangeApplySchema,
@@ -77,4 +81,4 @@ export const changeApplySchema = z.discriminatedUnion('type', [
     addedChangeApplySchema,
 ]);
 
-export type ChangeApply = ImmutableInfer<typeof changeApplySchema>;
+export type ChangeApply = Immutable<z.infer<typeof changeApplySchema>>;

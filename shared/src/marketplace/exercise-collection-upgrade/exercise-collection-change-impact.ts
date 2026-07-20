@@ -1,7 +1,7 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { templateVersionSchema } from '../models/versioned-elements.js';
 import { changeTargetSchema } from './exercise-collection-change-target.js';
-import type { ImmutableInfer } from './../../utils/infer.js';
 import { collectionUpgradeChangeElementSchema } from './exercise-collection-change-element.js';
 
 const sharedChangeImpactPropertiesSchema = z.object({
@@ -15,8 +15,8 @@ export const addedElementChangeImpactSchema = z.object({
     type: z.literal('added'),
 });
 
-export type AddedElementChangeImpact = ImmutableInfer<
-    typeof addedElementChangeImpactSchema
+export type AddedElementChangeImpact = Immutable<
+    z.infer<typeof addedElementChangeImpactSchema>
 >;
 
 export const removedElementChangeImpactSchema = z.object({
@@ -25,8 +25,8 @@ export const removedElementChangeImpactSchema = z.object({
     element: collectionUpgradeChangeElementSchema,
 });
 
-export type RemovedElementChangeImpact = ImmutableInfer<
-    typeof removedElementChangeImpactSchema
+export type RemovedElementChangeImpact = Immutable<
+    z.infer<typeof removedElementChangeImpactSchema>
 >;
 
 export const editableElementChangeImpactSchema = z.object({
@@ -41,8 +41,8 @@ export const editableElementChangeImpactSchema = z.object({
     element: collectionUpgradeChangeElementSchema,
 });
 
-export type EditableElementChangeImpact = ImmutableInfer<
-    typeof editableElementChangeImpactSchema
+export type EditableElementChangeImpact = Immutable<
+    z.infer<typeof editableElementChangeImpactSchema>
 >;
 
 export const changeImpactSchema = z.discriminatedUnion('type', [
@@ -51,4 +51,4 @@ export const changeImpactSchema = z.discriminatedUnion('type', [
     removedElementChangeImpactSchema,
 ]);
 
-export type ChangeImpact = ImmutableInfer<typeof changeImpactSchema>;
+export type ChangeImpact = Immutable<z.infer<typeof changeImpactSchema>>;

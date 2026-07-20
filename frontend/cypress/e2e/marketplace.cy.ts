@@ -1,4 +1,4 @@
-function createCollection (name: string) {
+function createCollection(name: string) {
     cy.visit('/collections');
     cy.get('[data-cy="create-new-collection-btn"]').click();
 

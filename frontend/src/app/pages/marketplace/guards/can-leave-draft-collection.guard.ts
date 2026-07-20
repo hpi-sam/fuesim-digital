@@ -4,7 +4,6 @@ import type {
     GuardResult,
     RouterStateSnapshot,
 } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../core/exercise-element.service';
 import { MarketplaceSetDetailComponent } from '../collection-detail-view/collection-detail-view.component';
 import { TwoButtonConfirmationModalService } from '../../../core/twobutton-confirmation-modal/twobutton-confirmation-modal.service';
@@ -13,7 +12,6 @@ import { TwoButtonConfirmationModalService } from '../../../core/twobutton-confi
     providedIn: 'root',
 })
 export class LeaveDraftCollectionGuard {
-    private readonly ngbModalService = inject(NgbModal);
     private readonly twoButtonConfirmationModalService = inject(
         TwoButtonConfirmationModalService
     );
@@ -25,6 +23,10 @@ export class LeaveDraftCollectionGuard {
         currentState: RouterStateSnapshot,
         nextState: RouterStateSnapshot
     ): Promise<GuardResult> {
+        if (!this.collectionService.versioningEnabled()) {
+            return true;
+        }
+
         const collectionEntityId = currentRoute.params['collectionEntityId'];
 
         const collectionIsInDraftState = await this.collectionService

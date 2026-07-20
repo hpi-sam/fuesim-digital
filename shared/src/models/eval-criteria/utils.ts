@@ -26,6 +26,7 @@ import {
     getEvalResultOfCountPatientsAtStatusCriterion,
     BoolEvalCriterionType,
     NumberEvalCriterionType,
+    getEvalResultOfCountMeasuresCriterion,
 } from 'fuesim-digital-shared';
 
 export function isNumberEvalCriterion(
@@ -61,7 +62,7 @@ export function isTemporalEvalCriterionType(
 
 export const boolCriterionTypeEvaluatorMap: {
     [key in BoolEvalCriterionType]: (
-        criterion: EvalCriterion,
+        criterion: Extract<EvalCriterion, { criterionType: key }>,
         context: EvalResultContext,
         cache?: { [key: string]: EvalResult }
     ) => BoolEvalResult;
@@ -77,14 +78,14 @@ export const boolCriterionTypeEvaluatorMap: {
 };
 export const numberCriterionTypeEvaluatorMap: {
     [key in NumberEvalCriterionType]: (
-        criterion: EvalCriterion,
+        criterion: Extract<EvalCriterion, { criterionType: key }>,
         context: EvalResultContext,
         cache?: { [key: string]: EvalResult }
     ) => NumberEvalResult;
 } = {
     constNumEvalCriterion: getEvalResultOfConstNumCriterion,
     countCompletedEvalCriterion: getEvalResultOfCountCompletedCriterion,
-    countMeasuresEvalCriterion: getEvalResultOfCountCompletedCriterion,
+    countMeasuresEvalCriterion: getEvalResultOfCountMeasuresCriterion,
     countPatientsAtStatusEvalCriterion:
         getEvalResultOfCountPatientsAtStatusCriterion,
     firstTrueAtEvalCriterion: getEvalResultOfFirstTrueAtCriterion,

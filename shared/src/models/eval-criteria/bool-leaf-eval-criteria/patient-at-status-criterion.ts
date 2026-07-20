@@ -55,7 +55,7 @@ export function newPatientAtStatusEvalCriterion(
  * @returns
  */
 export function getEvalResultOfPatientAtStatusCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: PatientAtStatusEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
@@ -68,7 +68,7 @@ export function getEvalResultOfPatientAtStatusCriterion(
     return newBoolEvalResult(
         criterion.id as UUID,
         context.currentTime,
-        criterion as BoolEvalCriterion,
+        criterion,
         isCompleted,
         isYellow
     );

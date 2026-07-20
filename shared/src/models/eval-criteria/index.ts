@@ -1,5 +1,4 @@
-export * from './criterion-categories.js';
-export * from './utils.js';
+export * from './eval-criterion-base.js';
 export * from './bool-combined-criteria/and-eval-criterion.js';
 export * from './bool-combined-criteria/compare-criterion.js';
 export * from './bool-combined-criteria/not-criterion.js';
@@ -13,3 +12,5 @@ export * from './number-eval-criteria/count-measures-criterion.js';
 export * from './number-eval-criteria/count-patients-at-status-criterion.js';
 export * from './number-eval-criteria/first-true-at-criterion.js';
 export * from './number-eval-criteria/timestamp-criterion.js';
+export * from './criterion-categories.js';
+export * from './utils.js';

@@ -49,7 +49,7 @@ export function newCountPatientsAtStatusEvalCriterion(
  * @returns
  */
 export function getEvalResultOfCountPatientsAtStatusCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: CountPatientsAtStatusEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): NumberEvalResult {

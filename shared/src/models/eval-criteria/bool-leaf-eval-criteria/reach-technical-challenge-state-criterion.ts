@@ -1,10 +1,8 @@
 import z from 'zod';
 import {
-    BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
     UUID,
     BoolEvalResult,
-    EvalCriterion,
     EvalResult,
     EvalResultContext,
     newBoolEvalResult,
@@ -53,7 +51,7 @@ export function newReachTechnicalChallengeStateEvalCriterion(
  * @returns
  */
 export function getEvalResultOfReachTechnicalChallengeStateCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: ReachTechnicalChallengeStateEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
@@ -67,9 +65,9 @@ export function getEvalResultOfReachTechnicalChallengeStateCriterion(
     const technicalChallenge = context.technicalChallenges[targetChallengeId]!;
     isCompleted = technicalChallenge.currentStateId === targetStateId;
     return newBoolEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
-        criterion as BoolEvalCriterion,
+        criterion,
         isCompleted,
         isYellow
     );

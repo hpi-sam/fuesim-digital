@@ -1,6 +1,5 @@
 import z from 'zod';
 import {
-    BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
     UUID,
     uuidSchema,
@@ -50,7 +49,7 @@ export function newAndEvalCriterion(
  * @returns
  */
 export function getEvalResultOfAndCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: AndEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
@@ -77,7 +76,7 @@ export function getEvalResultOfAndCriterion(
     return newBoolEvalResult(
         criterion.id as UUID,
         context.currentTime,
-        criterion as BoolEvalCriterion,
+        criterion,
         isCompleted,
         isYellow
     );

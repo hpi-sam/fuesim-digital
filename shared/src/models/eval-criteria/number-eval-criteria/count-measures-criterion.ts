@@ -48,7 +48,7 @@ export function newcountMeasuresEvalCriterion(
  * @returns
  */
 export function getEvalResultOfCountMeasuresCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: CountMeasuresEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): NumberEvalResult {

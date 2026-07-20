@@ -50,7 +50,7 @@ export function newFirstTrueAtEvalCriterion(
  * @returns
  */
 export function getEvalResultOfFirstTrueAtCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: FirstTrueAtEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult },
     previousResult?: EvalResult

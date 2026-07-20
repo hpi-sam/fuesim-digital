@@ -45,7 +45,7 @@ export function newConstNumEvalCriterion(
  * @returns
  */
 export function getEvalResultOfConstNumCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: ConstNumEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): NumberEvalResult {

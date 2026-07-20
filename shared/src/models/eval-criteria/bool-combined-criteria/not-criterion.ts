@@ -48,7 +48,7 @@ export function newNotEvalCriterion(
  * @returns
  */
 export function getEvalResultOfNotCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: NotEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
@@ -63,7 +63,7 @@ export function getEvalResultOfNotCriterion(
     return newBoolEvalResult(
         criterion.id,
         context.currentTime,
-        criterion as BoolEvalCriterion,
+        criterion,
         isCompleted,
         isYellow
     );

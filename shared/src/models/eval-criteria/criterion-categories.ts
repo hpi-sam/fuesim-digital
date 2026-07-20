@@ -1,37 +1,21 @@
 import { z } from 'zod';
-import { uuidSchema } from '../../utils/uuid.js';
-import { patientAtStatusEvalCriterionSchema } from './bool-leaf-eval-criteria/patient-at-status-criterion.js';
-import { viewScoutableEvalCriterionSchema } from './bool-leaf-eval-criteria/view-scoutable-criterion.js';
-import { reachTechnicalChallengeStateEvalCriterionSchema } from './bool-leaf-eval-criteria/reach-technical-challenge-state-criterion.js';
-import { compareEvalCriterionSchema } from './bool-combined-criteria/compare-criterion.js';
-import { constNumEvalCriterionSchema } from './number-eval-criteria/const-num-criterion.js';
-import { countCompletedEvalCriterionSchema } from './number-eval-criteria/count-completed-criterion.js';
-import { countPatientsAtStatusEvalCriterionSchema } from './number-eval-criteria/count-patients-at-status-criterion.js';
-import { countMeasuresEvalCriterionSchema } from './number-eval-criteria/count-measures-criterion.js';
-import { timestampEvalCriterionSchema } from './number-eval-criteria/timestamp-criterion.js';
-import { firstTrueAtEvalCriterionSchema } from './number-eval-criteria/first-true-at-criterion.js';
-import { orEvalCriterionSchema } from './bool-combined-criteria/or-criterion.js';
-import { notEvalCriterionSchema } from './bool-combined-criteria/not-criterion.js';
-import { andEvalCriterionSchema } from './bool-combined-criteria/and-eval-criterion.js';
+import {
+    patientAtStatusEvalCriterionSchema,
+    viewScoutableEvalCriterionSchema,
+    reachTechnicalChallengeStateEvalCriterionSchema,
+    compareEvalCriterionSchema,
+    constNumEvalCriterionSchema,
+    countCompletedEvalCriterionSchema,
+    countPatientsAtStatusEvalCriterionSchema,
+    countMeasuresEvalCriterionSchema,
+    timestampEvalCriterionSchema,
+    firstTrueAtEvalCriterionSchema,
+    orEvalCriterionSchema,
+    notEvalCriterionSchema,
+    andEvalCriterionSchema,
+} from 'fuesim-digital-shared';
 
-/* TODO @JohannesPotzi : fix id types: currently number criteria and bool criteria have evalCritIds. */
-export const evalCriterionBaseSchema = z.strictObject({
-    id: uuidSchema,
-    name: z.string(),
-    type: z.literal('evalCriterion'),
-    isVisibleForParticipants: z.boolean(),
-    isDraft: z.boolean(),
-});
-export const boolEvalCriterionBaseSchema = z.strictObject({
-    ...evalCriterionBaseSchema.shape,
-});
-
-export const numberEvalCriterionBaseSchema = z.strictObject({
-    ...evalCriterionBaseSchema.shape,
-});
-
-/* TODO @JohannesPotzi @Jogius : countUnqualifiedMeasuresEvalCriterion :
- as a template in the combined criteria creation form using the greater than criterion with comparative operator attribute. */
+/* TODO @JohannesPotzi @Jogius : countUnqualifiedMeasuresEvalCriterion */
 
 export const boolEvalCriterionLeafSchema = z.discriminatedUnion(
     'criterionType',

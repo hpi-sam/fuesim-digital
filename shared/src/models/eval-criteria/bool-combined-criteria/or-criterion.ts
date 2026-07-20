@@ -50,7 +50,7 @@ export function newOrEvalCriterion(
  * @returns
  */
 export function getEvalResultOfOrCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: OrEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
@@ -75,7 +75,7 @@ export function getEvalResultOfOrCriterion(
     return newBoolEvalResult(
         criterion.id as UUID,
         context.currentTime,
-        criterion as BoolEvalCriterion,
+        criterion,
         isCompleted,
         isYellow
     );

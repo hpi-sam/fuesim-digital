@@ -98,10 +98,9 @@ import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
 import {
     EvalCriterion,
-    evalCriterionBaseSchema,
     evalCriterionSchema,
 } from './models/eval-criteria/criterion-categories.js';
-
+import { evalCriterionBaseSchema } from 'fuesim-digital-shared';
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
     public readonly id = uuid();

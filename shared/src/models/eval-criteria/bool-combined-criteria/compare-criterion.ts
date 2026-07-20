@@ -6,7 +6,6 @@ import {
     uuidSchema,
     BoolEvalResult,
     EvalResult,
-    BoolEvalCriterion,
     getEvalResultFromCriterion,
 } from 'fuesim-digital-shared';
 import { uuid } from '../../../utils/uuid.js';
@@ -68,7 +67,7 @@ export function newCompareEvalCriterion(
  * @returns
  */
 export function getEvalResultOfCompareCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: CompareEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
@@ -163,7 +162,7 @@ export function getEvalResultOfCompareCriterion(
     return newBoolEvalResult(
         criterion.id as UUID,
         context.currentTime,
-        criterion as BoolEvalCriterion,
+        criterion,
         isCompleted,
         isYellow
     );

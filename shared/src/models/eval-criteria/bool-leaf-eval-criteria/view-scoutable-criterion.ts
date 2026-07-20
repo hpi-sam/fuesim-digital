@@ -48,7 +48,7 @@ export function newViewScoutableEvalCriterion(
  * @returns
  */
 export function getEvalResultOfViewScoutableCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: ViewScoutableEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
@@ -68,7 +68,7 @@ export function getEvalResultOfViewScoutableCriterion(
     return newBoolEvalResult(
         criterion.id as UUID,
         context.currentTime,
-        criterion as BoolEvalCriterion,
+        criterion,
         isCompleted,
         isYellow
     );

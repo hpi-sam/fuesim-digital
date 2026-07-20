@@ -46,7 +46,7 @@ export function newTimestampEvalCriterion(
  * @returns
  */
 export function getEvalResultOfTimestampCriterion(
-    evalCriterion: EvalCriterion,
+    evalCriterion: TimestampEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): NumberEvalResult {

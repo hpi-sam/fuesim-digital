@@ -50,11 +50,10 @@ export function newCountCompletedEvalCriterion(
  * @returns
  */
 export function getEvalResultOfCountCompletedCriterion(
-    evalCriterion: EvalCriterion,
+    criterion: CountCompletedEvalCriterion,
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): NumberEvalResult {
-    const criterion = evalCriterion as CountCompletedEvalCriterion;
     let num = null;
 
     if (!num) {

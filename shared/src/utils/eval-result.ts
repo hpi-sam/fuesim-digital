@@ -95,16 +95,21 @@ export function newEvalResultContext(
 export function newBoolEvalResult(
     criterionId: UUID,
     timestamp: number,
-    criterion: BoolEvalCriterion,
+    criterion: EvalCriterion,
     isCompleted: boolean,
     isYellow: boolean
 ): BoolEvalResult {
+    if (!isBoolEvalCriterion(criterion)) {
+        console.log(
+            '[Bad Input] trying to assign a non BoolCriterion to a BoolEvalResult'
+        );
+    }
     return {
         id: uuid(),
         type: 'boolEvalResult',
         criterionId,
         timestamp,
-        criterion,
+        criterion: criterion as BoolEvalCriterion,
         isCompleted,
         isYellow,
     };
@@ -158,14 +163,15 @@ export function getEvalResultFromCriterion(
             previousResult
         );
     } else if (isBoolEvalCriterion(evalCriterion)) {
+        /* TODO @JohannesPotzi : as never ... is that correct? */
         return boolCriterionTypeEvaluatorMap[evalCriterion.criterionType](
-            evalCriterion,
+            evalCriterion as never,
             context,
             cache
         );
     } else {
         return numberCriterionTypeEvaluatorMap[evalCriterion.criterionType](
-            evalCriterion,
+            evalCriterion as never,
             context,
             cache
         );

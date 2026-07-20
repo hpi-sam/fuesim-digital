@@ -11,7 +11,7 @@ import {
     marketplaceElementsDefinitions,
     TemplateVersion,
 } from 'fuesim-digital-shared';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgComponentOutlet } from '@angular/common';
 import { Immutable } from 'immer';
 import { EditConflictResolutionComponent } from '../edit-conflict-resolution/edit-conflict-resolution.component';
 import { VersionedElementModalData } from '../base-versioned-element-submodal';
@@ -22,7 +22,7 @@ import { ConfirmationModalService } from '../../../../../../core/confirmation-mo
 
 @Component({
     selector: 'app-versioned-element-modal',
-    imports: [DatePipe, VersionedElementFormComponent],
+    imports: [DatePipe, VersionedElementFormComponent, NgComponentOutlet],
     templateUrl: './versioned-element-modal.component.html',
     styleUrl: './versioned-element-modal.component.scss',
     host: {
@@ -86,6 +86,10 @@ export class VersionedElementModalComponent implements OnInit {
             this.data.mode === 'create' ? 'erstellen' : 'bearbeiten';
         return `${typeName} ${actionString}`;
     });
+
+    public readonly isEditingDisabled = computed(
+        () => this.timeTravelMode() || this.data.mode === 'view'
+    );
 
     public async selectVersion(version: number) {
         this.selectedVersion.set(version);

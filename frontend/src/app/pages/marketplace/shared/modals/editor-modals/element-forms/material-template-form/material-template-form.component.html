@@ -56,5 +56,5 @@
     [type]="data().type"
     [disabled]="disabled()"
     (submitData)="submitData()"
-    (discardChanges)="discardChanges.emit()"
+    (discardChanges)="formOutput.discardChanges()"
 />

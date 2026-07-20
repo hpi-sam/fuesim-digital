@@ -1,4 +1,4 @@
-import type { InputSignal, OutputEmitterRef } from '@angular/core';
+import { InjectionToken, type InputSignal } from '@angular/core';
 import type {
     TemplateVersion,
     Marketplace,
@@ -13,8 +13,7 @@ export abstract class BaseVersionedElementSubmodal<T> {
     public abstract btnText: InputSignal<string>;
     public abstract disabled: InputSignal<boolean>;
 
-    public abstract readonly dataSubmit: OutputEmitterRef<T>;
-    public abstract readonly discardChanges: OutputEmitterRef<void>;
+    public abstract readonly formOutput: FormOutput;
 }
 
 export interface SharedVersionedElementModalData<T> {
@@ -44,3 +43,13 @@ export interface EditingVersionedElementModalData<
 export type VersionedElementModalData<T> =
     | CreatingVersionedElementModalData<T>
     | EditingVersionedElementModalData<T>;
+
+interface FormOutput {
+    dataSubmit: (data: any) => void;
+    discardChanges: () => void;
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const FormOutputInjectionToken = new InjectionToken<FormOutput>(
+    'FormOutputInjectionToken'
+);

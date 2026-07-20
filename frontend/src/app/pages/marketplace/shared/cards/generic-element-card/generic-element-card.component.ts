@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, InjectionToken, input } from '@angular/core';
 import { NgbDropdownModule, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
 export type GenericElementCardIndicator =
@@ -11,6 +11,9 @@ export type GenericElementCardIndicator =
     selector: 'app-generic-element-card',
     templateUrl: './generic-element-card.component.html',
     styleUrl: './generic-element-card.component.scss',
+    host: {
+        '(click)': 'output.click()',
+    },
     imports: [NgbDropdownModule, NgbTooltip],
 })
 export class GenericElementCardComponent {
@@ -20,11 +23,17 @@ export class GenericElementCardComponent {
 
     public readonly editable = input<boolean>(true);
 
-    public readonly delete = output();
-    public readonly duplicate = output();
-    public readonly duplicateExternal = output();
-    public readonly restore = output();
-
     public readonly showIndicator = input<GenericElementCardIndicator>();
     public readonly small = input<boolean>(false);
+
+    public readonly output = inject(GenericElementCardOutputInjectionToken);
 }
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const GenericElementCardOutputInjectionToken = new InjectionToken<{
+    delete: () => void;
+    duplicate: () => void;
+    duplicateExternal: () => void;
+    restore: () => void;
+    click: () => void;
+}>('GenericElementCardOutputInjectionToken');

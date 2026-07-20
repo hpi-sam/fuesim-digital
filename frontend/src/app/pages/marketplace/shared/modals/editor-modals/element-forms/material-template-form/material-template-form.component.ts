@@ -1,11 +1,4 @@
-import {
-    Component,
-    effect,
-    inject,
-    input,
-    output,
-    signal,
-} from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { disabled, form, FormField } from '@angular/forms/signals';
 import {
     cloneDeepMutable,
@@ -16,6 +9,7 @@ import { CaterForFormComponent } from '../cater-for-form/cater-for-form.componen
 import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 import {
     BaseVersionedElementSubmodal,
+    FormOutputInjectionToken,
     VersionedElementModalData,
 } from '../../base-versioned-element-submodal';
 import { MessageService } from '../../../../../../../core/messages/message.service';
@@ -43,8 +37,7 @@ export class MaterialTemplateFormComponent implements BaseVersionedElementSubmod
     public readonly btnText = input.required<string>();
     public readonly disabled = input<boolean>(false);
 
-    public readonly dataSubmit = output<MaterialTemplate>();
-    public readonly discardChanges = output();
+    public readonly formOutput = inject(FormOutputInjectionToken);
 
     private readonly values = signal<MaterialTemplate>({
         id: uuid(),
@@ -90,7 +83,7 @@ export class MaterialTemplateFormComponent implements BaseVersionedElementSubmod
             return valuesOnSubmit.image.aspectRatio;
         });
 
-        this.dataSubmit.emit({
+        this.formOutput.dataSubmit({
             ...valuesOnSubmit,
             image: {
                 ...valuesOnSubmit.image,

@@ -2,8 +2,8 @@ import {
     Component,
     computed,
     effect,
+    inject,
     input,
-    output,
     signal,
 } from '@angular/core';
 import {
@@ -20,6 +20,7 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { disabled, form, FormField, required } from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
+    FormOutputInjectionToken,
     VersionedElementModalData,
 } from '../../base-versioned-element-submodal';
 import { MapEditorCardComponent } from '../../../../../../../shared/components/map-editor-card/map-editor-card.component';
@@ -50,8 +51,7 @@ export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<Ala
 
     public readonly disabled = input<boolean>(false);
 
-    public readonly dataSubmit = output<AlarmGroup>();
-    public readonly discardChanges = output();
+    public readonly formOutput = inject(FormOutputInjectionToken);
 
     public readonly values = signal<AlarmGroup>({
         id: uuid(),
@@ -150,6 +150,6 @@ export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<Ala
     }
 
     public submitData() {
-        this.dataSubmit.emit(this.agForm().value());
+        this.formOutput.dataSubmit(this.agForm().value());
     }
 }

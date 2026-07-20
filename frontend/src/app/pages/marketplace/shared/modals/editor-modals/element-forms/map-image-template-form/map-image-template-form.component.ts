@@ -1,11 +1,4 @@
-import {
-    Component,
-    effect,
-    inject,
-    input,
-    output,
-    signal,
-} from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import {
     cloneDeepMutable,
     MapImageTemplate,
@@ -14,6 +7,7 @@ import {
 import { form, required, disabled, FormField } from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
+    FormOutputInjectionToken,
     VersionedElementModalData,
 } from '../../base-versioned-element-submodal';
 import { MessageService } from '../../../../../../../core/messages/message.service';
@@ -41,8 +35,7 @@ export class MapImageTemplateFormComponent implements BaseVersionedElementSubmod
     public readonly btnText = input.required<string>();
     public readonly disabled = input<boolean>(false);
 
-    public readonly dataSubmit = output<MapImageTemplate>();
-    public readonly discardChanges = output();
+    public readonly formOutput = inject(FormOutputInjectionToken);
 
     public readonly values = signal<MapImageTemplate>({
         id: uuid(),
@@ -84,7 +77,7 @@ export class MapImageTemplateFormComponent implements BaseVersionedElementSubmod
             return valuesOnSubmit.image.aspectRatio;
         });
 
-        this.dataSubmit.emit({
+        this.formOutput.dataSubmit({
             ...valuesOnSubmit,
             image: {
                 ...valuesOnSubmit.image,

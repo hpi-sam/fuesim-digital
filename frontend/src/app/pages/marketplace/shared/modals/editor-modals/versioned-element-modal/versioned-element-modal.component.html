@@ -53,7 +53,7 @@
                     Änderungen vorzunehmen.
                 </div>
             }
-            @let editingDisabled = timeTravelMode() || data.mode === 'view';
+
             <app-versioned-element-form
                 [data]="selectedVersionData()"
                 [btnText]="
@@ -61,12 +61,12 @@
                         ? 'Element hinzufügen'
                         : 'Änderungen speichern'
                 "
-                [disabled]="editingDisabled"
+                [disabled]="isEditingDisabled()"
                 (dataSubmit)="submit($event)"
                 (discardChanges)="close()"
             />
             @if (
-                !editingDisabled &&
+                !isEditingDisabled() &&
                 dependentElements.hasValue() &&
                 dependentElements.value().length > 0
             ) {

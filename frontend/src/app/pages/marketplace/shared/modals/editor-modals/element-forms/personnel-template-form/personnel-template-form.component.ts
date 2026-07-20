@@ -1,11 +1,4 @@
-import {
-    Component,
-    effect,
-    inject,
-    input,
-    output,
-    signal,
-} from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import {
     cloneDeepMutable,
     PersonnelTemplate,
@@ -14,6 +7,7 @@ import {
 import { disabled, form, FormField, required } from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
+    FormOutputInjectionToken,
     VersionedElementModalData,
 } from '../../base-versioned-element-submodal';
 import { CaterForFormComponent } from '../cater-for-form/cater-for-form.component';
@@ -43,8 +37,7 @@ export class PersonnelTemplateFormComponent implements BaseVersionedElementSubmo
     public readonly btnText = input.required<string>();
     public readonly disabled = input<boolean>(false);
 
-    public readonly dataSubmit = output<PersonnelTemplate>();
-    public readonly discardChanges = output();
+    public readonly formOutput = inject(FormOutputInjectionToken);
 
     public readonly values = signal<PersonnelTemplate>({
         id: uuid(),
@@ -104,7 +97,7 @@ export class PersonnelTemplateFormComponent implements BaseVersionedElementSubmo
             return valuesOnSubmit.image.aspectRatio;
         });
 
-        this.dataSubmit.emit({
+        this.formOutput.dataSubmit({
             ...valuesOnSubmit,
             image: {
                 ...valuesOnSubmit.image,

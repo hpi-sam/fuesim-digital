@@ -42,7 +42,7 @@
             @if (showIndicator() === 'ghost') {
                 <button
                     class="btn btn-outline-secondary btn-sm"
-                    (click)="$event.stopPropagation(); restore.emit()"
+                    (click)="$event.stopPropagation(); output.restore()"
                 >
                     Wiederherstellen
                 </button>
@@ -54,7 +54,7 @@
                         <button
                             class="btn btn-outline-primary btn-sm"
                             ngbTooltip="Bearbeiten"
-                            placement="bottom"
+                            placement="top"
                             data-cy="editElementButton"
                         >
                             <i class="bi bi-pencil"></i>
@@ -68,7 +68,7 @@
                             ngbDropdownToggle
                             (click)="$event.stopPropagation()"
                             ngbTooltip="Duplizieren"
-                            placement="bottom"
+                            placement="top"
                             data-cy="duplicateElementButton"
                         >
                             <i class="bi bi-copy"></i>
@@ -77,7 +77,7 @@
                             <button
                                 ngbDropdownItem
                                 (click)="
-                                    $event.stopPropagation(); duplicate.emit()
+                                    $event.stopPropagation(); output.duplicate()
                                 "
                                 data-cy="duplicateInSameCollectionButton"
                             >
@@ -88,7 +88,7 @@
                                 ngbDropdownItem
                                 (click)="
                                     $event.stopPropagation();
-                                    duplicateExternal.emit()
+                                    output.duplicateExternal()
                                 "
                             >
                                 <i class="bi bi-arrow-up-right-circle me-1"></i>
@@ -98,9 +98,9 @@
                     </div>
                     <button
                         class="btn btn-outline-danger btn-sm"
-                        (click)="$event.stopPropagation(); delete.emit()"
+                        (click)="$event.stopPropagation(); output.delete()"
                         ngbTooltip="Löschen"
-                        placement="bottom"
+                        placement="top"
                         data-cy="deleteElementButton"
                     >
                         <i class="bi bi-trash"></i>

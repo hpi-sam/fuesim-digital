@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, Injector, input } from '@angular/core';
 import {
     TemplateVersion,
     gatherAllCollectionElements,
@@ -7,9 +7,11 @@ import {
     CollectionElements,
 } from 'fuesim-digital-shared';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgComponentOutlet } from '@angular/common';
 import {
     GenericElementCardComponent,
     GenericElementCardIndicator,
+    GenericElementCardOutputInjectionToken,
 } from '../generic-element-card/generic-element-card.component';
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
 import { CollectionService } from '../../../../../core/exercise-element.service';
@@ -19,10 +21,11 @@ import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 // eslint-disable-next-line import/no-cycle
 import { openSelectCollectionModal } from '../../modals/marketplace-select-collection-modal/select-collection-modal';
 import { openVersionedElementModal } from '../../modals/editor-modals/versioned-element-modal/open-versioned-element-model';
+import { marketplaceComponentDefinitions } from '../../definitions';
 
 @Component({
     selector: 'app-element-card',
-    imports: [GenericElementCardComponent, ValuesPipe],
+    imports: [GenericElementCardComponent, ValuesPipe, NgComponentOutlet],
     templateUrl: './element-card.component.html',
     styleUrl: './element-card.component.scss',
 })
@@ -51,6 +54,32 @@ export class ElementCardComponent {
     });
 
     public readonly small = input<boolean>(false);
+
+    public readonly genericElementCardComponent = GenericElementCardComponent;
+
+    public readonly genericElementCardInput = computed(() => {
+        const definition =
+            marketplaceComponentDefinitions[this.element().content.type];
+        return {
+            ...definition.elementCard(this.element().content as any),
+            editable: this.mode() === 'edit',
+            showIndicator: this.effectiveIndicator(),
+            small: this.small(),
+        };
+    });
+
+    public readonly genericElementCardOutputInjector = Injector.create([
+        {
+            provide: GenericElementCardOutputInjectionToken,
+            useValue: {
+                click: () => this.openEditor(),
+                delete: async () => this.deleteElement(),
+                duplicate: async () => this.duplicateElement(),
+                duplicateExternal: async () => this.duplicateElementExternal(),
+                restore: async () => this.restoreElement(),
+            },
+        },
+    ]);
 
     private getCollection(): VersionedCollectionPartial {
         const collection = this.collection();

@@ -4,7 +4,6 @@ import {
     effect,
     inject,
     input,
-    output,
     signal,
 } from '@angular/core';
 import {
@@ -28,6 +27,7 @@ import {
 } from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
+    FormOutputInjectionToken,
     VersionedElementModalData,
 } from '../../base-versioned-element-submodal';
 import { MessageService } from '../../../../../../../core/messages/message.service';
@@ -78,8 +78,7 @@ export class VehicleTemplateFormMarketplaceComponent implements BaseVersionedEle
     public readonly btnText = input<string>('Änderungen speichern');
     public readonly disabled = input<boolean>(false);
 
-    public readonly dataSubmit = output<VehicleTemplate>();
-    public readonly discardChanges = output();
+    public readonly formOutput = inject(FormOutputInjectionToken);
 
     public readonly vehicleForm = form(this.values, (schema) => {
         disabled(schema, this.disabled);
@@ -132,7 +131,7 @@ export class VehicleTemplateFormMarketplaceComponent implements BaseVersionedEle
             return valuesOnSubmit.image.aspectRatio;
         });
 
-        this.dataSubmit.emit({
+        this.formOutput.dataSubmit({
             ...valuesOnSubmit,
             image: {
                 ...valuesOnSubmit.image,

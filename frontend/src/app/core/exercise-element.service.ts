@@ -21,6 +21,7 @@ import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
+import { Router } from '@angular/router';
 import { preventStatusErrorToastContext } from '../shared/functions/http';
 import { httpOrigin, websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
@@ -39,6 +40,7 @@ export interface CollectionSubscriptionData {
     providedIn: 'root',
 })
 export class CollectionService {
+    private readonly router = inject(Router);
     private readonly httpClient = inject(HttpClient);
     private readonly messageService = inject(MessageService);
     private readonly ngbModalService = inject(NgbModal);
@@ -800,6 +802,16 @@ export class CollectionService {
             title: 'Element dupliziert',
             body: 'Das Element wurde erfolgreich dupliziert und zur Sammlung hinzugefügt.',
             color: 'success',
+            button: {
+                name: 'Sammlung öffnen',
+                color: 'primary',
+                action: () => {
+                    this.router.navigate([
+                        '/collections',
+                        opts.targetCollectionEntity,
+                    ]);
+                },
+            },
         });
 
         return typedData.result;

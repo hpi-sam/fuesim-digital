@@ -48,18 +48,16 @@
                 </button>
             } @else {
                 <div class="d-flex flex-row flex-wrap gap-2">
-                    @if (editable()) {
-                        <!-- a blank button that allows propagating the click event to the card itself,
+                    <!-- a blank button that allows propagating the click event to the card itself,
                          so that clicking the edit button opens the edit view -->
-                        <button
-                            class="btn btn-outline-primary btn-sm"
-                            ngbTooltip="Bearbeiten"
-                            placement="top"
-                            data-cy="editElementButton"
-                        >
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                    }
+                    <button
+                        class="btn btn-outline-primary btn-sm"
+                        ngbTooltip="Bearbeiten"
+                        placement="top"
+                        data-cy="editElementButton"
+                    >
+                        <i class="bi bi-pencil"></i>
+                    </button>
 
                     <div ngbDropdown class="d-inline-block">
                         <button
@@ -107,6 +105,32 @@
                     </button>
                 </div>
             }
+        } @else {
+            <div
+                class="d-flex flex-row flex-wrap justify-content-stretch gap-1"
+            >
+                <button
+                    class="btn btn-outline-secondary btn-sm flex-grow-1 px-2"
+                    ngbTooltip="Ansehen"
+                    placement="top"
+                    (click)="
+                        $event.stopPropagation(); output.duplicateExternal()
+                    "
+                >
+                    <i class="bi bi-eye"></i>
+                </button>
+                <button
+                    class="btn btn-outline-secondary btn-sm d-flex gap-1 justify-content-center px-3"
+                    ngbTooltip="In andere Sammlung duplizieren"
+                    placement="top"
+                    (click)="
+                        $event.stopPropagation(); output.duplicateExternal()
+                    "
+                >
+                    <i class="bi bi-copy"></i>
+                    <i class="bi bi-arrow-up-right me-1"></i>
+                </button>
+            </div>
         }
     </div>
     @if (showIndicator()) {

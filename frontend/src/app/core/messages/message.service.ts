@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import type { UUID } from 'fuesim-digital-shared';
 import { isEqual } from 'lodash-es';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, takeUntil } from 'rxjs';
 import type { MessageConfig } from './message';
 import { Message } from './message';
 
@@ -72,6 +72,11 @@ export class MessageService {
         let newestMessage: Message | undefined = messages.at(-1);
         if (!newestMessage || !isEqual(newestMessage.config, config)) {
             newestMessage = new Message(config, timeout);
+            newestMessage.event$
+                .pipe(takeUntil(newestMessage.destroyed$))
+                .subscribe(() => {
+                    config.button?.action();
+                });
             firstValueFrom(newestMessage.destroyed$).then(() => {
                 this.removeDestroyedMessage(newestMessage!.id);
             });

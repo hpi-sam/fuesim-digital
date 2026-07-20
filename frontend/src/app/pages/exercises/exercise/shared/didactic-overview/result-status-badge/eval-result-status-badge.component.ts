@@ -1,6 +1,6 @@
 import { Component, computed, inject, input } from '@angular/core';
 import {
-    EvalCriterionId,
+    UUID,
     EvalResult,
     getIsCompletedFromEvalResult,
     getNumFromEvalResult,
@@ -20,7 +20,7 @@ export class EvalResultStatusBadgeComponent {
     private readonly store = inject<Store<AppState>>(Store);
     public readonly result = input.required<EvalResult>();
     public readonly resultsMap = input.required<{
-        [criterionId: EvalCriterionId]: EvalResult;
+        [criterionId: UUID]: EvalResult;
     }>();
     public readonly results = this.store.selectSignal(selectEvalResults);
 

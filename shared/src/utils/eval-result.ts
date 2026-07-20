@@ -2,10 +2,8 @@ import { z } from 'zod';
 import {
     BoolEvalCriterion,
     EvalCriterion,
-    EvalCriterionId,
     NumberEvalCriterion,
     boolEvalCriterionSchema,
-    evalCriterionIdSchema,
     isTemporalEvalCriterionType,
     numberEvalCriterionSchema,
     getChildrenOfEvalCriterion,
@@ -20,8 +18,6 @@ import {
     ExerciseState,
     applyAction,
     ExerciseAction,
-    BoolEvalCriterionId,
-    NumberEvalCriterionId,
     evalCriterionSchema,
     technicalChallengeSchema,
     patientSchema,
@@ -37,7 +33,7 @@ import { Immutable, produce, WritableDraft } from 'immer';
 
 export const evalResultBaseSchema = z.strictObject({
     id: uuidSchema,
-    criterionId: evalCriterionIdSchema,
+    criterionId: uuidSchema,
     timestamp: z.number(),
 });
 export const numberEvalResultSchema = z.strictObject({
@@ -64,7 +60,7 @@ export const evalResultSchema = z.discriminatedUnion('type', [
 export type EvalResult = z.infer<typeof evalResultSchema>;
 
 export const evalResultContextSchema = z.strictObject({
-    evalCriteria: z.record(evalCriterionIdSchema, evalCriterionSchema),
+    evalCriteria: z.record(uuidSchema, evalCriterionSchema),
     technicalChallenges: z.record(uuidSchema, technicalChallengeSchema),
     patients: z.record(uuidSchema, patientSchema),
     scoutables: z.record(uuidSchema, scoutableSchema),
@@ -77,7 +73,7 @@ export type EvalResultContext = Immutable<
 >;
 
 export function newEvalResultContext(
-    evalCriteria: { [key: EvalCriterionId]: EvalCriterion },
+    evalCriteria: { [key: UUID]: EvalCriterion },
     technicalChallenges: { [key: string]: TechnicalChallenge },
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
@@ -97,7 +93,7 @@ export function newEvalResultContext(
 }
 
 export function newBoolEvalResult(
-    criterionId: BoolEvalCriterionId,
+    criterionId: UUID,
     timestamp: number,
     criterion: BoolEvalCriterion,
     isCompleted: boolean,
@@ -114,7 +110,7 @@ export function newBoolEvalResult(
     };
 }
 export function newNumberEvalResult(
-    criterionId: NumberEvalCriterionId,
+    criterionId: UUID,
     timestamp: number,
     criterion: NumberEvalCriterion,
     num: number
@@ -176,8 +172,8 @@ export function getEvalResultFromCriterion(
     }
 }
 export function getEvalResultsFromCriteria(
-    wantedEvalCriteria: { [key: EvalCriterionId]: EvalCriterion },
-    allEvalCriteria: { [key: EvalCriterionId]: EvalCriterion },
+    wantedEvalCriteria: { [key: UUID]: EvalCriterion },
+    allEvalCriteria: { [key: UUID]: EvalCriterion },
     technicalChallenges: { [key: string]: TechnicalChallenge },
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
@@ -224,7 +220,11 @@ export function updateEvalResultsMap(
 ): { [criterionId: string]: EvalResult } {
     const tmpCache: { [criterionId: string]: EvalResult } = {};
     return (
-        Object.values(context.evalCriteria as WritableDraft<EvalCriterion>)
+        Object.values(
+            context.evalCriteria as WritableDraft<{
+                [criterionId: UUID]: EvalCriterion;
+            }>
+        )
             /* For non parallel exercises we only care to cache results
             for temporal criteria, because the rest is selected via
             the exercise selector selectEvalResults. */
@@ -254,8 +254,8 @@ export function updateEvalResultsMap(
 }
 export function getChildResultsOfResult(
     result: EvalResult,
-    resultsMap: { [criterionId: EvalCriterionId]: EvalResult },
-    evalCriteria: { [criterionId: EvalCriterionId]: EvalCriterion }
+    resultsMap: { [criterionId: UUID]: EvalResult },
+    evalCriteria: { [criterionId: UUID]: EvalCriterion }
 ) {
     return getChildrenOfEvalCriterion(result.criterion, evalCriteria).reduce<
         EvalResult[]
@@ -283,7 +283,7 @@ export function getEvalResultsByExerciseState(state: ExerciseState) {
 export function getEvalResultsByActionHistory(
     actions: ExerciseAction[],
     initialStateString: ExerciseState
-): { [criterionId: EvalCriterionId]: EvalResult } {
+): { [criterionId: UUID]: EvalResult } {
     if (actions.length === 0) {
         return getEvalResultsByExerciseState(initialStateString);
     }

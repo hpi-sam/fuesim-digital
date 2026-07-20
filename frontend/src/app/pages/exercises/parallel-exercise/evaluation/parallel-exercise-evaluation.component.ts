@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import {
     EvalCriterion,
-    EvalCriterionId,
+    UUID,
     EvalResult,
     getIsCompletedFromEvalResult,
     getNumFromEvalResult,
@@ -9,7 +9,6 @@ import {
     getRootCriteriaMap,
     ParallelExerciseInstanceSummary,
     ParticipantKey,
-    UUID,
 } from 'fuesim-digital-shared';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpResourceRef } from '@angular/common/http';
@@ -109,7 +108,7 @@ export class ParallelExerciseEvaluationComponent {
                         console.log(crit.name);
                     });
                     const criteriaMap = criteria.reduce<{
-                        [criterionId: EvalCriterionId]: EvalCriterion;
+                        [criterionId: UUID]: EvalCriterion;
                     }>((mapObject, criterion) => {
                         mapObject[criterion.id] = criterion;
                         return mapObject;

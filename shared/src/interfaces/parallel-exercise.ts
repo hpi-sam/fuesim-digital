@@ -4,11 +4,11 @@ import {
     parallelExerciseKey,
     participantKeySchema,
     trainerKeySchema,
-} from '../exercise-keys.js';
+    uuidSchema,
+} from 'fuesim-digital-shared';
 import { validationMessages } from '../validation-messages.js';
 import { exerciseStatusSchema } from '../models/utils/exercise-status.js';
 import { logEntrySchema } from '../models/log-entry.js';
-import { evalCriterionIdSchema } from '../models/eval-criteria/criterion-categories.js';
 import { evalResultSchema } from '../utils/eval-result.js';
 import { getExerciseTemplateResponseDataSchema } from './exercise-template.js';
 import { stringToDate } from './utils.js';
@@ -67,7 +67,7 @@ export const parallelExerciseInstanceSummarySchema = z.object({
     currentTime: z.number(),
     currentStatus: exerciseStatusSchema,
     lastLogEntry: z.optional(logEntrySchema),
-    evalResults: z.record(evalCriterionIdSchema, evalResultSchema),
+    evalResults: z.record(uuidSchema, evalResultSchema),
     isActive: z.boolean(),
 });
 export type ParallelExerciseInstanceSummary = z.infer<

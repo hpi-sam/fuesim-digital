@@ -1,22 +1,21 @@
 import z from 'zod';
+import {} from '../criterion-categories.js';
+import {} from '../../../utils/uuid.js';
+import {} from '../../utils/patient-status.js';
 import {
     BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
-    BoolEvalCriterionId,
     EvalCriterion,
-    EvalCriterionId,
-} from '../criterion-categories.js';
-import { uuid, UUID, uuidSchema } from '../../../utils/uuid.js';
-import {
+    uuid,
+    UUID,
+    uuidSchema,
     PatientStatus,
     patientStatusSchema,
-} from '../../utils/patient-status.js';
-import {
     BoolEvalResult,
     EvalResult,
     EvalResultContext,
     newBoolEvalResult,
-} from '../../../utils/eval-result.js';
+} from 'fuesim-digital-shared';
 
 export const patientAtStatusEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -38,7 +37,7 @@ export function newPatientAtStatusEvalCriterion(
     isDraft?: boolean
 ): PatientAtStatusEvalCriterion {
     return {
-        id: uuid() as EvalCriterionId,
+        id: uuid() as UUID,
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -67,7 +66,7 @@ export function getEvalResultOfPatientAtStatusCriterion(
     const patient = context.patients[targetId]!;
     isCompleted = patient.realStatus === criterion.targetStatus;
     return newBoolEvalResult(
-        criterion.id as BoolEvalCriterionId,
+        criterion.id as UUID,
         context.currentTime,
         criterion as BoolEvalCriterion,
         isCompleted,

@@ -6,7 +6,7 @@ import {
     evalCriterionTypesNames,
     getRootCriteriaMap,
     type EvalCriterionCategory,
-    type EvalCriterionId,
+    type UUID,
     type EvalResult,
     type TechnicalChallengeId,
     type TechnicalChallengeStateId,
@@ -60,7 +60,7 @@ export class DidacticOverviewComponent {
         )
     );
     public readonly resultsMap = computed(() =>
-        this.results().reduce<{ [crieterionId: EvalCriterionId]: EvalResult }>(
+        this.results().reduce<{ [crieterionId: UUID]: EvalResult }>(
             (mapObject, result) => {
                 mapObject[result.criterionId] = result;
                 return mapObject;

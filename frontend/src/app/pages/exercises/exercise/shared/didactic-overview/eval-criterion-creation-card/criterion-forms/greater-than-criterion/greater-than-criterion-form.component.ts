@@ -2,13 +2,13 @@ import { Component, effect, output, signal } from '@angular/core';
 import { form } from '@angular/forms/signals';
 import {
     evalCriterionCategoryNames,
-    EvalCriterionId,
+    UUID,
     evalCriterionTypesNames,
 } from 'fuesim-digital-shared';
 
 interface LocalInputData {
-    leftChild: EvalCriterionId | null;
-    rightChild: EvalCriterionId | null;
+    leftChild: UUID | null;
+    rightChild: UUID | null;
 }
 
 @Component({
@@ -18,8 +18,8 @@ interface LocalInputData {
     imports: [],
 })
 export class CompareEvalCriterionFormComponent {
-    public readonly leftChildOut = output<EvalCriterionId | null>();
-    public readonly rightChildOut = output<EvalCriterionId | null>();
+    public readonly leftChildOut = output<UUID | null>();
+    public readonly rightChildOut = output<UUID | null>();
 
     public readonly evalCriterionCategoryNames = evalCriterionCategoryNames;
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;

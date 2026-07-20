@@ -1,16 +1,14 @@
 import z from 'zod';
 import {
-    BoolEvalCriterionId,
-    boolEvalCriterionIdSchema,
+    uuidSchema,
     EvalCriterion,
-    EvalCriterionId,
     EvalResult,
     EvalResultContext,
     getEvalResultFromCriterion,
     newNumberEvalResult,
     NumberEvalCriterion,
     numberEvalCriterionBaseSchema,
-    NumberEvalCriterionId,
+    UUID,
     NumberEvalResult,
     uuid,
 } from 'fuesim-digital-shared';
@@ -19,7 +17,7 @@ import { WritableDraft } from 'immer';
 export const countCompletedEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
     criterionType: z.literal('countCompletedEvalCriterion'),
-    children: z.array(boolEvalCriterionIdSchema).min(1),
+    children: z.array(uuidSchema).min(1),
 });
 /** This is a combined number eval criterion with an array of bool children by id;
  * The respecive EvalResult holds the count of fullfilled child criteria.
@@ -30,12 +28,12 @@ export type CountCompletedEvalCriterion = z.infer<
 >;
 export function newCountCompletedEvalCriterion(
     name: string,
-    children: BoolEvalCriterionId[],
+    children: UUID[],
     isVisibleForParticipants?: boolean,
     isDraft?: boolean
 ): CountCompletedEvalCriterion {
     return {
-        id: uuid() as EvalCriterionId,
+        id: uuid() as UUID,
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -83,7 +81,7 @@ export function getEvalResultOfCountCompletedCriterion(
     }
 
     return newNumberEvalResult(
-        criterion.id as NumberEvalCriterionId,
+        criterion.id as UUID,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

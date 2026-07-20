@@ -1,5 +1,5 @@
 import type {
-    EvalCriterionId,
+    UUID,
     EvalResult,
     ParallelExerciseId,
     SetAutojoinViewportAction,
@@ -37,7 +37,7 @@ export class ParallelExerciseService {
     private readonly subscriptions: { [key: ExerciseId]: Subscription } = {};
     public evalResultsMap: {
         [exerciseId: ExerciseId]: {
-            [criterionId: EvalCriterionId]: EvalResult;
+            [criterionId: UUID]: EvalResult;
         };
     } = {};
     public constructor(
@@ -277,7 +277,7 @@ export class ParallelExerciseService {
         return exercises.map((exercise) => {
             let incomplete = false;
             const state = exercise.exercise.currentStateString;
-            let evalResults: { [criterionId: EvalCriterionId]: EvalResult };
+            let evalResults: { [criterionId: UUID]: EvalResult };
             if (this.evalResultsMap[exercise.exercise.id]) {
                 evalResults = this.evalResultsMap[exercise.exercise.id]!;
             } else {

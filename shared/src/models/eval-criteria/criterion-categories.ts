@@ -14,26 +14,9 @@ import { orEvalCriterionSchema } from './bool-combined-criteria/or-criterion.js'
 import { notEvalCriterionSchema } from './bool-combined-criteria/not-criterion.js';
 import { andEvalCriterionSchema } from './bool-combined-criteria/and-eval-criterion.js';
 
-export const boolEvalCriterionIdSchema = uuidSchema.brand(
-    'BoolEvalCriterionId'
-);
-export type BoolEvalCriterionId = z.infer<typeof boolEvalCriterionIdSchema>;
-
-export const numberEvalCriterionIdSchema = uuidSchema.brand(
-    'NumberEvalcriterionId'
-);
-export type NumberEvalCriterionId = z.infer<typeof numberEvalCriterionIdSchema>;
-
-export const evalCriterionIdSchema = z.union([
-    boolEvalCriterionIdSchema,
-    numberEvalCriterionIdSchema,
-]);
-
-export type EvalCriterionId = z.infer<typeof evalCriterionIdSchema>;
-
 /* TODO @JohannesPotzi : fix id types: currently number criteria and bool criteria have evalCritIds. */
 export const evalCriterionBaseSchema = z.strictObject({
-    id: evalCriterionIdSchema,
+    id: uuidSchema,
     name: z.string(),
     type: z.literal('evalCriterion'),
     isVisibleForParticipants: z.boolean(),

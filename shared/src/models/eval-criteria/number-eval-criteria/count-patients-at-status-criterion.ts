@@ -6,7 +6,7 @@ import {
     newNumberEvalResult,
     NumberEvalCriterion,
     numberEvalCriterionBaseSchema,
-    NumberEvalCriterionId,
+    UUID,
     NumberEvalResult,
     PatientStatus,
     patientStatusSchema,
@@ -32,7 +32,7 @@ export function newCountPatientsAtStatusEvalCriterion(
     isDraft?: boolean
 ): CountPatientsAtStatusEvalCriterion {
     return {
-        id: uuid() as NumberEvalCriterionId,
+        id: uuid() as UUID,
         name,
         type: 'evalCriterion',
         criterionType: 'countPatientsAtStatusEvalCriterion',
@@ -70,7 +70,7 @@ export function getEvalResultOfCountPatientsAtStatusCriterion(
     );
     num = -1;
     return newNumberEvalResult(
-        criterion.id as NumberEvalCriterionId,
+        criterion.id as UUID,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

@@ -2,9 +2,8 @@ import z from 'zod';
 import {
     BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
-    BoolEvalCriterionId,
-    boolEvalCriterionIdSchema,
-    EvalCriterionId,
+    uuidSchema,
+    UUID,
     uuid,
     BoolEvalResult,
     EvalResult,
@@ -18,7 +17,7 @@ import { WritableDraft } from 'immer';
 export const orEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('orEvalCriterion'),
-    children: z.array(boolEvalCriterionIdSchema).min(1),
+    children: z.array(uuidSchema).min(1),
 });
 /**
  * This is a combined bool criterion with an array of bool critrion children by id;
@@ -29,12 +28,12 @@ export type OrEvalCriterion = z.infer<typeof orEvalCriterionSchema>;
 
 export function newOrEvalCriterion(
     name: string,
-    children?: BoolEvalCriterionId[],
+    children?: UUID[],
     isVisibleForParticipants?: boolean,
     isDraft?: boolean
 ): OrEvalCriterion {
     return {
-        id: uuid() as EvalCriterionId,
+        id: uuid() as UUID,
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -74,7 +73,7 @@ export function getEvalResultOfOrCriterion(
         }
     }
     return newBoolEvalResult(
-        criterion.id as BoolEvalCriterionId,
+        criterion.id as UUID,
         context.currentTime,
         criterion as BoolEvalCriterion,
         isCompleted,

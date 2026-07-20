@@ -2,7 +2,6 @@ import { Injectable, signal, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ClientToServerEvents,
-    EvalCriterionId,
     EvalResult,
     ExerciseAction,
     ExerciseKey,
@@ -93,7 +92,7 @@ export class ExerciseService {
     });
 
     public readonly evalResultsCache = signal<{
-        [criterionId: EvalCriterionId]: EvalResult;
+        [criterionId: UUID]: EvalResult;
     }>({});
 
     public readonly mostRecentAtion = new Subject<ExerciseAction>();

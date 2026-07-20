@@ -15,7 +15,6 @@ import {
     type PatientStatus,
     patientStatusAllowedValues,
     statusNames,
-    type UUID,
     combinedEvalCriterionTypes,
     type EvalCriterionCategory,
     type EvalCriterionType,
@@ -26,9 +25,8 @@ import {
     newReachTechnicalChallengeStateEvalCriterion,
     newPatientAtStatusEvalCriterion,
     newAndEvalCriterion,
-    type BoolEvalCriterionId,
     isBoolEvalCriterion,
-    type EvalCriterionId,
+    type UUID,
     newViewScoutableEvalCriterion,
     boolEvalCriterionLeafTypes,
     newCountCompletedEvalCriterion,
@@ -156,7 +154,7 @@ export class EvalCriterionCreationCardComponent {
         Object.values(this.store.selectSignal(selectEvalCriteria)())
     );
     private readonly criteriaShoppingCart = signal<{
-        [key: EvalCriterionId]: EvalCriterion;
+        [key: UUID]: EvalCriterion;
     }>({});
 
     public readonly shoppingCartResults = signal<EvalResult[]>([]);
@@ -387,7 +385,7 @@ export class EvalCriterionCreationCardComponent {
                         .subCriteria()
                         .value()
                         .filter((crit) => isBoolEvalCriterion(crit))
-                        .map((crit) => crit.id as BoolEvalCriterionId),
+                        .map((crit) => crit.id as UUID),
                     isVisisbleForParticipants,
                     asDraft
                 );
@@ -401,7 +399,7 @@ export class EvalCriterionCreationCardComponent {
                         .subCriteria()
                         .value()
                         .filter((crit) => isBoolEvalCriterion(crit))
-                        .map((crit) => crit.id as BoolEvalCriterionId),
+                        .map((crit) => crit.id as UUID),
                     isVisisbleForParticipants,
                     asDraft
                 );
@@ -415,7 +413,7 @@ export class EvalCriterionCreationCardComponent {
                         .subCriteria()
                         .value()
                         .filter((crit) => isBoolEvalCriterion(crit))
-                        .map((crit) => crit.id as BoolEvalCriterionId),
+                        .map((crit) => crit.id as UUID),
                     isVisisbleForParticipants,
                     asDraft
                 );

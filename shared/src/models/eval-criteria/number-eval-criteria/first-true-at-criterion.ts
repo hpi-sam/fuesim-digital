@@ -1,16 +1,14 @@
 import z from 'zod';
 import {
-    BoolEvalCriterionId,
+    UUID,
     EvalCriterion,
-    EvalCriterionId,
-    evalCriterionIdSchema,
+    uuidSchema,
     EvalResult,
     EvalResultContext,
     getEvalResultFromCriterion,
     newNumberEvalResult,
     NumberEvalCriterion,
     numberEvalCriterionBaseSchema,
-    NumberEvalCriterionId,
     NumberEvalResult,
     uuid,
 } from 'fuesim-digital-shared';
@@ -19,7 +17,7 @@ import { WritableDraft } from 'immer';
 export const firstTrueAtEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
     criterionType: z.literal('firstTrueAtEvalCriterion'),
-    child: evalCriterionIdSchema,
+    child: uuidSchema,
 });
 /** This is a combined number eval criterion with one bool child by id;
  * The respecive EvalResult holds the timestamp when the child criterion was first fullfilled.
@@ -30,12 +28,12 @@ export type FirstTrueAtEvalCriterion = z.infer<
 >;
 export function newFirstTrueAtEvalCriterion(
     name: string,
-    child: BoolEvalCriterionId,
+    child: UUID,
     isVisibleForParticipants?: boolean,
     isDraft?: boolean
 ): FirstTrueAtEvalCriterion {
     return {
-        id: uuid() as EvalCriterionId,
+        id: uuid() as UUID,
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -90,7 +88,7 @@ export function getEvalResultOfFirstTrueAtCriterion(
                 : -1;
     }
     return newNumberEvalResult(
-        criterion.id as NumberEvalCriterionId,
+        criterion.id as UUID,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

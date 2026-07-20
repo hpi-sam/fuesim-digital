@@ -2,16 +2,16 @@ import z from 'zod';
 import {
     BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
-    BoolEvalCriterionId,
     BoolEvalResult,
     currentStateOf,
     EvalCriterion,
-    EvalCriterionId,
     EvalResult,
     EvalResultContext,
     newBoolEvalResult,
+    uuid,
+    UUID,
+    uuidSchema,
 } from 'fuesim-digital-shared';
-import { uuid, UUID, uuidSchema } from '../../../utils/uuid.js';
 
 export const viewScoutableEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -31,7 +31,7 @@ export function newViewScoutableEvalCriterion(
     isDraft?: boolean
 ): ViewScoutableEvalCriterion {
     return {
-        id: uuid() as EvalCriterionId,
+        id: uuid() as UUID,
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -66,7 +66,7 @@ export function getEvalResultOfViewScoutableCriterion(
     }
 
     return newBoolEvalResult(
-        criterion.id as BoolEvalCriterionId,
+        criterion.id as UUID,
         context.currentTime,
         criterion as BoolEvalCriterion,
         isCompleted,

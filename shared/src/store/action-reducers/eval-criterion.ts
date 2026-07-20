@@ -1,12 +1,13 @@
 import { z } from 'zod';
-import type { ActionReducer } from '../action-reducer.js';
+
 import {
-    evalCriterionIdSchema,
+    ActionReducer,
+    uuidSchema,
     evalCriterionSchema,
-} from '../../models/eval-criteria/criterion-categories.js';
-import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { ReducerError } from '../reducer-error.js';
-import { getElement } from './utils/get-element.js';
+    cloneDeepMutable,
+    ReducerError,
+    getElement,
+} from 'fuesim-digital-shared';
 
 const createNewCriterionsActionSchema = z.strictObject({
     type: z.literal('[EvalCriterion] New Criterions'),
@@ -17,7 +18,7 @@ export type NewCriterionAction = z.infer<
 >;
 const updateCriterionActionSchema = z.strictObject({
     type: z.literal('[EvalCriterion] Update Criterion'),
-    id: evalCriterionIdSchema,
+    id: uuidSchema,
     newCriterion: evalCriterionSchema,
 });
 export type UpdateCriterionAction = z.infer<typeof updateCriterionActionSchema>;

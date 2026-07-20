@@ -2,12 +2,12 @@ import { Component, effect, output, signal } from '@angular/core';
 import { form } from '@angular/forms/signals';
 import {
     evalCriterionCategoryNames,
-    EvalCriterionId,
+    UUID,
     evalCriterionTypesNames,
 } from 'fuesim-digital-shared';
 
 interface LocalInputData {
-    targetCriterion: EvalCriterionId | null;
+    targetCriterion: UUID | null;
 }
 
 @Component({
@@ -17,7 +17,7 @@ interface LocalInputData {
     imports: [],
 })
 export class NotEvalCriterionFormComponent {
-    public readonly targetCriterionOut = output<EvalCriterionId | null>();
+    public readonly targetCriterionOut = output<UUID | null>();
 
     readonly inputModel = signal<LocalInputData>({
         targetCriterion: null,

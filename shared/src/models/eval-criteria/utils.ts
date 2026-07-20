@@ -3,12 +3,11 @@ import {
     EvalResult,
     EvalResultContext,
     NumberEvalResult,
-    UUID,
     getEvalResultOfCompareCriterion,
     BoolEvalCriterion,
     combinedEvalCriterionTypes,
     EvalCriterion,
-    EvalCriterionId,
+    UUID,
     EvalCriterionType,
     NumberEvalCriterion,
     numberEvalCriterionTypes,
@@ -98,9 +97,9 @@ export const numberCriterionTypeEvaluatorMap: {
  * @returns a the modified input map, without the children criteria of the specified criterion
  */
 export function removeChildrenOfCriterion(
-    criteriaMapIn: { [key: EvalCriterionId]: EvalCriterion | null },
+    criteriaMapIn: { [key: UUID]: EvalCriterion | null },
     currentCriterion?: EvalCriterion
-): { [key: EvalCriterionId]: EvalCriterion | null } {
+): { [key: UUID]: EvalCriterion | null } {
     if (!currentCriterion) {
         return criteriaMapIn;
     }
@@ -111,7 +110,7 @@ export function removeChildrenOfCriterion(
         return criteriaMapIn;
     }
     let criteriaMap = criteriaMapIn as {
-        [key: EvalCriterionId]: EvalCriterion | null;
+        [key: UUID]: EvalCriterion | null;
     };
     const type = currentCriterion.criterionType;
     if (
@@ -165,7 +164,7 @@ export function getRootCriteriaMap(criteriaMap: {
         if (isCombinedEvalCriterion(criterion)) {
             tmpMap = Object.values(
                 removeChildrenOfCriterion(criteriaMap, criterion)
-            ).reduce<{ [key: EvalCriterionId]: EvalCriterion }>((obj, crit) => {
+            ).reduce<{ [key: UUID]: EvalCriterion }>((obj, crit) => {
                 if (crit) {
                     obj[crit.id] = crit;
                 }
@@ -186,7 +185,7 @@ export function getRootCriteriaMap(criteriaMap: {
  */
 export function getChildrenOfEvalCriterion(
     criterion: EvalCriterion,
-    criteriaMap: { [citerionId: EvalCriterionId]: EvalCriterion }
+    criteriaMap: { [citerionId: UUID]: EvalCriterion }
 ): EvalCriterion[] {
     if (isCombinedEvalCriterion(criterion)) {
         const type = criterion.criterionType;
@@ -223,7 +222,7 @@ export function getChildrenOfEvalCriterion(
  */
 export function getEvalCriterionTreeDepth(
     criterion: EvalCriterion,
-    criteriaMap: { [citerionId: EvalCriterionId]: EvalCriterion }
+    criteriaMap: { [citerionId: UUID]: EvalCriterion }
 ): number {
     const children = getChildrenOfEvalCriterion(criterion, criteriaMap);
     if (children.length === 0) {

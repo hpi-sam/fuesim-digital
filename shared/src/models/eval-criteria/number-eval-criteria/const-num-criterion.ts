@@ -1,16 +1,15 @@
 import z from 'zod';
 import {
     EvalCriterion,
-    EvalCriterionId,
+    UUID,
     EvalResult,
     EvalResultContext,
     newNumberEvalResult,
     NumberEvalCriterion,
     numberEvalCriterionBaseSchema,
-    NumberEvalCriterionId,
     NumberEvalResult,
+    uuid,
 } from 'fuesim-digital-shared';
-import { uuid } from '../../../utils/uuid.js';
 
 export const constNumEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -29,7 +28,7 @@ export function newConstNumEvalCriterion(
     isDraft?: boolean
 ): ConstNumEvalCriterion {
     return {
-        id: uuid() as EvalCriterionId,
+        id: uuid() as UUID,
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -64,7 +63,7 @@ export function getEvalResultOfConstNumCriterion(
     num = criterion.num;
 
     return newNumberEvalResult(
-        criterion.id as NumberEvalCriterionId,
+        criterion.id as UUID,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

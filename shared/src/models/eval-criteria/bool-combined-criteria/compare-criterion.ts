@@ -2,12 +2,10 @@ import z from 'zod';
 import {
     boolEvalCriterionBaseSchema,
     EvalCriterion,
-    EvalCriterionId,
-    NumberEvalCriterionId,
-    numberEvalCriterionIdSchema,
+    UUID,
+    uuidSchema,
     BoolEvalResult,
     EvalResult,
-    BoolEvalCriterionId,
     BoolEvalCriterion,
     getEvalResultFromCriterion,
 } from 'fuesim-digital-shared';
@@ -31,8 +29,8 @@ export const compareEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('compareEvalCriterion'),
     operator: comparativeOperatorSubSchema,
-    leftChild: numberEvalCriterionIdSchema,
-    rightChild: numberEvalCriterionIdSchema,
+    leftChild: uuidSchema,
+    rightChild: uuidSchema,
     redThreshold: z.number(),
 });
 /* TODO @JohannesPotzi : add motivation */
@@ -42,15 +40,15 @@ export type CompareEvalCriterion = z.infer<typeof compareEvalCriterionSchema>;
 
 export function newCompareEvalCriterion(
     name: string,
-    leftChild: NumberEvalCriterionId,
-    rightChild: NumberEvalCriterionId,
+    leftChild: UUID,
+    rightChild: UUID,
     operator: ComparativeOperator,
     redThreshold: number,
     isVisibleForParticipants?: boolean,
     isDraft?: boolean
 ): CompareEvalCriterion {
     return {
-        id: uuid() as EvalCriterionId,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -163,7 +161,7 @@ export function getEvalResultOfCompareCriterion(
     }
     isCompleted = leftVal > rightVal;
     return newBoolEvalResult(
-        criterion.id as BoolEvalCriterionId,
+        criterion.id as UUID,
         context.currentTime,
         criterion as BoolEvalCriterion,
         isCompleted,

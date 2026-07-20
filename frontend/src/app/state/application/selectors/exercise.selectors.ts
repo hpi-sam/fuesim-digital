@@ -2,7 +2,7 @@ import type { MemoizedSelector } from '@ngrx/store';
 import { createSelector } from '@ngrx/store';
 import type {
     EvalCriterion,
-    EvalCriterionId,
+    UUID,
     ExerciseRadiogram,
     ExerciseSimulationActivityState,
     ExerciseSimulationActivityType,
@@ -11,7 +11,6 @@ import type {
     ExerciseState,
     MeasureTemplate,
     TechnicalChallengeId,
-    UUID,
     Vehicle,
     WithPosition,
 } from 'fuesim-digital-shared';
@@ -476,7 +475,7 @@ export const selectWorkingPersonnel = createSelector(
 function getEvalResultsSelectorBySubset(
     evalCriteriaSelector: MemoizedSelector<
         AppState,
-        { [criterionId: EvalCriterionId]: EvalCriterion },
+        { [criterionId: UUID]: EvalCriterion },
         any
     >
 ) {
@@ -515,7 +514,7 @@ export const selectNonDraftEvalCriteria = createSelector(
     (criteria) =>
         Object.values(criteria)
             .filter((crit) => !crit.isDraft)
-            .reduce<{ [criterionId: EvalCriterionId]: EvalCriterion }>(
+            .reduce<{ [criterionId: UUID]: EvalCriterion }>(
                 (obj, criterion) => {
                     obj[criterion.id] = criterion;
                     return obj;
@@ -529,7 +528,7 @@ export const selectDraftEvalCriteria = createSelector(
     (criteria) =>
         Object.values(criteria)
             .filter((crit) => crit.isDraft)
-            .reduce<{ [criterionId: EvalCriterionId]: EvalCriterion }>(
+            .reduce<{ [criterionId: UUID]: EvalCriterion }>(
                 (obj, criterion) => {
                     obj[criterion.id] = criterion;
                     return obj;

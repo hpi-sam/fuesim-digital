@@ -10,7 +10,6 @@ import {
     WritableSignal,
 } from '@angular/core';
 import {
-    EvalCriterionId,
     EvalResult,
     getChildResultsOfResult,
     getEvalCriterionTreeDepth,
@@ -73,7 +72,7 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
         {}
     );
     public readonly selectedResults = signal<{
-        [criterionId: EvalCriterionId]: boolean;
+        [criterionId: UUID]: boolean;
     }>({});
 
     ngOnInit(): void {

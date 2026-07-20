@@ -2,9 +2,8 @@ import z from 'zod';
 import {
     BoolEvalCriterion,
     boolEvalCriterionBaseSchema,
-    BoolEvalCriterionId,
-    boolEvalCriterionIdSchema,
-    EvalCriterionId,
+    UUID,
+    uuidSchema,
     BoolEvalResult,
     EvalResult,
     EvalResultContext,
@@ -17,7 +16,7 @@ import {
 export const notEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
     criterionType: z.literal('notEvalCriterion'),
-    child: boolEvalCriterionIdSchema,
+    child: uuidSchema,
 });
 /** This is a combined bool criterion with one bool child by id;
  * Precisely, when the child criterion is evaluated as false, this should be fullfilled.
@@ -27,12 +26,12 @@ export type NotEvalCriterion = z.infer<typeof notEvalCriterionSchema>;
 
 export function newNotEvalCriterion(
     name: string,
-    child: BoolEvalCriterionId,
+    child: UUID,
     isVisibleForParticipants?: boolean,
     isDraft?: boolean
 ): NotEvalCriterion {
     return {
-        id: uuid() as EvalCriterionId,
+        id: uuid() as UUID,
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -62,7 +61,7 @@ export function getEvalResultOfNotCriterion(
     isCompleted = res.type === 'boolEvalResult' ? res.isCompleted : true;
 
     return newBoolEvalResult(
-        criterion.id as BoolEvalCriterionId,
+        criterion.id,
         context.currentTime,
         criterion as BoolEvalCriterion,
         isCompleted,

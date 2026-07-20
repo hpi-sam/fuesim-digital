@@ -1,13 +1,12 @@
 import z from 'zod';
 import {
-    EvalCriterionId,
     numberEvalCriterionBaseSchema,
     NumberEvalResult,
     EvalResult,
     EvalResultContext,
     uuid,
     newNumberEvalResult,
-    NumberEvalCriterionId,
+    UUID,
     NumberEvalCriterion,
     EvalCriterion,
 } from 'fuesim-digital-shared';
@@ -30,7 +29,7 @@ export function newTimestampEvalCriterion(
     isDraft?: boolean
 ): TimestampEvalCriterion {
     return {
-        id: uuid() as EvalCriterionId,
+        id: uuid() as UUID,
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -70,7 +69,7 @@ export function getEvalResultOfTimestampCriterion(
     num = criterion.timestamp;
 
     return newNumberEvalResult(
-        criterion.id as NumberEvalCriterionId,
+        criterion.id as UUID,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

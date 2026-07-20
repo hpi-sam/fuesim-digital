@@ -1,13 +1,11 @@
 import z from 'zod';
 import {
     EvalCriterion,
-    EvalCriterionId,
     EvalResult,
     EvalResultContext,
     newNumberEvalResult,
     NumberEvalCriterion,
     numberEvalCriterionBaseSchema,
-    NumberEvalCriterionId,
     NumberEvalResult,
     uuid,
     UUID,
@@ -33,7 +31,7 @@ export function newcountMeasuresEvalCriterion(
     isDraft?: boolean
 ): CountMeasuresEvalCriterion {
     return {
-        id: uuid() as EvalCriterionId,
+        id: uuid() as UUID,
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -68,7 +66,7 @@ export function getEvalResultOfCountMeasuresCriterion(
         num = -1;
     }
     return newNumberEvalResult(
-        criterion.id as NumberEvalCriterionId,
+        criterion.id as UUID,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

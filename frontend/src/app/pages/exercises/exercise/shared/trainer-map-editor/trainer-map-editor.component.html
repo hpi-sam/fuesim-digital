@@ -111,20 +111,15 @@
         </div> -->
 
 <div class="card h-100">
-    <div class="card-header">
-        <h5 class="mb-0 d-flex align-items-center">
-            Editor
-            <span class="ms-auto">
-                <button
-                    class="btn btn-outline-primary btn-sm"
-                    (click)="openTemplateManagementModal()"
-                >
-                    <i class="bi-grid"></i>
-                    Übungselemente verwalten
-                </button>
-            </span>
-        </h5>
-    </div>
+    <app-sidebar-header title="Editor">
+        <button
+            class="btn btn-outline-primary btn-sm"
+            (click)="openTemplateManagementModal()"
+        >
+            <i class="bi-grid"></i>
+            Übungselemente verwalten
+        </button>
+    </app-sidebar-header>
     <!-- We want the editor panel to overflow, if it is too high -->
     <div
         ngbAccordion

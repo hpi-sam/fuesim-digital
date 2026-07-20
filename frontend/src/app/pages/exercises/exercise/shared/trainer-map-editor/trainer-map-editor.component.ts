@@ -67,6 +67,7 @@ import { openManageExerciseCollectionsModal } from '../manage-exercise-collectio
 import { CollectionService } from '../../../../../core/collection.service';
 import { openUploadTechnicalChallengeModal } from '../editor-panel/upload-technical-challenge-template-modal/upload-technical-challenge-template-modal.component.js';
 import { openEditTechnicalChallengeTemplateModal } from '../editor-panel/edit-technical-challenge-template-modal/edit-technical-challenge-template-modal.component.js';
+import { SidebarHeaderComponent } from '../exercise-map/shared/sidebar/sidebar-header/sidebar-header.component';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -102,6 +103,7 @@ type FilterCategory =
         CdkDrag,
         CdkDropList,
         NgTemplateOutlet,
+        SidebarHeaderComponent,
     ],
 })
 export class TrainerMapEditorComponent implements OnInit {

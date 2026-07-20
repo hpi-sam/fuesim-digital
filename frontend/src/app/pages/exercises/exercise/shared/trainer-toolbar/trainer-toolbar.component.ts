@@ -46,8 +46,8 @@ import { openMeasuresOverviewModal } from '../measures-overview/open-measures-ov
         NgbDropdownMenu,
         NgbDropdownButtonItem,
         NgbDropdownItem,
-        StartPauseButtonComponent,
         RouterLink,
+        StartPauseButtonComponent,
     ],
 })
 export class TrainerToolbarComponent {

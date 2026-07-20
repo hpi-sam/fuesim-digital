@@ -12,7 +12,7 @@ import { PointGeometryHelper } from '../utility/point-geometry-helper';
 import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
-import type { PopupService } from '../utility/popup.service';
+import type { FeatureSelectionService } from '../utility/feature-selection.service';
 import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
@@ -67,7 +67,7 @@ export class MaterialFeatureManager extends MoveableFeatureManager<Material> {
         olMap: OlMap,
         private readonly store: Store<AppState>,
         exerciseService: ExerciseService,
-        private readonly popupService: PopupService
+        private readonly popupService: FeatureSelectionService
     ) {
         super(
             olMap,

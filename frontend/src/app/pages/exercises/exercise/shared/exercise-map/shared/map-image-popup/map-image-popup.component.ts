@@ -1,7 +1,7 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { UUID } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
-import { PopupService } from '../../utility/popup.service';
+import { FeatureSelectionService } from '../../utility/feature-selection.service';
 import { MapImagesDetailsComponent } from '../../../../../../../shared/components/map-images-details/map-images-details.component';
 import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
 import { AppState } from '../../../../../../../state/app.state';
@@ -15,7 +15,7 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
     imports: [MapImagesDetailsComponent, HelpButtonComponent],
 })
 export class MapImagePopupComponent {
-    private readonly popupService = inject(PopupService);
+    private readonly popupService = inject(FeatureSelectionService);
     private readonly store = inject<Store<AppState>>(Store);
 
     public mapImageId!: UUID;

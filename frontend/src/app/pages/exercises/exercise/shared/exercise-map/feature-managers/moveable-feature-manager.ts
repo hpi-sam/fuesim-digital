@@ -20,7 +20,7 @@ import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-ma
 import { TranslateInteraction } from '../utility/translate-interaction';
 import { selectCurrentMainRole } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
-import type { PopupService } from '../utility/popup.service';
+import type { FeatureSelectionService } from '../utility/feature-selection.service';
 import { ElementManager } from './element-manager';
 
 /**
@@ -135,7 +135,7 @@ export abstract class MoveableFeatureManager<
     protected addMarking(
         feature: FeatureLike,
         styles: Style[],
-        popupService: PopupService,
+        popupService: FeatureSelectionService,
         store: any,
         markingStyle: any
     ) {

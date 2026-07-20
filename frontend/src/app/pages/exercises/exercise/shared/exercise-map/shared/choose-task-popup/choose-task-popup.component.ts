@@ -8,7 +8,7 @@ import {
 import { Store } from '@ngrx/store';
 import { TaskType, TechnicalChallengeId, UUID } from 'fuesim-digital-shared';
 import type { StateMachine } from 'fuesim-digital-shared';
-import { PopupService } from '../../utility/popup.service';
+import { FeatureSelectionService } from '../../utility/feature-selection.service';
 import { AppState } from '../../../../../../../state/app.state';
 import { createSelectAvailableTasks } from '../../../../../../../state/application/selectors/exercise.selectors';
 
@@ -21,7 +21,7 @@ import { createSelectAvailableTasks } from '../../../../../../../state/applicati
 })
 export class ChooseTaskPopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
-    private readonly popupService = inject(PopupService);
+    private readonly popupService = inject(FeatureSelectionService);
 
     // All are set via popup context before OnInit
     public technicalChallengeId!: TechnicalChallengeId;

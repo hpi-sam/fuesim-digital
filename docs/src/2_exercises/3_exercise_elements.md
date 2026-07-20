@@ -212,6 +212,21 @@ Bilder sind hauptsächlich als dekoratives Element vorgesehen. Beispielsweise k�
 
 Es ist auch möglich, ein großes Bild als Hintergrund für eine Übung zu verwenden, z. B. wenn ein Einsatz im Innenraum geübt wird.
 
+## Erkundungselemente
+
+Neben [Patienten](#patienten) und [Bildern](#bilder), bei denen Erkundungsinformationen hinzugefügt werden können, gibt es auch drei dedizierte Elemente:
+
+- **Passantin/Passant**: Strichmännchen mit Sprechblase
+- **Erkundung**: Lupe
+
+Teilnehmende können die Erkundungsinformationen dann per Klick auf die Sprechblase/Lupe ansehen.
+
+### Nutzung in Übungen
+
+Die Erkundungselemente können aus dem Bereich <kbd>Erkundung</kbd> im Editor auf die Karte gezogen und dort positioniert werden. Ein Übungsleiter kann durch einen Klick auf das Erkundungselement dort Informationen hinterlegen. Dabei kann ein <kbd>Interner Name</kbd> vergeben werden, welcher später z. B. in der Auswertung zur Wiedererkennung dient. Über <kbd>Inhalte sind für Teilnehmende sichtbar</kbd> lässt sich die Sichtbarkeit für Teilnehmende ein- und ausschalten. Im Rich-Text-Editor können dann die Informationen hinterlegt werden.
+
+![Einstellungsmöglichkeiten für Erkundungselemente](./scoutable.png)
+
 ## Krankenhäuser
 
 Krankenhäuser können in der FüSim Digital als mögliche Transportziele für den Abtransport von [Patienten](#patienten) hinterlegt werden.

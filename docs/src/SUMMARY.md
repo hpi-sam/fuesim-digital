@@ -13,6 +13,7 @@
     - [Übungselemente](2_exercises/3_exercise_elements.md)
     - [Durchführung](2_exercises/4_conduction.md)
     - [Auswertung](2_exercises/5_evaluation.md)
+    - [Parallelübungen](2_exercises/6_parallel.md)
 - [Simulation](3_simulation/index.md)
 - [Übungselemente und Vorlagen](4_editing/index.md)
 - [Benutzerverwaltung](5_users/index.md)

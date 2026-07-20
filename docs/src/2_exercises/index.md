@@ -9,3 +9,4 @@ Dieser Teil der Anleitung ist wie folgt strukturiert:
 - Im Abschnitt [Übungselemente](3_exercise_elements.md) werden alle Übungselemente aufgelistet und jeweils mit ihren Interaktions- und Einstellungsmöglichkeiten sowie dem vorgesehenen Einsatz in Übungen beschrieben. Bei Übungselementen handelt es sich um Objekte, mit denen Übungsteilnehmende direkt oder indirekt interagieren können, und von denen ein Großteil auf der Übungskarte zu sehen ist.
 - Im Abschnitt [Durchführung](4_conduction.md) werden die Eingriffs- und Steuerungsmöglichkeiten erklärt, die eine Übungsleitung während einer Übung hat.
 - Im Abschnitt [Auswertung](5_evaluation.md) wird beschrieben, welche Möglichkeiten Übungsleitende zur Auswertung laufender und abgeschlossener Übungen haben.
+- Im Abschnitt [Parallelübungen](6_parallel.md) geht es um ein besonderes Übungsformat, wo die Teilnehmenden nicht in einer Übung zusammenarbeiten, sondern jeweils für sich in einer eigenen Übungsinstanz.

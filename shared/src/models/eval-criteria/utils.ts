@@ -21,6 +21,7 @@ import type {
     NumberEvalCriterionType,
 } from './criterion-categories.js';
 import {
+    boolEvalCritrionTypes,
     combinedEvalCriterionTypes,
     numberEvalCriterionTypes,
     temporalEvalCriterionTypes,

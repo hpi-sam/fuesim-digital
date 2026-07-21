@@ -514,7 +514,7 @@ export class CollectionService {
             color: 'success',
         });
 
-        return parsedData.createdSet;
+        return parsedData.createdCollection;
     }
     public async archiveCollection(setEntityId: CollectionEntityId) {
         await lastValueFrom(

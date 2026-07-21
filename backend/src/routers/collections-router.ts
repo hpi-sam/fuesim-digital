@@ -714,7 +714,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             const parsedBody =
                 Marketplace.Collection.Duplicate.requestSchema.parse(req.body);
 
-            const createdSet =
+            const createdCollection =
                 await collectionService.duplicateCollectionVersion(
                     collectionVersionId,
                     parsedBody.targetOrganisationId,
@@ -723,7 +723,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
             res.send(
                 Marketplace.Collection.Duplicate.responseSchema.encode({
-                    createdSet,
+                    createdCollection,
                 })
             );
         }

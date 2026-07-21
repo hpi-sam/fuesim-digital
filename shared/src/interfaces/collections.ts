@@ -302,7 +302,7 @@ export namespace Marketplace {
                 targetOrganisationId: organisationIdSchema,
             }),
             response: z.object({
-                createdSet: collectionVersionSchema,
+                createdCollection: collectionVersionSchema,
             }),
         });
 

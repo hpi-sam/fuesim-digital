@@ -13,7 +13,11 @@ import type {
     OrganisationId,
     CollectionOrganisationRelationshipType,
 } from 'fuesim-digital-shared';
-import { currentStateVersion } from 'fuesim-digital-shared';
+import {
+    currentStateVersion,
+    getElementDependencies,
+    replaceDependencies,
+} from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
 import {
     eq,
@@ -39,6 +43,7 @@ import {
 } from '../schema.js';
 import { defaultCollectionData } from '../default-data/collection-default-data.js';
 import { Config } from '../../config.js';
+import { DAG } from '../../utils/dag.js';
 import { BaseRepository } from './base-repository.js';
 
 function canEditCollection(collection: CollectionVersion): boolean {
@@ -1011,13 +1016,12 @@ export class CollectionRepository extends BaseRepository {
             versionId: CollectionVersionId;
         };
     }) {
-        const { source, target } = data;
         await this.databaseConnection.transaction(async (tx) => {
             const targetSet = this.onlySingleStrict(
                 await tx
                     .select()
                     .from(collectionTable)
-                    .where(eq(collectionTable.versionId, target.versionId))
+                    .where(eq(collectionTable.versionId, data.target.versionId))
             );
 
             if (!canEditCollection(targetSet)) {
@@ -1026,53 +1030,101 @@ export class CollectionRepository extends BaseRepository {
                 );
             }
 
-            const latestElements = this.latestElements();
-
-            const createdElements = await tx
-                .with(latestElements)
-                .insert(elementTable)
-                .select(
-                    tx
-                        .select({
-                            // WARNING: This is order-sensitive, based on the order in the schema
-                            // and requires ALL fields (even defaulted ones) to be selected
-                            versionId: sql`uuid_generate_v4()`.as('versionId'),
-                            entityId:
-                                sql`'element_entity_' || uuid_generate_v4()`.as(
-                                    'entityId'
-                                ),
-                            version: sql<number>`1`.as('version'),
-                            stateVersion: latestElements.stateVersion,
-                            createdAt: sql`now()`.as('createdAt'),
-                            editedAt: sql`now()`.as('editedAt'),
-                            title: latestElements.title,
-                            description: latestElements.description,
-                            content: latestElements.content,
-                        } satisfies {
-                            [K in keyof typeof elementTable.$inferInsert]: any;
-                        })
-                        .from(latestElements)
-                        .innerJoin(
-                            elementCollectionMappingTable,
-                            eq(
-                                latestElements.versionId,
-                                elementCollectionMappingTable.elementVersionId
-                            )
-                        )
-                        .where(
-                            eq(
-                                elementCollectionMappingTable.collectionVersionId,
-                                source.versionId
-                            )
-                        )
+            const allCopyableElements = await tx
+                .select()
+                .from(elementTable)
+                .innerJoin(
+                    elementCollectionMappingTable,
+                    eq(
+                        elementCollectionMappingTable.elementVersionId,
+                        elementTable.versionId
+                    )
                 )
-                .returning();
+                .where(
+                    eq(
+                        elementCollectionMappingTable.collectionVersionId,
+                        data.source.versionId
+                    )
+                );
 
-            if (createdElements.length > 0) {
+            const dag = new DAG(
+                allCopyableElements.map((m) => String(m.elements.versionId))
+            );
+
+            for (const elem of allCopyableElements) {
+                const dependencyVersionIds = getElementDependencies(
+                    elem.elements.content
+                );
+                for (const vId of dependencyVersionIds) {
+                    dag.addEdge(elem.elements.versionId, vId);
+                }
+            }
+
+            // These are now sorted in the order so that elements that are being
+            // dependend upon receive their new versionId, so that we can use
+            // that new versionId then as a replacement in those elements that
+            // depend on the old versionId
+            const topSortedElementIds = dag.topsort(undefined);
+
+            // Mapping from old versionIds to the newly assigned versionIds
+            const versionIdMapping: { [oldId in string]?: ElementVersionId } =
+                {};
+
+            const createdElementIds: VersionedElementPartial[] = [];
+
+            for (const sortedElementId of topSortedElementIds) {
+                const element = allCopyableElements.find(
+                    (f) => f.elements.versionId === sortedElementId
+                );
+                if (element === undefined) {
+                    throw new Error('previously existing element not found');
+                }
+
+                const newElementContent = replaceDependencies(
+                    element.elements.content,
+                    Object.entries(versionIdMapping).map((m) => ({
+                        old: m[0] as ElementVersionId,
+                        new: m[1]!,
+                    }))
+                );
+
+                // we need this await here in the for loop to prevent
+                // possible race condidtions with the mapping assignment
+                // eslint-disable-next-line no-await-in-loop
+                const sqlReturn = await tx
+                    .insert(elementTable)
+                    .values({
+                        title: element.elements.title,
+                        description: element.elements.description,
+                        stateVersion: element.elements.stateVersion,
+                        version: 1,
+                        content: newElementContent,
+                    })
+                    .returning();
+
+                const newElement = sqlReturn.at(0);
+
+                if (newElement === undefined) {
+                    throw new Error('element could not be created');
+                }
+
+                // Save the new Mapping so that we can replace
+                // old dependencies to the old versionId for coming
+                // elements to be copied (thats why topsort ;) )
+                versionIdMapping[sortedElementId] = newElement.versionId;
+
+                createdElementIds.push({
+                    entityId: newElement.entityId,
+                    versionId: newElement.versionId,
+                });
+            }
+
+            // Attach the newly created elements to the collection
+            if (createdElementIds.length > 0) {
                 await tx.insert(elementCollectionMappingTable).values(
-                    createdElements.map((element) => ({
-                        collectionEntityId: target.entityId,
-                        collectionVersionId: target.versionId,
+                    createdElementIds.map((element) => ({
+                        collectionEntityId: data.target.entityId,
+                        collectionVersionId: data.target.versionId,
                         elementEntityId: element.entityId,
                         elementVersionId: element.versionId,
                         isBaseReference: false,

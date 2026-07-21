@@ -1,17 +1,14 @@
-import z from 'zod';
-import {
-    BoolEvalCriterion,
-    boolEvalCriterionBaseSchema,
-    BoolEvalResult,
-    currentStateOf,
-    EvalCriterion,
-    EvalResult,
+import * as z from 'zod';
+import type { UUID } from '../../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../../utils/uuid.js';
+import type {
     EvalResultContext,
-    newBoolEvalResult,
-    uuid,
-    UUID,
-    uuidSchema,
-} from 'fuesim-digital-shared';
+    EvalResult,
+    BoolEvalResult,
+} from '../../../utils/eval-result/eval-result.js';
+import { newBoolEvalResult } from '../../../utils/eval-result/utils.js';
+import { currentStateOf } from '../../technical-challenge/state-machine.js';
+import { boolEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 
 export const viewScoutableEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -31,7 +28,7 @@ export function newViewScoutableEvalCriterion(
     isDraft?: boolean
 ): ViewScoutableEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -52,9 +49,9 @@ export function getEvalResultOfViewScoutableCriterion(
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
-    const criterion = evalCriterion as ViewScoutableEvalCriterion;
+    const criterion = evalCriterion;
     let isCompleted = false;
-    let isYellow = false;
+    const isYellow = false;
     const scoutableChallenge =
         context.technicalChallenges[criterion.targetScoutableId];
     if (scoutableChallenge) {
@@ -66,7 +63,7 @@ export function getEvalResultOfViewScoutableCriterion(
     }
 
     return newBoolEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion,
         isCompleted,

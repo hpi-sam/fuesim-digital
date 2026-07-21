@@ -1,76 +1,31 @@
-import { z } from 'zod';
+import { produce, WritableDraft } from 'immer';
+import { ExerciseState } from '../../state.js';
+import { applyAction, ExerciseAction } from '../../store/index.js';
+import { uuid, UUID } from '../uuid.js';
+import {
+    BoolEvalResult,
+    EvalResult,
+    EvalResultContext,
+    NumberEvalResult,
+} from './eval-result.js';
 import {
     BoolEvalCriterion,
     EvalCriterion,
+    Measure,
+    MeasureTemplateCategory,
     NumberEvalCriterion,
-    boolEvalCriterionSchema,
-    isTemporalEvalCriterionType,
-    numberEvalCriterionSchema,
-    getChildrenOfEvalCriterion,
     Patient,
     Scoutable,
     TechnicalChallenge,
-    UUID,
-    uuid,
-    uuidSchema,
-    Measure,
-    MeasureTemplateCategory,
-    ExerciseState,
-    applyAction,
-    ExerciseAction,
-    evalCriterionSchema,
-    technicalChallengeSchema,
-    patientSchema,
-    scoutableSchema,
-    measureSchema,
-    measureTemplateCategorySchema,
+} from '../../models/index.js';
+import {
+    boolCriterionTypeEvaluatorMap,
+    getChildrenOfEvalCriterion,
     getEvalResultOfFirstTrueAtCriterion,
     isBoolEvalCriterion,
-    boolCriterionTypeEvaluatorMap,
+    isTemporalEvalCriterionType,
     numberCriterionTypeEvaluatorMap,
-} from 'fuesim-digital-shared';
-import { Immutable, produce, WritableDraft } from 'immer';
-
-export const evalResultBaseSchema = z.strictObject({
-    id: uuidSchema,
-    criterionId: uuidSchema,
-    timestamp: z.number(),
-});
-export const numberEvalResultSchema = z.strictObject({
-    ...evalResultBaseSchema.shape,
-    type: z.literal('numberEvalResult'),
-    criterion: numberEvalCriterionSchema,
-    num: z.number(),
-});
-export type NumberEvalResult = z.infer<typeof numberEvalResultSchema>;
-
-export const boolEvalResultSchema = z.strictObject({
-    ...evalResultBaseSchema.shape,
-    type: z.literal('boolEvalResult'),
-    criterion: boolEvalCriterionSchema,
-    isCompleted: z.boolean(),
-    isYellow: z.boolean(),
-});
-export type BoolEvalResult = z.infer<typeof boolEvalResultSchema>;
-
-export const evalResultSchema = z.discriminatedUnion('type', [
-    numberEvalResultSchema,
-    boolEvalResultSchema,
-]);
-export type EvalResult = z.infer<typeof evalResultSchema>;
-
-export const evalResultContextSchema = z.strictObject({
-    evalCriteria: z.record(uuidSchema, evalCriterionSchema),
-    technicalChallenges: z.record(uuidSchema, technicalChallengeSchema),
-    patients: z.record(uuidSchema, patientSchema),
-    scoutables: z.record(uuidSchema, scoutableSchema),
-    measures: z.record(uuidSchema, measureSchema),
-    measureTemplates: z.record(uuidSchema, measureTemplateCategorySchema),
-    currentTime: z.number(),
-});
-export type EvalResultContext = Immutable<
-    z.infer<typeof evalResultContextSchema>
->;
+} from '../../models/eval-criteria/index.js';
 
 export function newEvalResultContext(
     evalCriteria: { [key: UUID]: EvalCriterion },
@@ -152,7 +107,7 @@ export function getEvalResultFromCriterion(
     previousResult?: EvalResult
 ): EvalResult {
     /* TODO @JohannesPotzi @Jogius : This reduces redundant visits to criteria in the tree. Can we do Better? */
-    if (cache && cache[evalCriterion.id] !== undefined) {
+    if (cache?.[evalCriterion.id] !== undefined) {
         return cache[evalCriterion.id]!;
     }
     if (evalCriterion.criterionType === 'firstTrueAtEvalCriterion') {
@@ -169,13 +124,12 @@ export function getEvalResultFromCriterion(
             context,
             cache
         );
-    } else {
-        return numberCriterionTypeEvaluatorMap[evalCriterion.criterionType](
-            evalCriterion as never,
-            context,
-            cache
-        );
     }
+    return numberCriterionTypeEvaluatorMap[evalCriterion.criterionType](
+        evalCriterion as never,
+        context,
+        cache
+    );
 }
 export function getEvalResultsFromCriteria(
     wantedEvalCriteria: { [key: UUID]: EvalCriterion },
@@ -219,45 +173,6 @@ export function getIsCompletedFromEvalResult(
 ): boolean | null {
     return result.type === 'boolEvalResult' ? result.isCompleted : null;
 }
-export function updateEvalResultsMap(
-    evalResultsMap: { [criterionId: string]: EvalResult },
-    context: EvalResultContext,
-    temporalOnly: boolean
-): { [criterionId: string]: EvalResult } {
-    const tmpCache: { [criterionId: string]: EvalResult } = {};
-    return (
-        Object.values(
-            context.evalCriteria as WritableDraft<{
-                [criterionId: UUID]: EvalCriterion;
-            }>
-        )
-            /* For non parallel exercises we only care to cache results
-            for temporal criteria, because the rest is selected via
-            the exercise selector selectEvalResults. */
-            .filter((crit) => {
-                if (!temporalOnly) {
-                    return true;
-                }
-                return isTemporalEvalCriterionType(crit.criterionType);
-            })
-            .flatMap((criterion: EvalCriterion): EvalResult => {
-                const previousRes = evalResultsMap[criterion.id];
-                return getEvalResultFromCriterion(
-                    criterion,
-                    context,
-                    tmpCache,
-                    previousRes
-                );
-            })
-            .reduce<{ [criterionId: UUID]: EvalResult }>(
-                (evalResultObject, evalResult) => {
-                    evalResultObject[evalResult.criterionId] = evalResult;
-                    return evalResultObject;
-                },
-                {}
-            )
-    );
-}
 export function getChildResultsOfResult(
     result: EvalResult,
     resultsMap: { [criterionId: UUID]: EvalResult },
@@ -272,32 +187,4 @@ export function getChildResultsOfResult(
         }
         return obj;
     }, []);
-}
-export function getEvalResultsByExerciseState(state: ExerciseState) {
-    return getEvalResultsFromCriteria(
-        state.evalCriteria,
-        state.evalCriteria,
-        state.technicalChallenges,
-        state.patients,
-        state.scoutables,
-        state.measures,
-        state.measureTemplates,
-        state.currentTime
-    );
-}
-
-export function getEvalResultsByActionHistory(
-    actions: ExerciseAction[],
-    initialStateString: ExerciseState
-): { [criterionId: UUID]: EvalResult } {
-    if (actions.length === 0) {
-        return getEvalResultsByExerciseState(initialStateString);
-    }
-    const finalState = produce(initialStateString, (draftState) => {
-        actions.forEach((action) => {
-            applyAction(draftState, action);
-        });
-    });
-
-    return getEvalResultsByExerciseState(finalState);
 }

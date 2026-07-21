@@ -1,17 +1,16 @@
-import z from 'zod';
-import {
-    boolEvalCriterionBaseSchema,
-    UUID,
-    BoolEvalResult,
-    EvalResult,
+import * as z from 'zod';
+import { uuid } from '../../../utils/uuid.js';
+import type {
     EvalResultContext,
-    newBoolEvalResult,
-    TechnicalChallengeId,
-    technicalChallengeIdSchema,
-    TechnicalChallengeStateId,
-    technicalChallengeStateIdSchema,
-    uuid,
-} from 'fuesim-digital-shared';
+    EvalResult,
+    BoolEvalResult,
+} from '../../../utils/eval-result/eval-result.js';
+import { newBoolEvalResult } from '../../../utils/eval-result/utils.js';
+import type { TechnicalChallengeStateId } from '../../technical-challenge/state-machine.js';
+import { technicalChallengeStateIdSchema } from '../../technical-challenge/state-machine.js';
+import type { TechnicalChallengeId } from '../../technical-challenge/technical-challenge.js';
+import { technicalChallengeIdSchema } from '../../technical-challenge/technical-challenge.js';
+import { boolEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 
 export const reachTechnicalChallengeStateEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -33,7 +32,7 @@ export function newReachTechnicalChallengeStateEvalCriterion(
     isDraft?: boolean
 ): ReachTechnicalChallengeStateEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -55,11 +54,10 @@ export function getEvalResultOfReachTechnicalChallengeStateCriterion(
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
-    const criterion =
-        evalCriterion as ReachTechnicalChallengeStateEvalCriterion;
+    const criterion = evalCriterion;
     /* TODO @JohannesPotzi : implement logic for yellow result. */
     let isCompleted = false;
-    let isYellow = false;
+    const isYellow = false;
     const targetChallengeId = criterion.targetTechnicalChallengeId;
     const targetStateId = criterion.targetTechnicalChallengeStateId;
     const technicalChallenge = context.technicalChallenges[targetChallengeId]!;

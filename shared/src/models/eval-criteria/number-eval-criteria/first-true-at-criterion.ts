@@ -1,18 +1,21 @@
-import z from 'zod';
-import {
-    UUID,
-    EvalCriterion,
-    uuidSchema,
-    EvalResult,
+import * as z from 'zod';
+import type { WritableDraft } from 'immer';
+import type { UUID } from '../../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../../utils/uuid.js';
+import type {
     EvalResultContext,
+    EvalResult,
+    NumberEvalResult,
+} from '../../../utils/eval-result/eval-result.js';
+import {
     getEvalResultFromCriterion,
     newNumberEvalResult,
+} from '../../../utils/eval-result/utils.js';
+import type {
+    EvalCriterion,
     NumberEvalCriterion,
-    numberEvalCriterionBaseSchema,
-    NumberEvalResult,
-    uuid,
-} from 'fuesim-digital-shared';
-import { WritableDraft } from 'immer';
+} from '../criterion-categories.js';
+import { numberEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 
 export const firstTrueAtEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -33,7 +36,7 @@ export function newFirstTrueAtEvalCriterion(
     isDraft?: boolean
 ): FirstTrueAtEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -55,7 +58,7 @@ export function getEvalResultOfFirstTrueAtCriterion(
     cache?: { [key: string]: EvalResult },
     previousResult?: EvalResult
 ): NumberEvalResult {
-    const criterion = evalCriterion as FirstTrueAtEvalCriterion;
+    const criterion = evalCriterion;
     let num = null;
 
     if (!num) {
@@ -88,7 +91,7 @@ export function getEvalResultOfFirstTrueAtCriterion(
                 : -1;
     }
     return newNumberEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

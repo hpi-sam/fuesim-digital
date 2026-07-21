@@ -5,10 +5,10 @@ import type {
     SetAutojoinViewportAction,
     ParallelExerciseKey,
     ExerciseId,
-    ExerciseAction,
 } from 'fuesim-digital-shared';
 import {
     getEvalResultsByActionHistory,
+    newEvalResultContext,
     parallelExerciseInstanceSummarySchema,
     updateEvalResultsMap,
 } from 'fuesim-digital-shared';
@@ -54,13 +54,18 @@ export class ParallelExerciseService {
                         const id = join.activeExercise.exercise.id;
                         const state = join.activeExercise.getStateSnapshot();
                         const previousResults = this.evalResultsMap[id];
-                        this.evalResultsMap[id] = updateEvalResultsMap(
-                            previousResults ?? {},
+                        const context = newEvalResultContext(
                             state.evalCriteria,
                             state.technicalChallenges,
                             state.patients,
                             state.scoutables,
-                            state.currentTime,
+                            state.measures,
+                            state.measureTemplates,
+                            state.currentTime
+                        );
+                        this.evalResultsMap[id] = updateEvalResultsMap(
+                            previousResults ?? {},
+                            context,
                             false
                         );
                     }

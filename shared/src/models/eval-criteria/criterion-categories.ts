@@ -1,19 +1,17 @@
 import { z } from 'zod';
-import {
-    patientAtStatusEvalCriterionSchema,
-    viewScoutableEvalCriterionSchema,
-    reachTechnicalChallengeStateEvalCriterionSchema,
-    compareEvalCriterionSchema,
-    constNumEvalCriterionSchema,
-    countCompletedEvalCriterionSchema,
-    countPatientsAtStatusEvalCriterionSchema,
-    countMeasuresEvalCriterionSchema,
-    timestampEvalCriterionSchema,
-    firstTrueAtEvalCriterionSchema,
-    orEvalCriterionSchema,
-    notEvalCriterionSchema,
-    andEvalCriterionSchema,
-} from 'fuesim-digital-shared';
+import { reachTechnicalChallengeStateEvalCriterionSchema } from './bool-leaf-eval-criteria/reach-technical-challenge-state-criterion.js';
+import { patientAtStatusEvalCriterionSchema } from './bool-leaf-eval-criteria/patient-at-status-criterion.js';
+import { viewScoutableEvalCriterionSchema } from './bool-leaf-eval-criteria/view-scoutable-criterion.js';
+import { andEvalCriterionSchema } from './bool-combined-criteria/and-eval-criterion.js';
+import { orEvalCriterionSchema } from './bool-combined-criteria/or-criterion.js';
+import { notEvalCriterionSchema } from './bool-combined-criteria/not-criterion.js';
+import { compareEvalCriterionSchema } from './bool-combined-criteria/compare-criterion.js';
+import { constNumEvalCriterionSchema } from './number-eval-criteria/const-num-criterion.js';
+import { countPatientsAtStatusEvalCriterionSchema } from './number-eval-criteria/count-patients-at-status-criterion.js';
+import { countCompletedEvalCriterionSchema } from './number-eval-criteria/count-completed-criterion.js';
+import { countMeasuresEvalCriterionSchema } from './number-eval-criteria/count-measures-criterion.js';
+import { timestampEvalCriterionSchema } from './number-eval-criteria/timestamp-criterion.js';
+import { firstTrueAtEvalCriterionSchema } from './number-eval-criteria/first-true-at-criterion.js';
 
 /* TODO @JohannesPotzi @Jogius : countUnqualifiedMeasuresEvalCriterion */
 

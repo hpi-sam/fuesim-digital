@@ -14,4 +14,6 @@ export * from './format-duration.js';
 export * from './string-compare.js';
 export * from './make-optional.js';
 export * from './string-coordinates.js';
-export * from './eval-result.js';
+export * from './eval-result/eval-result.js';
+export * from './eval-result/utils.js';
+export * from './eval-result/parallel-utils.js';

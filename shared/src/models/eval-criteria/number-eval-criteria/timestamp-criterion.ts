@@ -1,15 +1,13 @@
-import z from 'zod';
-import {
-    numberEvalCriterionBaseSchema,
-    NumberEvalResult,
-    EvalResult,
+import * as z from 'zod';
+import { uuid } from '../../../utils/uuid.js';
+import type {
     EvalResultContext,
-    uuid,
-    newNumberEvalResult,
-    UUID,
-    NumberEvalCriterion,
-    EvalCriterion,
-} from 'fuesim-digital-shared';
+    EvalResult,
+    NumberEvalResult,
+} from '../../../utils/eval-result/eval-result.js';
+import { newNumberEvalResult } from '../../../utils/eval-result/utils.js';
+import type { NumberEvalCriterion } from '../criterion-categories.js';
+import { numberEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 
 export const timestampEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -29,7 +27,7 @@ export function newTimestampEvalCriterion(
     isDraft?: boolean
 ): TimestampEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -55,7 +53,7 @@ export function getEvalResultOfTimestampCriterion(
             `[Bad Input] Trying to evaluate a ${evalCriterion.criterionType} as a timestampEvalCriterion.`
         );
     }
-    const criterion = evalCriterion as TimestampEvalCriterion;
+    const criterion = evalCriterion;
     let num = null;
 
     if (!num) {
@@ -69,7 +67,7 @@ export function getEvalResultOfTimestampCriterion(
     num = criterion.timestamp;
 
     return newNumberEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

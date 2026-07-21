@@ -1,17 +1,16 @@
-import z from 'zod';
-import {
-    BoolEvalCriterion,
-    boolEvalCriterionBaseSchema,
-    UUID,
-    uuidSchema,
-    BoolEvalResult,
-    EvalResult,
+import * as z from 'zod';
+import { boolEvalCriterionBaseSchema } from '../eval-criterion-base.js';
+import type {
     EvalResultContext,
+    EvalResult,
+    BoolEvalResult,
+} from '../../../utils/eval-result/eval-result.js';
+import {
     getEvalResultFromCriterion,
     newBoolEvalResult,
-    uuid,
-    EvalCriterion,
-} from 'fuesim-digital-shared';
+} from '../../../utils/eval-result/utils.js';
+import type { UUID } from '../../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../../utils/uuid.js';
 
 export const notEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -31,7 +30,7 @@ export function newNotEvalCriterion(
     isDraft?: boolean
 ): NotEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -52,10 +51,10 @@ export function getEvalResultOfNotCriterion(
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
-    const criterion = evalCriterion as NotEvalCriterion;
+    const criterion = evalCriterion;
     let isCompleted = false;
     /* TODO @Johannes Potzi : Can we just say, that the negation of yellow is always yellow? */
-    let isYellow = false;
+    const isYellow = false;
 
     const res = getEvalResultFromCriterion(criterion, context, cache);
     isCompleted = res.type === 'boolEvalResult' ? res.isCompleted : true;

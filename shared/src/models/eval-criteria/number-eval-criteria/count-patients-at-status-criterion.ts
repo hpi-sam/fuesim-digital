@@ -1,17 +1,15 @@
-import z from 'zod';
-import {
-    EvalCriterion,
-    EvalResult,
+import * as z from 'zod';
+import { uuid } from '../../../utils/uuid.js';
+import type {
     EvalResultContext,
-    newNumberEvalResult,
-    NumberEvalCriterion,
-    numberEvalCriterionBaseSchema,
-    UUID,
+    EvalResult,
     NumberEvalResult,
-    PatientStatus,
-    patientStatusSchema,
-    uuid,
-} from 'fuesim-digital-shared';
+} from '../../../utils/eval-result/eval-result.js';
+import { newNumberEvalResult } from '../../../utils/eval-result/utils.js';
+import type { PatientStatus } from '../../utils/patient-status.js';
+import { patientStatusSchema } from '../../utils/patient-status.js';
+import type { NumberEvalCriterion } from '../criterion-categories.js';
+import { numberEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 
 export const countPatientsAtStatusEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -32,7 +30,7 @@ export function newCountPatientsAtStatusEvalCriterion(
     isDraft?: boolean
 ): CountPatientsAtStatusEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         criterionType: 'countPatientsAtStatusEvalCriterion',
@@ -53,7 +51,7 @@ export function getEvalResultOfCountPatientsAtStatusCriterion(
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): NumberEvalResult {
-    const criterion = evalCriterion as CountPatientsAtStatusEvalCriterion;
+    const criterion = evalCriterion;
     let num = null;
 
     if (!num) {
@@ -70,7 +68,7 @@ export function getEvalResultOfCountPatientsAtStatusCriterion(
     );
     num = -1;
     return newNumberEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

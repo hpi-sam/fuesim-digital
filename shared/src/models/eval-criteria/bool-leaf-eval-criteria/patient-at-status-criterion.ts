@@ -1,21 +1,15 @@
-import z from 'zod';
-import {} from '../criterion-categories.js';
-import {} from '../../../utils/uuid.js';
-import {} from '../../utils/patient-status.js';
-import {
-    BoolEvalCriterion,
-    boolEvalCriterionBaseSchema,
-    EvalCriterion,
-    uuid,
-    UUID,
-    uuidSchema,
-    PatientStatus,
-    patientStatusSchema,
-    BoolEvalResult,
-    EvalResult,
+import * as z from 'zod';
+import type { UUID } from '../../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../../utils/uuid.js';
+import type {
     EvalResultContext,
-    newBoolEvalResult,
-} from 'fuesim-digital-shared';
+    EvalResult,
+    BoolEvalResult,
+} from '../../../utils/eval-result/eval-result.js';
+import { newBoolEvalResult } from '../../../utils/eval-result/utils.js';
+import type { PatientStatus } from '../../utils/patient-status.js';
+import { patientStatusSchema } from '../../utils/patient-status.js';
+import { boolEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 
 export const patientAtStatusEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -37,7 +31,7 @@ export function newPatientAtStatusEvalCriterion(
     isDraft?: boolean
 ): PatientAtStatusEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -59,14 +53,14 @@ export function getEvalResultOfPatientAtStatusCriterion(
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
-    const criterion = evalCriterion as PatientAtStatusEvalCriterion;
+    const criterion = evalCriterion;
     let isCompleted = false;
-    let isYellow = false;
+    const isYellow = false;
     const targetId = criterion.targetPatientId;
     const patient = context.patients[targetId]!;
     isCompleted = patient.realStatus === criterion.targetStatus;
     return newBoolEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion,
         isCompleted,

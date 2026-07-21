@@ -1,18 +1,21 @@
-import z from 'zod';
-import {
-    uuidSchema,
-    EvalCriterion,
-    EvalResult,
+import * as z from 'zod';
+import type { WritableDraft } from 'immer';
+import type { UUID } from '../../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../../utils/uuid.js';
+import type {
     EvalResultContext,
+    EvalResult,
+    NumberEvalResult,
+} from '../../../utils/eval-result/eval-result.js';
+import {
     getEvalResultFromCriterion,
     newNumberEvalResult,
+} from '../../../utils/eval-result/utils.js';
+import type {
+    EvalCriterion,
     NumberEvalCriterion,
-    numberEvalCriterionBaseSchema,
-    UUID,
-    NumberEvalResult,
-    uuid,
-} from 'fuesim-digital-shared';
-import { WritableDraft } from 'immer';
+} from '../criterion-categories.js';
+import { numberEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 
 export const countCompletedEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -33,7 +36,7 @@ export function newCountCompletedEvalCriterion(
     isDraft?: boolean
 ): CountCompletedEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -80,7 +83,7 @@ export function getEvalResultOfCountCompletedCriterion(
     }
 
     return newNumberEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

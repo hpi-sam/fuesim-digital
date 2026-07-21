@@ -1,19 +1,18 @@
-import z from 'zod';
-import {
-    boolEvalCriterionBaseSchema,
-    EvalCriterion,
-    UUID,
-    uuidSchema,
+import * as z from 'zod';
+import type { WritableDraft } from 'immer';
+import type { UUID } from '../../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../../utils/uuid.js';
+import type {
     BoolEvalResult,
     EvalResult,
-    getEvalResultFromCriterion,
-} from 'fuesim-digital-shared';
-import { uuid } from '../../../utils/uuid.js';
-import {
     EvalResultContext,
+} from '../../../utils/eval-result/eval-result.js';
+import {
+    getEvalResultFromCriterion,
     newBoolEvalResult,
-} from '../../../utils/eval-result.js';
-import { WritableDraft } from 'immer';
+} from '../../../utils/eval-result/utils.js';
+import type { EvalCriterion } from '../criterion-categories.js';
+import { boolEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 export const comparativeOperatorSubSchema = z.union([
     z.literal('greaterThan'),
     z.literal('greaterThanOrEqual'),
@@ -72,7 +71,7 @@ export function getEvalResultOfCompareCriterion(
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
     /* TODO @JohannesPotzi: Test this. */
-    const criterion = evalCriterion as CompareEvalCriterion;
+    const criterion = evalCriterion;
     let isCompleted = false;
     let isYellow = false;
     const leftCrit = context.evalCriteria[
@@ -92,8 +91,8 @@ export function getEvalResultOfCompareCriterion(
     }
     let leftVal = 0;
     let rightVal = 0;
-    const leftRes = getEvalResultFromCriterion(leftCrit!, context, cache);
-    const rightRes = getEvalResultFromCriterion(rightCrit!, context, cache);
+    const leftRes = getEvalResultFromCriterion(leftCrit, context, cache);
+    const rightRes = getEvalResultFromCriterion(rightCrit, context, cache);
     const isLeftNum = leftRes.type === 'numberEvalResult';
     const isRightNum = rightRes.type === 'numberEvalResult';
     if (!isLeftNum || !isRightNum) {
@@ -160,7 +159,7 @@ export function getEvalResultOfCompareCriterion(
     }
     isCompleted = leftVal > rightVal;
     return newBoolEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion,
         isCompleted,

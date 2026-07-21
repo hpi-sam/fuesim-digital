@@ -100,7 +100,8 @@ import {
     EvalCriterion,
     evalCriterionSchema,
 } from './models/eval-criteria/criterion-categories.js';
-import { evalCriterionBaseSchema } from 'fuesim-digital-shared';
+import { evalCriterionBaseSchema } from './models/eval-criteria/eval-criterion-base.js';
+
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
     public readonly id = uuid();

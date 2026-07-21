@@ -1,17 +1,18 @@
-import z from 'zod';
-import {
-    boolEvalCriterionBaseSchema,
-    UUID,
-    uuidSchema,
-    BoolEvalResult,
-    EvalResult,
+import * as z from 'zod';
+import type { WritableDraft } from 'immer';
+import type {
     EvalResultContext,
+    EvalResult,
+    BoolEvalResult,
+} from '../../../utils/eval-result/eval-result.js';
+import {
     getEvalResultFromCriterion,
     newBoolEvalResult,
-    uuid,
-    EvalCriterion,
-} from 'fuesim-digital-shared';
-import { WritableDraft } from 'immer';
+} from '../../../utils/eval-result/utils.js';
+import type { UUID } from '../../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../../utils/uuid.js';
+import type { EvalCriterion } from '../criterion-categories.js';
+import { boolEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 
 export const andEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -53,7 +54,7 @@ export function getEvalResultOfAndCriterion(
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
-    const criterion = evalCriterion as AndEvalCriterion;
+    const criterion = evalCriterion;
     let isCompleted = false;
     let isYellow = false;
     let isIncomplete = false;
@@ -74,7 +75,7 @@ export function getEvalResultOfAndCriterion(
     isYellow = isIncomplete && atLeastOneCompleted;
 
     return newBoolEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion,
         isCompleted,

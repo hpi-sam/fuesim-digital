@@ -1,15 +1,15 @@
 import { z } from 'zod';
 import { exerciseTemplateIdSchema, parallelExerciseIdSchema } from '../ids.js';
+import { validationMessages } from '../validation-messages.js';
+import { exerciseStatusSchema } from '../models/utils/exercise-status.js';
+import { logEntrySchema } from '../models/log-entry.js';
+import { evalResultSchema } from '../utils/eval-result/eval-result.js';
 import {
     parallelExerciseKey,
     participantKeySchema,
     trainerKeySchema,
-    uuidSchema,
-} from 'fuesim-digital-shared';
-import { validationMessages } from '../validation-messages.js';
-import { exerciseStatusSchema } from '../models/utils/exercise-status.js';
-import { logEntrySchema } from '../models/log-entry.js';
-import { evalResultSchema } from '../utils/eval-result.js';
+} from '../exercise-keys.js';
+import { uuidSchema } from '../utils/uuid.js';
 import { getExerciseTemplateResponseDataSchema } from './exercise-template.js';
 import { stringToDate } from './utils.js';
 

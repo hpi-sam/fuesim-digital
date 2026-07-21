@@ -1,18 +1,18 @@
-import z from 'zod';
-import {
-    BoolEvalCriterion,
-    boolEvalCriterionBaseSchema,
-    uuidSchema,
-    UUID,
-    uuid,
-    BoolEvalResult,
-    EvalResult,
+import * as z from 'zod';
+import type { WritableDraft } from 'immer';
+import type { UUID } from '../../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../../utils/uuid.js';
+import type {
     EvalResultContext,
+    EvalResult,
+    BoolEvalResult,
+} from '../../../utils/eval-result/eval-result.js';
+import {
     getEvalResultFromCriterion,
     newBoolEvalResult,
-    EvalCriterion,
-} from 'fuesim-digital-shared';
-import { WritableDraft } from 'immer';
+} from '../../../utils/eval-result/utils.js';
+import type { EvalCriterion } from '../criterion-categories.js';
+import { boolEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 
 export const orEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -33,7 +33,7 @@ export function newOrEvalCriterion(
     isDraft?: boolean
 ): OrEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -54,9 +54,9 @@ export function getEvalResultOfOrCriterion(
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): BoolEvalResult {
-    const criterion = evalCriterion as OrEvalCriterion;
+    const criterion = evalCriterion;
     let isCompleted = false;
-    let isYellow = false;
+    const isYellow = false;
     for (let i = 0; i < criterion.children.length; i += 1) {
         const res = getEvalResultFromCriterion(
             context.evalCriteria[
@@ -73,7 +73,7 @@ export function getEvalResultOfOrCriterion(
         }
     }
     return newBoolEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion,
         isCompleted,

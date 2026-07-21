@@ -1,51 +1,54 @@
-import {
+import type {
     BoolEvalResult,
     EvalResult,
     EvalResultContext,
     NumberEvalResult,
-    getEvalResultOfCompareCriterion,
+} from '../../utils/eval-result/eval-result.js';
+import type { UUID } from '../../utils/uuid.js';
+import { getEvalResultOfAndCriterion } from './bool-combined-criteria/and-eval-criterion.js';
+import { getEvalResultOfCompareCriterion } from './bool-combined-criteria/compare-criterion.js';
+import { getEvalResultOfNotCriterion } from './bool-combined-criteria/not-criterion.js';
+import { getEvalResultOfOrCriterion } from './bool-combined-criteria/or-criterion.js';
+import { getEvalResultOfPatientAtStatusCriterion } from './bool-leaf-eval-criteria/patient-at-status-criterion.js';
+import { getEvalResultOfReachTechnicalChallengeStateCriterion } from './bool-leaf-eval-criteria/reach-technical-challenge-state-criterion.js';
+import { getEvalResultOfViewScoutableCriterion } from './bool-leaf-eval-criteria/view-scoutable-criterion.js';
+import type {
     BoolEvalCriterion,
-    combinedEvalCriterionTypes,
+    BoolEvalCriterionType,
     EvalCriterion,
-    UUID,
     EvalCriterionType,
     NumberEvalCriterion,
+    NumberEvalCriterionType,
+} from './criterion-categories.js';
+import {
+    combinedEvalCriterionTypes,
     numberEvalCriterionTypes,
     temporalEvalCriterionTypes,
-    getEvalResultOfAndCriterion,
-    getEvalResultOfTimestampCriterion,
-    getEvalResultOfCountCompletedCriterion,
-    getEvalResultOfFirstTrueAtCriterion,
-    getEvalResultOfNotCriterion,
-    getEvalResultOfOrCriterion,
-    getEvalResultOfPatientAtStatusCriterion,
-    getEvalResultOfReachTechnicalChallengeStateCriterion,
-    getEvalResultOfViewScoutableCriterion,
-    getEvalResultOfConstNumCriterion,
-    newCountCompletedEvalCriterion,
-    getEvalResultOfCountPatientsAtStatusCriterion,
-    BoolEvalCriterionType,
-    NumberEvalCriterionType,
-    getEvalResultOfCountMeasuresCriterion,
-} from 'fuesim-digital-shared';
+} from './criterion-categories.js';
+import { getEvalResultOfConstNumCriterion } from './number-eval-criteria/const-num-criterion.js';
+import { getEvalResultOfCountCompletedCriterion } from './number-eval-criteria/count-completed-criterion.js';
+import { getEvalResultOfCountMeasuresCriterion } from './number-eval-criteria/count-measures-criterion.js';
+import { getEvalResultOfCountPatientsAtStatusCriterion } from './number-eval-criteria/count-patients-at-status-criterion.js';
+import { getEvalResultOfFirstTrueAtCriterion } from './number-eval-criteria/first-true-at-criterion.js';
+import { getEvalResultOfTimestampCriterion } from './number-eval-criteria/timestamp-criterion.js';
 
 export function isNumberEvalCriterion(
     criterion: EvalCriterion
 ): criterion is NumberEvalCriterion {
     return numberEvalCriterionTypes.includes(
-        //@ts-expect-error: not assignable
+        // @ts-expect-error: not assignable
         criterion.criterionType
     );
 }
 export function isBoolEvalCriterion(
     criterion: EvalCriterion
 ): criterion is BoolEvalCriterion {
-    //@ts-expect-error: not assignable
+    // @ts-expect-error: not assignable
     return boolEvalCritrionTypes.includes(criterion.criterionType);
 }
 export function isCombinedEvalCriterion(evalCriterion: EvalCriterion) {
     return combinedEvalCriterionTypes.includes(
-        //@ts-expect-error: not assignable
+        // @ts-expect-error: not assignable
         evalCriterion.criterionType
     );
 }
@@ -110,7 +113,7 @@ export function removeChildrenOfCriterion(
         );
         return criteriaMapIn;
     }
-    let criteriaMap = criteriaMapIn as {
+    const criteriaMap = criteriaMapIn as {
         [key: UUID]: EvalCriterion | null;
     };
     const type = currentCriterion.criterionType;

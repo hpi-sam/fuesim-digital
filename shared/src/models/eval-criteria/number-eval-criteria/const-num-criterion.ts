@@ -1,15 +1,13 @@
-import z from 'zod';
-import {
-    EvalCriterion,
-    UUID,
-    EvalResult,
+import * as z from 'zod';
+import { uuid } from '../../../utils/uuid.js';
+import { numberEvalCriterionBaseSchema } from '../eval-criterion-base.js';
+import type {
     EvalResultContext,
-    newNumberEvalResult,
-    NumberEvalCriterion,
-    numberEvalCriterionBaseSchema,
+    EvalResult,
     NumberEvalResult,
-    uuid,
-} from 'fuesim-digital-shared';
+} from '../../../utils/eval-result/eval-result.js';
+import { newNumberEvalResult } from '../../../utils/eval-result/utils.js';
+import type { NumberEvalCriterion } from '../criterion-categories.js';
 
 export const constNumEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -28,7 +26,7 @@ export function newConstNumEvalCriterion(
     isDraft?: boolean
 ): ConstNumEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -49,7 +47,7 @@ export function getEvalResultOfConstNumCriterion(
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): NumberEvalResult {
-    const criterion = evalCriterion as ConstNumEvalCriterion;
+    const criterion = evalCriterion;
     let num = null;
     if (!num) {
         console.log(
@@ -63,7 +61,7 @@ export function getEvalResultOfConstNumCriterion(
     num = criterion.num;
 
     return newNumberEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

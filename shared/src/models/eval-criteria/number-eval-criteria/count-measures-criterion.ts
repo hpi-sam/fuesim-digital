@@ -1,16 +1,14 @@
-import z from 'zod';
-import {
-    EvalCriterion,
-    EvalResult,
+import * as z from 'zod';
+import type { UUID } from '../../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../../utils/uuid.js';
+import type {
     EvalResultContext,
-    newNumberEvalResult,
-    NumberEvalCriterion,
-    numberEvalCriterionBaseSchema,
+    EvalResult,
     NumberEvalResult,
-    uuid,
-    UUID,
-    uuidSchema,
-} from 'fuesim-digital-shared';
+} from '../../../utils/eval-result/eval-result.js';
+import { newNumberEvalResult } from '../../../utils/eval-result/utils.js';
+import type { NumberEvalCriterion } from '../criterion-categories.js';
+import { numberEvalCriterionBaseSchema } from '../eval-criterion-base.js';
 
 export const countMeasuresEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -31,7 +29,7 @@ export function newcountMeasuresEvalCriterion(
     isDraft?: boolean
 ): CountMeasuresEvalCriterion {
     return {
-        id: uuid() as UUID,
+        id: uuid(),
         name,
         type: 'evalCriterion',
         isVisibleForParticipants: isVisibleForParticipants ?? false,
@@ -52,7 +50,7 @@ export function getEvalResultOfCountMeasuresCriterion(
     context: EvalResultContext,
     cache?: { [key: string]: EvalResult }
 ): NumberEvalResult {
-    const criterion = evalCriterion as CountMeasuresEvalCriterion;
+    const criterion = evalCriterion;
     let num = null;
     /* TODO @JohannesPotzi @Jogius : implementation*/
     console.log('TODO: implement evaluation of countMeasuresEvalCriterion');
@@ -66,7 +64,7 @@ export function getEvalResultOfCountMeasuresCriterion(
         num = -1;
     }
     return newNumberEvalResult(
-        criterion.id as UUID,
+        criterion.id,
         context.currentTime,
         criterion as NumberEvalCriterion,
         num

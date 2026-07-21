@@ -1,4 +1,4 @@
-import type { WritableDraft } from 'immer';
+import { castDraft, type WritableDraft } from 'immer';
 import { newLogEntry } from '../../../models/log-entry.js';
 import type { Tag } from '../../../models/tag.js';
 import {
@@ -45,7 +45,8 @@ import type { Vehicle } from '../../../models/vehicle.js';
 import { formatDuration } from '../../../utils/format-duration.js';
 import type { ExerciseRadiogram } from '../../../models/radiogram/exercise-radiogram.js';
 import { TypeAssertedObject } from '../../../utils/type-asserted-object.js';
-import type { TechnicalChallengeStateId } from '../../../models/technical-challenge/state-machine.js';
+import type { StateMachineState } from '../../../models/technical-challenge/state-machine.js';
+import { TechnicalChallenge } from '../../../models/technical-challenge/technical-challenge.js';
 import {
     getElement,
     getExerciseBehaviorById,
@@ -60,7 +61,9 @@ export function log(
 ) {
     if (!logActive(state)) return;
 
-    const logEntry = newLogEntry(description, tags, state.currentTime);
+    const logEntry = castDraft(
+        newLogEntry(description, tags, state.currentTime)
+    );
 
     if (state.logEntries) {
         state.logEntries.push(logEntry);
@@ -973,7 +976,7 @@ export function logTechnicalChallengePersonnelAssigned(
     if (!logActive(state)) return;
 
     const personnel = getElement(state, 'personnel', personnelId);
-    const task = getElement(state, 'task', taskId);
+    const task = getElement(state, 'taskType', taskId);
     logTechnicalChallenge(
         state,
         [createPersonnelTypeTag(state, personnel), createTaskTag(state, task)],
@@ -991,7 +994,7 @@ export function logTechnicalChallengePersonnelUnassigned(
     if (!logActive(state)) return;
 
     const personnel = getElement(state, 'personnel', personnelId);
-    const task = getElement(state, 'task', taskId);
+    const task = getElement(state, 'taskType', taskId);
     logTechnicalChallenge(
         state,
         [createPersonnelTypeTag(state, personnel), createTaskTag(state, task)],
@@ -1003,8 +1006,8 @@ export function logTechnicalChallengePersonnelUnassigned(
 export function logTechnicalChallengeStateTransition(
     state: WritableDraft<ExerciseState>,
     technicalChallengeId: UUID,
-    fromId: TechnicalChallengeStateId,
-    toId: TechnicalChallengeStateId
+    fromId: StateMachineState['id'],
+    toId: StateMachineState['id']
 ) {
     if (!logActive(state)) return;
 
@@ -1013,8 +1016,11 @@ export function logTechnicalChallengeStateTransition(
         'technicalChallenge',
         technicalChallengeId
     );
-    const fromState = technicalChallenge.states[fromId]!;
-    const toState = technicalChallenge.states[toId]!;
+    const fromState = TechnicalChallenge.getStateById(
+        technicalChallenge,
+        fromId
+    )!;
+    const toState = TechnicalChallenge.getStateById(technicalChallenge, toId)!;
     logTechnicalChallenge(
         state,
         [

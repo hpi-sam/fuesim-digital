@@ -12,10 +12,51 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - There are now notifications when viewing an exercise replay whenever a measure is taken or a scoutable element is viewed.
 - There is now a banner that is displayed when the application is unable to start properly, informing the user about potential causes.
 - There is now a didactic overview for trainers in "Auswertung" -> "Didaktische Übersicht" which allows trainers to set criteria and see live results. In the parallel exercise dashboard an equivalent overview for all instances has been added.
+- New participants joining a parallel exercise after it started now get fast-forwarded to be in sync with all other participants.
 
 ### Fixed
 
 - The deletion of alarm groups no longer breaks breaks measure templates that use them.
+- Elements are now only marked scoutable once their name or content is specified, and can be marked as unscoutable again.
+- The measures toolbar no longer interferes with map interactions.
+- Show exercise import validation error messages in a readable format.
+- Exercise instances in a parallel exercise are now created based on the state the exercise template was in when the parallel exercise was created.
+
+## [0.17.0] - 2026-06-30
+
+### Added
+
+- Names of new vehicle are automatically numbered using a counter per vehicle template. This can be en-/disabled using the '#' placeholder in the default name.
+
+### Fixed
+
+- Complete exports (including history) of exercise templates are now permitted.
+
+## [0.16.0] - 2026-06-23
+
+### Changed
+
+- Anonymous exercises are automatically deleted, if they are unused for a configurable amount of days.
+
+### Fixed
+
+- Locking the map zoom now also disables zooming in by double clicking/tapping on the map.
+- Participants, who are restricted to a viewport can again see all vehicles that arrive in their viewport. Due to a bug, vehicles were invisible if the vehicle status display or load times were used in an exercise.
+
+## [0.15.0] - 2026-06-15
+
+### Added
+
+- Vehicles can have load times per patient. While a patient is being loaded into the vehicle, it cannot be moved or transferred and no second patient can be loaded at the same time. Load times can be configured per vehicle template and can be disabled globally. While the load time is running, a countdown is shown above the vehicle.
+
+### Changed
+
+- Replace `fuesim-manv.de` links with `fuesim.digital`
+- Help pages are linked in landing page footer
+
+### Fixed
+
+- The naming has been unified to use "Alarmgruppe" instead of a mix of "Alarmgruppe" and "Alarmierungsgruppe".
 
 ## [0.14.0] - 2026-06-11
 
@@ -23,11 +64,13 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Trainers can configure whether participants can use the button to completely load a vehicle. To ensure backwards compatibility, loading a patient into a vehicle will for now still automatically load all personnel and material, independent from whether the button is active.
 - Trainers can configure whether related elements such as the personnel of a vehicle should be highlighted when one of the elements is selected. Highlighting can be turned off, activated for trainers only (default, matches previous behavior), or activated for both trainers and participants.
+- In the parallel exercise overview, a button to copy the participant link to the clipboard has been added.
 
 ### Changed
 
 - Trainers now have access to the 'Einsatzübersicht' in Exercises and Exercise Templates.
 - Clients now automatically rejoin the exercise with the same view and role when disconnecting due to network issues/reloads.
+- Participants no longer see a button to export the current exercise.
 
 ### Fixed
 
@@ -465,7 +508,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.14.0...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.16.0...v0.17.0
+[0.16.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.15.0...v0.16.0
+[0.15.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.1...v0.14.0
 [0.13.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.1...v0.13.0

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const tagSchema = z.strictObject({
     category: z.string(),
@@ -20,7 +21,7 @@ export const tagSchema = z.strictObject({
     specifier: z.string(),
 });
 
-export type Tag = z.infer<typeof tagSchema>;
+export type Tag = Immutable<z.infer<typeof tagSchema>>;
 
 /**
  * Please use a function from {@link ./utils/tag-helpers.ts} to create a tag for a specific category.

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { sendSimulationEvent } from '../events/utils.js';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import {
@@ -15,8 +16,8 @@ export const sendRemoteEventActivityStateSchema = z.strictObject({
     targetSimulatedRegionId: uuidSchema,
     event: exerciseSimulationEventSchema,
 });
-export type SendRemoteEventActivityState = z.infer<
-    typeof sendRemoteEventActivityStateSchema
+export type SendRemoteEventActivityState = Immutable<
+    z.infer<typeof sendRemoteEventActivityStateSchema>
 >;
 
 export function newSendRemoteEventActivityState(

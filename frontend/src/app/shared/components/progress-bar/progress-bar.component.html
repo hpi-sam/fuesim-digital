@@ -13,6 +13,9 @@
         [attr.aria-valuemax]="max()"
         [style.width]="`${progressPercentage()}%`"
     >
-        <span> {{ current() }}s / {{ max() }}s </span>
+        <span>
+            {{ formatNumber(current(), 'de', '1.0-0') }}{{ unit() }} /
+            {{ formatNumber(max(), 'de', '1.0-0') }}{{ unit() }}
+        </span>
     </div>
 </div>

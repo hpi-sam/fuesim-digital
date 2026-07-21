@@ -85,6 +85,27 @@
             "when": 1781254712421,
             "tag": "0011_organisations",
             "breakpoints": true
+        },
+        {
+            "idx": 12,
+            "version": "7",
+            "when": 1783340116245,
+            "tag": "0012_marketplace",
+            "breakpoints": true
+        },
+        {
+            "idx": 13,
+            "version": "7",
+            "when": 1784034245345,
+            "tag": "0013_exercises_parallel_exercises_orgs",
+            "breakpoints": true
+        },
+        {
+            "idx": 14,
+            "version": "7",
+            "when": 1784047030463,
+            "tag": "0014_parallel_exercise_state_string",
+            "breakpoints": true
         }
     ]
 }

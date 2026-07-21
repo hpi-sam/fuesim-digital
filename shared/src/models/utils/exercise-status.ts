@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const exerciseStatusAllowedValues = [
     'notStarted',
@@ -7,7 +8,7 @@ export const exerciseStatusAllowedValues = [
 ] as const;
 
 export const exerciseStatusSchema = z.literal(exerciseStatusAllowedValues);
-export type ExerciseStatus = z.infer<typeof exerciseStatusSchema>;
+export type ExerciseStatus = Immutable<z.infer<typeof exerciseStatusSchema>>;
 
 export const exerciseTypeAllowedValues = [
     'standalone',
@@ -16,7 +17,8 @@ export const exerciseTypeAllowedValues = [
 ] as const;
 
 export const exerciseTypeSchema = z.literal(exerciseTypeAllowedValues);
-export type ExerciseType = z.infer<typeof exerciseTypeSchema>;
+export type ExerciseType = Immutable<z.infer<typeof exerciseTypeSchema>>;
+
 export const exerciseTypeGermanNameDictionary: {
     [K in ExerciseType]: string;
 } = {

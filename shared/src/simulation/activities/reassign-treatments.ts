@@ -47,8 +47,8 @@ export const reassignTreatmentsActivityStateSchema = z.strictObject({
     countingStartedAt: z.int().nonnegative().optional(),
     countingTimePerPatient: z.int().nonnegative(),
 });
-export type ReassignTreatmentsActivityState = z.infer<
-    typeof reassignTreatmentsActivityStateSchema
+export type ReassignTreatmentsActivityState = Immutable<
+    z.infer<typeof reassignTreatmentsActivityStateSchema>
 >;
 
 export function newReassignTreatmentsActivityState(

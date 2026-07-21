@@ -14,6 +14,7 @@ import {
     NgbDropdownMenu,
     NgbDropdownButtonItem,
     NgbDropdownItem,
+    NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AsyncPipe } from '@angular/common';
 import { MessageService } from '../../../../../../core/messages/message.service';
@@ -49,6 +50,7 @@ import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
         MapEditorCardComponent,
         AsyncPipe,
         ValuesPipe,
+        NgbTooltip,
     ],
 })
 export class VehicleTemplateFormComponent implements OnChanges {
@@ -93,6 +95,7 @@ export class VehicleTemplateFormComponent implements OnChanges {
                     aspectRatio,
                     height: valuesOnSubmit.height,
                     patientCapacity: valuesOnSubmit.patientCapacity,
+                    patientLoadMinutes: valuesOnSubmit.patientLoadMinutes,
                     materialTemplateIds: valuesOnSubmit.materialTemplates.map(
                         (template) => template.id
                     ),
@@ -145,6 +148,7 @@ export interface EditableVehicleTemplateValues {
     url: string | null;
     height: number;
     patientCapacity: number;
+    patientLoadMinutes: number;
     materialTemplates: MaterialTemplate[];
     personnelTemplates: PersonnelTemplate[];
 }
@@ -156,6 +160,7 @@ export interface ChangedVehicleTemplateValues {
     aspectRatio: number;
     height: number;
     patientCapacity: number;
+    patientLoadMinutes: number;
     materialTemplateIds: UUID[];
     personnelTemplateIds: UUID[];
 }

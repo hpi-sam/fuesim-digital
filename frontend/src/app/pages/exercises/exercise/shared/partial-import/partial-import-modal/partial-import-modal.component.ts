@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import type { PartialExport } from 'fuesim-digital-shared';
+import type { MigratedPartialExport } from 'fuesim-digital-shared';
 import { preparePartialExportForImport } from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import { MessageService } from '../../../../../../core/messages/message.service';
@@ -20,7 +20,7 @@ export class PartialImportModalComponent {
 
     public importingPartialExport = false;
 
-    public partialExport!: PartialExport;
+    public partialExport!: MigratedPartialExport;
 
     public close() {
         this.activeModal.close();

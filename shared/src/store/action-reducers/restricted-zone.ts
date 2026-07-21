@@ -1,123 +1,116 @@
-import { IsBoolean, IsNumber, IsString, IsUUID } from 'class-validator';
-import { Action, ActionReducer } from '../action-reducer.js';
+import { z } from 'zod';
+import type { Immutable } from 'immer';
+import type { ActionReducer } from '../action-reducer.js';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
-import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { type Size, sizeSchema } from '../../models/utils/size.js';
 import {
-    type RestrictedZone,
     restrictedZoneSchema,
     type VehicleRestriction,
-    vehicleRestrictionAllowedValues,
+    vehicleRestrictionSchema,
 } from '../../models/restricted-zone.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
-import {
-    type MapCoordinates,
-    mapCoordinatesSchema,
-} from '../../models/utils/position/map-coordinates.js';
+import { type UUID } from '../../utils/uuid.js';
+import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
+import { vehicleTemplateSchema } from '../../models/vehicle-template.js';
 import { getElement } from './utils/get-element.js';
 
-export class AddRestrictedZoneAction implements Action {
-    @IsValue('[RestrictedZone] Add restricted zone' as const)
-    public readonly type = '[RestrictedZone] Add restricted zone';
-    @IsZodSchema(restrictedZoneSchema)
-    public readonly restrictedZone!: RestrictedZone;
-}
+const addRestrictedZoneActionSchema = z.strictObject({
+    type: z.literal('[RestrictedZone] Add restricted zone'),
+    restrictedZone: restrictedZoneSchema,
+});
+export type AddRestrictedZoneAction = Immutable<
+    z.infer<typeof addRestrictedZoneActionSchema>
+>;
 
-export class MoveRestrictedZoneAction implements Action {
-    @IsValue('[RestrictedZone] Move restricted zone' as const)
-    public readonly type = '[RestrictedZone] Move restricted zone';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly restrictedZoneId!: UUID;
-    @IsZodSchema(mapCoordinatesSchema)
-    public readonly targetPosition!: MapCoordinates;
-}
+const moveRestrictedZoneActionSchema = z.strictObject({
+    type: z.literal('[RestrictedZone] Move restricted zone'),
+    restrictedZoneId: restrictedZoneSchema.shape.id,
+    targetPosition: mapCoordinatesSchema,
+});
+export type MoveRestrictedZoneAction = Immutable<
+    z.infer<typeof moveRestrictedZoneActionSchema>
+>;
 
-export class RemoveRestrictedZoneAction implements Action {
-    @IsValue('[RestrictedZone] Remove restricted zone' as const)
-    public readonly type = '[RestrictedZone] Remove restricted zone';
-    @IsUUID()
-    public readonly restrictedZoneId!: UUID;
-}
+const removeRestrictedZoneActionSchema = z.strictObject({
+    type: z.literal('[RestrictedZone] Remove restricted zone'),
+    restrictedZoneId: restrictedZoneSchema.shape.id,
+});
+export type RemoveRestrictedZoneAction = Immutable<
+    z.infer<typeof removeRestrictedZoneActionSchema>
+>;
 
-export class RenameRestrictedZoneAction implements Action {
-    @IsValue('[RestrictedZone] Rename restricted zone' as const)
-    public readonly type = '[RestrictedZone] Rename restricted zone';
+const renameRestrictedZoneActionSchema = z.strictObject({
+    type: z.literal('[RestrictedZone] Rename restricted zone'),
+    restrictedZoneId: restrictedZoneSchema.shape.id,
+    newName: restrictedZoneSchema.shape.name,
+});
+export type RenameRestrictedZoneAction = Immutable<
+    z.infer<typeof renameRestrictedZoneActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly restrictedZoneId!: UUID;
+const resizeRestrictedZoneActionSchema = z.strictObject({
+    type: z.literal('[RestrictedZone] Resize restricted zone'),
+    restrictedZoneId: restrictedZoneSchema.shape.id,
+    targetPosition: mapCoordinatesSchema,
+    newSize: restrictedZoneSchema.shape.size,
+});
+export type ResizeRestrictedZoneAction = Immutable<
+    z.infer<typeof resizeRestrictedZoneActionSchema>
+>;
 
-    @IsString()
-    public readonly newName!: string;
-}
+const setRestrictedZoneCapacityActionSchema = z.strictObject({
+    type: z.literal('[RestrictedZone] Set capacity'),
+    restrictedZoneId: restrictedZoneSchema.shape.id,
+    newCapacity: restrictedZoneSchema.shape.capacity,
+});
+export type SetRestrictedZoneCapacityAction = Immutable<
+    z.infer<typeof setRestrictedZoneCapacityActionSchema>
+>;
 
-export class ResizeRestrictedZoneAction implements Action {
-    @IsValue('[RestrictedZone] Resize restricted zone' as const)
-    public readonly type = '[RestrictedZone] Resize restricted zone';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly restrictedZoneId!: UUID;
-    @IsZodSchema(mapCoordinatesSchema)
-    public readonly targetPosition!: MapCoordinates;
-    @IsZodSchema(sizeSchema)
-    public readonly newSize!: Size;
-}
+const setRestrictedZoneColorActionSchema = z.strictObject({
+    type: z.literal('[RestrictedZone] Set color'),
+    restrictedZoneId: restrictedZoneSchema.shape.id,
+    newColor: restrictedZoneSchema.shape.color,
+});
+export type SetRestrictedZoneColorAction = Immutable<
+    z.infer<typeof setRestrictedZoneColorActionSchema>
+>;
 
-export class SetRestrictedZoneCapacityAction implements Action {
-    @IsValue('[RestrictedZone] Set capacity' as const)
-    public readonly type = '[RestrictedZone] Set capacity';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly restrictedZoneId!: UUID;
-    @IsNumber()
-    public readonly newCapacity!: number;
-}
+const setRestrictedZoneNameVisibleActionSchema = z.strictObject({
+    type: z.literal('[RestrictedZone] Set nameVisible'),
+    restrictedZoneId: restrictedZoneSchema.shape.id,
+    newNameVisible: restrictedZoneSchema.shape.nameVisible,
+});
+export type SetRestrictedZoneNameVisibleAction = Immutable<
+    z.infer<typeof setRestrictedZoneNameVisibleActionSchema>
+>;
 
-export class SetRestrictedZoneColorAction implements Action {
-    @IsValue('[RestrictedZone] Set color' as const)
-    public readonly type = '[RestrictedZone] Set color';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly restrictedZoneId!: UUID;
-    @IsString()
-    public readonly newColor!: string;
-}
+const setRestrictedZoneCapacityVisibleActionSchema = z.strictObject({
+    type: z.literal('[RestrictedZone] Set capacityVisible'),
+    restrictedZoneId: restrictedZoneSchema.shape.id,
+    newCapacityVisible: restrictedZoneSchema.shape.capacityVisible,
+});
+export type SetRestrictedZoneCapacityVisibleAction = Immutable<
+    z.infer<typeof setRestrictedZoneCapacityVisibleActionSchema>
+>;
 
-export class SetRestrictedZoneNameVisibleAction implements Action {
-    @IsValue('[RestrictedZone] Set nameVisible' as const)
-    public readonly type = '[RestrictedZone] Set nameVisible';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly restrictedZoneId!: UUID;
-    @IsBoolean()
-    public readonly newNameVisible!: boolean;
-}
-
-export class SetRestrictedZoneCapacityVisibleAction implements Action {
-    @IsValue('[RestrictedZone] Set capacityVisible' as const)
-    public readonly type = '[RestrictedZone] Set capacityVisible';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly restrictedZoneId!: UUID;
-    @IsBoolean()
-    public readonly newCapacityVisible!: boolean;
-}
-
-export class SetVehicleRestrictionAction implements Action {
-    @IsValue('[RestrictedZone] Set vehicle restriction' as const)
-    public readonly type = '[RestrictedZone] Set vehicle restriction';
-    @IsUUID(4, uuidValidationOptions)
-    public readonly restrictedZoneId!: UUID;
-    @IsString()
-    public readonly vehicleTemplateId!: string;
-    @IsLiteralUnion(vehicleRestrictionAllowedValues)
-    public readonly restriction!: VehicleRestriction;
-}
+const setVehicleRestrictionActionSchema = z.strictObject({
+    type: z.literal('[RestrictedZone] Set vehicle restriction'),
+    restrictedZoneId: restrictedZoneSchema.shape.id,
+    vehicleTemplateId: vehicleTemplateSchema.shape.id,
+    restriction: vehicleRestrictionSchema,
+});
+export type SetVehicleRestrictionAction = Immutable<
+    z.infer<typeof setVehicleRestrictionActionSchema>
+>;
 
 export namespace RestrictedZoneActionReducers {
     export const addRestrictedZone: ActionReducer<AddRestrictedZoneAction> = {
-        action: AddRestrictedZoneAction,
+        type: addRestrictedZoneActionSchema.shape.type.value,
+        actionSchema: addRestrictedZoneActionSchema,
         reducer: (draftState, { restrictedZone }) => {
             // Initialize vehicle restrictions with 'restrict' for all vehicle types
             const vehicleRestrictions: {
@@ -148,7 +141,8 @@ export namespace RestrictedZoneActionReducers {
     };
 
     export const moveRestrictedZone: ActionReducer<MoveRestrictedZoneAction> = {
-        action: MoveRestrictedZoneAction,
+        type: moveRestrictedZoneActionSchema.shape.type.value,
+        actionSchema: moveRestrictedZoneActionSchema,
         reducer: (draftState, { restrictedZoneId, targetPosition }) => {
             changePositionWithId(
                 restrictedZoneId,
@@ -163,7 +157,8 @@ export namespace RestrictedZoneActionReducers {
 
     export const removeRestrictedZone: ActionReducer<RemoveRestrictedZoneAction> =
         {
-            action: RemoveRestrictedZoneAction,
+            type: removeRestrictedZoneActionSchema.shape.type.value,
+            actionSchema: removeRestrictedZoneActionSchema,
             reducer: (draftState, { restrictedZoneId }) => {
                 delete draftState.restrictedZones[restrictedZoneId];
                 return draftState;
@@ -173,7 +168,8 @@ export namespace RestrictedZoneActionReducers {
 
     export const renameRestrictedZone: ActionReducer<RenameRestrictedZoneAction> =
         {
-            action: RenameRestrictedZoneAction,
+            type: renameRestrictedZoneActionSchema.shape.type.value,
+            actionSchema: renameRestrictedZoneActionSchema,
             reducer: (draftState, { restrictedZoneId, newName }) => {
                 const restrictedZone = getElement(
                     draftState,
@@ -188,7 +184,8 @@ export namespace RestrictedZoneActionReducers {
 
     export const resizeRestrictedZone: ActionReducer<ResizeRestrictedZoneAction> =
         {
-            action: ResizeRestrictedZoneAction,
+            type: resizeRestrictedZoneActionSchema.shape.type.value,
+            actionSchema: resizeRestrictedZoneActionSchema,
             reducer: (
                 draftState,
                 { restrictedZoneId, targetPosition, newSize }
@@ -211,7 +208,8 @@ export namespace RestrictedZoneActionReducers {
 
     export const setRestrictedZoneCapacity: ActionReducer<SetRestrictedZoneCapacityAction> =
         {
-            action: SetRestrictedZoneCapacityAction,
+            type: setRestrictedZoneCapacityActionSchema.shape.type.value,
+            actionSchema: setRestrictedZoneCapacityActionSchema,
             reducer: (draftState, { restrictedZoneId, newCapacity }) => {
                 const restrictedZone = getElement(
                     draftState,
@@ -226,7 +224,8 @@ export namespace RestrictedZoneActionReducers {
 
     export const setRestrictedZoneColor: ActionReducer<SetRestrictedZoneColorAction> =
         {
-            action: SetRestrictedZoneColorAction,
+            type: setRestrictedZoneColorActionSchema.shape.type.value,
+            actionSchema: setRestrictedZoneColorActionSchema,
             reducer: (draftState, { restrictedZoneId, newColor }) => {
                 const restrictedZone = getElement(
                     draftState,
@@ -241,7 +240,8 @@ export namespace RestrictedZoneActionReducers {
 
     export const setRestrictedZoneNameVisible: ActionReducer<SetRestrictedZoneNameVisibleAction> =
         {
-            action: SetRestrictedZoneNameVisibleAction,
+            type: setRestrictedZoneNameVisibleActionSchema.shape.type.value,
+            actionSchema: setRestrictedZoneNameVisibleActionSchema,
             reducer: (draftState, { restrictedZoneId, newNameVisible }) => {
                 const restrictedZone = getElement(
                     draftState,
@@ -256,7 +256,8 @@ export namespace RestrictedZoneActionReducers {
 
     export const setRestrictedZoneCapacityVisible: ActionReducer<SetRestrictedZoneCapacityVisibleAction> =
         {
-            action: SetRestrictedZoneCapacityVisibleAction,
+            type: setRestrictedZoneCapacityVisibleActionSchema.shape.type.value,
+            actionSchema: setRestrictedZoneCapacityVisibleActionSchema,
             reducer: (draftState, { restrictedZoneId, newCapacityVisible }) => {
                 const restrictedZone = getElement(
                     draftState,
@@ -271,7 +272,8 @@ export namespace RestrictedZoneActionReducers {
 
     export const setVehicleRestriction: ActionReducer<SetVehicleRestrictionAction> =
         {
-            action: SetVehicleRestrictionAction,
+            type: setVehicleRestrictionActionSchema.shape.type.value,
+            actionSchema: setVehicleRestrictionActionSchema,
             reducer: (
                 draftState,
                 { restrictedZoneId, vehicleTemplateId, restriction }

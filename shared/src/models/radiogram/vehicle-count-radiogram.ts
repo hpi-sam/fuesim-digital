@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { UUID } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
 import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
@@ -8,7 +9,9 @@ export const vehicleCountRadiogramSchema = z.strictObject({
     type: z.literal('vehicleCountRadiogram'),
     vehicleCount: z.record(z.string(), z.int().nonnegative()),
 });
-export type VehicleCountRadiogram = z.infer<typeof vehicleCountRadiogramSchema>;
+export type VehicleCountRadiogram = Immutable<
+    z.infer<typeof vehicleCountRadiogramSchema>
+>;
 
 export function newVehicleCountRadiogram(
     id: UUID,

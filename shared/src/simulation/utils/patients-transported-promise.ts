@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 
 export const patientsTransportPromiseSchema = z.strictObject({
@@ -8,8 +9,8 @@ export const patientsTransportPromiseSchema = z.strictObject({
     targetSimulatedRegionId: uuidSchema,
 });
 
-export type PatientsTransportPromise = z.infer<
-    typeof patientsTransportPromiseSchema
+export type PatientsTransportPromise = Immutable<
+    z.infer<typeof patientsTransportPromiseSchema>
 >;
 
 export function newPatientsTransportPromise(

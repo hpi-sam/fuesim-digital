@@ -1,0 +1,43 @@
+@if (parallelExercises()) {
+    <div class="row row-cols-3 mt-2">
+        @for (
+            parallelExercise of parallelExercises();
+            track parallelExercise.id
+        ) {
+            <div class="col mb-4">
+                <app-parallel-exercise-card
+                    [parallelExercise]="parallelExercise"
+                    (updated)="reload()"
+                />
+            </div>
+        } @empty {
+            <div class="col flex-grow-1">
+                <p class="bg-light p-4 rounded-3 lead mb-0">
+                    Es gibt noch keine Parallelübungen.
+                </p>
+            </div>
+        }
+    </div>
+} @else {
+    <div class="row row-cols-3 mt-2">
+        @for (_ of [1, 2, 3]; track $index) {
+            <div class="col">
+                <div class="card" aria-hidden="true">
+                    <div class="card-body">
+                        <h2 class="card-title h4 placeholder-glow">
+                            <span class="placeholder col-6"></span>
+                        </h2>
+                        <p class="card-text placeholder-glow">
+                            <span class="placeholder col-4"></span>
+                            <span class="placeholder col-4"></span>
+                        </p>
+                        <a
+                            class="btn btn-primary disabled placeholder col-6"
+                            aria-disabled="true"
+                        ></a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

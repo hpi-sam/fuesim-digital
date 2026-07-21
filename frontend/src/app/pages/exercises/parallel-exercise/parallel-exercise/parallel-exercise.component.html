@@ -4,18 +4,22 @@
         @let exercise = parallelExercise.value();
         <h1 class="mb-4 d-flex align-items-center">
             <div>Parallelübung:&nbsp;</div>
-            <app-inline-text-editor
-                class="flex-grow-1"
-                [required]="true"
-                [value]="exercise.name"
-                name="Name der Paralellübung"
-                (update)="
-                    patchParallelExercise({
-                        name: $event,
-                    })
-                "
-                [singleLine]="true"
-            />
+            @if (exercise.userRole !== 'viewer') {
+                <app-inline-text-editor
+                    class="flex-grow-1"
+                    [required]="true"
+                    [value]="exercise.name"
+                    name="Name der Paralellübung"
+                    (update)="
+                        patchParallelExercise({
+                            name: $event,
+                        })
+                    "
+                    [singleLine]="true"
+                />
+            } @else {
+                {{ exercise.name }}
+            }
         </h1>
         <div class="row mb-4 align-items-stretch">
             <div class="col">
@@ -34,28 +38,31 @@
                                     [currentTime]="leadingExercise.currentTime"
                                 />
                                 <div class="flex-grow-1"></div>
-                                @if (
-                                    leadingExercise.currentStatus !== 'running'
-                                ) {
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary"
-                                        (click)="
-                                            parallelExerciseService.startParallelExercise()
-                                        "
-                                    >
-                                        Start
-                                    </button>
-                                } @else {
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary"
-                                        (click)="
-                                            parallelExerciseService.pauseParallelExercise()
-                                        "
-                                    >
-                                        Pause
-                                    </button>
+                                @if (exercise.userRole !== 'viewer') {
+                                    @if (
+                                        leadingExercise.currentStatus !==
+                                        'running'
+                                    ) {
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            (click)="
+                                                parallelExerciseService.startParallelExercise()
+                                            "
+                                        >
+                                            Start
+                                        </button>
+                                    } @else {
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            (click)="
+                                                parallelExerciseService.pauseParallelExercise()
+                                            "
+                                        >
+                                            Pause
+                                        </button>
+                                    }
                                 }
                             } @else {
                                 <div class="alert alert-info" role="alert">
@@ -78,12 +85,13 @@
                         </div>
                         <div class="flex-grow-1"></div>
                         <button
-                            class="btn btn-outline-secondary btn-sm ms-3"
-                            ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten."
-                            (click)="shareParticipantLink()"
-                        >
-                            Teilnehmerlink teilen
-                        </button>
+                            app-copy-button
+                            class="btn btn-outline-secondary"
+                            [value]="participantUrl()"
+                            text="Teilnehmerlink"
+                            ngbTooltip="Link kopieren"
+                            container="body"
+                        ></button>
                     </div>
                     <div class="card-body d-flex justify-content-center py-0">
                         <qr-code

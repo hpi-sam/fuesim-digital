@@ -3,6 +3,7 @@ import { PeriodicEventHandler } from './exercise/periodic-events/periodic-event-
 import { ExerciseWebsocketServer } from './exercise/websocket.js';
 import { ApiHttpServer } from './http-server.js';
 import type { Services } from './database/services/index.js';
+import type { Repositories } from './database/repositories/index.js';
 
 export class FuesimServer {
     private readonly _httpServer: ApiHttpServer;
@@ -14,11 +15,21 @@ export class FuesimServer {
 
     public async saveTick() {
         await this.services.exerciseService.saveUnsavedExercises();
+
+        // also delete unused exercises here as the operation is very cheap
+        await this.services.exerciseService.deleteUnusedExercises();
     }
 
-    public constructor(private readonly services: Services) {
+    public constructor(
+        private readonly services: Services,
+        private readonly repositories: Repositories
+    ) {
         const app = express();
-        this._websocketServer = new ExerciseWebsocketServer(app, this.services);
+        this._websocketServer = new ExerciseWebsocketServer(
+            app,
+            this.services,
+            this.repositories
+        );
         this._httpServer = new ApiHttpServer(app, services);
 
         this.saveHandler = new PeriodicEventHandler(

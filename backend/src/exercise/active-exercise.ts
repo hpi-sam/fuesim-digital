@@ -9,10 +9,10 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     applyAction,
-    cloneDeepMutable,
     reduceExerciseState,
     ReducerError,
     validateExerciseAction,
+    cloneDeepMutable,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type {
@@ -20,11 +20,10 @@ import type {
     ExerciseTemplateEntry,
 } from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
-import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
 import { RestoreError } from '../utils/restore-error.js';
 import { ActionWrapper } from './action-wrapper.js';
 import type { ExerciseClientWrapper } from './client-wrapper.js';
-import { patientTick } from './patient-ticking.js';
+import { buildTickAction } from './tick-action.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
 
 export class ActiveExercise {
@@ -87,32 +86,16 @@ export class ActiveExercise {
     public readonly emitterId = null;
 
     /**
-     * How many ticks have to pass until treatments get recalculated (e.g. with {@link tickInterval} === 1000 and {@link refreshTreatmentInterval} === 60 every minute)
-     */
-    private readonly refreshTreatmentInterval = 20;
-    /**
      * This function gets called once every second in case the exercise is running.
      * All periodic actions of the exercise (e.g. status changes for patients) should happen here.
      */
     private readonly tick = async () => {
         try {
-            const patientUpdates = patientTick(
+            const updateAction = buildTickAction(
                 this.getStateSnapshot(),
-                this.tickInterval
+                this.tickInterval,
+                this.exercise.tickCounter
             );
-            const updateAction: ExerciseAction = {
-                type: '[Exercise] Tick',
-                patientUpdates,
-                /**
-                 * Refresh every {@link refreshTreatmentInterval} * {@link tickInterval} ms seconds
-                 */
-                // TODO: Refactor this: do this in the reducer instead of sending it in the action
-                refreshTreatments:
-                    this.exercise.tickCounter %
-                        this.refreshTreatmentInterval ===
-                    0,
-                tickInterval: this.tickInterval,
-            };
             this.applyAction(updateAction, this.emitterId);
             this.exercise.tickCounter++;
             this.markAsModified();
@@ -263,6 +246,8 @@ export class ActiveExercise {
 
     /**
      * Applies and broadcasts the action on the current state.
+     * @param action action to apply
+     * @param emitterId the clientId, or `null` for server actions
      * @param intermediateAction When set is run between reducing the state and broadcasting the action
      * @throws Error if the action is not applicable on the current state
      */
@@ -315,33 +300,25 @@ export class ActiveExercise {
         this.pause();
     }
 
-    private validateAction(action: ExerciseAction) {
-        const errors = validateExerciseAction(action);
-        if (errors.length > 0) {
-            throw new ValidationErrorWrapper(errors);
-        }
-    }
-
     /**
      * Recreates the {@link currentState} by applying all actions from {@link temporaryActionHistory} to the {@link initialState}
      * as well as adding actions to the end to gracefully mark the end of the previous exercise session.
      */
     public restoreState() {
-        let currentState = cloneDeepMutable(this.exercise.initialStateString);
+        const currentState = cloneDeepMutable(this.exercise.initialStateString);
 
         this.temporaryActionHistory.forEach((actionWrapper) => {
-            this.validateAction(actionWrapper.getAction().actionString);
+            const action = validateExerciseAction(
+                actionWrapper.getAction().actionString
+            );
             try {
-                currentState = applyAction(
-                    currentState,
-                    actionWrapper.getAction().actionString
-                );
+                applyAction(currentState, action);
             } catch (e: unknown) {
                 if (e instanceof ReducerError) {
                     throw new RestoreError(
                         `A reducer error occurred while restoring (Action ${
                             actionWrapper.getAction().index
-                        }: \`${JSON.stringify(actionWrapper.getAction().actionString)}\`)`,
+                        }: \`${JSON.stringify(action)}\`)`,
                         this.exercise.id,
                         e
                     );

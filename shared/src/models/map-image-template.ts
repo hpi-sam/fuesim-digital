@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import {
     type ImageProperties,
@@ -11,7 +12,9 @@ export const mapImageTemplateSchema = z.strictObject({
     name: z.string(),
     image: imagePropertiesSchema,
 });
-export type MapImageTemplate = z.infer<typeof mapImageTemplateSchema>;
+export type MapImageTemplate = Immutable<
+    z.infer<typeof mapImageTemplateSchema>
+>;
 
 export function newMapImageTemplate(
     name: string,

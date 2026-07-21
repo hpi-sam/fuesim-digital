@@ -7,12 +7,14 @@ import {
 } from '../client-wrapper.js';
 import type { Services } from '../../database/services/index.js';
 import { Config } from '../../config.js';
+import type { Repositories } from '../../database/repositories/index.js';
 import { secureOn } from './secure-on.js';
 
 export function registerJoinParallelExerciseHandler(
     io: ExerciseServer,
     socket: ExerciseSocket,
-    services: Services
+    services: Services,
+    repositories: Repositories
 ) {
     secureOn(socket, 'joinParallelExercise', async (id: UUID, callback) => {
         if (!Config.parallelExercisesEnabled) {
@@ -26,7 +28,8 @@ export function registerJoinParallelExerciseHandler(
         const clientWrapper = ClientWrapper.init(
             ParallelExerciseClientWrapper,
             socket,
-            services
+            services,
+            repositories
         );
         if (!clientWrapper) {
             callback({

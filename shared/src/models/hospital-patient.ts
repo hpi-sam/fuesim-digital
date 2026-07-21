@@ -1,4 +1,4 @@
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { z } from 'zod';
 import { uuidSchema } from '../utils/uuid.js';
 
@@ -44,7 +44,7 @@ export const hospitalPatientSchema = z.strictObject({
     health: healthPointsSchema,
     treatmentTime: z.number().nonnegative(),
 });
-export type HospitalPatient = z.infer<typeof hospitalPatientSchema>;
+export type HospitalPatient = Immutable<z.infer<typeof hospitalPatientSchema>>;
 
 /**
  * used to create a Mutable\<HospitalPatient\> inside action-reducers/hospital.ts

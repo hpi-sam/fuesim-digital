@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { sendSimulationEvent } from '../events/utils.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
 import { type UUIDSet, uuidSetSchema } from '../../utils/uuid-set.js';
@@ -22,8 +23,8 @@ export const transferPatientToHospitalActivityStateSchema = z.strictObject({
     vehicleId: uuidSchema,
     transferManagementRegionId: uuidSchema,
 });
-export type TransferPatientToHospitalActivityState = z.infer<
-    typeof transferPatientToHospitalActivityStateSchema
+export type TransferPatientToHospitalActivityState = Immutable<
+    z.infer<typeof transferPatientToHospitalActivityStateSchema>
 >;
 
 export function newTransferPatientToHospitalActivityState(

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { PatientTemplate } from './patient-template.js';
 import { patientTemplateSchema } from './patient-template.js';
 import {
@@ -16,7 +17,7 @@ export const patientCategorySchema = z.strictObject({
     image: imagePropertiesSchema,
     patientTemplates: z.array(patientTemplateSchema).nonempty(),
 });
-export type PatientCategory = z.infer<typeof patientCategorySchema>;
+export type PatientCategory = Immutable<z.infer<typeof patientCategorySchema>>;
 
 export function newPatientCategory(
     name: string,

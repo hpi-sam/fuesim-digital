@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import type { MapImageTemplate } from './map-image-template.js';
 import { positionSchema } from './utils/position/position.js';
@@ -29,7 +30,7 @@ export const mapImageSchema = z.strictObject({
     scoutableId: uuidSchema.nullable(),
 });
 
-export type MapImage = z.infer<typeof mapImageSchema>;
+export type MapImage = Immutable<z.infer<typeof mapImageSchema>>;
 export function newMapImage(
     templateId: UUID,
     topLeft: MapCoordinates,

@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import {
     exerciseExistsResponseDataSchema,
     ExerciseKey,
-    exerciseKeysSchema,
+    getExerciseResponseDataSchema,
     getExercisesResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     getOrganisationDetailsResponseDataSchema,
@@ -16,7 +16,6 @@ import {
     PostParallelExerciseRequestData,
     TrainerKey,
     type ExerciseTimeline,
-    type StateExport,
     type PatchExerciseTemplateRequestData,
     ExerciseTemplateId,
     ParallelExerciseId,
@@ -28,13 +27,14 @@ import {
     PatchOrganisationRequestData,
     postOrganisationInviteLinkResponseDataSchema,
     ParallelExerciseKey,
+    getExerciseConfigResponseDataSchema,
     OrganisationMembershipId,
     OrganisationMembershipRole,
     getExerciseTemplateResponseDataSchema,
+    PostExerciseRequestData,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
-import { z } from 'zod';
 import type { AppState } from '../state/app.state';
 import { selectExerciseKey } from '../state/application/selectors/application.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
@@ -49,19 +49,13 @@ export class ApiService {
     private readonly messageService = inject(MessageService);
     private readonly httpClient = inject(HttpClient);
 
-    public async createExercise() {
-        return lastValueFrom(
-            this.httpClient
-                .post(`${httpOrigin}/api/exercise`, {})
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
-        );
-    }
+    readonly exerciseConfig = this.getExerciseConfigResource();
 
-    public async importExercise(exportedState: StateExport) {
+    public async createExercise(data: PostExerciseRequestData) {
         return lastValueFrom(
             this.httpClient
-                .post(`${httpOrigin}/api/exercise`, exportedState)
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
+                .post(`${httpOrigin}/api/exercise`, data)
+                .pipe(map((v) => getExerciseResponseDataSchema.parse(v)))
         );
     }
 
@@ -97,25 +91,45 @@ export class ApiService {
             parse: getExercisesResponseDataSchema.parse,
         });
     }
+
+    public async getExercises(params?: { organisationId: OrganisationId }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(`${httpOrigin}/api/exercises/?${queryParams}`)
+        ).then(getExercisesResponseDataSchema.parse);
+    }
+
     public getExerciseTemplatesResource() {
         return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
             parse: getExerciseTemplatesResponseDataSchema.parse,
         });
     }
 
-    public getParallelExercisesEnabledResource() {
-        return httpResource(
-            () => `${httpOrigin}/api/parallel_exercises/enabled`,
-            {
-                parse: z.boolean().parse,
-            }
-        );
+    public async getExerciseTemplates(params?: {
+        organisationId: OrganisationId;
+    }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(
+                `${httpOrigin}/api/exercise_templates/?${queryParams}`
+            )
+        ).then(getExerciseTemplatesResponseDataSchema.parse);
     }
 
-    public async getParallelExercisesEnabled() {
+    public getExerciseConfigResource() {
+        return httpResource(() => `${httpOrigin}/api/config`, {
+            parse: getExerciseConfigResponseDataSchema.parse,
+        });
+    }
+
+    public async getExerciseConfig() {
         return lastValueFrom(
-            this.httpClient.get(`${httpOrigin}/api/parallel_exercises/enabled`)
-        ).then(z.boolean().parse);
+            this.httpClient.get(`${httpOrigin}/api/config`)
+        ).then(getExerciseConfigResponseDataSchema.parse);
     }
 
     public getParallelExerciseResource(id: ParallelExerciseId) {
@@ -126,16 +140,32 @@ export class ApiService {
             }
         );
     }
+
     public async getParallelExercise(id: ParallelExerciseId) {
         return lastValueFrom(
             this.httpClient.get(`${httpOrigin}/api/parallel_exercises/${id}`)
         ).then(getParallelExerciseResponseDataSchema.parse);
     }
+
     public getParallelExercisesResource() {
         return httpResource(() => `${httpOrigin}/api/parallel_exercises/`, {
             parse: getParallelExercisesResponseDataSchema.parse,
         });
     }
+
+    public async getParallelExercises(params?: {
+        organisationId: OrganisationId;
+    }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(
+                `${httpOrigin}/api/parallel_exercises/?${queryParams}`
+            )
+        ).then(getParallelExercisesResponseDataSchema.parse);
+    }
+
     public async getExerciseTemplateViewportsById(id: ExerciseTemplateId) {
         return lastValueFrom(
             this.httpClient.get(
@@ -188,7 +218,7 @@ export class ApiService {
                     `${httpOrigin}/api/exercise_templates/${templateId}/new`,
                     {}
                 )
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
+                .pipe(map((v) => getExerciseResponseDataSchema.parse(v)))
         );
     }
 

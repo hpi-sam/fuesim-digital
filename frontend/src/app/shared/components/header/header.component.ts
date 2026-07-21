@@ -11,7 +11,6 @@ import { AsyncPipe } from '@angular/common';
 import { AuthService } from '../../../core/auth.service';
 import { UserAccountNavbarItemComponent } from '../user-account-navbar-item/user-account-navbar-item.component';
 import { ApiService } from '../../../core/api.service';
-import { ParallelExerciseService } from '../../../core/parallel-exercise.service.js';
 
 @Component({
     selector: 'app-header',
@@ -32,7 +31,5 @@ export class HeaderComponent {
     route = inject(ActivatedRoute);
     readonly auth = inject(AuthService);
     readonly apiService = inject(ApiService);
-    private readonly parallelExerciseService = inject(ParallelExerciseService);
-    protected readonly parallelExercisesEnabled =
-        this.parallelExerciseService.parallelExercisesEnabled.value;
+    protected readonly exerciseConfig = this.apiService.exerciseConfig.value;
 }

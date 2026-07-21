@@ -1,12 +1,14 @@
 import type {
     ClientToServerEvents,
+    GetExerciseTemplateWithTrainerKeyResponseData,
     MergeIntersection,
     OrganisationId,
+    PostExerciseRequestData,
     PostExerciseTemplateRequestData,
     ServerToClientEvents,
 } from 'fuesim-digital-shared';
 import {
-    exerciseKeysSchema,
+    getExerciseResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     sleep,
     socketIoTransports,
@@ -36,6 +38,8 @@ import { ParallelExerciseRepository } from '../database/repositories/parallel-ex
 import type { Repositories } from '../database/repositories/index.js';
 import { OrganisationService } from '../database/services/organisation-service.js';
 import { OrganisationRepository } from '../database/repositories/organisation-repository.js';
+import { CollectionRepository } from '../database/repositories/collection-repository.js';
+import { CollectionService } from '../database/services/collection-service.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
@@ -151,10 +155,11 @@ export class TestEnvironment {
         return this._services;
     }
 
-    public httpRequest(
+    public httpRequest<TData extends object | string>(
         method: HttpMethod,
         url: string,
-        session?: string
+        session?: string,
+        data?: TData
     ): request.Test {
         const req = request(this.server.httpServer.httpServer)[method](url);
         if (session) {
@@ -163,6 +168,7 @@ export class TestEnvironment {
                 `${this.services.authService.SESSION_COOKIE_NAME}=${session}`
             );
         }
+        req.send(data);
 
         return req;
     }
@@ -170,7 +176,7 @@ export class TestEnvironment {
     public init(repositories: Repositories, services: Services) {
         this._repositories = repositories;
         this._services = services;
-        this.server = new FuesimServer(this.services);
+        this.server = new FuesimServer(this.services, this.repositories);
     }
 
     /**
@@ -212,6 +218,8 @@ export function createTestEnvironment(): TestEnvironment {
     let actionRepository: ActionRepository;
     let userRepository: UserRepository;
     let sessionRepository: SessionRepository;
+    let collectionService: CollectionService;
+    let collectionRepository: CollectionRepository;
     let accessKeyRepository: AccessKeyRepository;
     let parallelExerciseService: ParallelExerciseService;
     let parallelExerciseRepository: ParallelExerciseRepository;
@@ -235,6 +243,13 @@ export function createTestEnvironment(): TestEnvironment {
         );
         organisationRepository = new OrganisationRepository(
             databaseService.databaseConnection
+        );
+        collectionRepository = new CollectionRepository(
+            databaseService.databaseConnection
+        );
+        collectionService = new CollectionService(
+            organisationService,
+            collectionRepository
         );
 
         exerciseService = new ExerciseService(
@@ -263,8 +278,10 @@ export function createTestEnvironment(): TestEnvironment {
         );
         parallelExerciseService = new ParallelExerciseService(
             parallelExerciseRepository,
+            exerciseRepository,
             exerciseManagerService,
             exerciseService,
+            organisationRepository,
             actionRepository
         );
 
@@ -276,6 +293,7 @@ export function createTestEnvironment(): TestEnvironment {
             sessionRepository,
             userRepository,
             organisationRepository,
+            collectionRepository,
         };
         const services: Services = {
             authService,
@@ -284,6 +302,7 @@ export function createTestEnvironment(): TestEnvironment {
             parallelExerciseService,
             databaseService,
             organisationService,
+            collectionService,
         };
         environment.init(repositories, services);
     });
@@ -353,20 +372,25 @@ async function setupDatabase(): Promise<DatabaseService> {
 
 export async function createExercise(
     environment: TestEnvironment,
-    session?: string
+    session?: string,
+    organisationId?: OrganisationId
 ) {
     const response = await environment
         .httpRequest('post', '/api/exercise', session)
+        .send({
+            organisationId: organisationId ?? null,
+            importObject: null,
+        } satisfies PostExerciseRequestData)
         .expect(201);
 
-    return exerciseKeysSchema.parse(response.body);
+    return getExerciseResponseDataSchema.parse(response.body);
 }
 
 export async function createExerciseTemplate(
     environment: TestEnvironment,
     session: string,
     organisationId: OrganisationId
-) {
+): Promise<GetExerciseTemplateWithTrainerKeyResponseData> {
     const response = await environment
         .httpRequest('post', '/api/exercise_templates', session)
         .send({
@@ -378,9 +402,8 @@ export async function createExerciseTemplate(
         .expect(201);
 
     const parsed = getExerciseTemplateResponseDataSchema.parse(response.body);
-    const template =
-        (await environment.repositories.exerciseRepository.getExerciseTemplateById(
-            parsed.id
-        ))!;
-    return template;
+
+    return (await environment.repositories.exerciseRepository.getExerciseTemplateById(
+        parsed.id
+    ))!;
 }

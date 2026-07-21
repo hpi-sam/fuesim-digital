@@ -1,6 +1,6 @@
-import type { WritableDraft } from 'immer';
-import { produce } from 'immer';
-import { ExerciseState } from '../../../state.js';
+import { produce, type WritableDraft } from 'immer';
+import type { ExerciseState } from '../../../state.js';
+import { newExerciseState } from '../../../state.js';
 import { addMaterial } from '../../../../tests/utils/materials.spec.js';
 import { addPatient } from '../../../../tests/utils/patients.spec.js';
 import { addPersonnel } from '../../../../tests/utils/personnel.spec.js';
@@ -16,7 +16,7 @@ import type { PatientStatus } from '../../../models/utils/patient-status.js';
 import { uuid } from '../../../utils/uuid.js';
 import { updateTreatments } from './calculate-treatments.js';
 
-const emptyState = ExerciseState.create('123456' as ParticipantKey);
+const emptyState = newExerciseState('123456' as ParticipantKey);
 
 function createNotSan(position: Position) {
     const template = defaultPersonnelTemplates.notSan;

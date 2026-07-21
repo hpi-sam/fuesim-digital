@@ -5,8 +5,11 @@ import type {
     OrganisationMembershipRole,
 } from 'fuesim-digital-shared';
 import {
+    exerciseTable,
+    exerciseTemplateTable,
     type OrganisationInsert,
     type OrganisationInviteLinkInsert,
+    parallelExerciseTable,
 } from '../schema.js';
 import {
     organisationInviteLinkTable,
@@ -17,6 +20,29 @@ import {
 import { BaseRepository } from './base-repository.js';
 
 export class OrganisationRepository extends BaseRepository {
+    public getCountSelect() {
+        return {
+            membersCount: this.databaseConnection.$count(
+                organisationMembershipTable,
+                eq(
+                    organisationMembershipTable.organisationId,
+                    organisationTable.id
+                )
+            ),
+            exercisesCount: this.databaseConnection.$count(
+                exerciseTable,
+                eq(exerciseTable.organisationId, organisationTable.id)
+            ),
+            exerciseTemplatesCount: this.databaseConnection.$count(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.organisationId, organisationTable.id)
+            ),
+            parallelExercisesCount: this.databaseConnection.$count(
+                parallelExerciseTable,
+                eq(parallelExerciseTable.organisationId, organisationTable.id)
+            ),
+        };
+    }
     public async getOrganisationsForUser(
         userId: string,
         allowedRoles: readonly OrganisationMembershipRole[]
@@ -35,13 +61,7 @@ export class OrganisationRepository extends BaseRepository {
             .select({
                 ...getTableColumns(organisationTable),
                 userRole: membershipsSubquery.role,
-                membersCount: this.databaseConnection.$count(
-                    organisationMembershipTable,
-                    eq(
-                        organisationMembershipTable.organisationId,
-                        organisationTable.id
-                    )
-                ),
+                ...this.getCountSelect(),
             })
             .from(organisationTable)
             .innerJoin(
@@ -87,6 +107,18 @@ export class OrganisationRepository extends BaseRepository {
         return this.onlySingle(
             await this.databaseConnection
                 .select()
+                .from(organisationTable)
+                .where(eq(organisationTable.id, id))
+        );
+    }
+
+    public async getOrganisationDetailsById(id: OrganisationId) {
+        return this.onlySingle(
+            await this.databaseConnection
+                .select({
+                    ...getTableColumns(organisationTable),
+                    ...this.getCountSelect(),
+                })
                 .from(organisationTable)
                 .where(eq(organisationTable.id, id))
         );

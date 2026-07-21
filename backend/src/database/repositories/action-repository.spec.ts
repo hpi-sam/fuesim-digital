@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import type { SetPretriageEnabledAction } from '../../../../shared/dist/store/action-reducers/configuration.js';
+import type { SetPretriageEnabledAction } from 'fuesim-digital-shared';
 import { createTestEnvironment } from '../../test/utils.js';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { actionTable } from '../schema.js';
@@ -20,7 +20,9 @@ describe('ActionRepository', () => {
         // This is to test whether actions before exercise id assignment
         // are saved and retrieved correctly with this exerciseId.
         const activeExercise =
-            await environment.services.exerciseService.createExerciseFromBlank();
+            await environment.services.exerciseService.createExerciseFromBlank(
+                {}
+            );
 
         const actions = [
             new ActionWrapper(

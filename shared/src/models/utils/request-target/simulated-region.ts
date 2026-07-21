@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { UUID } from '../../../utils/uuid.js';
 import { uuidSchema } from '../../../utils/uuid.js';
 import { getElement } from '../../../store/action-reducers/utils/get-element.js';
@@ -12,8 +13,8 @@ export const simulatedRegionRequestTargetConfigurationSchema = z.strictObject({
     type: z.literal('simulatedRegionRequestTarget'),
     targetSimulatedRegionId: uuidSchema,
 });
-export type SimulatedRegionRequestTargetConfiguration = z.infer<
-    typeof simulatedRegionRequestTargetConfigurationSchema
+export type SimulatedRegionRequestTargetConfiguration = Immutable<
+    z.infer<typeof simulatedRegionRequestTargetConfigurationSchema>
 >;
 
 export function newSimulatedRegionRequestTargetConfiguration(

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { newMaterialCountRadiogram } from '../../models/radiogram/material-count-radiogram.js';
 import { newPatientCountRadiogram } from '../../models/radiogram/patient-count-radiogram.js';
 import { newPersonnelCountRadiogram } from '../../models/radiogram/personnel-count-radiogram.js';
@@ -29,7 +30,9 @@ export const reportableInformationAllowedValues = [
 export const reportableInformationSchema = z.literal(
     reportableInformationAllowedValues
 );
-export type ReportableInformation = z.infer<typeof reportableInformationSchema>;
+export type ReportableInformation = Immutable<
+    z.infer<typeof reportableInformationSchema>
+>;
 
 export const reportableInformationTypeToGermanNameDictionary: {
     [Key in ReportableInformation]: string;

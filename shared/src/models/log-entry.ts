@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { Tag } from './tag.js';
 import { tagSchema } from './tag.js';
 
@@ -8,7 +9,7 @@ export const logEntrySchema = z.strictObject({
     timestamp: z.number(),
 });
 
-export type LogEntry = z.infer<typeof logEntrySchema>;
+export type LogEntry = Immutable<z.infer<typeof logEntrySchema>>;
 
 export function newLogEntry(
     description: string,

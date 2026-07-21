@@ -6,16 +6,31 @@ import type {
     PauseExerciseAction,
     ParallelExerciseId,
     Client,
+    CollectionEntityId,
 } from 'fuesim-digital-shared';
-import { ReducerError, newClient, newClientRole } from 'fuesim-digital-shared';
-import { Subject, filter, throttleTime, type Subscription } from 'rxjs';
+import {
+    Marketplace,
+    ReducerError,
+    newClient,
+    newClientRole,
+    cloneDeepMutable,
+} from 'fuesim-digital-shared';
+import {
+    Subject,
+    filter,
+    takeUntil,
+    throttleTime,
+    type Subscription,
+} from 'rxjs';
 import cookie from 'cookie';
+import type { z } from 'zod';
 import type { ExerciseSocket } from '../exercise-server.js';
 import { Config, isDevelopment } from '../config.js';
 import type { SessionInformation } from '../auth/auth-service.js';
-import type { ParallelExercise } from '../database/schema.js';
+import type { ParallelExerciseDetailsEntry } from '../database/schema.js';
 import { PermissionDeniedError } from '../utils/http.js';
 import type { Services } from '../database/services/index.js';
+import type { Repositories } from '../database/repositories/index.js';
 import type { ActiveExercise } from './active-exercise.js';
 import { clientMap } from './client-map.js';
 
@@ -27,23 +42,26 @@ export abstract class ClientWrapper {
 
     public constructor(
         public readonly socket: ExerciseSocket,
-        public readonly services: Services
+        public readonly services: Services,
+        public readonly repositories: Repositories
     ) {}
 
     public static init<T extends typeof ClientWrapper>(
         wrapperClass: T,
         socket: ExerciseSocket,
-        services: Services
+        services: Services,
+        repositories: Repositories
     ): InstanceType<T> | undefined {
         if (clientMap.get(socket)) {
             // Already registered
             return;
         }
         // @ts-expect-error typing
-        const wrapper = new wrapperClass(socket, services);
+        const wrapper = new wrapperClass(socket, services, repositories);
         clientMap.set(socket, wrapper);
         return wrapper;
     }
+
     public async getSessionInformation() {
         const cookies = cookie.parse(this.socket.request.headers.cookie ?? '');
         const sessionToken =
@@ -158,7 +176,7 @@ export class ExerciseClientWrapper extends ClientWrapper {
 }
 
 export class ParallelExerciseClientWrapper extends ClientWrapper {
-    private chosenExercise: ParallelExercise | null = null;
+    private chosenExercise: ParallelExerciseDetailsEntry | null = null;
     private readonly subscriptions: Subscription[] = [];
     private readonly cachedActiveExercises: ActiveExercise[] = [];
     private readonly aggregatedActions = new Subject<void>();
@@ -232,7 +250,16 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
         );
     }
 
-    public applyActionToAll(action: ExerciseAction) {
+    public async applyActionToAll(action: ExerciseAction) {
+        const isEditorOrAdmin =
+            await this.repositories.organisationRepository.isMemberWithRoleOfOrganisationById(
+                this.chosenExercise!.organisationId,
+                this.session!.user.id,
+                ['editor', 'admin']
+            );
+        if (!isEditorOrAdmin) {
+            throw new PermissionDeniedError();
+        }
         for (const activeExercise of this.cachedActiveExercises) {
             try {
                 activeExercise.applyAction(action, null);
@@ -245,14 +272,14 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
         }
     }
 
-    public start() {
-        this.applyActionToAll({
+    public async start() {
+        await this.applyActionToAll({
             type: '[Exercise] Start',
         } satisfies StartExerciseAction);
     }
 
-    public pause() {
-        this.applyActionToAll({
+    public async pause() {
+        await this.applyActionToAll({
             type: '[Exercise] Pause',
         } satisfies PauseExerciseAction);
     }
@@ -276,5 +303,179 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
     public override disconnect() {
         this.leaveParallelExercise();
         super.disconnect();
+    }
+}
+
+export class CollectionClientWrapper extends ClientWrapper {
+    private chosenCollection?: CollectionEntityId;
+    private dependencies: CollectionEntityId[] = [];
+
+    private readonly stopListen$ = new Subject<void>();
+
+    public async startCollectionListener(collectionId: CollectionEntityId) {
+        this.stopListen$.next();
+        this.chosenCollection = collectionId;
+
+        const initialData = await this.getInitialData(collectionId);
+        await this.loadDependencies(collectionId);
+        this.startListen(collectionId);
+        return initialData;
+    }
+
+    public async stopCollectionListener(
+        collectionEntityId: CollectionEntityId
+    ) {
+        // we dont want to stop listening based on old data
+        if (this.chosenCollection !== collectionEntityId) return;
+
+        this.stopListen$.next();
+        this.chosenCollection = undefined;
+        this.dependencies = [];
+    }
+
+    public override disconnect() {
+        this.stopListen$.next();
+        this.stopListen$.complete();
+        super.disconnect();
+    }
+
+    public abort(reason: string) {
+        console.warn(
+            `Aborting collection listener for collection ${this.chosenCollection}:`,
+            reason
+        );
+        this.disconnect();
+    }
+
+    // this needs to be any, bc schema.encode removed the
+    // brand causing typescript errors when an encoded value
+    // (without brand) is passed to notifyChange (expecting a brand)
+    private notifyChange(
+        update: z.input<typeof Marketplace.Collection.Events.SSEvent.schema>
+    ) {
+        console.log({ update });
+        this.socket.emit('collectionUpdate', update);
+    }
+
+    private startListen(collectionEntityId: CollectionEntityId) {
+        this.services.collectionService.events
+            .pipe(
+                filter(
+                    (update) =>
+                        update.collectionEntityId === collectionEntityId ||
+                        this.dependencies.includes(update.collectionEntityId)
+                ),
+                takeUntil(this.stopListen$)
+            )
+            .subscribe(async (update) => {
+                switch (update.event) {
+                    case 'dependency:change': {
+                        await this.loadDependencies(collectionEntityId);
+                        this.notifyChange(update);
+
+                        const latestDependencyElements =
+                            await this.services.collectionService.getLatestDraftElementsOfCollection(
+                                collectionEntityId
+                            );
+
+                        this.notifyChange(
+                            Marketplace.Collection.Events.DependencyReplaceData.schema.encode(
+                                {
+                                    event: 'dependency:replace-data',
+                                    collectionEntityId,
+                                    data: {
+                                        imported: cloneDeepMutable(
+                                            latestDependencyElements.imported
+                                        ),
+                                        references: cloneDeepMutable(
+                                            latestDependencyElements.references
+                                        ),
+                                    },
+                                } satisfies typeof Marketplace.Collection.Events.DependencyReplaceData.Type
+                            )
+                        );
+                        break;
+                    }
+                    default:
+                        this.notifyChange(
+                            Marketplace.Collection.Events.SSEvent.schema.encode(
+                                cloneDeepMutable(update)
+                            )
+                        );
+                }
+            });
+    }
+
+    private async loadDependencies(collectionEntityId: CollectionEntityId) {
+        const latestCollection =
+            await this.services.collectionService.getLatestCollectionById(
+                collectionEntityId,
+                { draftState: true }
+            );
+        if (!latestCollection) {
+            this.abort('Collection not found');
+            return;
+        }
+
+        this.dependencies = (
+            await this.services.collectionService.getCollectionDependencies(
+                latestCollection.versionId
+            )
+        ).map((dependency) => dependency.entityId);
+    }
+
+    private async getInitialData(collectionEntityId: CollectionEntityId) {
+        const latestDraftStateVersion =
+            await this.services.collectionService.getLatestCollectionById(
+                collectionEntityId,
+                { draftState: true }
+            );
+
+        const latestPubishedVersion =
+            await this.services.collectionService.getLatestCollectionById(
+                collectionEntityId,
+                { draftState: false }
+            );
+
+        if (!latestDraftStateVersion || !latestPubishedVersion) {
+            this.abort('Collection not found');
+            return;
+        }
+
+        const draftStateElements =
+            await this.services.collectionService.getElementsOfCollectionVersion(
+                latestDraftStateVersion.versionId,
+                { allowDraftState: true }
+            );
+
+        const publishedElements =
+            await this.services.collectionService.getElementsOfCollectionVersion(
+                latestPubishedVersion.versionId,
+                {
+                    allowDraftState: false,
+                }
+            );
+
+        const userRelationship =
+            await this.services.collectionService.getUserRoleInCollection(
+                latestDraftStateVersion.entityId,
+                this.session!
+            );
+        if (!userRelationship) {
+            this.abort('User has no relationship to collection');
+            return;
+        }
+
+        return Marketplace.Collection.Events.InitialData.schema.encode({
+            collectionEntityId,
+            event: 'initialdata',
+            data: {
+                collection: latestDraftStateVersion,
+                elements: cloneDeepMutable(draftStateElements),
+                userRelationship,
+                publishedCollection: latestPubishedVersion,
+                publishedElements: cloneDeepMutable(publishedElements),
+            },
+        });
     }
 }

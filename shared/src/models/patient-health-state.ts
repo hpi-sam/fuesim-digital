@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { healthPointsSchema } from './utils/health-points.js';
 
@@ -24,7 +25,9 @@ export const functionParametersSchema = z.strictObject({
     rettSanModifier: z.number(),
     // TODO: sanModifier not included
 });
-export type FunctionParameters = z.infer<typeof functionParametersSchema>;
+export type FunctionParameters = Immutable<
+    z.infer<typeof functionParametersSchema>
+>;
 
 export function newFunctionParameters(
     constantChange: number,
@@ -57,7 +60,9 @@ export const conditionParametersSchema = z.strictObject({
      */
     matchingHealthStateId: uuidSchema,
 });
-export type ConditionParameters = z.infer<typeof conditionParametersSchema>;
+export type ConditionParameters = Immutable<
+    z.infer<typeof conditionParametersSchema>
+>;
 
 export const patientHealthStateSchema = z.strictObject({
     id: uuidSchema,
@@ -69,7 +74,9 @@ export const patientHealthStateSchema = z.strictObject({
      */
     nextStateConditions: z.array(conditionParametersSchema),
 });
-export type PatientHealthState = z.infer<typeof patientHealthStateSchema>;
+export type PatientHealthState = Immutable<
+    z.infer<typeof patientHealthStateSchema>
+>;
 
 export function newPatientHealthState(
     functionParameters: FunctionParameters,

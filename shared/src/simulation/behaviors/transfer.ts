@@ -1,5 +1,6 @@
 import { groupBy } from 'lodash-es';
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
 import { amountOfResourcesInVehicle } from '../../models/utils/amount-of-resources-in-vehicle.js';
@@ -45,7 +46,9 @@ export const transferBehaviorStateSchema = z.strictObject({
     recurringActivityId: uuidSchema.optional(),
 });
 
-export type TransferBehaviorState = z.infer<typeof transferBehaviorStateSchema>;
+export type TransferBehaviorState = Immutable<
+    z.infer<typeof transferBehaviorStateSchema>
+>;
 
 export function newTransferBehaviorState(
     loadTimePerPatient: number = 60_000, // 1 minute

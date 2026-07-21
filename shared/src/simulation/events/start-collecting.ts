@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     type ReportableInformation,
     reportableInformationSchema,
@@ -11,8 +12,8 @@ export const startCollectingInformationSchema = z.strictObject({
     informationType: reportableInformationSchema,
     interfaceSignallerKey: z.string().nullable(),
 });
-export type StartCollectingInformationEvent = z.infer<
-    typeof startCollectingInformationSchema
+export type StartCollectingInformationEvent = Immutable<
+    z.infer<typeof startCollectingInformationSchema>
 >;
 
 export function newStartCollectingInformationEvent(

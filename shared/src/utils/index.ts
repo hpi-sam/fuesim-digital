@@ -17,3 +17,4 @@ export * from './string-coordinates.js';
 export * from './eval-result/eval-result.js';
 export * from './eval-result/utils.js';
 export * from './eval-result/parallel-utils.js';
+export * from './element-type-plural-map.js';

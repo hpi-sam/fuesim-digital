@@ -16,6 +16,7 @@ export class CopyButtonComponent {
 
     readonly value = input<string>('');
     readonly icon = input<string>('copy');
+    readonly text = input<string>('');
 
     copy() {
         navigator.clipboard.writeText(this.value());

@@ -1,7 +1,6 @@
-import * as util from 'node:util';
 import { ReducerError } from 'fuesim-digital-shared';
+import { ZodError } from 'zod';
 import { DatabaseService } from './database/services/database-service.js';
-import { ValidationErrorWrapper } from './utils/validation-error-wrapper.js';
 import { RestoreError } from './utils/restore-error.js';
 import { Config } from './config.js';
 import { FuesimServer } from './fuesim-server.js';
@@ -19,6 +18,8 @@ import type { Services } from './database/services/index.js';
 import { ParallelExerciseService } from './database/services/parallel-exercise-service.js';
 import { OrganisationService } from './database/services/organisation-service.js';
 import { OrganisationRepository } from './database/repositories/organisation-repository.js';
+import { CollectionRepository } from './database/repositories/collection-repository.js';
+import { CollectionService } from './database/services/collection-service.js';
 
 async function main() {
     Config.initialize();
@@ -58,6 +59,9 @@ async function main() {
         organisationRepository: new OrganisationRepository(
             databaseService.databaseConnection
         ),
+        collectionRepository: new CollectionRepository(
+            databaseService.databaseConnection
+        ),
     };
 
     const exerciseService = new ExerciseService(
@@ -72,14 +76,22 @@ async function main() {
     );
     const parallelExerciseService = new ParallelExerciseService(
         repositories.parallelExerciseRepository,
+        repositories.exerciseRepository,
         exerciseManagerService,
         exerciseService,
         repositories.actionRepository
+        repositories.organisationRepository
     );
     const organisationService = new OrganisationService(
         repositories.organisationRepository,
         repositories.userRepository
     );
+    const collectionService = new CollectionService(
+        organisationService,
+        repositories.collectionRepository
+    );
+
+    await collectionService.initialize();
 
     let authService: AuthService;
     try {
@@ -100,6 +112,7 @@ async function main() {
         parallelExerciseService,
         databaseService,
         organisationService,
+        collectionService,
     };
 
     if (Config.useDb) {
@@ -115,10 +128,10 @@ async function main() {
             );
         } catch (e: unknown) {
             console.error('❌ An error occurred while loading exercises.');
-            if (e instanceof ValidationErrorWrapper) {
+            if (e instanceof ZodError) {
                 console.error(
                     'The validation of the exercises and actions in the database failed:',
-                    util.inspect(e.errors, false, null, true)
+                    e.message
                 );
                 return;
             } else if (e instanceof ReducerError) {
@@ -140,7 +153,7 @@ async function main() {
     }
 
     // eslint-disable-next-line no-new
-    new FuesimServer(services);
+    new FuesimServer(services, repositories);
 }
 
 main();

@@ -5,6 +5,7 @@ import { socketIoTransports } from 'fuesim-digital-shared';
 import { Config } from '../config.js';
 import type { ExerciseSocket, ExerciseServer } from '../exercise-server.js';
 import type { Services } from '../database/services/index.js';
+import type { Repositories } from '../database/repositories/index.js';
 import { clientMap } from './client-map.js';
 import {
     registerGetStateHandler,
@@ -13,12 +14,14 @@ import {
 } from './websocket-handler/index.js';
 import { registerJoinParallelExerciseHandler } from './websocket-handler/join-parallel-exercise-handler.js';
 import { registerControlParallelExerciseHandler } from './websocket-handler/control-parallel-exercise-handler.js';
+import { registerCollectionHandler } from './websocket-handler/collection-handler.js';
 
 export class ExerciseWebsocketServer {
     public readonly exerciseServer: ExerciseServer;
     public constructor(
         app: core.Express,
-        private readonly services: Services
+        private readonly services: Services,
+        private readonly repositories: Repositories
     ) {
         Config.initialize();
 
@@ -44,15 +47,27 @@ export class ExerciseWebsocketServer {
 
     private registerClient(client: ExerciseSocket) {
         // register handlers
-        registerJoinExerciseHandler(this.exerciseServer, client, this.services);
+        registerJoinExerciseHandler(
+            this.exerciseServer,
+            client,
+            this.services,
+            this.repositories
+        );
         registerGetStateHandler(this.exerciseServer, client);
         registerProposeActionHandler(this.exerciseServer, client);
         registerJoinParallelExerciseHandler(
             this.exerciseServer,
             client,
-            this.services
+            this.services,
+            this.repositories
         );
         registerControlParallelExerciseHandler(this.exerciseServer, client);
+        registerCollectionHandler(
+            this.exerciseServer,
+            client,
+            this.services,
+            this.repositories
+        );
 
         // Register disconnect handler
         client.on('disconnect', () => {

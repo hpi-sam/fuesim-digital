@@ -10,6 +10,7 @@ import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
 import { CopyButtonComponent } from '../copy-button/copy-button.component';
 import { InlineTextEditorComponent } from '../inline-text-editor/inline-text-editor.component';
+import { OrganisationBadgeComponent } from '../../../pages/organisations/shared/organisation-badge/organisation-badge.component.js';
 
 @Component({
     selector: 'app-parallel-exercise-card',
@@ -20,6 +21,7 @@ import { InlineTextEditorComponent } from '../inline-text-editor/inline-text-edi
         RouterLink,
         DatePipe,
         InlineTextEditorComponent,
+        OrganisationBadgeComponent,
     ],
 })
 export class ParallelExerciseCardComponent {

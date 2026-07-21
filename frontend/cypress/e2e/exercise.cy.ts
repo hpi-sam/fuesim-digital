@@ -351,15 +351,19 @@ describe('A trainer on the exercise page', () => {
     });
 
     it('can manage hospitals and transfer vehicles to them', () => {
+        cy.get('[data-cy=trainerToolbarSettingsButton]').click();
+        cy.get('[data-cy=settingsVehicleLoadTimesEnabledCheckbox]').uncheck();
+        cy.get('[data-cy=settingsClosePopupButton]').click({ force: true });
+
         cy.get('[data-cy=trainerToolbarCreationButton]').click();
         cy.get('[data-cy=trainerToolbarHospitalsButton]').click();
 
         cy.log('add a hospital').get('[data-cy="hospitalAddButton"]').click();
         cy.get('@trainerSocketPerformedActions')
-            .firstElement()
+            .lastElement()
             .should('have.property', 'type', '[Hospital] Add hospital');
         cy.get('@trainerSocketPerformedActions')
-            .firstElement()
+            .lastElement()
             .its('hospital')
             .as('createdHospital');
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     defaultTileMapProperties,
     defaultOperationsMapProperties,
@@ -15,13 +16,16 @@ export const exerciseConfigurationSchema = z.strictObject({
     patientIdentifierPrefix: z.string(),
     vehicleStatusHighlight: z.boolean(),
     vehicleStatusInPatientStatusColor: z.boolean(),
+    vehicleLoadTimesEnabled: z.boolean(),
     highlightRelatedElements: z.literal(['off', 'trainersOnly', 'all']),
     participantLoadAllEnabled: z.boolean(),
     tileMapProperties: tileMapPropertiesSchema,
     operationsMapProperties: operationsMapPropertiesSchema,
     evaluationEnabled: z.boolean(),
 });
-export type ExerciseConfiguration = z.infer<typeof exerciseConfigurationSchema>;
+export type ExerciseConfiguration = Immutable<
+    z.infer<typeof exerciseConfigurationSchema>
+>;
 export function newExerciseConfiguration(): ExerciseConfiguration {
     return {
         type: 'exerciseConfiguration',
@@ -30,6 +34,7 @@ export function newExerciseConfiguration(): ExerciseConfiguration {
         patientIdentifierPrefix: '',
         vehicleStatusHighlight: false,
         vehicleStatusInPatientStatusColor: false,
+        vehicleLoadTimesEnabled: true,
         highlightRelatedElements: 'trainersOnly',
         participantLoadAllEnabled: true,
         tileMapProperties: defaultTileMapProperties,

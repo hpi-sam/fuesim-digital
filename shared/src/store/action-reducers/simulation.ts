@@ -1,43 +1,16 @@
-import {
-    IsBoolean,
-    IsInt,
-    IsNumber,
-    IsOptional,
-    IsString,
-    IsUUID,
-    Min,
-    ValidateIf,
-} from 'class-validator';
-import { WritableDraft } from 'immer';
+import type { WritableDraft, Immutable } from 'immer';
+import { z } from 'zod';
 import { newStartCollectingInformationEvent } from '../../simulation/events/start-collecting.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import { nextUUID } from '../../simulation/utils/randomness.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
+import { transferDestinationTypeSchema } from '../../simulation/utils/transfer-destination.js';
+import { resourceDescriptionSchema } from '../../models/utils/resource-description.js';
+import { uuidSchema } from '../../utils/uuid.js';
+import { exerciseRequestTargetConfigurationSchema } from '../../models/utils/request-target/exercise-request-target.js';
+import { uuidSetSchema } from '../../utils/uuid-set.js';
 import {
-    type TransferDestination,
-    transferDestinationTypeSchema,
-} from '../../simulation/utils/transfer-destination.js';
-import {
-    type ResourceDescription,
-    resourceDescriptionSchema,
-} from '../../models/utils/resource-description.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import {
-    type UUID,
-    uuidArrayValidationOptions,
-    uuidValidationOptions,
-} from '../../utils/uuid.js';
-import {
-    type ExerciseRequestTargetConfiguration,
-    exerciseRequestTargetConfigurationSchema,
-} from '../../models/utils/request-target/exercise-request-target.js';
-import { IsUUIDSet } from '../../utils/validators/is-uuid-set.js';
-import type { UUIDSet } from '../../utils/uuid-set.js';
-import {
-    type PatientStatus,
-    type PatientStatusForTransport,
     patientStatusForTransportSchema,
     patientStatusSchema,
     statusNames,
@@ -45,7 +18,6 @@ import {
 import type { TreatPatientsBehaviorState } from '../../simulation/behaviors/treat-patients.js';
 import {
     behaviorTypeToGermanNameDictionary,
-    type ReportableInformation,
     reportableInformationSchema,
     reportableInformationTypeToGermanNameDictionary,
 } from '../../simulation/behaviors/utils.js';
@@ -74,7 +46,10 @@ import {
     updateRequestPatientCountsDelay,
     updateRequestVehiclesDelay,
 } from '../../simulation/behaviors/manage-patient-transport-to-hospital.js';
-import { UnloadArrivingVehiclesBehaviorState } from '../../simulation/behaviors/unload-arrived-vehicles.js';
+import type { UnloadArrivingVehiclesBehaviorState } from '../../simulation/behaviors/unload-arrived-vehicles.js';
+import { simulatedRegionSchema } from '../../models/simulated-region.js';
+import { simulationBehaviorStateSchema } from '../../simulation/behaviors/simulation-behavior.js';
+import { vehicleSchema } from '../../models/vehicle.js';
 import {
     getActivityById,
     getBehaviorById,
@@ -82,581 +57,403 @@ import {
 } from './utils/get-element.js';
 import { logBehavior } from './utils/log.js';
 
-export class UpdateTreatPatientsIntervalsAction implements Action {
-    @IsValue('[TreatPatientsBehavior] Update TreatPatientsIntervals' as const)
-    public readonly type =
-        '[TreatPatientsBehavior] Update TreatPatientsIntervals';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorStateId!: UUID;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    public readonly unknown?: number;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    public readonly counted?: number;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    public readonly triaged?: number;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    public readonly secured?: number;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    public readonly countingTimePerPatient?: number;
-}
-
-export class ProvidePersonnelBehaviorUpdateVehiclePrioritiesAction implements Action {
-    @IsValue('[ProvidePersonnelBehavior] Update VehiclePriorities' as const)
-    public readonly type =
-        '[ProvidePersonnelBehavior] Update VehiclePriorities';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsUUID(4, uuidArrayValidationOptions)
-    public readonly priorities!: readonly UUID[];
-}
-
-export class UnloadArrivingVehiclesBehaviorUpdateUnloadDelayAction implements Action {
-    @IsValue('[UnloadArrivingVehiclesBehavior] Update UnloadDelay' as const)
-    public readonly type =
-        '[UnloadArrivingVehiclesBehavior] Update UnloadDelay';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsNumber()
-    @Min(0)
-    public readonly unloadDelay!: number;
-}
-
-export class CreateReportAction implements Action {
-    @IsValue('[ReportBehavior] Create Report')
-    public readonly type = '[ReportBehavior] Create Report';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsZodSchema(reportableInformationSchema)
-    public readonly informationType!: ReportableInformation;
-
-    @IsString()
-    @ValidateIf((_, value) => value !== null)
-    public readonly interfaceSignallerKey!: string | null;
-}
-
-export class UpdateReportTreatmentStatusChangesAction implements Action {
-    @IsValue('[ReportBehavior] Update report treatment status changes')
-    public readonly type =
-        '[ReportBehavior] Update report treatment status changes';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsBoolean()
-    public readonly reportChanges!: boolean;
-}
-
-export class UpdateReportTransferOfCategoryInSingleRegionCompletedAction implements Action {
-    @IsValue(
-        '[ReportBehavior] Update report transfer of category in single region completed'
-    )
-    public readonly type =
-        '[ReportBehavior] Update report transfer of category in single region completed';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsBoolean()
-    public readonly reportChanges!: boolean;
-}
-
-export class UpdateReportTransferOfCategoryInMultipleRegionsCompletedAction implements Action {
-    @IsValue(
-        '[ReportBehavior] Update report transfer of category in multiple regions completed'
-    )
-    public readonly type =
-        '[ReportBehavior] Update report transfer of category in multiple regions completed';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsBoolean()
-    public readonly reportChanges!: boolean;
-}
-
-export class CreateRecurringReportsAction implements Action {
-    @IsValue('[ReportBehavior] Create Recurring Report')
-    public readonly type = '[ReportBehavior] Create Recurring Report';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsNumber()
-    @Min(0)
-    public readonly interval!: number;
-
-    @IsZodSchema(reportableInformationSchema)
-    public readonly informationType!: ReportableInformation;
-}
-
-export class UpdateRecurringReportsAction implements Action {
-    @IsValue('[ReportBehavior] Update Recurring Report')
-    public readonly type = '[ReportBehavior] Update Recurring Report';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsNumber()
-    @Min(0)
-    public readonly interval!: number;
-
-    @IsZodSchema(reportableInformationSchema)
-    public readonly informationType!: ReportableInformation;
-}
-
-export class RemoveRecurringReportsAction implements Action {
-    @IsValue('[ReportBehavior] Remove Recurring Report')
-    public readonly type = '[ReportBehavior] Remove Recurring Report';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsZodSchema(reportableInformationSchema)
-    public readonly informationType!: ReportableInformation;
-}
-
-export class ChangeAutomaticDistributionLimitAction implements Action {
-    @IsValue('[AutomaticDistributionBehavior] Change Limit')
-    public readonly type = '[AutomaticDistributionBehavior] Change Limit';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsString()
-    public readonly vehicleType!: string;
-
-    @IsInt()
-    @Min(0)
-    public readonly newLimit!: number;
-}
-export class UpdateRequestIntervalAction implements Action {
-    @IsValue('[RequestBehavior] Update RequestInterval')
-    public readonly type = '[RequestBehavior] Update RequestInterval';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly requestInterval!: number;
-}
-
-export class AddAutomaticDistributionDestinationAction implements Action {
-    @IsValue('[AutomaticDistributionBehavior] Add Destination')
-    public readonly type = '[AutomaticDistributionBehavior] Add Destination';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly destinationId!: string;
-}
-
-export class UpdateRequestTargetAction implements Action {
-    @IsValue('[RequestBehavior] Update RequestTarget')
-    public readonly type = '[RequestBehavior] Update RequestTarget';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsZodSchema(exerciseRequestTargetConfigurationSchema)
-    public readonly requestTarget!: ExerciseRequestTargetConfiguration;
-}
-
-export class RemoveAutomaticDistributionDestinationAction implements Action {
-    @IsValue('[AutomaticDistributionBehavior] Remove Destination')
-    public readonly type = '[AutomaticDistributionBehavior] Remove Destination';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly destinationId!: string;
-}
-
-export class UpdatePromiseInvalidationIntervalAction implements Action {
-    @IsValue('[RequestBehavior] Update Promise invalidation interval')
-    public readonly type =
-        '[RequestBehavior] Update Promise invalidation interval';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly promiseInvalidationInterval!: number;
-}
-
-export class UpdatePatientLoadTimeAction implements Action {
-    @IsValue('[TransferBehavior] Update Patient Load Time')
-    public readonly type = '[TransferBehavior] Update Patient Load Time';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly loadTimePerPatient!: number;
-}
-
-export class UpdatePersonnelLoadTimeAction implements Action {
-    @IsValue('[TransferBehavior] Update Personnel Load Time')
-    public readonly type = '[TransferBehavior] Update Personnel Load Time';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly personnelLoadTime!: number;
-}
-
-export class UpdateDelayBetweenSendsAction implements Action {
-    @IsValue('[TransferBehavior] Update Delay Between Sends')
-    public readonly type = '[TransferBehavior] Update Delay Between Sends';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly delayBetweenSends!: number;
-}
-
-export class SendTransferRequestEventAction implements Action {
-    @IsValue('[TransferBehavior] Send Transfer Request Event')
-    public readonly type = '[TransferBehavior] Send Transfer Request Event';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId!: UUID;
-
-    @IsZodSchema(transferDestinationTypeSchema)
-    public readonly destinationType!: TransferDestination;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly destinationId!: UUID;
-
-    @IsUUIDSet()
-    public readonly patients!: UUIDSet;
-}
-
-export class TransferVehiclesAction implements Action {
-    @IsValue('[TransferBehavior] Transfer Vehicles')
-    public readonly type = '[TransferBehavior] Transfer Vehicles';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsZodSchema(resourceDescriptionSchema)
-    readonly requestedVehicles!: ResourceDescription;
-
-    @IsZodSchema(transferDestinationTypeSchema)
-    public readonly destinationType!: TransferDestination;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly destinationId!: UUID;
-}
-
-export class ChangeTransportRequestTargetAction implements Action {
-    @IsValue(
+const updateTreatPatientsIntervalsActionSchema = z.strictObject({
+    type: z.literal('[TreatPatientsBehavior] Update TreatPatientsIntervals'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorStateId: simulationBehaviorStateSchema.shape.id,
+    unknown: z.number().nonnegative().optional(),
+    counted: z.number().nonnegative().optional(),
+    triaged: z.number().nonnegative().optional(),
+    secured: z.number().nonnegative().optional(),
+    countingTimePerPatient: z.number().nonnegative().optional(),
+});
+export type UpdateTreatPatientsIntervalsAction = Immutable<
+    z.infer<typeof updateTreatPatientsIntervalsActionSchema>
+>;
+
+const providePersonnelBehaviorUpdateVehiclePrioritiesActionSchema =
+    z.strictObject({
+        type: z.literal('[ProvidePersonnelBehavior] Update VehiclePriorities'),
+        simulatedRegionId: simulatedRegionSchema.shape.id,
+        behaviorId: simulationBehaviorStateSchema.shape.id,
+        priorities: z.array(uuidSchema), // TODO: are those personnel or vehicle uuids?
+    });
+export type ProvidePersonnelBehaviorUpdateVehiclePrioritiesAction = Immutable<
+    z.infer<typeof providePersonnelBehaviorUpdateVehiclePrioritiesActionSchema>
+>;
+
+const unloadArrivingVehiclesBehaviorUpdateUnloadDelayActionSchema =
+    z.strictObject({
+        type: z.literal('[UnloadArrivingVehiclesBehavior] Update UnloadDelay'),
+        simulatedRegionId: simulatedRegionSchema.shape.id,
+        behaviorId: simulationBehaviorStateSchema.shape.id,
+        unloadDelay: z.number().nonnegative(),
+    });
+export type UnloadArrivingVehiclesBehaviorUpdateUnloadDelayAction = Immutable<
+    z.infer<typeof unloadArrivingVehiclesBehaviorUpdateUnloadDelayActionSchema>
+>;
+
+const createReportActionSchema = z.strictObject({
+    type: z.literal('[ReportBehavior] Create Report'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    informationType: reportableInformationSchema,
+    interfaceSignallerKey: z.string().nullable(), // TODO: test if validator works out
+});
+export type CreateReportAction = Immutable<
+    z.infer<typeof createReportActionSchema>
+>;
+
+const updateReportTreatmentStatusChangesActionSchema = z.strictObject({
+    type: z.literal('[ReportBehavior] Update report treatment status changes'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    reportChanges: z.boolean(),
+});
+export type UpdateReportTreatmentStatusChangesAction = Immutable<
+    z.infer<typeof updateReportTreatmentStatusChangesActionSchema>
+>;
+
+const updateReportTransferOfCategoryInSingleRegionCompletedActionSchema =
+    z.strictObject({
+        type: z.literal(
+            '[ReportBehavior] Update report transfer of category in single region completed'
+        ),
+        simulatedRegionId: simulatedRegionSchema.shape.id,
+        behaviorId: simulationBehaviorStateSchema.shape.id,
+        reportChanges: z.boolean(),
+    });
+export type UpdateReportTransferOfCategoryInSingleRegionCompletedAction =
+    Immutable<
+        z.infer<
+            typeof updateReportTransferOfCategoryInSingleRegionCompletedActionSchema
+        >
+    >;
+
+const updateReportTransferOfCategoryInMultipleRegionsCompletedActionSchema =
+    z.strictObject({
+        type: z.literal(
+            '[ReportBehavior] Update report transfer of category in multiple regions completed'
+        ),
+        simulatedRegionId: simulatedRegionSchema.shape.id,
+        behaviorId: simulationBehaviorStateSchema.shape.id,
+        reportChanges: z.boolean(),
+    });
+export type UpdateReportTransferOfCategoryInMultipleRegionsCompletedAction =
+    Immutable<
+        z.infer<
+            typeof updateReportTransferOfCategoryInMultipleRegionsCompletedActionSchema
+        >
+    >;
+
+const createRecurringReportsActionSchema = z.strictObject({
+    type: z.literal('[ReportBehavior] Create Recurring Report'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    interval: z.number().nonnegative(),
+    informationType: reportableInformationSchema,
+});
+export type CreateRecurringReportsAction = Immutable<
+    z.infer<typeof createRecurringReportsActionSchema>
+>;
+const updateRecurringReportsActionSchema = z.strictObject({
+    type: z.literal('[ReportBehavior] Update Recurring Report'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    interval: z.number().nonnegative(),
+    informationType: reportableInformationSchema,
+});
+export type UpdateRecurringReportsAction = Immutable<
+    z.infer<typeof updateRecurringReportsActionSchema>
+>;
+
+const removeRecurringReportsActionSchema = z.strictObject({
+    type: z.literal('[ReportBehavior] Remove Recurring Report'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    informationType: reportableInformationSchema,
+});
+export type RemoveRecurringReportsAction = Immutable<
+    z.infer<typeof removeRecurringReportsActionSchema>
+>;
+
+const changeAutomaticDistributionLimitActionSchema = z.strictObject({
+    type: z.literal('[AutomaticDistributionBehavior] Change Limit'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    vehicleType: z.string(),
+    newLimit: z.int().nonnegative(),
+});
+
+export type ChangeAutomaticDistributionLimitAction = Immutable<
+    z.infer<typeof changeAutomaticDistributionLimitActionSchema>
+>;
+
+const updateRequestIntervalActionSchema = z.strictObject({
+    type: z.literal('[RequestBehavior] Update RequestInterval'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    requestInterval: z.int().nonnegative(),
+});
+
+export type UpdateRequestIntervalAction = Immutable<
+    z.infer<typeof updateRequestIntervalActionSchema>
+>;
+
+const addAutomaticDistributionDestinationActionSchema = z.strictObject({
+    type: z.literal('[AutomaticDistributionBehavior] Add Destination'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    destinationId: uuidSchema,
+});
+export type AddAutomaticDistributionDestinationAction = Immutable<
+    z.infer<typeof addAutomaticDistributionDestinationActionSchema>
+>;
+
+const updateRequestTargetActionSchema = z.strictObject({
+    type: z.literal('[RequestBehavior] Update RequestTarget'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    requestTarget: exerciseRequestTargetConfigurationSchema,
+});
+export type UpdateRequestTargetAction = Immutable<
+    z.infer<typeof updateRequestTargetActionSchema>
+>;
+
+const removeAutomaticDistributionDestinationActionSchema = z.strictObject({
+    type: z.literal('[AutomaticDistributionBehavior] Remove Destination'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    destinationId: uuidSchema,
+});
+export type RemoveAutomaticDistributionDestinationAction = Immutable<
+    z.infer<typeof removeAutomaticDistributionDestinationActionSchema>
+>;
+
+const updatePromiseInvalidationIntervalActionSchema = z.strictObject({
+    type: z.literal('[RequestBehavior] Update Promise invalidation interval'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    promiseInvalidationInterval: z.int().nonnegative(),
+});
+export type UpdatePromiseInvalidationIntervalAction = Immutable<
+    z.infer<typeof updatePromiseInvalidationIntervalActionSchema>
+>;
+
+const updatePatientLoadTimeActionSchema = z.strictObject({
+    type: z.literal('[TransferBehavior] Update Patient Load Time'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    loadTimePerPatient: z.int().nonnegative(),
+});
+export type UpdatePatientLoadTimeAction = Immutable<
+    z.infer<typeof updatePatientLoadTimeActionSchema>
+>;
+
+const updatePersonnelLoadTimeActionSchema = z.strictObject({
+    type: z.literal('[TransferBehavior] Update Personnel Load Time'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    personnelLoadTime: z.int().nonnegative(),
+});
+export type UpdatePersonnelLoadTimeAction = Immutable<
+    z.infer<typeof updatePersonnelLoadTimeActionSchema>
+>;
+
+const updateDelayBetweenSendsActionSchema = z.strictObject({
+    type: z.literal('[TransferBehavior] Update Delay Between Sends'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    delayBetweenSends: z.int().nonnegative(),
+});
+export type UpdateDelayBetweenSendsAction = Immutable<
+    z.infer<typeof updateDelayBetweenSendsActionSchema>
+>;
+
+const sendTransferRequestEventActionSchema = z.strictObject({
+    type: z.literal('[TransferBehavior] Send Transfer Request Event'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    vehicleId: vehicleSchema.shape.id,
+    destinationType: transferDestinationTypeSchema,
+    destinationId: uuidSchema,
+    patients: uuidSetSchema,
+});
+export type SendTransferRequestEventAction = Immutable<
+    z.infer<typeof sendTransferRequestEventActionSchema>
+>;
+
+const transferVehiclesActionSchema = z.strictObject({
+    type: z.literal('[TransferBehavior] Transfer Vehicles'),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    requestedVehicles: resourceDescriptionSchema,
+    destinationType: transferDestinationTypeSchema,
+    destinationId: uuidSchema,
+});
+export type TransferVehiclesAction = Immutable<
+    z.infer<typeof transferVehiclesActionSchema>
+>;
+
+const changeTransportRequestTargetActionSchema = z.strictObject({
+    type: z.literal(
         '[ManagePatientsTransportToHospitalBehavior] Change Transport Request Target'
-    )
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Change Transport Request Target';
+    ),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    requestTargetId: uuidSchema.optional(), // TODO
+});
+export type ChangeTransportRequestTargetAction = Immutable<
+    z.infer<typeof changeTransportRequestTargetActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsOptional()
-    @IsUUID(4, uuidValidationOptions)
-    public readonly requestTargetId?: UUID;
-}
-
-export class AddSimulatedRegionToManageForTransportAction implements Action {
-    @IsValue(
+const addSimulatedRegionToManageForTransportActionSchema = z.strictObject({
+    type: z.literal(
         '[ManagePatientsTransportToHospitalBehavior] Add Simulated Region To Manage For Transport'
-    )
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Add Simulated Region To Manage For Transport';
+    ),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    managedSimulatedRegionId: simulatedRegionSchema.shape.id,
+});
+export type AddSimulatedRegionToManageForTransportAction = Immutable<
+    z.infer<typeof addSimulatedRegionToManageForTransportActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly managedSimulatedRegionId!: UUID;
-}
-
-export class RemoveSimulatedRegionToManageFromTransportAction implements Action {
-    @IsValue(
+const removeSimulatedRegionToManageFromTransportActionSchema = z.strictObject({
+    type: z.literal(
         '[ManagePatientsTransportToHospitalBehavior] Remove Simulated Region To Manage From Transport'
-    )
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Remove Simulated Region To Manage From Transport';
+    ),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    managedSimulatedRegionId: simulatedRegionSchema.shape.id,
+});
+export type RemoveSimulatedRegionToManageFromTransportAction = Immutable<
+    z.infer<typeof removeSimulatedRegionToManageFromTransportActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly managedSimulatedRegionId!: UUID;
-}
-
-export class UpdatePatientsExpectedInRegionForTransportAction implements Action {
-    @IsValue(
+const updatePatientsExpectedInRegionForTransportActionSchema = z.strictObject({
+    type: z.literal(
         '[ManagePatientsTransportToHospitalBehavior] Update Patients Expected In Region For Transport'
-    )
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Update Patients Expected In Region For Transport';
+    ),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    managedSimulatedRegionId: simulatedRegionSchema.shape.id,
+    patientsExpected: z.int().nonnegative(),
+    patientStatus: patientStatusSchema,
+});
+export type UpdatePatientsExpectedInRegionForTransportAction = Immutable<
+    z.infer<typeof updatePatientsExpectedInRegionForTransportActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly managedSimulatedRegionId!: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly patientsExpected!: number;
-
-    @IsZodSchema(patientStatusSchema)
-    public readonly patientStatus!: PatientStatus;
-}
-
-export class AddVehicleTypeForPatientTransportAction implements Action {
-    @IsValue(
+const addVehicleTypeForPatientTransportActionSchema = z.strictObject({
+    type: z.literal(
         '[ManagePatientsTransportToHospitalBehavior] Add Vehicle Type For Patient Transport'
-    )
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Add Vehicle Type For Patient Transport';
+    ),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    vehicleTypeName: z.string(), // TODO
+    patientStatus: patientStatusForTransportSchema,
+});
+export type AddVehicleTypeForPatientTransportAction = Immutable<
+    z.infer<typeof addVehicleTypeForPatientTransportActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsString()
-    public readonly vehicleTypeName!: string;
-
-    @IsZodSchema(patientStatusForTransportSchema)
-    public readonly patientStatus!: PatientStatusForTransport;
-}
-
-export class RemoveVehicleTypeForPatientTransportAction implements Action {
-    @IsValue(
+const removeVehicleTypeForPatientTransportActionSchema = z.strictObject({
+    type: z.literal(
         '[ManagePatientsTransportToHospitalBehavior] Remove Vehicle Type For Patient Transport'
-    )
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Remove Vehicle Type For Patient Transport';
+    ),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    vehicleTypeName: z.string(), // TODO
+    patientStatus: patientStatusForTransportSchema,
+});
+export type RemoveVehicleTypeForPatientTransportAction = Immutable<
+    z.infer<typeof removeVehicleTypeForPatientTransportActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
+const updateRequestVehicleDelayForPatientTransportActionSchema = z.strictObject(
+    {
+        type: z.literal(
+            '[ManagePatientsTransportToHospitalBehavior] Update Request Vehicle Delay For Patient Transport'
+        ),
+        simulatedRegionId: simulatedRegionSchema.shape.id,
+        behaviorId: simulationBehaviorStateSchema.shape.id,
+        requestVehicleDelay: z.int().nonnegative(),
+    }
+);
+export type UpdateRequestVehicleDelayForPatientTransportAction = Immutable<
+    z.infer<typeof updateRequestVehicleDelayForPatientTransportActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
+const updateRequestPatientCountDelayForPatientTransportActionSchema =
+    z.strictObject({
+        type: z.literal(
+            '[ManagePatientsTransportToHospitalBehavior] Update Request Patient Count Delay For Patient Transport'
+        ),
+        simulatedRegionId: simulatedRegionSchema.shape.id,
+        behaviorId: simulationBehaviorStateSchema.shape.id,
+        requestPatientCountDelay: z.int().nonnegative(),
+    });
+export type UpdateRequestPatientCountDelayForPatientTransportAction = Immutable<
+    z.infer<
+        typeof updateRequestPatientCountDelayForPatientTransportActionSchema
+    >
+>;
 
-    @IsString()
-    public readonly vehicleTypeName!: string;
+const updatePromiseInvalidationIntervalForPatientTransportActionSchema =
+    z.strictObject({
+        type: z.literal(
+            '[ManagePatientsTransportToHospitalBehavior] Update Promise Invalidation Interval For Patient Transport'
+        ),
+        simulatedRegionId: simulatedRegionSchema.shape.id,
+        behaviorId: simulationBehaviorStateSchema.shape.id,
+        promiseInvalidationInterval: z.int().nonnegative(),
+    });
+export type UpdatePromiseInvalidationIntervalForPatientTransportAction =
+    Immutable<
+        z.infer<
+            typeof updatePromiseInvalidationIntervalForPatientTransportActionSchema
+        >
+    >;
 
-    @IsZodSchema(patientStatusForTransportSchema)
-    public readonly patientStatus!: PatientStatusForTransport;
-}
-
-export class UpdateRequestVehicleDelayForPatientTransportAction implements Action {
-    @IsValue(
-        '[ManagePatientsTransportToHospitalBehavior] Update Request Vehicle Delay For Patient Transport'
-    )
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Update Request Vehicle Delay For Patient Transport';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly requestVehicleDelay!: number;
-}
-
-export class UpdateRequestPatientCountDelayForPatientTransportAction implements Action {
-    @IsValue(
-        '[ManagePatientsTransportToHospitalBehavior] Update Request Patient Count Delay For Patient Transport'
-    )
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Update Request Patient Count Delay For Patient Transport';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly requestPatientCountDelay!: number;
-}
-
-export class UpdatePromiseInvalidationIntervalForPatientTransportAction implements Action {
-    @IsValue(
-        '[ManagePatientsTransportToHospitalBehavior] Update Promise Invalidation Interval For Patient Transport'
-    )
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Update Promise Invalidation Interval For Patient Transport';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly promiseInvalidationInterval!: number;
-}
-
-export class UpdateMaximumCategoryToTransportAction implements Action {
-    @IsValue(
+const updateMaximumCategoryToTransportActionSchema = z.strictObject({
+    type: z.literal(
         '[ManagePatientsTransportToHospitalBehavior] Update Maximum Category To Transport'
-    )
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Update Maximum Category To Transport';
+    ),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+    maximumCategoryToTransport: patientStatusForTransportSchema,
+});
+export type UpdateMaximumCategoryToTransportAction = Immutable<
+    z.infer<typeof updateMaximumCategoryToTransportActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
+const startTransportActionSchema = z.strictObject({
+    type: z.literal(
+        '[ManagePatientsTransportToHospitalBehavior] Start Transport'
+    ),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+});
+export type StartTransportAction = Immutable<
+    z.infer<typeof startTransportActionSchema>
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-
-    @IsZodSchema(patientStatusForTransportSchema)
-    public readonly maximumCategoryToTransport!: PatientStatusForTransport;
-}
-
-export class StartTransportAction implements Action {
-    @IsValue('[ManagePatientsTransportToHospitalBehavior] Start Transport')
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Start Transport';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-}
-
-export class StopTransportAction implements Action {
-    @IsValue('[ManagePatientsTransportToHospitalBehavior] Stop Transport')
-    public readonly type =
-        '[ManagePatientsTransportToHospitalBehavior] Stop Transport';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId!: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId!: UUID;
-}
+const stopTransportActionSchema = z.strictObject({
+    type: z.literal(
+        '[ManagePatientsTransportToHospitalBehavior] Stop Transport'
+    ),
+    simulatedRegionId: simulatedRegionSchema.shape.id,
+    behaviorId: simulationBehaviorStateSchema.shape.id,
+});
+export type StopTransportAction = Immutable<
+    z.infer<typeof stopTransportActionSchema>
+>;
 
 export namespace SimulationActionReducers {
     export const updateTreatPatientsIntervals: ActionReducer<UpdateTreatPatientsIntervalsAction> =
         {
-            action: UpdateTreatPatientsIntervalsAction,
+            type: updateTreatPatientsIntervalsActionSchema.shape.type.value,
+            actionSchema: updateTreatPatientsIntervalsActionSchema,
             /*
              *   unknown, counted, triaged, secured, countingTimePerPatient stay the same when undefined
              */
@@ -780,7 +577,10 @@ export namespace SimulationActionReducers {
 
     export const unloadArrivingVehiclesBehaviorUpdateUnloadDelay: ActionReducer<UnloadArrivingVehiclesBehaviorUpdateUnloadDelayAction> =
         {
-            action: UnloadArrivingVehiclesBehaviorUpdateUnloadDelayAction,
+            type: unloadArrivingVehiclesBehaviorUpdateUnloadDelayActionSchema
+                .shape.type.value,
+            actionSchema:
+                unloadArrivingVehiclesBehaviorUpdateUnloadDelayActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, unloadDelay }
@@ -824,7 +624,8 @@ export namespace SimulationActionReducers {
         };
 
     export const createReport: ActionReducer<CreateReportAction> = {
-        action: CreateReportAction,
+        type: createReportActionSchema.shape.type.value,
+        actionSchema: createReportActionSchema,
         reducer(
             draftState,
             { simulatedRegionId, informationType, interfaceSignallerKey }
@@ -849,7 +650,9 @@ export namespace SimulationActionReducers {
 
     export const updateReportTreatmentStatusChanges: ActionReducer<UpdateReportTreatmentStatusChangesAction> =
         {
-            action: UpdateReportTreatmentStatusChangesAction,
+            type: updateReportTreatmentStatusChangesActionSchema.shape.type
+                .value,
+            actionSchema: updateReportTreatmentStatusChangesActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, reportChanges }
@@ -892,7 +695,10 @@ export namespace SimulationActionReducers {
 
     export const updateReportTransferOfCategoryInSingleRegionCompleted: ActionReducer<UpdateReportTransferOfCategoryInSingleRegionCompletedAction> =
         {
-            action: UpdateReportTransferOfCategoryInSingleRegionCompletedAction,
+            type: updateReportTransferOfCategoryInSingleRegionCompletedActionSchema
+                .shape.type.value,
+            actionSchema:
+                updateReportTransferOfCategoryInSingleRegionCompletedActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, reportChanges }
@@ -935,7 +741,10 @@ export namespace SimulationActionReducers {
 
     export const updateReportTransferOfCategoryInMultipleRegionsCompleted: ActionReducer<UpdateReportTransferOfCategoryInMultipleRegionsCompletedAction> =
         {
-            action: UpdateReportTransferOfCategoryInMultipleRegionsCompletedAction,
+            type: updateReportTransferOfCategoryInMultipleRegionsCompletedActionSchema
+                .shape.type.value,
+            actionSchema:
+                updateReportTransferOfCategoryInMultipleRegionsCompletedActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, reportChanges }
@@ -980,7 +789,8 @@ export namespace SimulationActionReducers {
 
     export const createRecurringReports: ActionReducer<CreateRecurringReportsAction> =
         {
-            action: CreateRecurringReportsAction,
+            type: createRecurringReportsActionSchema.shape.type.value,
+            actionSchema: createRecurringReportsActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, interval, informationType }
@@ -1039,7 +849,8 @@ export namespace SimulationActionReducers {
 
     export const updateRecurringReports: ActionReducer<UpdateRecurringReportsAction> =
         {
-            action: UpdateRecurringReportsAction,
+            type: updateRecurringReportsActionSchema.shape.type.value,
+            actionSchema: updateRecurringReportsActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, interval, informationType }
@@ -1096,7 +907,8 @@ export namespace SimulationActionReducers {
 
     export const removeRecurringReports: ActionReducer<RemoveRecurringReportsAction> =
         {
-            action: RemoveRecurringReportsAction,
+            type: removeRecurringReportsActionSchema.shape.type.value,
+            actionSchema: removeRecurringReportsActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, informationType }
@@ -1152,7 +964,8 @@ export namespace SimulationActionReducers {
 
     export const changeAutomaticDistributionLimit: ActionReducer<ChangeAutomaticDistributionLimitAction> =
         {
-            action: ChangeAutomaticDistributionLimitAction,
+            type: changeAutomaticDistributionLimitActionSchema.shape.type.value,
+            actionSchema: changeAutomaticDistributionLimitActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, vehicleType, newLimit }
@@ -1211,7 +1024,8 @@ export namespace SimulationActionReducers {
 
     export const updateRequestInterval: ActionReducer<UpdateRequestIntervalAction> =
         {
-            action: UpdateRequestIntervalAction,
+            type: updateRequestIntervalActionSchema.shape.type.value,
+            actionSchema: updateRequestIntervalActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, requestInterval }
@@ -1253,7 +1067,9 @@ export namespace SimulationActionReducers {
 
     export const addAutomaticDistributionDestination: ActionReducer<AddAutomaticDistributionDestinationAction> =
         {
-            action: AddAutomaticDistributionDestinationAction,
+            type: addAutomaticDistributionDestinationActionSchema.shape.type
+                .value,
+            actionSchema: addAutomaticDistributionDestinationActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, destinationId }
@@ -1326,7 +1142,8 @@ export namespace SimulationActionReducers {
 
     export const updateRequestTarget: ActionReducer<UpdateRequestTargetAction> =
         {
-            action: UpdateRequestTargetAction,
+            type: updateRequestTargetActionSchema.shape.type.value,
+            actionSchema: updateRequestTargetActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, requestTarget }
@@ -1383,7 +1200,9 @@ export namespace SimulationActionReducers {
 
     export const removeAutomaticDistributionDestination: ActionReducer<RemoveAutomaticDistributionDestinationAction> =
         {
-            action: RemoveAutomaticDistributionDestinationAction,
+            type: removeAutomaticDistributionDestinationActionSchema.shape.type
+                .value,
+            actionSchema: removeAutomaticDistributionDestinationActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, destinationId }
@@ -1435,7 +1254,9 @@ export namespace SimulationActionReducers {
         };
     export const updatePromiseInvalidationInterval: ActionReducer<UpdatePromiseInvalidationIntervalAction> =
         {
-            action: UpdatePromiseInvalidationIntervalAction,
+            type: updatePromiseInvalidationIntervalActionSchema.shape.type
+                .value,
+            actionSchema: updatePromiseInvalidationIntervalActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, promiseInvalidationInterval }
@@ -1473,7 +1294,10 @@ export namespace SimulationActionReducers {
 
     export const updateTreatmentVehiclePriorities: ActionReducer<ProvidePersonnelBehaviorUpdateVehiclePrioritiesAction> =
         {
-            action: ProvidePersonnelBehaviorUpdateVehiclePrioritiesAction,
+            type: providePersonnelBehaviorUpdateVehiclePrioritiesActionSchema
+                .shape.type.value,
+            actionSchema:
+                providePersonnelBehaviorUpdateVehiclePrioritiesActionSchema,
             reducer(draftState, { simulatedRegionId, behaviorId, priorities }) {
                 const simulatedRegion = getElement(
                     draftState,
@@ -1517,7 +1341,8 @@ export namespace SimulationActionReducers {
 
     export const updatePatientLoadTime: ActionReducer<UpdatePatientLoadTimeAction> =
         {
-            action: UpdatePatientLoadTimeAction,
+            type: updatePatientLoadTimeActionSchema.shape.type.value,
+            actionSchema: updatePatientLoadTimeActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, loadTimePerPatient }
@@ -1557,7 +1382,8 @@ export namespace SimulationActionReducers {
 
     export const updatePersonnelLoadTime: ActionReducer<UpdatePersonnelLoadTimeAction> =
         {
-            action: UpdatePersonnelLoadTimeAction,
+            type: updatePersonnelLoadTimeActionSchema.shape.type.value,
+            actionSchema: updatePersonnelLoadTimeActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, personnelLoadTime }
@@ -1597,7 +1423,8 @@ export namespace SimulationActionReducers {
 
     export const updateDelayBetweenSends: ActionReducer<UpdateDelayBetweenSendsAction> =
         {
-            action: UpdateDelayBetweenSendsAction,
+            type: updateDelayBetweenSendsActionSchema.shape.type.value,
+            actionSchema: updateDelayBetweenSendsActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, delayBetweenSends }
@@ -1650,7 +1477,8 @@ export namespace SimulationActionReducers {
 
     export const sendTransferRequestEvent: ActionReducer<SendTransferRequestEventAction> =
         {
-            action: SendTransferRequestEventAction,
+            type: sendTransferRequestEventActionSchema.shape.type.value,
+            actionSchema: sendTransferRequestEventActionSchema,
             reducer(
                 draftState,
                 {
@@ -1692,7 +1520,8 @@ export namespace SimulationActionReducers {
         };
 
     export const transferVehicles: ActionReducer<TransferVehiclesAction> = {
-        action: TransferVehiclesAction,
+        type: transferVehiclesActionSchema.shape.type.value,
+        actionSchema: transferVehiclesActionSchema,
         reducer(
             draftState,
             {
@@ -1723,7 +1552,8 @@ export namespace SimulationActionReducers {
 
     export const changeTransportRequestTarget: ActionReducer<ChangeTransportRequestTargetAction> =
         {
-            action: ChangeTransportRequestTargetAction,
+            type: changeTransportRequestTargetActionSchema.shape.type.value,
+            actionSchema: changeTransportRequestTargetActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, requestTargetId }
@@ -1776,7 +1606,9 @@ export namespace SimulationActionReducers {
 
     export const addSimulatedRegionToManageForTransport: ActionReducer<AddSimulatedRegionToManageForTransportAction> =
         {
-            action: AddSimulatedRegionToManageForTransportAction,
+            type: addSimulatedRegionToManageForTransportActionSchema.shape.type
+                .value,
+            actionSchema: addSimulatedRegionToManageForTransportActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, managedSimulatedRegionId }
@@ -1841,7 +1673,10 @@ export namespace SimulationActionReducers {
 
     export const removeSimulatedRegionToManageForTransport: ActionReducer<RemoveSimulatedRegionToManageFromTransportAction> =
         {
-            action: RemoveSimulatedRegionToManageFromTransportAction,
+            type: removeSimulatedRegionToManageFromTransportActionSchema.shape
+                .type.value,
+            actionSchema:
+                removeSimulatedRegionToManageFromTransportActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, managedSimulatedRegionId }
@@ -1892,7 +1727,10 @@ export namespace SimulationActionReducers {
 
     export const updatePatientsExpectedInRegionForTransport: ActionReducer<UpdatePatientsExpectedInRegionForTransportAction> =
         {
-            action: UpdatePatientsExpectedInRegionForTransportAction,
+            type: updatePatientsExpectedInRegionForTransportActionSchema.shape
+                .type.value,
+            actionSchema:
+                updatePatientsExpectedInRegionForTransportActionSchema,
             reducer(
                 draftState,
                 {
@@ -1964,7 +1802,9 @@ export namespace SimulationActionReducers {
 
     export const addVehicleTypeForPatientTransport: ActionReducer<AddVehicleTypeForPatientTransportAction> =
         {
-            action: AddVehicleTypeForPatientTransportAction,
+            type: addVehicleTypeForPatientTransportActionSchema.shape.type
+                .value,
+            actionSchema: addVehicleTypeForPatientTransportActionSchema,
             reducer(
                 draftState,
                 {
@@ -2023,7 +1863,9 @@ export namespace SimulationActionReducers {
 
     export const removeVehicleTypeForPatientTransport: ActionReducer<RemoveVehicleTypeForPatientTransportAction> =
         {
-            action: RemoveVehicleTypeForPatientTransportAction,
+            type: removeVehicleTypeForPatientTransportActionSchema.shape.type
+                .value,
+            actionSchema: removeVehicleTypeForPatientTransportActionSchema,
             reducer(
                 draftState,
                 {
@@ -2082,7 +1924,10 @@ export namespace SimulationActionReducers {
 
     export const updateRequestVehicleDelayForPatientTransport: ActionReducer<UpdateRequestVehicleDelayForPatientTransportAction> =
         {
-            action: UpdateRequestVehicleDelayForPatientTransportAction,
+            type: updateRequestVehicleDelayForPatientTransportActionSchema.shape
+                .type.value,
+            actionSchema:
+                updateRequestVehicleDelayForPatientTransportActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, requestVehicleDelay }
@@ -2126,7 +1971,10 @@ export namespace SimulationActionReducers {
 
     export const updateRequestPatientCountDelayForPatientTransport: ActionReducer<UpdateRequestPatientCountDelayForPatientTransportAction> =
         {
-            action: UpdateRequestPatientCountDelayForPatientTransportAction,
+            type: updateRequestPatientCountDelayForPatientTransportActionSchema
+                .shape.type.value,
+            actionSchema:
+                updateRequestPatientCountDelayForPatientTransportActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, requestPatientCountDelay }
@@ -2170,7 +2018,10 @@ export namespace SimulationActionReducers {
 
     export const updatePromiseInvalidationIntervalForPatientTransport: ActionReducer<UpdatePromiseInvalidationIntervalForPatientTransportAction> =
         {
-            action: UpdatePromiseInvalidationIntervalForPatientTransportAction,
+            type: updatePromiseInvalidationIntervalForPatientTransportActionSchema
+                .shape.type.value,
+            actionSchema:
+                updatePromiseInvalidationIntervalForPatientTransportActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, promiseInvalidationInterval }
@@ -2209,7 +2060,8 @@ export namespace SimulationActionReducers {
 
     export const updateMaximumCategoryToTransport: ActionReducer<UpdateMaximumCategoryToTransportAction> =
         {
-            action: UpdateMaximumCategoryToTransportAction,
+            type: updateMaximumCategoryToTransportActionSchema.shape.type.value,
+            actionSchema: updateMaximumCategoryToTransportActionSchema,
             reducer(
                 draftState,
                 { simulatedRegionId, behaviorId, maximumCategoryToTransport }
@@ -2252,7 +2104,8 @@ export namespace SimulationActionReducers {
         };
 
     export const startTransport: ActionReducer<StartTransportAction> = {
-        action: StartTransportAction,
+        type: startTransportActionSchema.shape.type.value,
+        actionSchema: startTransportActionSchema,
         reducer(draftState, { simulatedRegionId, behaviorId }) {
             const simulatedRegion = getElement(
                 draftState,
@@ -2285,7 +2138,8 @@ export namespace SimulationActionReducers {
     };
 
     export const stopTransport: ActionReducer<StopTransportAction> = {
-        action: StopTransportAction,
+        type: stopTransportActionSchema.shape.type.value,
+        actionSchema: stopTransportActionSchema,
         reducer(draftState, { simulatedRegionId, behaviorId }) {
             const simulatedRegion = getElement(
                 draftState,

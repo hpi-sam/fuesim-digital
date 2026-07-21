@@ -1,49 +1,59 @@
-@if (scoutable(); as scoutable) {
-    @if (currentRole() === 'trainer') {
-        <div class="p-2">
-            <div class="form-group pb-3">
-                <label class="form-label mb-0">Interner Name</label>
-                <p class="small text-muted mb-1">
-                    Dieser Name wird in der Auswertung angezeigt.
-                </p>
-                <input
-                    #nameInput="ngModel"
-                    [ngModel]="scoutable.name"
-                    (appSaveOnTyping)="rename($event)"
-                    type="text"
-                    class="form-control"
-                />
-                <app-display-validation
-                    [ngModelInput]="nameInput"
-                ></app-display-validation>
-            </div>
-            @if (scoutable.isVisibleForParticipants) {
-                <button
-                    class="btn btn-outline-primary btn-sm me-2"
-                    ngbTooltip="Für Teilnehmende verstecken"
-                    (click)="setVisibility(false)"
-                >
-                    <i class="bi bi-eye"></i>
-                </button>
-                <span>Inhalte sind für Teilnehmende sichtbar.</span>
-            } @else {
-                <button
-                    class="btn btn-outline-primary btn-sm me-2"
-                    ngbTooltip="Für Teilnehmende sichtbar machen"
-                    (click)="setVisibility(true)"
-                >
-                    <i class="bi bi-eye-slash"></i>
-                </button>
-                <span>Inhalte sind für Teilnehmende nicht sichtbar.</span>
-            }
+@if (currentRole() === 'trainer') {
+    <div class="p-2">
+        <div class="form-group pb-3">
+            <label class="form-label mb-0">Interner Name</label>
+            <p class="small text-muted mb-1">
+                Dieser Name wird in der Auswertung angezeigt.
+            </p>
+            <input
+                #nameInput="ngModel"
+                [ngModel]="model().name"
+                (appSaveOnTyping)="changeName($event)"
+                type="text"
+                class="form-control"
+            />
+            <app-display-validation
+                [ngModelInput]="nameInput"
+            ></app-display-validation>
         </div>
-    }
+        @if (model().isVisibleForParticipants) {
+            <button
+                class="btn btn-outline-primary btn-sm me-2"
+                ngbTooltip="Für Teilnehmende verstecken"
+                (click)="changeVisibility(false)"
+            >
+                <i class="bi bi-eye"></i>
+            </button>
+            <span>Inhalte sind für Teilnehmende sichtbar.</span>
+        } @else {
+            <button
+                class="btn btn-outline-primary btn-sm me-2"
+                ngbTooltip="Für Teilnehmende sichtbar machen"
+                (click)="changeVisibility(true)"
+            >
+                <i class="bi bi-eye-slash"></i>
+            </button>
+            <span>Inhalte sind für Teilnehmende nicht sichtbar.</span>
+        }
+        <app-user-generated-content-editor
+            [userGeneratedContent]="model().content"
+            (userGeneratedContentChange)="changeContent($event)"
+        />
+        <button
+            class="btn btn-primary"
+            [disabled]="element().scoutableId === null"
+            (click)="removeScoutability()"
+        >
+            Erkundung entfernen
+        </button>
+    </div>
+}
 
-    @if (currentRole() === 'trainer' || scoutable.isVisibleForParticipants) {
+@if (scoutable(); as scoutable) {
+    @if (currentRole() !== 'trainer' && scoutable.isVisibleForParticipants) {
         <div>
             <app-user-generated-content-editor
-                [userGeneratedContent]="scoutable.userGeneratedContent"
-                (userGeneratedContentChange)="updateContent($event)"
+                [userGeneratedContent]="model().content"
             />
         </div>
     }

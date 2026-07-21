@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { exerciseSimulationEventSchema } from '../simulation/events/exercise-simulation-event.js';
 import { exerciseSimulationBehaviorStateSchema } from '../simulation/behaviors/exercise-simulation-behavior.js';
@@ -25,7 +26,7 @@ export const simulatedRegionSchema = z.strictObject({
     behaviors: z.array(exerciseSimulationBehaviorStateSchema),
     activities: z.record(uuidSchema, exerciseSimulationActivityStateSchema),
 });
-export type SimulatedRegion = z.infer<typeof simulatedRegionSchema>;
+export type SimulatedRegion = Immutable<z.infer<typeof simulatedRegionSchema>>;
 
 export function newSimulatedRegion(
     position: MapCoordinates,

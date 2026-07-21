@@ -8,6 +8,7 @@ import {
 import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { uuidSchema } from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { ReducerError } from '../reducer-error.js';
 import { getElement } from './utils/get-element.js';
 import { logScoutableViewed } from './utils/log.js';
 
@@ -30,10 +31,19 @@ export type MakeElementScoutableAction = z.infer<
     typeof makeElementScoutableActionSchema
 >;
 
+const removeElementScoutabilityActionSchema = z.strictObject({
+    type: z.literal('[Scoutable] Remove scoutability'),
+    elementType: scoutableElementTypeSchema,
+    elementId: uuidSchema,
+});
+export type RemoveElementScoutabilityAction = z.infer<
+    typeof removeElementScoutabilityActionSchema
+>;
+
 const setIsVisibleForParticipantsActionSchema = z.strictObject({
     type: z.literal('[Scoutable] Set isVisibleForParticipants'),
     scoutableId: scoutableSchema.shape.id,
-    value: z.boolean(),
+    value: scoutableSchema.shape.isVisibleForParticipants,
 });
 export type SetIsVisibleForParticipantsAction = z.infer<
     typeof setIsVisibleForParticipantsActionSchema
@@ -48,7 +58,7 @@ export type MarkAsViewedAction = z.infer<typeof markAsViewedActionSchema>;
 const renameActionSchema = z.strictObject({
     type: z.literal('[Scoutable] Rename'),
     scoutableId: scoutableSchema.shape.id,
-    name: z.string(),
+    name: scoutableSchema.shape.name,
 });
 export type RenameAction = z.infer<typeof renameActionSchema>;
 
@@ -63,6 +73,23 @@ export namespace ScoutableActionReducers {
                 draftState.scoutables[scoutable.id] =
                     cloneDeepMutable(scoutable);
 
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+    export const removeElementScoutability: ActionReducer<RemoveElementScoutabilityAction> =
+        {
+            type: removeElementScoutabilityActionSchema.shape.type.value,
+            actionSchema: removeElementScoutabilityActionSchema,
+            reducer: (draftState, { elementType, elementId }) => {
+                const element = getElement(draftState, elementType, elementId);
+                const scoutableId = element.scoutableId;
+                if (!scoutableId)
+                    throw new ReducerError(
+                        'Cannot remove scoutability on an element that is not scoutable'
+                    );
+                delete draftState.scoutables[scoutableId];
+                element.scoutableId = null;
                 return draftState;
             },
             rights: 'trainer',

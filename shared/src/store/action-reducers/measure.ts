@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { measureSchema } from '../../models/measure/measures.js';
 import type { ActionReducer } from '../action-reducer.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
@@ -11,11 +12,13 @@ export const addMeasureActionSchema = z.strictObject({
     type: z.literal('[Measure] Add Measure'),
     measure: measureSchema,
 });
-export type AddMeasureAction = z.infer<typeof addMeasureActionSchema>;
+export type AddMeasureAction = Immutable<
+    z.infer<typeof addMeasureActionSchema>
+>;
 
 export namespace MeasureActionReducers {
     export const addMeasure: ActionReducer<AddMeasureAction> = {
-        type: '[Measure] Add Measure',
+        type: addMeasureActionSchema.shape.type.value,
         actionSchema: addMeasureActionSchema,
         reducer: (draftState, { measure }) => {
             let newDraftState = draftState;

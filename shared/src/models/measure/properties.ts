@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { alarmGroupSchema } from '../alarm-group.js';
 import { transferPointSchema } from '../transfer-point.js';
 import { validationMessages } from '../../validation-messages.js';
@@ -164,4 +165,4 @@ export const measurePropertySchema = z.discriminatedUnion('type', [
     drawLinePropertySchema,
 ]);
 
-export type MeasureProperty = z.infer<typeof measurePropertySchema>;
+export type MeasureProperty = Immutable<z.infer<typeof measurePropertySchema>>;

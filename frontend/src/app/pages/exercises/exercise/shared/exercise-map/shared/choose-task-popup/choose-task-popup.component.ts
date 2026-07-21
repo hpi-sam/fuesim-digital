@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, Signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Task, TechnicalChallengeId, UUID } from 'fuesim-digital-shared';
+import { TaskType, TechnicalChallengeId, UUID } from 'fuesim-digital-shared';
+import type { StateMachine } from 'fuesim-digital-shared';
 import { PopupService } from '../../utility/popup.service';
 import { AppState } from '../../../../../../../state/app.state';
 import { createSelectAvailableTasks } from '../../../../../../../state/application/selectors/exercise.selectors';
@@ -18,12 +19,21 @@ export class ChooseTaskPopupComponent implements OnInit {
     // All are set via popup context before OnInit
     public technicalChallengeId!: TechnicalChallengeId;
     public personnelId!: UUID;
-    public assignTaskCallback!: (taskId: UUID) => void;
+    public assignTaskCallback!: (
+        stateMachineId: StateMachine['id'],
+        taskTypeId: TaskType['id']
+    ) => void;
 
-    public readonly availableTasks!: Signal<Task[]>;
+    /** Available tasks, grouped by their containing state machine */
+    public readonly availableTasks!: Signal<
+        { stateMachine: StateMachine; tasks: TaskType[] }[]
+    >;
 
-    public assignTask(taskId: UUID) {
-        this.assignTaskCallback(taskId);
+    public assignTask(
+        stateMachineId: StateMachine['id'],
+        taskTypeId: TaskType['id']
+    ) {
+        this.assignTaskCallback(stateMachineId, taskTypeId);
         this.popupService.submitPopup();
     }
 

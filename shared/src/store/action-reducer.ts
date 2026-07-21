@@ -3,29 +3,13 @@ import type { ZodType } from 'zod';
 import type { Client } from '../models/client.js';
 import type { Role, SpecificRole } from '../models/utils/role.js';
 import type { ExerciseState } from '../state.js';
-import type { Constructor } from '../utils/constructor.js';
 
-interface BaseActionReducer<A extends Action = Action> {
+export interface ActionReducer<A extends Action = Action> {
+    readonly type: A['type'];
+    readonly actionSchema: ZodType<A>;
     readonly reducer: ReducerFunction<A>;
     readonly rights: ReducerRights<A>;
 }
-
-interface LegacyActionReducer<
-    A extends Action = Action,
-> extends BaseActionReducer<A> {
-    readonly action: Constructor<A>;
-}
-
-interface SchemaBasedActionReducer<
-    A extends Action = Action,
-> extends BaseActionReducer<A> {
-    readonly type: A['type'];
-    readonly actionSchema: ZodType<A>;
-}
-
-export type ActionReducer<A extends Action = Action> =
-    | LegacyActionReducer<A>
-    | SchemaBasedActionReducer<A>;
 
 /**
  *  An action is an interface for immutable JSON objects used to update the store in the frontend and

@@ -4,7 +4,6 @@ import type { CollectionEntityId } from '../marketplace/models/versioned-id-sche
 import {
     collectionEntityIdSchema,
     collectionVersionIdSchema,
-    elementEntityIdSchema,
     elementVersionIdSchema,
     versionedCollectionPartialSchema,
 } from '../marketplace/models/versioned-id-schema.js';
@@ -396,9 +395,7 @@ export namespace Marketplace {
 
             export const ElementDelete = defineEvent(
                 'element:delete',
-                z.object({
-                    entityId: elementEntityIdSchema,
-                })
+                templateVersionSchema
             );
 
             export const CollectionUpdate = defineEvent(

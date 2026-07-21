@@ -1309,6 +1309,18 @@ export class CollectionRepository extends BaseRepository {
         return this.onlySingle(result);
     }
 
+    // TODO: @Quixelation: this should be removed after thesis user study end
+    public async getUNSAFELatestELementVersion(entityId: ElementEntityId) {
+        return this.onlySingle(
+            await this.databaseConnection
+                .select()
+                .from(elementTable)
+                .where(eq(elementTable.entityId, entityId))
+                .orderBy(desc(elementTable.version))
+                .limit(1)
+        );
+    }
+
     public async unmapElementFromCollection(
         elementEntityId: ElementEntityId,
         collectionVersionId: CollectionVersionId

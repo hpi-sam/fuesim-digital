@@ -136,19 +136,28 @@ export class ElementCardComponent {
             collection.entityId
         );
         if (result.requiresConfirmation.length > 0) {
-            const cascadingConfirmation =
-                await this.confirmationService.confirm({
-                    title: 'Element in weiteren Elementen verwendet',
-                    description: `Das Element "${this.element().title}" wird in folgenden Elementen verwendet: ${result.requiresConfirmation.map((e) => `"${e.title}"`).join(', ')}. Wenn Sie es jetzt löschen, wird es auch aus diesen weiteren Elemente entfernt. Möchten Sie es trotzdem löschen?`,
-                    confirmationButtonText: `Unwiderruflich aus ${result.requiresConfirmation.length} Elementen löschen`,
-                });
+            if (this.collectionService.versioningEnabled()) {
+                const cascadingConfirmation =
+                    await this.confirmationService.confirm({
+                        title: 'Element in weiteren Elementen verwendet',
+                        description: `Das Element "${this.element().title}" wird in folgenden Elementen verwendet: ${result.requiresConfirmation.map((e) => `"${e.title}"`).join(', ')}. Wenn Sie es jetzt löschen, wird es auch aus diesen weiteren Elemente entfernt. Möchten Sie es trotzdem löschen?`,
+                        confirmationButtonText: `Unwiderruflich aus ${result.requiresConfirmation.length} Elementen löschen`,
+                    });
 
-            if (!cascadingConfirmation) return;
+                if (!cascadingConfirmation) return;
+            }
             await this.collectionService.deleteElement(
                 this.element().entityId,
                 collection.entityId,
                 result.requiresConfirmation.map((e) => e.versionId)
             );
+        }
+
+        // TODO: @Quixelation this is only for thesis testing and not for prod
+        // this is to prevent a bug that happens only when versioning is disabled
+        // ________________REMOVE IN PROD______________________________
+        if (!this.collectionService.versioningEnabled()) {
+            location.reload();
         }
     }
 

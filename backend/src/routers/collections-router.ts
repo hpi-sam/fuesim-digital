@@ -778,21 +778,12 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         '/:collectionEntityId/version/:collectionVersionId/elements',
         otherAccess,
         async (req, res) => {
-            console.log('Getting elements of collection version');
             const collectionVersionId = getCollectionVersionId(req);
-            console.log('yes,daddy :3');
             const data = await collectionService.getElementsOfCollectionVersion(
                 collectionVersionId,
                 { allowDraftState: false }
             );
 
-            console.log('----------------------------------------------');
-            console.log('data: ', JSON.stringify(data, null, 2));
-            console.log(
-                Marketplace.Collection.GetElementsOfCollectionVersion.responseSchema.safeEncode(
-                    cloneDeepMutable(data)
-                )
-            );
             res.send(
                 Marketplace.Collection.GetElementsOfCollectionVersion.responseSchema.encode(
                     cloneDeepMutable(data)

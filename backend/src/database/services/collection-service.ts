@@ -18,6 +18,7 @@ import type {
     ExerciseState,
     CollectionMembershipRole,
     CollectionVisibility,
+    ChangeApply,
 } from 'fuesim-digital-shared';
 import {
     applyMigrations,
@@ -44,6 +45,7 @@ import type { OrganisationService } from './organisation-service.js';
 interface EventBuffer {
     next: (event: typeof Marketplace.Collection.Events.SSEvent.Type) => void;
     flush: () => void;
+    return: () => (typeof Marketplace.Collection.Events.SSEvent.Type)[];
 }
 
 export class CollectionService {
@@ -69,10 +71,13 @@ export class CollectionService {
             eventBuffer: EventBuffer
         ) => Promise<T>
     ): Promise<T> {
-        // using cleanup = this.afterCollectionUpdate(collectionEntityId);
+        // TODO: After Thesis, move this eventbuffer init back into transaciton block
+        const eventBuffer = this.newDeferredEventBuffer();
+        using cleanup = this.afterCollectionUpdate(
+            collectionEntityId,
+            eventBuffer
+        );
         return this.transaction(async (tx) => {
-            const eventBuffer = tx.newDeferredEventBuffer();
-
             const [draftState, createdNewDraftState] =
                 await tx.collectionRepository.getOrCreateDraftStateCollectionVersion(
                     collectionEntityId
@@ -122,11 +127,14 @@ export class CollectionService {
             },
             flush: () => {
                 const eventsToFlush = [...subject];
-                subject.length = 0;
+                if (!Config.experimentalDisableVersioning) {
+                    subject.length = 0;
+                }
                 for (const event of eventsToFlush) {
                     this.eventSubject.next(event);
                 }
             },
+            return: () => subject,
         };
     };
 
@@ -846,7 +854,6 @@ export class CollectionService {
         elements: TemplateVersion[],
         ignoreCollections: CollectionEntityId[]
     ): Promise<CollectionElementsSingle[]> {
-        console.log({ elements });
         const foundElements: {
             [collectionVersionId: CollectionEntityId]: {
                 collection: CollectionVersion;
@@ -1196,7 +1203,10 @@ export class CollectionService {
             eventBuffer.flush();
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            using cleanup = this.afterCollectionUpdate(draftState.entityId);
+            using cleanup = this.afterCollectionUpdate(
+                draftState.entityId,
+                eventBuffer
+            );
 
             return {
                 newSetVersionId: draftState.versionId,
@@ -1265,7 +1275,8 @@ export class CollectionService {
 
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 using cleanup = this.afterCollectionUpdate(
-                    containingSet.entityId
+                    containingSet.entityId,
+                    eventBuffer
                 );
 
                 const [elementIsInLatestCollectionVersion] =
@@ -1340,9 +1351,7 @@ export class CollectionService {
 
                 eventBuffer.next({
                     event: 'element:delete',
-                    data: {
-                        entityId: elementEntityId,
-                    },
+                    data: latestElementVersion,
                     collectionEntityId: containingSet.entityId,
                 });
 
@@ -1829,8 +1838,10 @@ export class CollectionService {
 
     // TODO: We can remove this as soon as the thesis about the marketplace is done
     public afterCollectionUpdate(
-        collectionEntityId: CollectionEntityId
+        collectionEntityId: CollectionEntityId,
+        events: EventBuffer
     ): DisposableStack {
+        console.log('After Collection Update');
         const ds = new DisposableStack();
         ds.defer(async () => {
             // We dont need this if we already have versioning
@@ -1849,37 +1860,140 @@ export class CollectionService {
                     collection.entityId
                 );
 
+            console.log({ affectedExercises });
+
             await Promise.all(
                 affectedExercises.rows.map(async (exerciseEntry) => {
                     const exercise = this.exerciseService.getExerciseById(
                         exerciseEntry.id
                     );
+
+                    // Change Impacts
+
+                    const changeApplies: ChangeApply[] = [];
+
+                    for (const event of events.return()) {
+                        switch (event.event) {
+                            case 'element:delete': {
+                                console.log({ event });
+                                const vehiclesOfThisTypeOnMap = Object.values(
+                                    exercise.getStateSnapshot().vehicles
+                                ).filter((f) => (
+                                        f.entity?.entityId ===
+                                        event.data.entityId
+                                    ));
+
+                                console.log({ vehiclesOfThisTypeOnMap });
+                                const removedIds: string[] = [];
+
+                                for (const vehicle of vehiclesOfThisTypeOnMap) {
+                                    removedIds.push(vehicle.id);
+                                    changeApplies.push({
+                                        type: 'removed',
+                                        action: 'remove',
+                                        marketplaceElement: event.data,
+                                        target: {
+                                            kind: 'map',
+                                            elementType: 'vehicle',
+                                            elementId: vehicle.id,
+                                        },
+                                    });
+                                }
+
+                                Object.values(
+                                    exercise.getStateSnapshot().alarmGroups
+                                ).forEach((m) => {
+                                    Object.values(m.alarmGroupVehicles).forEach(
+                                        (av) => {
+                                            if (
+                                                removedIds.includes(
+                                                    av.vehicleTemplateId
+                                                )
+                                            ) {
+                                                changeApplies.push({
+                                                    type: 'removed',
+                                                    action: 'remove',
+                                                    marketplaceElement:
+                                                        event.data,
+                                                    target: {
+                                                        kind: 'alarm-group-vehicle',
+                                                        alarmGroupId: m.id,
+                                                        alarmGroupName: m.name,
+                                                        alarmGrupVehicleId:
+                                                            av.id,
+                                                    },
+                                                });
+                                            }
+                                        }
+                                    );
+                                });
+
+                                break;
+                            }
+                            case 'element:update': {
+                                Object.values(
+                                    exercise.getStateSnapshot().vehicles
+                                ).forEach((v) => {
+                                    if (
+                                        v.entity?.entityId ===
+                                        event.data.entityId
+                                    ) {
+                                        changeApplies.push({
+                                            type: 'editable',
+                                            action: 'update',
+                                            marketplaceElement: event.data,
+                                            target: {
+                                                kind: 'map',
+                                                elementId: v.id,
+                                                elementType: 'vehicle',
+                                            },
+                                        });
+                                    }
+                                });
+
+                                break;
+                            }
+                        }
+                    }
+
+                    console.log({ changeApplies });
+
+                    console.log({
+                        exercise: exercise.participantKey,
+                    });
+
+                    const collectionElements =
+                        await this.getElementsOfCollectionVersion(
+                            collection.versionId,
+                            { allowDraftState: true }
+                        );
+
+                    const overwriteTemplates = await getAllCollectionElements(
+                        cloneDeepMutable(
+                            exerciseEntry.currentStateString.selectedCollections
+                        ),
+                        // We allow draftState here only bc we are in a section where Versioning is disabled
+                        async (c) =>
+                            this.getElementsOfCollectionVersion(c.versionId, {
+                                allowDraftState: true,
+                            })
+                    );
+                    console.log({
+                        exercise: exercise.participantKey,
+                        collectionElements,
+                        overwriteTemplates,
+                    });
                     exercise.applyAction(
                         {
                             type: '[Collection] Upgrade Collection',
-                            // The disabling of versioning causes no changeApplies to be sent.
+                            // The disabling of versioning causes no REAL changeApplies to be sent.
                             // THIS causes this feature-flag to be named EXPERIMENTAL!
-                            changeApplies: [],
+                            changeApplies,
                             // we want to keep the same exercise version, since we do NOT work with versioning in this configuration
                             // TODO: @Quixelation
                             collection,
-                            collectionElements:
-                                await this.getElementsOfCollectionVersion(
-                                    collection.versionId,
-                                    { allowDraftState: true }
-                                ),
-                            overwriteTemplates: await getAllCollectionElements(
-                                cloneDeepMutable(
-                                    exerciseEntry.currentStateString
-                                        .selectedCollections
-                                ),
-                                // We allow draftState here only bc we are in a section where Versioning is disabled
-                                async (c) =>
-                                    this.getElementsOfCollectionVersion(
-                                        c.versionId,
-                                        { allowDraftState: true }
-                                    )
-                            ),
+                            collectionElements,
+                            overwriteTemplates,
                         },
                         null
                     );

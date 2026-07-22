@@ -1,6 +1,3 @@
-import { produce, WritableDraft } from 'immer';
-import { ExerciseState } from '../../state.js';
-import { applyAction, ExerciseAction } from '../../store/index.js';
 import { uuid, UUID } from '../uuid.js';
 import {
     BoolEvalResult,
@@ -23,6 +20,7 @@ import {
     getChildrenOfEvalCriterion,
     getEvalResultOfFirstTrueAtCriterion,
     isBoolEvalCriterion,
+    isNumberEvalCriterion,
     isTemporalEvalCriterionType,
     numberCriterionTypeEvaluatorMap,
 } from '../../models/eval-criteria/index.js';
@@ -110,8 +108,9 @@ export function getEvalResultFromCriterion(
     if (cache?.[evalCriterion.id] !== undefined) {
         return cache[evalCriterion.id]!;
     }
+    let res = null;
     if (evalCriterion.criterionType === 'firstTrueAtEvalCriterion') {
-        return getEvalResultOfFirstTrueAtCriterion(
+        res = getEvalResultOfFirstTrueAtCriterion(
             evalCriterion,
             context,
             cache,
@@ -119,17 +118,19 @@ export function getEvalResultFromCriterion(
         );
     } else if (isBoolEvalCriterion(evalCriterion)) {
         /* TODO @JohannesPotzi : as never ... is that correct? */
-        return boolCriterionTypeEvaluatorMap[evalCriterion.criterionType](
+        res = boolCriterionTypeEvaluatorMap[evalCriterion.criterionType](
+            evalCriterion as never,
+            context,
+            cache
+        );
+    } else if (isNumberEvalCriterion(evalCriterion)) {
+        res = numberCriterionTypeEvaluatorMap[evalCriterion.criterionType](
             evalCriterion as never,
             context,
             cache
         );
     }
-    return numberCriterionTypeEvaluatorMap[evalCriterion.criterionType](
-        evalCriterion as never,
-        context,
-        cache
-    );
+    return res!;
 }
 export function getEvalResultsFromCriteria(
     wantedEvalCriteria: { [key: UUID]: EvalCriterion },

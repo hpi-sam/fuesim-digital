@@ -79,8 +79,8 @@ async function main() {
         repositories.exerciseRepository,
         exerciseManagerService,
         exerciseService,
+        repositories.organisationRepository,
         repositories.actionRepository
-        repositories.organisationRepository
     );
     const organisationService = new OrganisationService(
         repositories.organisationRepository,

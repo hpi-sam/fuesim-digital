@@ -257,33 +257,35 @@ export const selectVisibleScoutableIndicators = createSelector(
                         isInViewport(viewport, scoutableIndicator.position))
             );
         const technicalChallengeScoutables: ScoutableIndicator[] =
-            Object.values(technicalChallenges).flatMap((challenge) =>
-                Object.values(challenge.stateMachines).map((stateMachine) => {
-                    const currentState = currentStateOf(stateMachine);
+            Object.values(technicalChallenges).map((challenge) => {
+                const allStateMachinesViewed = Object.values(
+                    challenge.stateMachines
+                )
+                    .map(currentStateOf)
+                    .every((currentState) => currentState.viewedByParticipants);
 
-                    const offset = { x: challenge.size.width, y: 0 };
-                    const elementPos = currentCoordinatesOf(challenge);
+                const offset = { x: challenge.size.width, y: 0 };
+                const elementPos = currentCoordinatesOf(challenge);
 
-                    const position = newMapCoordinatesAt(
-                        elementPos.x + offset.x,
-                        elementPos.y + offset.y
-                    );
+                const position = newMapCoordinatesAt(
+                    elementPos.x + offset.x,
+                    elementPos.y + offset.y
+                );
 
-                    const viewStatus =
-                        currentState.viewedByParticipants &&
-                        currentRole === 'trainer'
-                            ? 'viewed'
-                            : 'unviewed';
-                    return {
-                        id: `${stateMachine.id}:${currentState.id}`,
-                        position,
-                        scoutableElementType: 'technicalChallenge',
-                        scoutableElementId: challenge.id,
-                        imageUrl: scoutableImages[viewStatus].generic,
-                        height: 50,
-                    };
-                })
-            );
+                const viewStatus =
+                    allStateMachinesViewed && currentRole === 'trainer'
+                        ? 'viewed'
+                        : 'unviewed';
+
+                return {
+                    id: `${challenge.id}:${challenge.id}`,
+                    position,
+                    scoutableElementType: 'technicalChallenge',
+                    scoutableElementId: challenge.id,
+                    imageUrl: scoutableImages[viewStatus].generic,
+                    height: 50,
+                };
+            });
 
         return [...normalScoutables, ...technicalChallengeScoutables].reduce<{
             [id: `${UUID}:${UUID}`]: ScoutableIndicator;

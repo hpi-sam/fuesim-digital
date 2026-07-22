@@ -106,14 +106,12 @@ export const stateMachineStateSchema = z.object({
     title: z.string(),
     image: imagePropertiesSchema,
     userGeneratedContent: userGeneratedContentSchema,
-    viewedByParticipants: z.boolean().optional(),
+    viewedByParticipants: z.boolean().optional().default(false),
     /**
      * maps taskId to the task-specific progress multiplier (default 1)
      * */
     possibleTasks: z.record(taskTypeSchema.shape.id, z.number()),
     outgoingTransitions: z.array(transitionSchema),
-
-    viewedByParticipant: z.boolean().optional().default(false),
 });
 export type StateMachineState = Immutable<
     z.infer<typeof stateMachineStateSchema>
@@ -137,7 +135,7 @@ export function newTechnicalChallengeState(
         userGeneratedContent: userGeneratedContent ?? newUserGeneratedContent(),
         possibleTasks,
         outgoingTransitions,
-        viewedByParticipant: false,
+        viewedByParticipants: false,
     };
 }
 

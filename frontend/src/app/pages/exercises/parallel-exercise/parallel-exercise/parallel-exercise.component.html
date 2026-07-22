@@ -93,37 +93,87 @@
             <ng-container ngbNavItem="invite">
                 <a ngbNavLink>Teilnehmende Einladen</a>
                 <ng-template ngbNavContent>
-                    <div class="row">
-                        <div class="col"></div>
-                        <div class="col">
+                    <div class="row my-5">
+                        <div class="col-lg-6">
+                            <h1 class="m-3 text-center">
+                                Bisher
+                                {{
+                                    parallelExerciseService.exerciseInstances()
+                                        .length
+                                }}
+                                Teilnehmende
+                            </h1>
+                            <h2 class="m-3 text-center">
+                                @for (
+                                    exerciseInstance of parallelExerciseService.exerciseInstances();
+                                    track exerciseInstance.participantKey
+                                ) {
+                                    <span
+                                        class="badge m-2"
+                                        [ngClass]="
+                                            exerciseInstance.isActive
+                                                ? 'bg-primary'
+                                                : 'bg-secondary'
+                                        "
+                                    >
+                                        {{
+                                            exerciseInstance.clientNames
+                                                .length > 0
+                                                ? exerciseInstance.clientNames.join(
+                                                      ', '
+                                                  )
+                                                : exerciseInstance.participantKey
+                                        }}
+                                    </span>
+                                }
+                            </h2>
+                        </div>
+                        <div class="col-lg-6">
                             <div class="card h-100">
                                 <div
                                     class="card-header h4 d-flex align-content-center"
                                 >
-                                    <div>
-                                        Teilnehmenden-PIN:
-                                        <span class="font-monospace fw-bold">{{
-                                            exercise.participantKey
-                                        }}</span>
-                                    </div>
+                                    <div>Übung als Teilnehmender Beitreten</div>
                                     <div class="flex-grow-1"></div>
                                     <button
                                         app-copy-button
-                                        class="btn btn-outline-secondary"
+                                        class="btn bt-lg btn-outline-secondary"
                                         [value]="participantUrl()"
                                         text="Teilnehmerlink"
                                         ngbTooltip="Link kopieren"
                                         container="body"
                                     ></button>
                                 </div>
-                                <div
-                                    class="card-body d-flex justify-content-center py-0"
-                                >
-                                    <qr-code
-                                        [value]="participantUrl()"
-                                        size="350"
-                                        errorCorrectionLevel="M"
-                                    />
+
+                                <div class="card-body py-3">
+                                    <h2 class="text-center m-0 p-0">
+                                        Scanne den QR-Code...
+                                    </h2>
+                                    <div
+                                        class="w-100 m-0 p-0 d-flex justify-content-center"
+                                    >
+                                        <qr-code
+                                            [value]="participantUrl()"
+                                            size="400"
+                                            errorCorrectionLevel="M"
+                                        />
+                                    </div>
+
+                                    <h2 class="text-center m-0 p-0">
+                                        ...oder gib die Übungs-PIN
+                                    </h2>
+                                    <h1 class="text-center m-0 p-0">
+                                        <span class="font-monospace fw-bold"
+                                            >{{ exercise.participantKey }}
+                                        </span>
+                                    </h1>
+                                    <h2 class="text-center m-0 p-0">
+                                        auf
+                                        <a href="{{ serviceUrl() }} ">{{
+                                            serviceUrl()
+                                        }}</a>
+                                        ein.
+                                    </h2>
                                 </div>
                             </div>
                         </div>
@@ -134,56 +184,46 @@
             <ng-container ngbNavItem="participants">
                 <a ngbNavLink>Teilnehmende Verwalten</a>
                 <ng-template ngbNavContent>
-                    <div class="row">
-                        <div class="col">
-                            <div class="card">
-                                <div class="card-header h4">
-                                    Teilnehmende
-                                    <span class="badge bg-secondary float-end">
-                                        <i class="bi bi-people me-1"></i>
-                                        {{
-                                            parallelExerciseService.exerciseInstances()
-                                                .length
-                                        }}
-                                    </span>
-                                </div>
-                                <table class="table table-striped mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Teilnehmenden-PIN</th>
-                                            <th>Name(n)</th>
-                                            <th>Letzte Aktion</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for (
-                                            exerciseInstance of parallelExerciseService.exerciseInstances();
-                                            track exerciseInstance.participantKey
-                                        ) {
-                                            <tr
-                                                app-parallel-exercise-instance-row
-                                                [exerciseInstance]="
-                                                    exerciseInstance
-                                                "
-                                            ></tr>
-                                        } @empty {
-                                            <tr>
-                                                <td
-                                                    colspan="3"
-                                                    class="text-muted"
-                                                >
-                                                    Es sind noch keine
-                                                    Teilnehmenden der Übung
-                                                    beigetreten.
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div class="card row my-5">
+                        <div class="card-header h4">
+                            Teilnehmende
+                            <span class="badge bg-secondary float-end">
+                                <i class="bi bi-people me-1"></i>
+                                {{
+                                    parallelExerciseService.exerciseInstances()
+                                        .length
+                                }}
+                            </span>
                         </div>
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Teilnehmenden-PIN</th>
+                                    <th>Name(n)</th>
+                                    <th>Letzte Aktion</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (
+                                    exerciseInstance of parallelExerciseService.exerciseInstances();
+                                    track exerciseInstance.participantKey
+                                ) {
+                                    <tr
+                                        app-parallel-exercise-instance-row
+                                        [exerciseInstance]="exerciseInstance"
+                                    ></tr>
+                                } @empty {
+                                    <tr>
+                                        <td colspan="3" class="text-muted">
+                                            Es sind noch keine Teilnehmenden der
+                                            Übung beigetreten.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </ng-template>
             </ng-container>
@@ -194,7 +234,7 @@
             </ng-container>
         </nav>
 
-        <div [ngbNavOutlet]="nav" class="mt-2"></div>
+        <div [ngbNavOutlet]="nav" class="mt-2 mb-5"></div>
     } @else if (parallelExercise.isLoading()) {
         <div class="row row-cols-3">
             @for (_ of [1, 2, 3]; track $index) {

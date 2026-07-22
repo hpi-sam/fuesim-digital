@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
+import { NgClass } from '@angular/common';
 import {
     NgbTooltip,
     NgbNav,
@@ -36,6 +37,7 @@ import { CopyButtonComponent } from '../../../../shared/components/copy-button/c
         FooterComponent,
         NgbTooltip,
         InlineTextEditorComponent,
+        NgClass,
         NgbNav,
         NgbNavItem,
         NgbNavLink,
@@ -59,6 +61,7 @@ export class ParallelExerciseComponent {
         () =>
             `${location.origin}/exercises/parallel/join/${this.parallelExercise.value()?.participantKey}`
     );
+    readonly serviceUrl = computed(() => `${location.origin}/`);
 
     async patchParallelExercise(data: PatchParallelExerciseRequestData) {
         const parallelExercise = this.parallelExercise.value();

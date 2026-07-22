@@ -100,6 +100,7 @@ export const transitionSchema = z.object({
     targetState: stateMachineStateIdSchema,
     guard: guardSchema,
 });
+export type StateMachineStateId = z.infer<typeof stateMachineStateIdSchema>;
 
 export const stateMachineStateSchema = z.object({
     id: stateMachineStateIdSchema,
@@ -260,14 +261,16 @@ function isTimerGuardFulfilled(
 
 export type Transition = Immutable<z.infer<typeof transitionSchema>>;
 
+const stateMachineIdSchema = uuidSchema.brand<'StateMachineId'>();
 export const stateMachineDefinitionSchema = z.strictObject({
-    id: uuidSchema.brand<'StateMachineId'>(),
+    id: stateMachineIdSchema,
     name: z.string(),
     states: z.record(stateMachineStateSchema.shape.id, stateMachineStateSchema),
     initialStateId: stateMachineStateSchema.shape.id,
     tasks: z.record(taskTypeSchema.shape.id, taskSchema),
     timers: z.record(timerSchema.shape.id, timerSchema),
 });
+export type StateMachineId = z.infer<typeof stateMachineIdSchema>;
 
 export const stateMachineSchema = z
     .strictObject({

@@ -32,23 +32,32 @@
 
         @if (this.criterionForm.technicalChallengeId().value() !== '') {
             <label class="mt-1">
-                Ziel-Zustand:
-                <select
-                    class="form-select me-2"
-                    [formField]="
-                        this.criterionForm.targetTechnicalChallengeState
-                    "
-                >
-                    <option value="" disabled>Kein Zustand ausgewählt</option>
-                    @for (
-                        state of this.selectedTechnicalChallengeStates();
-                        track state.id
-                    ) {
-                        <option value="{{ state.id }}">
-                            {{ state.title }}
+                @let machines = this.stateMachinesOfselectedTechnicalChallenge;
+                {{
+                    machines()?.length === 1
+                        ? 'Ziel Zustand:'
+                        : 'Ziel Zustände:'
+                }}
+                @for (machine of machines(); track machine.id) {
+                    {{ machine.name }}:
+                    <select class="form-select me-2">
+                        <option value="" disabled>
+                            Kein Zustand ausgewählt
                         </option>
-                    }
-                </select>
+                        @if (this.stateMachineStates(); as states) {
+                            @for (state of states[machine.id]; track $index) {
+                                <option
+                                    (mousedown)="
+                                        selectTargetState(machine.id, state.id)
+                                    "
+                                >
+                                    {{ state.title }}
+                                </option>
+                            }
+                        }
+                    </select>
+                    <br />
+                }
             </label>
         }
     </div>

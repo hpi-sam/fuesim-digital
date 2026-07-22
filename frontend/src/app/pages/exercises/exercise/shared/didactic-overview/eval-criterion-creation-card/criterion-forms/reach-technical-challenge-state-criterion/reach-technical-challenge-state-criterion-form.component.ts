@@ -10,8 +10,10 @@ import { Store } from '@ngrx/store';
 import {
     evalCriterionCategoryNames,
     evalCriterionTypesNames,
+    StateMachineId,
+    StateMachineState,
+    StateMachineStateId,
     TechnicalChallengeId,
-    TechnicalChallengeStateId,
 } from 'fuesim-digital-shared';
 import { AppState } from '../../../../../../../../state/app.state';
 import { selectTechnicalChallenges } from '../../../../../../../../state/application/selectors/exercise.selectors';
@@ -20,7 +22,10 @@ import { FormsModule } from '@angular/forms';
 
 interface LocalInputData {
     technicalChallengeId: TechnicalChallengeId | '';
-    targetTechnicalChallengeState: TechnicalChallengeStateId | '';
+    targetStateMachineIds: StateMachineId[];
+    targetStateMachineStateIds: {
+        [targetStateMachineId: StateMachineId]: StateMachineStateId;
+    };
 }
 
 @Component({
@@ -38,13 +43,15 @@ export class ReachTechnicalChallengeStateEvalCriterionFormComponent {
     public readonly technicalChallengeIdOut = output<
         TechnicalChallengeId | ''
     >();
-    public readonly targetTechnicalChallengeStateOut = output<
-        TechnicalChallengeStateId | ''
-    >();
+    public readonly targetStateMachineIdsOut = output<StateMachineId[]>();
+    public readonly targetStateMachineStateIdsOut = output<{
+        [targetStateMachineId: StateMachineId]: StateMachineStateId;
+    }>();
 
     readonly inputModel = signal<LocalInputData>({
         technicalChallengeId: '',
-        targetTechnicalChallengeState: '',
+        targetStateMachineIds: [],
+        targetStateMachineStateIds: {},
     });
     criterionForm = form(this.inputModel);
 
@@ -56,8 +63,11 @@ export class ReachTechnicalChallengeStateEvalCriterionFormComponent {
             this.technicalChallengeIdOut.emit(
                 this.criterionForm.technicalChallengeId().value()
             );
-            this.targetTechnicalChallengeStateOut.emit(
-                this.criterionForm.targetTechnicalChallengeState().value()
+            this.targetStateMachineIdsOut.emit(
+                this.criterionForm.targetStateMachineIds().value()
+            );
+            this.targetStateMachineStateIdsOut.emit(
+                this.criterionForm.targetStateMachineStateIds().value()
             );
         });
     }
@@ -65,14 +75,42 @@ export class ReachTechnicalChallengeStateEvalCriterionFormComponent {
     private readonly tcs = this.store.selectSignal(selectTechnicalChallenges);
     public readonly technicalChallenges = signal(Object.values(this.tcs()));
 
-    public readonly selectedTechnicalChallengeStates = computed(() => {
+    public readonly stateMachinesOfselectedTechnicalChallenge = computed(() => {
         if (this.criterionForm.technicalChallengeId().value() !== '') {
             const id = this.criterionForm.technicalChallengeId().value();
             const tcWithId =
                 this.technicalChallenges().filter((tc) => tc.id === id)[0] ??
                 null;
-            return Object.values(tcWithId!.states);
+            return Object.values(tcWithId!.stateMachines);
         }
         return null;
     });
+    public readonly stateMachineStates = computed(() =>
+        this.stateMachinesOfselectedTechnicalChallenge()?.reduce<{
+            [stateMachieId: StateMachineId]: StateMachineState[];
+        }>((obj, machine) => {
+            obj[machine.id] = Object.values(machine.states);
+            return obj;
+        }, {})
+    );
+    /**
+     * adds the target stateMachineId and the stateMachineStateId to the target ids in the form;
+     * @param machineId The id of the target state machine
+     * @param stateId the id of the target state machine state
+     */
+    public selectTargetState(
+        machineId: StateMachineId,
+        stateId: StateMachineStateId
+    ) {
+        this.criterionForm.targetStateMachineIds().value.update((obj) => {
+            if (!obj.includes(machineId)) {
+                obj = [...obj, machineId];
+            }
+            return obj;
+        });
+        this.criterionForm.targetStateMachineStateIds().value.update((obj) => {
+            obj[machineId] = stateId;
+            return obj;
+        });
+    }
 }

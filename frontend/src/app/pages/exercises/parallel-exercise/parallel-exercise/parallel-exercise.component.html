@@ -28,22 +28,20 @@
             <div class="col-lg-5 col-md-12">
                 <div class="card bg-secondary-subtle">
                     <div class="card-body row mb-0 p-3 px-4">
-                        @let leadingExercise =
-                            parallelExerciseService.exerciseInstances()[0];
-                        @if (leadingExercise) {
-                            <div class="col h2">
-                                <span
-                                    class="badge rounded-pill bg-light text-dark state-badge h-100 px-3 m-0 d-flex align-items-center"
-                                >
-                                    <span class="text-center w-100">
-                                        <i class="bi bi-people me-1"></i>
-                                        {{
-                                            parallelExerciseService.exerciseInstances()
-                                                .length
-                                        }}
-                                    </span>
+                        @let exerciseInstances =
+                            parallelExerciseService.exerciseInstances();
+                        @let leadingExercise = exerciseInstances[0];
+                        <div class="col h2">
+                            <span
+                                class="badge rounded-pill bg-light text-dark state-badge h-100 px-3 m-0 d-flex align-items-center"
+                            >
+                                <span class="text-center w-100">
+                                    <i class="bi bi-people me-1"></i>
+                                    {{ exerciseInstances.length }}
                                 </span>
-                            </div>
+                            </span>
+                        </div>
+                        @if (leadingExercise) {
                             <app-exercise-state-badge-inner
                                 class="col h1"
                                 [exerciseStatus]="leadingExercise.currentStatus"
@@ -78,8 +76,8 @@
                                 }
                             </div>
                         } @else {
-                            <div class="w-100 h-100">
-                                <p class="text-danger text-center">
+                            <div class="col w-100 h-100">
+                                <p class="h2 text-danger text-center">
                                     Warte auf Teilnehmende.
                                 </p>
                             </div>
@@ -97,13 +95,12 @@
                         <div class="col-lg-6">
                             <h1 class="m-3 text-center">
                                 Bisher
-                                {{
-                                    parallelExerciseService.exerciseInstances()
-                                        .length
+                                {{ exerciseInstances.length }}
+                                Teilnehmende{{
+                                    exerciseInstances.length === 1 ? '(r)' : ''
                                 }}
-                                Teilnehmende
                             </h1>
-                            <h2 class="m-3 text-center">
+                            <h2 class="m-3 mt-5 text-center">
                                 @for (
                                     exerciseInstance of parallelExerciseService.exerciseInstances();
                                     track exerciseInstance.participantKey
@@ -125,6 +122,8 @@
                                                 : exerciseInstance.participantKey
                                         }}
                                     </span>
+                                } @empty {
+                                    <span class="display-1"> :-( </span>
                                 }
                             </h2>
                         </div>
@@ -133,7 +132,9 @@
                                 <div
                                     class="card-header h4 d-flex align-content-center"
                                 >
-                                    <div>Übung als Teilnehmender Beitreten</div>
+                                    <div>
+                                        Übung als Teilnehmende(r) Beitreten
+                                    </div>
                                     <div class="flex-grow-1"></div>
                                     <button
                                         app-copy-button
@@ -162,7 +163,7 @@
                                     <h2 class="text-center m-0 p-0">
                                         ...oder gib die Übungs-PIN
                                     </h2>
-                                    <h1 class="text-center m-0 p-0">
+                                    <h1 class="text-center m-0 p-0 display-3">
                                         <span class="font-monospace fw-bold"
                                             >{{ exercise.participantKey }}
                                         </span>

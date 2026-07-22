@@ -1,6 +1,14 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
-import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbTooltip,
+    NgbNav,
+    NgbNavContent,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
 import {
     GetParallelExerciseResponseData,
     PatchParallelExerciseRequestData,
@@ -28,6 +36,12 @@ import { CopyButtonComponent } from '../../../../shared/components/copy-button/c
         FooterComponent,
         NgbTooltip,
         InlineTextEditorComponent,
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbNavContent,
+        NgbNavOutlet,
         CopyButtonComponent,
     ],
 })
@@ -35,6 +49,8 @@ export class ParallelExerciseComponent {
     private readonly apiService = inject(ApiService);
     private readonly route = inject(ActivatedRoute);
     public readonly parallelExerciseService = inject(ParallelExerciseService);
+
+    activeTab = 'invite';
 
     parallelExercise: HttpResourceRef<
         GetParallelExerciseResponseData | undefined

@@ -10,6 +10,7 @@ import { newBoolEvalResult } from '../../../utils/eval-result/utils.js';
 import type { PatientStatus } from '../../utils/patient-status.js';
 import { patientStatusSchema } from '../../utils/patient-status.js';
 import { boolEvalCriterionBaseSchema } from '../eval-criterion-base.js';
+import { Immutable } from 'immer';
 
 export const patientAtStatusEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -20,8 +21,8 @@ export const patientAtStatusEvalCriterionSchema = z.strictObject({
 /**
  * This is a bool leaf eval criterion which should evaluate as true, precisely when the target patient's real status is the target status.
  */
-export type PatientAtStatusEvalCriterion = z.infer<
-    typeof patientAtStatusEvalCriterionSchema
+export type PatientAtStatusEvalCriterion = Immutable<
+    z.infer<typeof patientAtStatusEvalCriterionSchema>
 >;
 export function newPatientAtStatusEvalCriterion(
     name: string,

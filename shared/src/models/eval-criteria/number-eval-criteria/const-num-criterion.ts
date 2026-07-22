@@ -8,6 +8,7 @@ import type {
 } from '../../../utils/eval-result/eval-result.js';
 import { newNumberEvalResult } from '../../../utils/eval-result/utils.js';
 import type { NumberEvalCriterion } from '../criterion-categories.js';
+import { Immutable } from 'immer';
 
 export const constNumEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -17,7 +18,9 @@ export const constNumEvalCriterionSchema = z.strictObject({
 /** This is a number eval criterion, which holds a constant number, specified on creation.
  * This synergises with the compare criterion and allows trainers to compare dynamic values from number criteria against constant expected value.
  */
-export type ConstNumEvalCriterion = z.infer<typeof constNumEvalCriterionSchema>;
+export type ConstNumEvalCriterion = Immutable<
+    z.infer<typeof constNumEvalCriterionSchema>
+>;
 
 export function newConstNumEvalCriterion(
     name: string,

@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import type { UUID } from '../../../utils/uuid.js';
 import { uuid, uuidSchema } from '../../../utils/uuid.js';
 import type {
@@ -26,8 +26,8 @@ export const firstTrueAtEvalCriterionSchema = z.strictObject({
  * The respecive EvalResult holds the timestamp when the child criterion was first fullfilled.
  * This synergises with the compare criterion and allows trainers to compare its dynamic value against a number of another number criterion (intended to have a timestamp value).
  */
-export type FirstTrueAtEvalCriterion = z.infer<
-    typeof firstTrueAtEvalCriterionSchema
+export type FirstTrueAtEvalCriterion = Immutable<
+    z.infer<typeof firstTrueAtEvalCriterionSchema>
 >;
 export function newFirstTrueAtEvalCriterion(
     name: string,

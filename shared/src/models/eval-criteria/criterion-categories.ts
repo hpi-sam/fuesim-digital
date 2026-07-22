@@ -12,6 +12,7 @@ import { countCompletedEvalCriterionSchema } from './number-eval-criteria/count-
 import { countMeasuresEvalCriterionSchema } from './number-eval-criteria/count-measures-criterion.js';
 import { timestampEvalCriterionSchema } from './number-eval-criteria/timestamp-criterion.js';
 import { firstTrueAtEvalCriterionSchema } from './number-eval-criteria/first-true-at-criterion.js';
+import { Immutable } from 'immer';
 
 /* TODO @JohannesPotzi @Jogius : countUnqualifiedMeasuresEvalCriterion */
 
@@ -48,7 +49,7 @@ export const evalCriterionSchema = z.discriminatedUnion('criterionType', [
     boolEvalCriterionSchema,
     numberEvalCriterionSchema,
 ]);
-export type EvalCriterion = z.infer<typeof evalCriterionSchema>;
+export type EvalCriterion = Immutable<z.infer<typeof evalCriterionSchema>>;
 
 export type EvalCriterionCategory =
     | 'boolEvalCriterion'

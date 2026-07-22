@@ -18,6 +18,7 @@ import {
     technicalChallengeSchema,
 } from '../../technical-challenge/technical-challenge.js';
 import { boolEvalCriterionBaseSchema } from '../eval-criterion-base.js';
+import { Immutable } from 'immer';
 
 export const reachTechnicalChallengeStateEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -32,8 +33,8 @@ export const reachTechnicalChallengeStateEvalCriterionSchema = z.strictObject({
 /**
  * This is a bool leaf eval criterion which should evaluate as true, precisely when the target technical challenge's state is the target state.
  */
-export type ReachTechnicalChallengeStateEvalCriterion = z.infer<
-    typeof reachTechnicalChallengeStateEvalCriterionSchema
+export type ReachTechnicalChallengeStateEvalCriterion = Immutable<
+    z.infer<typeof reachTechnicalChallengeStateEvalCriterionSchema>
 >;
 export function newReachTechnicalChallengeStateEvalCriterion(
     name: string,

@@ -11,6 +11,7 @@ import {
 } from '../../../utils/eval-result/utils.js';
 import type { UUID } from '../../../utils/uuid.js';
 import { uuid, uuidSchema } from '../../../utils/uuid.js';
+import { Immutable } from 'immer';
 
 export const notEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -21,7 +22,9 @@ export const notEvalCriterionSchema = z.strictObject({
  * Precisely, when the child criterion is evaluated as false, this should be fullfilled.
  * This is motivated by trainers needing to check, weather an expected mistake has not been done.
  */
-export type NotEvalCriterion = z.infer<typeof notEvalCriterionSchema>;
+export type NotEvalCriterion = Immutable<
+    z.infer<typeof notEvalCriterionSchema>
+>;
 
 export function newNotEvalCriterion(
     name: string,

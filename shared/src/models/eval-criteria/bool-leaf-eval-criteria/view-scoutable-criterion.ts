@@ -9,6 +9,7 @@ import type {
 import { newBoolEvalResult } from '../../../utils/eval-result/utils.js';
 import { currentStateOf } from '../../technical-challenge/state-machine.js';
 import { boolEvalCriterionBaseSchema } from '../eval-criterion-base.js';
+import { Immutable } from 'immer';
 
 export const viewScoutableEvalCriterionSchema = z.strictObject({
     ...boolEvalCriterionBaseSchema.shape,
@@ -18,8 +19,8 @@ export const viewScoutableEvalCriterionSchema = z.strictObject({
 /**
  * This is a bool leaf eval criterion which should evaluate as true, precisely when the target scoutable has been viewed by participants.
  */
-export type ViewScoutableEvalCriterion = z.infer<
-    typeof viewScoutableEvalCriterionSchema
+export type ViewScoutableEvalCriterion = Immutable<
+    z.infer<typeof viewScoutableEvalCriterionSchema>
 >;
 export function newViewScoutableEvalCriterion(
     name: string,

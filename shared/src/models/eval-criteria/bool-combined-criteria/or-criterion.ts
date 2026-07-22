@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import type { UUID } from '../../../utils/uuid.js';
 import { uuid, uuidSchema } from '../../../utils/uuid.js';
 import type {
@@ -24,7 +24,7 @@ export const orEvalCriterionSchema = z.strictObject({
  * Precisely when any children are fullfilled, this should be fullfilled.
  * This is motivated by a diversity of possible solutions of a given exercise scenario.
  */
-export type OrEvalCriterion = z.infer<typeof orEvalCriterionSchema>;
+export type OrEvalCriterion = Immutable<z.infer<typeof orEvalCriterionSchema>>;
 
 export function newOrEvalCriterion(
     name: string,

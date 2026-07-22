@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import type { UUID } from '../../../utils/uuid.js';
 import { uuid, uuidSchema } from '../../../utils/uuid.js';
 import type {
@@ -34,7 +34,9 @@ export const compareEvalCriterionSchema = z.strictObject({
 /* TODO @JohannesPotzi : add motivation */
 /** This is a combined bool criterion with two child number criteria by id and a ComparativeOperator;
  * Precisely, when the expression (leftChild operator rightChild) is true, this should be fullfilled.*/
-export type CompareEvalCriterion = z.infer<typeof compareEvalCriterionSchema>;
+export type CompareEvalCriterion = Immutable<
+    z.infer<typeof compareEvalCriterionSchema>
+>;
 
 export function newCompareEvalCriterion(
     name: string,

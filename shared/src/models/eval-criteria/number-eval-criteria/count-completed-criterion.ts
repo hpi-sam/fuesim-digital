@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import type { UUID } from '../../../utils/uuid.js';
 import { uuid, uuidSchema } from '../../../utils/uuid.js';
 import type {
@@ -26,8 +26,8 @@ export const countCompletedEvalCriterionSchema = z.strictObject({
  * The respecive EvalResult holds the count of fullfilled child criteria.
  * This synergises with the compare criterion and allows trainers to compare its dynamic value against a number of another number criterion.
  */
-export type CountCompletedEvalCriterion = z.infer<
-    typeof countCompletedEvalCriterionSchema
+export type CountCompletedEvalCriterion = Immutable<
+    z.infer<typeof countCompletedEvalCriterionSchema>
 >;
 export function newCountCompletedEvalCriterion(
     name: string,

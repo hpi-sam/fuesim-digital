@@ -8,6 +8,7 @@ import type {
 import { newNumberEvalResult } from '../../../utils/eval-result/utils.js';
 import type { NumberEvalCriterion } from '../criterion-categories.js';
 import { numberEvalCriterionBaseSchema } from '../eval-criterion-base.js';
+import { Immutable } from 'immer';
 
 export const timestampEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -17,8 +18,8 @@ export const timestampEvalCriterionSchema = z.strictObject({
 /** This is a number eval criterion, which holds a constant number, specified on creation;
  *  The number is processed as a timestamp.
  * This synergises with the compare criterion and allows trainers to compare dynamic timestamps from (timesstamp-)number criteria against a constant expected value.*/
-export type TimestampEvalCriterion = z.infer<
-    typeof timestampEvalCriterionSchema
+export type TimestampEvalCriterion = Immutable<
+    z.infer<typeof timestampEvalCriterionSchema>
 >;
 export function newTimestampEvalCriterion(
     name: string,

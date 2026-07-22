@@ -10,6 +10,7 @@ import type { PatientStatus } from '../../utils/patient-status.js';
 import { patientStatusSchema } from '../../utils/patient-status.js';
 import type { NumberEvalCriterion } from '../criterion-categories.js';
 import { numberEvalCriterionBaseSchema } from '../eval-criterion-base.js';
+import { Immutable } from 'immer';
 
 export const countPatientsAtStatusEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -20,8 +21,8 @@ export const countPatientsAtStatusEvalCriterionSchema = z.strictObject({
  * The respective EvalResult holds the count of patients with the specified status as real status.
  * This synergises with the compare criterion and allows trainers to compare its dynamic value against a number of another number criterion.
  */
-export type CountPatientsAtStatusEvalCriterion = z.infer<
-    typeof countPatientsAtStatusEvalCriterionSchema
+export type CountPatientsAtStatusEvalCriterion = Immutable<
+    z.infer<typeof countPatientsAtStatusEvalCriterionSchema>
 >;
 export function newCountPatientsAtStatusEvalCriterion(
     name: string,

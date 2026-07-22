@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import type {
     EvalResultContext,
     EvalResult,
@@ -24,7 +24,9 @@ export const andEvalCriterionSchema = z.strictObject({
  * Precisely when all children fullfilled, this should be fullfilled.
  * This is motivated by compactness of the results table.
  */
-export type AndEvalCriterion = z.infer<typeof andEvalCriterionSchema>;
+export type AndEvalCriterion = Immutable<
+    z.infer<typeof andEvalCriterionSchema>
+>;
 
 export function newAndEvalCriterion(
     name: string,

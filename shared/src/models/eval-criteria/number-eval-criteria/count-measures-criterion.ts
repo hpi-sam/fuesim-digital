@@ -9,6 +9,7 @@ import type {
 import { newNumberEvalResult } from '../../../utils/eval-result/utils.js';
 import type { NumberEvalCriterion } from '../criterion-categories.js';
 import { numberEvalCriterionBaseSchema } from '../eval-criterion-base.js';
+import { Immutable } from 'immer';
 
 export const countMeasuresEvalCriterionSchema = z.strictObject({
     ...numberEvalCriterionBaseSchema.shape,
@@ -19,8 +20,8 @@ export const countMeasuresEvalCriterionSchema = z.strictObject({
  * The respective EvalResult holds the count of measures of the specified template.
  * This synergises with the compare criterion and allows trainers to compare its dynamic value against a number of another number criterion.
  */
-export type CountMeasuresEvalCriterion = z.infer<
-    typeof countMeasuresEvalCriterionSchema
+export type CountMeasuresEvalCriterion = Immutable<
+    z.infer<typeof countMeasuresEvalCriterionSchema>
 >;
 export function newcountMeasuresEvalCriterion(
     name: string,

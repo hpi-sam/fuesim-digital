@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { GuardIndex } from "./models/index.js";
 
 export interface BenchmarkValue<T> {

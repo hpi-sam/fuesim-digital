@@ -4,7 +4,7 @@ export const addEventQueue58: Migration = {
     action: null,
 
     state: (state: any) => {
-        state.technicalChallengeEventQueue = {
+        state.stateMachineEventQueue = {
             events: [],
             indices: new Map(),
         };

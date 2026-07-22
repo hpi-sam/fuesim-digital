@@ -295,6 +295,7 @@ function insertLeafEvents(
                 guard
             );
             insert(
+                exerciseState.participantKey,
                 queue,
                 newStateMachineEvent(
                     eventTimestamp,
@@ -311,6 +312,7 @@ function insertLeafEvents(
                 guard
             );
             insert(
+                exerciseState.participantKey,
                 queue,
                 newStateMachineEvent(
                     eventTimestamp,
@@ -495,7 +497,7 @@ function applyEventToQueue(
         console.log(
             `[applyEvent:insert]\n\tsmId=${stateMachineId}\n\tguardId=${event.guardId}\n\tt=${event.timestamp}`
         );
-        insert(queue, event);
+        insert(exerciseState.participantKey, queue, event);
         return;
     }
     const current = queue.events[queue.guardIndices[event.guardId]!]!;
@@ -511,7 +513,7 @@ function applyEventToQueue(
     console.log(
         `[applyEvent:update]\n\tsmId=${stateMachineId}\n\tguardId: ${current.guardId}→${event.guardId}\n\tt: ${current.timestamp}→${event.timestamp}`
     );
-    modify(queue, event.guardId, event);
+    modify(exerciseState.participantKey, queue, event.guardId, event);
 }
 
 /** Full recomputation across all transitions — use after state transitions and on initial creation. */
@@ -521,6 +523,7 @@ export function updateEventQueue(
     stateMachine: WritableDraft<StateMachine>
 ) {
     removeByStateMachineId(
+        exerciseState.participantKey,
         exerciseState.stateMachineEventQueue,
         stateMachine.id
     );
@@ -582,7 +585,9 @@ export function updateEventQueueAfterTaskChange(
                     queue.events[queue.guardIndices[guard.id]!]!.timestamp !==
                     eventTimestamp
                 ) {
-                    modify(queue, guardId, { timestamp: eventTimestamp });
+                    modify(exerciseState.participantKey, queue, guardId, {
+                        timestamp: eventTimestamp,
+                    });
                 }
             }
         }
@@ -677,7 +682,7 @@ function _simulateAllTechnicalChallenges(
 
     let nProcessed = 0;
     while ((peek(queue)?.timestamp ?? Infinity) <= draftState.currentTime) {
-        const event = pop(queue)!;
+        const event = pop(draftState.participantKey, queue)!;
         console.log(
             `[tick:fire]\n\t#${nProcessed}\n\tsmId=${event.stateMachineId}\n\tguardId=${event.guardId}\n\teventTime=${event.timestamp}\n\tcurrentTime=${draftState.currentTime}`
         );

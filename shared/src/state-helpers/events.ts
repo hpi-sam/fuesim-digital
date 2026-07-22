@@ -1,3 +1,4 @@
+import { benchmark } from '../benchmark.js';
 import type {
     StateMachineEvent,
     StateMachineEventQueue,
@@ -20,21 +21,26 @@ function guardIdsOf(
     return set;
 }
 
-export function insert(
-    queue: StateMachineEventQueue,
-    event: StateMachineEvent
-) {
+function _insert(queue: StateMachineEventQueue, event: StateMachineEvent) {
     queue.events.push(event);
     queue.guardIndices[event.guardId] = queue.events.length - 1;
     guardIdsOf(queue, event.stateMachineId)[event.guardId] = true;
     bubbleUp(queue, queue.events.length - 1);
 }
 
+export function insert(
+    exerciseKey: string,
+    queue: StateMachineEventQueue,
+    event: StateMachineEvent
+) {
+    benchmark(exerciseKey, 'queue:insert', () => _insert(queue, event));
+}
+
 export function peek(queue: StateMachineEventQueue): StateMachineEvent | null {
     return queue.events[0] ?? null;
 }
 
-export function pop(queue: StateMachineEventQueue): StateMachineEvent | null {
+function _pop(queue: StateMachineEventQueue): StateMachineEvent | null {
     if (queue.events.length === 0) return null;
     if (queue.events.length === 1) {
         const event = queue.events.pop()!;
@@ -54,10 +60,14 @@ export function pop(queue: StateMachineEventQueue): StateMachineEvent | null {
     return min;
 }
 
-export function removeByGuardId(
-    queue: StateMachineEventQueue,
-    id: GuardId
-): boolean {
+export function pop(
+    exerciseKey: string,
+    queue: StateMachineEventQueue
+): StateMachineEvent | null {
+    return benchmark(exerciseKey, 'queue:pop', () => _pop(queue));
+}
+
+function _removeByGuardId(queue: StateMachineEventQueue, id: GuardId): boolean {
     const index = queue.guardIndices[id];
     if (index === undefined) return false;
 
@@ -79,7 +89,17 @@ export function removeByGuardId(
     return true;
 }
 
-export function removeByStateMachineId(
+export function removeByGuardId(
+    exerciseKey: string,
+    queue: StateMachineEventQueue,
+    id: GuardId
+): boolean {
+    return benchmark(exerciseKey, 'queue:removeGuardById', () =>
+        _removeByGuardId(queue, id)
+    );
+}
+
+function _removeByStateMachineId(
     queue: StateMachineEventQueue,
     stateMachineId: StateMachineId
 ): boolean {
@@ -88,7 +108,7 @@ export function removeByStateMachineId(
     if (set === undefined) return false;
 
     for (const guardId of TypeAssertedObject.keys(set)) {
-        removeByGuardId(queue, guardId);
+        _removeByGuardId(queue, guardId);
     }
 
     delete queue.guardIdsOf[stateMachineId];
@@ -96,7 +116,17 @@ export function removeByStateMachineId(
     return true;
 }
 
-export function modify(
+export function removeByStateMachineId(
+    exerciseKey: string,
+    queue: StateMachineEventQueue,
+    stateMachineId: StateMachineId
+): boolean {
+    return benchmark(exerciseKey, 'queue:removeByStateMachineId', () =>
+        _removeByStateMachineId(queue, stateMachineId)
+    );
+}
+
+function _modify(
     queue: StateMachineEventQueue,
     id: GuardId,
     updates: Partial<StateMachineEvent>
@@ -110,6 +140,17 @@ export function modify(
     bubbleDown(queue, index);
 
     return true;
+}
+
+export function modify(
+    exerciseKey: string,
+    queue: StateMachineEventQueue,
+    id: GuardId,
+    updates: Partial<StateMachineEvent>
+) {
+    return benchmark(exerciseKey, 'queue:modify', () =>
+        _modify(queue, id, updates)
+    );
 }
 
 function swap(queue: StateMachineEventQueue, i: number, j: number) {

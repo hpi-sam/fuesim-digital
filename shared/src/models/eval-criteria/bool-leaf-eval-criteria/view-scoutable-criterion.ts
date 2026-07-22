@@ -55,8 +55,9 @@ export function getEvalResultOfViewScoutableCriterion(
     const scoutableChallenge =
         context.technicalChallenges[criterion.targetScoutableId];
     if (scoutableChallenge) {
-        const currentState = currentStateOf(scoutableChallenge);
-        isCompleted = currentState.viewedByParticipants ?? false;
+        isCompleted = Object.values(scoutableChallenge.stateMachines)
+            .map(currentStateOf)
+            .every((machine) => machine.viewedByParticipants);
     } else {
         const scoutable = context.scoutables[criterion.targetScoutableId]!;
         isCompleted = scoutable.viewedByParticipants;

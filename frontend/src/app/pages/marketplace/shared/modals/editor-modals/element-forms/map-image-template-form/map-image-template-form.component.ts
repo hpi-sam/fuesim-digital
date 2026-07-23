@@ -2,9 +2,16 @@ import { Component, effect, inject, input, signal } from '@angular/core';
 import {
     cloneDeepMutable,
     MapImageTemplate,
+    mapImageTemplateSchema,
+    stripEntityFromElementSchema,
     uuid,
 } from 'fuesim-digital-shared';
-import { form, required, disabled, FormField } from '@angular/forms/signals';
+import {
+    form,
+    disabled,
+    FormField,
+    validateStandardSchema,
+} from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
     FormOutputInjectionToken,
@@ -49,11 +56,11 @@ export class MapImageTemplateFormComponent implements BaseVersionedElementSubmod
     });
 
     public readonly mapImageForm = form(this.values, (schema) => {
-        required(schema.name);
-        required(schema.image.url);
-        required(schema.image.height);
-
         disabled(schema, this.disabled);
+        validateStandardSchema(
+            schema,
+            stripEntityFromElementSchema(mapImageTemplateSchema)
+        );
     });
 
     constructor() {

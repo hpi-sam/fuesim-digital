@@ -8,16 +8,23 @@ import {
 } from '@angular/core';
 import {
     AlarmGroup,
+    alarmGroupSchema,
     cloneDeepMutable,
     isElementVersionId,
     newAlarmGroupVehicle,
+    stripEntityFromElementSchema,
     TypedTemplateVersion,
     uuid,
     VehicleTemplate,
 } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { disabled, form, FormField, required } from '@angular/forms/signals';
+import {
+    disabled,
+    form,
+    FormField,
+    validateStandardSchema,
+} from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
     FormOutputInjectionToken,
@@ -64,7 +71,10 @@ export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<Ala
 
     public readonly agForm = form(this.values, (schema) => {
         disabled(schema, this.disabled);
-        required(schema.name);
+        validateStandardSchema(
+            schema,
+            stripEntityFromElementSchema(alarmGroupSchema)
+        );
     });
 
     public readonly availableVehicles = computed(() => {

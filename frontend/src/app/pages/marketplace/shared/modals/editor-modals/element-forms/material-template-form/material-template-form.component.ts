@@ -1,8 +1,15 @@
 import { Component, effect, inject, input, signal } from '@angular/core';
-import { disabled, form, FormField } from '@angular/forms/signals';
+import {
+    disabled,
+    form,
+    FormField,
+    validateStandardSchema,
+} from '@angular/forms/signals';
 import {
     cloneDeepMutable,
     MaterialTemplate,
+    materialTemplateSchema,
+    stripEntityFromElementSchema,
     uuid,
 } from 'fuesim-digital-shared';
 import { CaterForFormComponent } from '../cater-for-form/cater-for-form.component';
@@ -60,6 +67,10 @@ export class MaterialTemplateFormComponent implements BaseVersionedElementSubmod
 
     public readonly materialForm = form(this.values, (schema) => {
         disabled(schema, this.disabled);
+        validateStandardSchema(
+            schema,
+            stripEntityFromElementSchema(materialTemplateSchema)
+        );
     });
 
     constructor() {

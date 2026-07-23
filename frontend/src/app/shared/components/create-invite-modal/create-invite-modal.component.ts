@@ -5,33 +5,33 @@ import {
     PostOrganisationInviteLinkResponseData,
 } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../../../core/api.service';
-import { MessageService } from '../../../../core/messages/message.service';
-import { CopyButtonComponent } from '../../../../shared/components/copy-button/copy-button.component.js';
+import { ApiService } from '../../../core/api.service';
+import { MessageService } from '../../../core/messages/message.service';
+import { CopyButtonComponent } from '../copy-button/copy-button.component';
 
 @Component({
-    selector: 'app-invite-member-modal',
-    templateUrl: './invite-member-modal.component.html',
-    styleUrls: ['./invite-member-modal.component.scss'],
+    selector: 'app-create-invite-modal',
+    templateUrl: './create-invite-modal.component.html',
+    styleUrls: ['./create-invite-modal.component.scss'],
     imports: [FormsModule, CopyButtonComponent, NgbTooltip],
 })
-export class InviteMemberModalComponent {
+export class CreateInviteModalComponent {
     private readonly apiService = inject(ApiService);
     private readonly activeModal = inject(NgbActiveModal);
     private readonly messageService = inject(MessageService);
 
-    public readonly organisation = signal<
-        GetOrganisationsResponseData[0] | null
-    >(null);
+    public  titleText!: string;
+    public  descriptionText!: string;
+    public typeText!: string;
+    public createInviteFn!: () => Promise<string>;
+
     public readonly created = output<boolean>();
-    readonly inviteLink = signal<PostOrganisationInviteLinkResponseData | null>(
+    readonly inviteLink = signal<string | null>(
         null
     );
 
     public async invite() {
-        const inviteLink = await this.apiService.createOrganisationInviteLink(
-            this.organisation()!.id
-        );
+        const inviteLink = await this.createInviteFn();
         this.inviteLink.set(inviteLink);
         this.created.emit(true);
     }

@@ -11,7 +11,7 @@ import {
     marketplaceElementsDefinitions,
     TemplateVersion,
 } from 'fuesim-digital-shared';
-import { DatePipe, NgComponentOutlet } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Immutable } from 'immer';
 import { EditConflictResolutionComponent } from '../edit-conflict-resolution/edit-conflict-resolution.component';
 import { VersionedElementModalData } from '../base-versioned-element-submodal';
@@ -19,10 +19,12 @@ import { VersionedElementFormComponent } from '../versioned-element-form/version
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
+import { marketplaceComponentDefinitions } from '../../../definitions';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component';
 
 @Component({
     selector: 'app-versioned-element-modal',
-    imports: [DatePipe, VersionedElementFormComponent, NgComponentOutlet],
+    imports: [DatePipe, VersionedElementFormComponent, HelpButtonComponent],
     templateUrl: './versioned-element-modal.component.html',
     styleUrl: './versioned-element-modal.component.scss',
     host: {
@@ -58,6 +60,8 @@ export class VersionedElementModalComponent implements OnInit {
 
         return this.selectedVersion() !== this.data.element.version;
     });
+
+    public hasHelpUrl: string | null = null;
 
     public readonly versionHistory =
         signal<Immutable<TemplateVersion[] | null>>(null);
@@ -106,6 +110,8 @@ export class VersionedElementModalComponent implements OnInit {
     }
 
     public async ngOnInit() {
+        this.hasHelpUrl =
+            marketplaceComponentDefinitions[this.data.type].helpUrl ?? null;
         if (
             this.data.mode !== 'create' &&
             this.data.hideVersionHistory !== true

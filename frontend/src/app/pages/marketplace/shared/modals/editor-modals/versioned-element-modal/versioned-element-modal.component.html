@@ -1,5 +1,11 @@
 <div class="modal-header">
-    <h4 class="modal-title">{{ modalHeaderString() }}</h4>
+    <h4 class="modal-title">
+        {{ modalHeaderString() }}
+
+        @if (hasHelpUrl !== null) {
+            <app-help-button [url]="hasHelpUrl" />
+        }
+    </h4>
     <button class="btn-close ml-auto" (click)="dismiss()"></button>
 </div>
 <div class="">

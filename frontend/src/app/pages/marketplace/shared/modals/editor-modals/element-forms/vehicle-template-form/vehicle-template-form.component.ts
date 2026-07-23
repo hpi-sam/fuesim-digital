@@ -8,22 +8,22 @@ import {
 } from '@angular/core';
 import {
     cloneDeepMutable,
+    stripEntityFromElementSchema,
     TypedTemplateVersion,
     uuid,
+    vehicleTemplateSchema,
     type MaterialTemplate,
     type PersonnelTemplate,
     type VehicleTemplate,
 } from 'fuesim-digital-shared';
 import { WritableDraft } from 'immer';
 import { FormsModule } from '@angular/forms';
-
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import {
     disabled,
     form,
     FormField,
-    min,
-    required,
+    validateStandardSchema,
 } from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
@@ -51,6 +51,7 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
         FormField,
         ImagePartialFormComponent,
         MarketplaceFormSubmitButtonBarComponent,
+        NgbTooltip,
     ],
     templateUrl: './vehicle-template-form.component.html',
     styleUrls: ['./vehicle-template-form.component.scss'],
@@ -82,13 +83,10 @@ export class VehicleTemplateFormMarketplaceComponent implements BaseVersionedEle
 
     public readonly vehicleForm = form(this.values, (schema) => {
         disabled(schema, this.disabled);
-        required(schema.name);
-        required(schema.vehicleType);
-        required(schema.image.url);
-        required(schema.image.height);
-        min(schema.image.height, 1);
-        min(schema.patientCapacity, 0);
-        required(schema.patientCapacity);
+        validateStandardSchema(
+            schema,
+            stripEntityFromElementSchema(vehicleTemplateSchema)
+        );
     });
 
     public readonly availableMaterialTemplates = computed(() => {

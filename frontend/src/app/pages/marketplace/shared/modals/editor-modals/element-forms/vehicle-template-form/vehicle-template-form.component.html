@@ -12,7 +12,15 @@
     ></app-display-model-validation>
 </div>
 <div class="form-group mb-3">
-    <label class="form-label">Standardname von neuen Fahrzeugen:</label>
+    <label class="form-label"
+        >Standardname von neuen Fahrzeugen:
+        <span
+            class="text-info"
+            ngbTooltip="'#' im Namen werden automatisch fortlaufend nummeriert"
+        >
+            <i class="bi bi-lightbulb"></i>
+        </span>
+    </label>
     <input
         [formField]="vehicleForm.name"
         type="text"
@@ -34,6 +42,18 @@
         type="number"
         class="form-control"
         placeholder="1"
+    />
+    <app-display-model-validation
+        [field]="vehicleForm.patientCapacity()"
+    ></app-display-model-validation>
+</div>
+<div class="form-group mb-3">
+    <label class="form-label">Ladezeit pro Patient:</label>
+    <input
+        [formField]="vehicleForm.patientLoadMinutes"
+        type="number"
+        class="form-control"
+        placeholder="2"
     />
     <app-display-model-validation
         [field]="vehicleForm.patientCapacity()"

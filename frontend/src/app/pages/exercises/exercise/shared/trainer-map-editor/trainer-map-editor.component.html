@@ -679,10 +679,13 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
-                                <em class="mb-1 d-block"
-                                    >Diese Vorlagen können per Drag-&-Drop
-                                    verwendet werden</em
+                                <div
+                                    class="alert alert-secondary small mb-0 px-2 py-1 d-flex align-items-center mb-2"
                                 >
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Diese Vorlagen können durch das Ziehen in
+                                    die Ansicht links verwendet werden
+                                </div>
                                 @let alarmGroupTemplates =
                                     (alarmGroupTemplates$ | async | values) ??
                                     [];

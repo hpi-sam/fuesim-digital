@@ -31,3 +31,19 @@ export function getEntityFromElement(
     }
     return undefined;
 }
+
+export type StripEntityFromElementType<T extends object> = T & {
+    entity?: undefined;
+};
+export function stripEntityFromElementSchema<T extends z.ZodObject>(
+    schema: T
+): z.ZodObject<
+    T['shape'] & {
+        entity: z.ZodOptional<z.ZodAny>;
+    }
+> {
+    return z.object({
+        ...schema.shape,
+        entity: z.any().optional(),
+    });
+}

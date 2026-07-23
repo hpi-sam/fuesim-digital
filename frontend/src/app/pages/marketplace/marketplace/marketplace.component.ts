@@ -8,6 +8,9 @@ import { openCreateCollectionModal } from '../shared/modals/create-collection-mo
 import { AuthService } from '../../../core/auth.service';
 import { UserAccountNavbarItemComponent } from '../../../shared/components/user-account-navbar-item/user-account-navbar-item.component';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
+import { PromptModalComponent } from '../../../core/prompt-modal/prompt-modal.component';
+import { PromptModalService } from '../../../core/prompt-modal/prompt-modal.service';
+import { openSelectOrganisationModal } from '../shared/modals/select-organisation-modal/open-select-organisation-modal';
 
 @Component({
     selector: 'app-marketplace',
@@ -22,6 +25,7 @@ import { ConfirmationModalService } from '../../../core/confirmation-modal/confi
 })
 export class MarketplaceComponent {
     private readonly confirmationService = inject(ConfirmationModalService);
+    private readonly promptService = inject(PromptModalService);
     private readonly collectionService = inject(CollectionService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly authService = inject(AuthService);
@@ -48,6 +52,31 @@ export class MarketplaceComponent {
                 this.userAvailableCollections.reload();
             }
         });
+    }
+
+    public async joinCollection() {
+        const promptResult = await this.promptService.prompt({
+            title: 'Sammlung beitreten',
+            description:
+                'Bitte geben Sie den Einladungscode ein, um der Sammlung beizutreten.',
+            placeholder: "Einladungscode",
+            confirmationButtonText: 'Beitreten',
+        })
+
+        if (promptResult.result !== true) return;
+
+        const collectionPreview = await this.collectionService.getJoinCodePreview(promptResult.value);
+
+        console.log(collectionPreview);
+
+        const organisationId = await openSelectOrganisationModal(this.ngbModalService, {
+            descriptionText: `Bitte wählen Sie die Organisation aus, mit der Sie der Sammlung "${collectionPreview.title}" beitreten möchten. Die Sammlung wird dann in dieser Organisation verfügbar sein.`,
+        })
+
+        console.log(organisationId);
+
+        await this.collectionService.joinCollectionByJoinCode(promptResult.value, organisationId);
+
     }
 
     public async archiveCollection(collection: CollectionVersion) {

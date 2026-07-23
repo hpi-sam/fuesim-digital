@@ -135,7 +135,7 @@ export namespace Marketplace {
             }),
         });
 
-        export const GetCollectionRole = new Route({
+        export const GetCollectionUserRole = new Route({
             response: z.object({
                 result: collectionMembershipRole.nullable(),
             }),
@@ -157,6 +157,23 @@ export namespace Marketplace {
             }),
         });
 
+        export const GetUserRoleInCollection = new Route({
+            response: z.object({
+                result: collectionMembershipRole.nullable()
+            })
+        })
+
+        export const AddCollectionOrganisation = new Route({
+            request: z.object({
+                organisationId: organisationIdSchema
+            }),
+            response: z.object({
+                result: z.object({
+                    status: z.literal(['success']),
+                }),
+            }),
+        })
+
         export const GetCollectionOrganisations = new Route({
             response: z.object({
                 result: z.array(
@@ -164,6 +181,7 @@ export namespace Marketplace {
                         id: organisationIdSchema,
                         name: z.string(),
                         owner: z.boolean(),
+                        personalOrganisationOf: z.string().nullable(),
                     })
                 ),
             }),
@@ -325,13 +343,13 @@ export namespace Marketplace {
         });
 
         class TypedSchema<D, T> {
-            constructor(public readonly schema: T) {}
+            constructor(public readonly schema: T) { }
 
             public readonly Type!: T extends z.ZodType
                 ? // if D is defined (override type), use D, otherwise infer from T
-                  D extends unknown
-                    ? Immutable<z.infer<T>>
-                    : D
+                D extends unknown
+                ? Immutable<z.infer<T>>
+                : D
                 : never;
 
             public readonly InputType!: T extends z.ZodType

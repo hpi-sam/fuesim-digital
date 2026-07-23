@@ -1,0 +1,25 @@
+<div class="d-flex flex-row align-items-center gap-3">
+    @let isPersonalOrganisationMember =
+        member().personalOrganisationOf === ownUserId();
+    <span>
+        {{ member().name }}
+        @if (isPersonalOrganisationMember) {
+            <span class="badge text-bg-secondary ms-1"
+                >Ihre Private Organisation</span
+            >
+        }
+        @if (member().owner) {
+            <span class="badge text-bg-primary ms-1">Besitzer</span>
+        }
+    </span>
+    @if(!member().owner){
+
+        <button
+            class="btn btn-outline-danger btn-sm ms-auto"
+            (click)="removeCollectionMember(member().id, member.name)"
+        >
+            <i class="bi bi-x-square me-1"></i>
+            Entfernen
+        </button>
+    }
+</div>

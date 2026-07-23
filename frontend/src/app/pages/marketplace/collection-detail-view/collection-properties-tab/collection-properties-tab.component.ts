@@ -14,13 +14,17 @@ import {
 } from 'fuesim-digital-shared';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgbDropdownModule, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../../core/exercise-element.service';
 import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
 import { CopyButtonComponent } from '../../../../shared/components/copy-button/copy-button.component';
 import { CollectionRelationshipTypeDisplayNamePipe } from '../../../../shared/pipes/collection-relationship-type-display-name.pipe';
 import { AuthService } from '../../../../core/auth.service';
 import { ConfirmationModalService } from '../../../../core/confirmation-modal/confirmation-modal.service';
+import { CollectionMemberItemComponent } from './collection-member-item/collection-member-item.component';
+import { ApiService } from '../../../../core/api.service';
+import { openCreateInviteModal } from '../../../../shared/components/create-invite-modal/open-create-invite-modal';
+import { openSelectOrganisationModal } from '../../shared/modals/select-organisation-modal/open-select-organisation-modal';
 
 @Component({
     selector: 'app-collection-details-tab',
@@ -31,14 +35,17 @@ import { ConfirmationModalService } from '../../../../core/confirmation-modal/co
         NgbTooltip,
         NgbDropdownModule,
         CollectionRelationshipTypeDisplayNamePipe,
+        CollectionMemberItemComponent,
     ],
     templateUrl: './collection-properties-tab.component.html',
     styleUrl: './collection-properties-tab.component.scss',
 })
 export class CollectionDetailsTabComponent {
-    private readonly collectionService = inject(CollectionService);
     private readonly authService = inject(AuthService);
+    private readonly ngbModalService = inject(NgbModal);
+    private readonly collectionService = inject(CollectionService);
     private readonly router = inject(Router);
+    private readonly apiService = inject(ApiService);
     private readonly confirmationModalService = inject(
         ConfirmationModalService
     );
@@ -62,22 +69,32 @@ export class CollectionDetailsTabComponent {
                 .sort((a, b) => Number(b.owner) - Number(a.owner)),
     });
 
-    public readonly ownUserId = computed(
-        () => this.authService.authData().user?.id
-    );
-
-    public readonly inviteCode = resource({
+    public readonly userIsEditor = resource({
         params: () => ({
-            collectionEntityId: this.collection().entityId,
+            membersData: this.members.hasValue() ? this.members.value() : undefined,
         }),
-        loader: async ({ params: { collectionEntityId } }) =>
-            this.collectionService.getCollectionInviteCode(collectionEntityId),
-    });
-    public readonly inviteJoinLink = computed(() => {
-        const inviteCode = this.inviteCode.value();
-        return inviteCode
-            ? `${location.protocol}//${location.host}/collections/${this.collection().entityId}?join=${inviteCode.code}`
-            : '';
+        loader: async ({ params: { membersData: members } }) => {
+            if (!members) return false;
+
+            const userId = this.authService.authData().user?.id;
+            if (!userId) return false;
+
+            const ownerOrganisation = members.find((member) => member.owner);
+            if (!ownerOrganisation) return false;
+
+            try {
+                const ownerOrga = await this.apiService.getOrganisation(
+                    ownerOrganisation.id
+                );
+                return (
+                    ownerOrga.userRole === 'editor' ||
+                    ownerOrga.userRole === 'admin'
+                );
+            } catch (err) {
+                console.error('Error fetching owner organisation:', err);
+                return false;
+            }
+        },
     });
 
     public readonly collectionTitle = signal('');
@@ -88,11 +105,28 @@ export class CollectionDetailsTabComponent {
         });
     }
 
-    public async createInviteCode() {
-        const result = await this.collectionService.createCollectionInviteCode(
-            this.collection().entityId
-        );
-        this.inviteCode.set(result);
+    public async addOrganisation(){
+        const organisationId = await openSelectOrganisationModal(this.ngbModalService, {
+            descriptionText: "Bitte wählen Sie eine Organisation aus, die Sie zu dieser Sammlung hinzufügen möchten. Die Organisation wird als Betrachter hinzugefügt.",
+        })
+
+        await this.collectionService.addOrganisationToCollection(organisationId, this.collection().entityId);
+        this.members.reload();
+    }
+
+    public async invite() {
+        openCreateInviteModal(
+            this.ngbModalService,
+            {
+                title: 'Mitglieder einladen',
+                description: `Sie können an dieser Stelle einen Zugriffscode erstellen, den sie an andere
+                Personen weitergeben können und welcher sieben Tage lang gültig ist.
+                Diese können dann über die Übungselemente-Startseite mit einer Organisation dieser Sammlung als Betrachter beitreten.
+                `,
+                type: 'Zugriffscode',
+                createInviteFn: () => this.collectionService.createCollectionInviteCode(this.collection().entityId).then((response) => response.code),
+            }
+        )
     }
 
     public async revokeInviteCode() {
@@ -105,22 +139,6 @@ export class CollectionDetailsTabComponent {
         if (!confirmationResult) return;
         await this.collectionService.revokeCollectionInviteCode(
             this.collection().entityId
-        );
-        this.inviteCode.set(undefined);
-    }
-
-    public async removeCollectionMember(
-        organisationId: OrganisationId,
-        userName: string
-    ) {
-        const confirmationResult = await this.confirmationModalService.confirm({
-            title: 'Mitglied entfernen',
-            description: `Möchten Sie ${userName} wirklich entfernen? Dadurch verliert die Person den Zugriff auf die Sammlung. Die Person kann die Sammlung erneut betreten, wenn sie einen gültigen Einladungslink hat.`,
-        });
-        if (!confirmationResult) return;
-        await this.collectionService.removeCollectionMember(
-            this.collection().entityId,
-            organisationId
         );
     }
 

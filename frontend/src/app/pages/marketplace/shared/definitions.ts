@@ -7,6 +7,7 @@ import { VehicleTemplateFormMarketplaceComponent } from './modals/editor-modals/
 
 interface MarketplaceItemDefintition<C extends MarketplaceElementContent> {
     elementFormComponent: any;
+    helpUrl?: string;
     elementCard: (content: C) => {
         title: string;
         subtitle?: string;
@@ -21,6 +22,7 @@ export const marketplaceComponentDefinitions: {
 } = {
     alarmGroup: {
         elementFormComponent: AlarmgroupFormComponent,
+        helpUrl: '2_exercises/3_exercise_elements.html#alarmgruppen',
         elementCard: (content) => ({
             title: content.name,
             subtitle: `${Object.values(content.alarmGroupVehicles).length} Fahrzeuge`,
@@ -28,6 +30,7 @@ export const marketplaceComponentDefinitions: {
     },
     mapImageTemplate: {
         elementFormComponent: MapImageTemplateFormComponent,
+        helpUrl: '2_exercises/3_exercise_elements.html#bilder',
         elementCard: (content) => ({
             title: content.name,
             image: content.image.url,
@@ -50,6 +53,8 @@ export const marketplaceComponentDefinitions: {
     },
     vehicleTemplate: {
         elementFormComponent: VehicleTemplateFormMarketplaceComponent,
+        helpUrl:
+            '2_exercises/3_exercise_elements.html#fahrzeuge-mit-personal-und-material',
         elementCard: (content) => ({
             title: content.vehicleType,
             subtitle: content.name,

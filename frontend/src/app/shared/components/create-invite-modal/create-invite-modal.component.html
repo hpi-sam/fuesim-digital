@@ -1,20 +1,16 @@
 <div class="modal-header">
-    <h4 class="modal-title">Mitglied einladen</h4>
+    <h4 class="modal-title">{{titleText}}</h4>
     <button type="button" class="btn-close" (click)="close()"></button>
 </div>
 <div class="modal-body">
-    @if (organisation(); as org) {
         <p>
-            Sie können an dieser Stelle einen Link erstellen, den sie an andere
-            Personen weitergeben können und welcher sieben Tage lang gültig ist.
-            Diese treten dann der Organisation <em>{{ org.name }}</em> als
-            Betrachter bei.
+        {{descriptionText}}
         </p>
 
         @if (inviteLink(); as inviteLink) {
             <div class="input-group">
                 <input
-                    [ngModel]="inviteLink.inviteLink"
+                    [ngModel]="inviteLink"
                     type="text"
                     class="form-control"
                     readonly
@@ -22,17 +18,16 @@
                 <button
                     app-copy-button
                     class="btn btn-outline-secondary"
-                    [value]="inviteLink.inviteLink"
+                    [value]="inviteLink"
                     icon="link-45deg"
-                    ngbTooltip="Einladungslink kopieren"
+                    ngbTooltip="{{typeText}} kopieren"
                     container="body"
                 ></button>
             </div>
         } @else {
             <button class="btn btn-primary" (click)="invite()">
                 <i class="bi bi-link-45deg me-1"></i>
-                Link erstellen
+                {{typeText}} erstellen
             </button>
         }
-    }
 </div>

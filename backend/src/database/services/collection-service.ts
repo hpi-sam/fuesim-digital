@@ -141,7 +141,7 @@ export class CollectionService {
         private readonly eventSubject = new Subject<
             typeof Marketplace.Collection.Events.SSEvent.Type
         >()
-    ) {}
+    ) { }
 
     public async initialize() {
         await this.collectionRepository.setDefaultCollectionData();
@@ -153,10 +153,10 @@ export class CollectionService {
         return this.collectionRepository.getJoinCode(collectionEntityId);
     }
 
-    public async getOrCreateCollectionInviteCode(
+    public async createCollectionInviteCode(
         collectionEntityId: CollectionEntityId
     ) {
-        return this.collectionRepository.getOrCreateJoinCode(
+        return this.collectionRepository.createJoinCode(
             collectionEntityId
         );
     }
@@ -198,9 +198,9 @@ export class CollectionService {
         // with different roles in the collection
         const highestOrganisationRole = collectionRoles.reduce<
             | [
-                  OrganisationWithRole,
-                  CollectionOrganisationRelationshipType | null,
-              ]
+                OrganisationWithRole,
+                CollectionOrganisationRelationshipType | null,
+            ]
             | null
         >((highestRole, currentRole) => {
             if (
@@ -268,6 +268,17 @@ export class CollectionService {
 
         // if we dont have direct rights, the highest role we can get is other
         return rolesInParents.some((r) => r) ? 'other' : null;
+    }
+
+    public async addCollectionOrganisation(
+        collectionEntityId: CollectionEntityId,
+        organisationId: OrganisationId,
+    ) {
+        return await this.collectionRepository.setOrganisationCollectionViewer(
+            organisationId,
+            collectionEntityId,
+            { allowDowngrade: false }
+        )
     }
 
     public async getCollectionOrganisation(
@@ -444,8 +455,8 @@ export class CollectionService {
         opts: {
             throwOnDuplicate: boolean;
         } = {
-            throwOnDuplicate: true,
-        }
+                throwOnDuplicate: true,
+            }
     ) {
         return this.reduce(
             data.importTo,
@@ -1214,10 +1225,10 @@ export class CollectionService {
         const transitiveElementReferences = (
             opts.transitive === true
                 ? await Promise.all(
-                      directElementReferences.map(async (directReference) =>
-                          this.getDependenciesOfElement(directReference)
-                      )
-                  )
+                    directElementReferences.map(async (directReference) =>
+                        this.getDependenciesOfElement(directReference)
+                    )
+                )
                 : []
         ).flat();
 

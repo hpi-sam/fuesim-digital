@@ -192,11 +192,7 @@ export class CollectionRepository extends BaseRepository {
         );
     }
 
-    public async getOrCreateJoinCode(collectionEntityId: CollectionEntityId) {
-        const existingCode = await this.getJoinCode(collectionEntityId);
-        if (existingCode && existingCode.expiresAt > new Date()) {
-            return existingCode;
-        }
+    public async createJoinCode(collectionEntityId: CollectionEntityId) {
         return this.onlySingleStrict(
             await this.databaseConnection
                 .insert(collectionJoinCodesTable)
@@ -276,6 +272,7 @@ export class CollectionRepository extends BaseRepository {
         return null;
     }
 
+
     public async getCollectionOrganisations(
         collectionEntityId: CollectionEntityId
     ) {
@@ -284,6 +281,8 @@ export class CollectionRepository extends BaseRepository {
                 id: organisationTable.id,
                 name: organisationTable.name,
                 owner: collectionOrganisationMappingTable.owner,
+                personalOrganisationOf:
+                    organisationTable.personalOrganisationOf,
             })
             .from(collectionOrganisationMappingTable)
             .innerJoin(

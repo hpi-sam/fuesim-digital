@@ -7,17 +7,17 @@ import {
     organisationMembershipRoleToGermanNameDictionary,
 } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
-import { InviteMemberModalComponent } from '../../shared/invite-member-modal/invite-member-modal.component.js';
 import { ApiService } from '../../../../core/api.service.js';
 import { MessageService } from '../../../../core/messages/message.service.js';
 import { ConfirmationModalService } from '../../../../core/confirmation-modal/confirmation-modal.service.js';
 import { AuthService } from '../../../../core/auth.service.js';
+import { openCreateInviteModal } from '../../../../shared/components/create-invite-modal/open-create-invite-modal';
 
 @Component({
     selector: 'app-organisation-tab-members',
-    imports: [FormsModule],
+    imports: [FormsModule, NgbTooltip],
     templateUrl: './organisation-tab-members.component.html',
     styleUrl: './organisation-tab-members.component.scss',
 })
@@ -41,10 +41,19 @@ export class OrganisationTabMembersComponent {
         organisationMembershipRoleAllowedValues;
 
     async invite() {
-        const modalRef = this.ngbModalService.open(InviteMemberModalComponent);
-        const componentInstance =
-            modalRef.componentInstance as InviteMemberModalComponent;
-        componentInstance.organisation.set(this.organisation());
+        openCreateInviteModal(this.ngbModalService, {
+            title: 'Mitglied einladen',
+            description: `Sie können an dieser Stelle einen Link erstellen, den sie an andere
+            Personen weitergeben können und welcher sieben Tage lang gültig ist.
+            Diese treten dann der Organisation "${this.organisation().name}" als
+            Betrachter bei.`,
+            type: "Einladungslink",
+            createInviteFn: () =>
+                this.apiService.createOrganisationInviteLink(
+                    this.organisation()!.id
+                ).then((response) => response.inviteLink),
+
+        })
     }
 
     async updateMembershipRole(

@@ -734,9 +734,9 @@ export class CollectionService {
         collection: VersionedCollectionPartial
     ): Promise<
         | {
-              newerVersionAvailable: true;
-              latestVersion: VersionedCollectionPartial;
-          }
+            newerVersionAvailable: true;
+            latestVersion: VersionedCollectionPartial;
+        }
         | { newerVersionAvailable: false }
     > {
         const latestCollection =
@@ -846,19 +846,47 @@ export class CollectionService {
         return typedData.result;
     }
 
-    public async getCollectionInviteCode(
-        collectionEntityId: CollectionEntityId
-    ) {
+    public async getUserRoleInCollection(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.get<
-                typeof Marketplace.Collection.GetInviteCode.Response
-            >(`${this.ENDPOINT}/${collectionEntityId}/invitecode`)
+                typeof Marketplace.Collection.GetCollectionUserRole.Response
+            >(`${this.ENDPOINT}/${collectionEntityId}/user-role`)
         );
 
         const typedData =
-            Marketplace.Collection.GetInviteCode.responseSchema.parse(data);
+            Marketplace.Collection.GetCollectionUserRole.responseSchema.parse(data);
 
         return typedData.result;
+    }
+
+    public async addOrganisationToCollection(
+        organisationId: OrganisationId,
+        collectionEntityId: CollectionEntityId
+    ) {
+        try {
+            await lastValueFrom(
+                this.httpClient.post(
+                    `${this.ENDPOINT}/${collectionEntityId}/members`,
+                    Marketplace.Collection.AddCollectionOrganisation.requestSchema.encode({
+                        organisationId,
+                    }),
+                    {
+                        context: preventStatusErrorToastContext(),
+                    }
+                )
+            );
+
+            this.messageService.postMessage({
+                title: 'Organisation hinzugefügt',
+                body: 'Die Organisation wurde erfolgreich zur Sammlung hinzugefügt.',
+                color: 'success',
+            });
+        } catch (error) {
+            this.messageService.postError({
+                title: 'Fehler beim Hinzufügen der Organisation',
+                body: 'Die Organisation konnte nicht zur Sammlung hinzugefügt werden. Bitte versuchen Sie es erneut.',
+            })
+        }
     }
 
     public async revokeCollectionInviteCode(
@@ -881,7 +909,7 @@ export class CollectionService {
         collectionEntityId: CollectionEntityId
     ) {
         const data = await lastValueFrom(
-            this.httpClient.put<
+            this.httpClient.post<
                 typeof Marketplace.Collection.PutInviteCode.Response
             >(`${this.ENDPOINT}/${collectionEntityId}/invitecode`, {})
         );
@@ -913,11 +941,13 @@ export class CollectionService {
         return typedData.result;
     }
 
-    public async joinCollectionByJoinCode(joinCode: string) {
+    public async joinCollectionByJoinCode(joinCode: string, organisationId: OrganisationId) {
         const data = await lastValueFrom(
             this.httpClient.post<
                 typeof Marketplace.Collection.JoinByJoinCode.Response
-            >(`${this.ENDPOINT}/join/${joinCode}`, {})
+            >(`${this.ENDPOINT}/join`,
+                Marketplace.Collection.JoinByJoinCode.requestSchema.encode({ organisationId, joinCode })
+            )
         );
 
         const typedData =
@@ -931,21 +961,11 @@ export class CollectionService {
             });
         }
 
-        return typedData.result;
-    }
-
-    public async getUserCollectionRole(collectionEntityId: CollectionEntityId) {
-        const data = await lastValueFrom(
-            this.httpClient.get<
-                typeof Marketplace.Collection.GetCollectionRole.Response
-            >(`${this.ENDPOINT}/${collectionEntityId}/user-role`)
-        );
-
-        const typedData =
-            Marketplace.Collection.GetCollectionRole.responseSchema.parse(data);
+        this.router.navigate(['/collections', typedData.result]);
 
         return typedData.result;
     }
+
 
     public async getCollectionMembers(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(

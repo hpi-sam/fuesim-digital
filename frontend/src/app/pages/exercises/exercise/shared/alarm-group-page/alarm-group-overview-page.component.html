@@ -11,9 +11,9 @@
     </div>
     <div class="d-flex align-items-center mb-3">
         <h3
-            class="modal-title d-flex align-items-center flex-wrap column-gap-3"
+            class="modal-title d-flex align-items-center flex-wrap column-gap-3 justify-content-between w-100"
         >
-            <span>Alarmierungsgruppen</span>
+            <span class="flex-grow-1">Alarmgruppen</span>
 
             <div ngbDropdown class="d-inline-block">
                 <button
@@ -29,8 +29,8 @@
                         (click)="addEmptyAlarmGroup()"
                         data-cy="alarmGroupAddButton"
                     >
-                        <i class="bi bi-plus-square-dotted me-2"></i>Leere
-                        Alarmgruppe
+                        <i class="bi bi-plus-square-dotted me-2"></i>
+                        Leere Alarmgruppe
                     </button>
                     <button
                         ngbDropdownItem
@@ -59,18 +59,18 @@
             </li>
         } @empty {
             <div class="text-muted mt-3 mb-3 d-flex flex-column gap-3">
-                <span>Es sind noch keine Alarmierungsgruppen vorhanden:</span>
+                <span>Es sind noch keine Alarmgruppen vorhanden:</span>
                 <span class="d-flex"
                     ><i class="me-2 bi bi-plus-lg"></i
                     ><span
-                        >Klicken Sie auf "Hinzufügen", um eine neue
-                        Alarmierungsgruppe zu erstellen</span
+                        >Klicken Sie auf "Hinzufügen", um eine neue Alarmgruppe
+                        zu erstellen</span
                     ></span
                 >
                 <span class="d-flex"
                     ><i class="me-2 bi bi-hand-index"></i
                     ><span
-                        >Ziehen Sie bestehende Alarmierungsgruppen aus der
+                        >Ziehen Sie bestehende Alarmgruppen aus der
                         Seitenleiste</span
                     ></span
                 >

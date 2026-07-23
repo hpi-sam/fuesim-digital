@@ -2,9 +2,16 @@ import { Component, effect, inject, input, signal } from '@angular/core';
 import {
     cloneDeepMutable,
     PersonnelTemplate,
+    personnelTemplateSchema,
+    stripEntityFromElementSchema,
     uuid,
 } from 'fuesim-digital-shared';
-import { disabled, form, FormField, required } from '@angular/forms/signals';
+import {
+    disabled,
+    form,
+    FormField,
+    validateStandardSchema,
+} from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
     FormOutputInjectionToken,
@@ -61,19 +68,11 @@ export class PersonnelTemplateFormComponent implements BaseVersionedElementSubmo
     });
 
     public readonly personnelForm = form(this.values, (schema) => {
-        required(schema.name);
-        required(schema.abbreviation);
-        required(schema.personnelType);
-        required(schema.image.url);
-        required(schema.image.height);
-        required(schema.canCaterFor.red);
-        required(schema.canCaterFor.yellow);
-        required(schema.canCaterFor.green);
-        required(schema.canCaterFor.logicalOperator);
-        required(schema.overrideTreatmentRange);
-        required(schema.treatmentRange);
-
         disabled(schema, this.disabled);
+        validateStandardSchema(
+            schema,
+            stripEntityFromElementSchema(personnelTemplateSchema)
+        );
     });
 
     constructor() {

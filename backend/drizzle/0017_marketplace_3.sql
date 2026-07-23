@@ -1,0 +1,1 @@
+ALTER TABLE "collection_join_codes" DROP CONSTRAINT "collection_join_codes_collection_unique";

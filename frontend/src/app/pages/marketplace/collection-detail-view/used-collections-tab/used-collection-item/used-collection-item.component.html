@@ -2,7 +2,7 @@
     <div
         class="d-flex flex-row align-items-center justify-content-between gap-2 card-header"
     >
-        <h3 class="mb-0 d-flex flex-row align-items-center">
+        <span class="h4 mb-0 d-flex flex-row align-items-center">
             <span
                 >{{ collection().title }} (Version {{ collection().version }})
             </span>
@@ -16,7 +16,7 @@
                 class="btn btn-link"
                 ><i class="bi bi-box-arrow-up-right"></i
             ></a>
-        </h3>
+        </span>
         @if (newerVersionAvailable.isLoading()) {
             <div class="spinner-grow-sm text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -28,7 +28,8 @@
                     class="btn btn-outline-danger btn-sm"
                     (click)="removeCollectionDependency(collection().versionId)"
                 >
-                    Sammlung entfernen <i class="bi bi-x-square ms-1"></i>
+                    <i class="bi bi-x-square me-1"></i>
+                    Sammlung entfernen
                 </button>
             }
             @if (
@@ -36,9 +37,10 @@
                 newerVersionAvailable.value().newerVersionAvailable
             ) {
                 <button
-                    class="btn btn-outline-primary btn-sm"
+                    class="btn btn-outline-changed btn-sm"
                     (click)="openUpgradeVersionModal()"
                 >
+                    <i class="bi bi-arrow-repeat me-1"></i>
                     Version aktualisieren
                 </button>
             }

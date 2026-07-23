@@ -4,6 +4,7 @@
 @use 'bootstrap/scss/bootstrap';
 
 @use 'maplibre-gl/dist/maplibre-gl.css';
+@use 'app/pages/marketplace/shared/_change-indicator-colors' as ci;
 
 .dropdown-menu {
     overflow: auto;
@@ -85,5 +86,15 @@ $primary-muted: color-mix(in srgb, bootstrap.$primary 60%, transparent);
     }
     100% {
         box-shadow: 0 0 1px 0px var(--pulsating-color, $primary-muted);
+    }
+}
+
+.btn-outline-changed {
+    border: map-get(bootstrap.$border-widths, 1) solid;
+    color: ci.$change-primary !important;
+    border-color: ci.$change-primary !important;
+    &:hover {
+        color: var(--bs-white) !important;
+        background-color: ci.$change-primary !important;
     }
 }

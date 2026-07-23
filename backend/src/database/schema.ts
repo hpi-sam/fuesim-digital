@@ -460,7 +460,7 @@ export const collectionJoinCodesTable = pgTable('collection_join_codes', {
         .primaryKey()
         .notNull()
         .$defaultFn(() => crypto.randomBytes(10).toString('hex')),
-    collection: varchar().notNull().unique().$type<CollectionEntityId>(),
+    collection: varchar().notNull().$type<CollectionEntityId>(),
     expiresAt: timestamp({ withTimezone: true, mode: 'date' }).notNull(),
 });
 

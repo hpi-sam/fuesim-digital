@@ -1,5 +1,5 @@
 {
-    "id": "0a4912a4-f3d4-4e2c-ba13-0a5a999c1dfe",
+    "id": "3f916a7a-76fe-4cdd-a8bd-c33daa4bda3b",
     "prevId": "62469a0c-0dc9-462c-aa87-2589dd3aa10b",
     "version": "7",
     "dialect": "postgresql",
@@ -173,13 +173,7 @@
             "indexes": {},
             "foreignKeys": {},
             "compositePrimaryKeys": {},
-            "uniqueConstraints": {
-                "collection_join_codes_collection_unique": {
-                    "name": "collection_join_codes_collection_unique",
-                    "nullsNotDistinct": false,
-                    "columns": ["collection"]
-                }
-            },
+            "uniqueConstraints": {},
             "policies": {},
             "checkConstraints": {},
             "isRLSEnabled": false
@@ -350,7 +344,7 @@
                 },
                 "elementVersionId": {
                     "name": "elementVersionId",
-                    "type": "varchar",
+                    "type": "uuid",
                     "primaryKey": false,
                     "notNull": true
                 },
@@ -406,7 +400,7 @@
             "columns": {
                 "versionId": {
                     "name": "versionId",
-                    "type": "varchar",
+                    "type": "uuid",
                     "primaryKey": true,
                     "notNull": true
                 },
@@ -532,9 +526,9 @@
                     "primaryKey": false,
                     "notNull": true
                 },
-                "user": {
-                    "name": "user",
-                    "type": "varchar",
+                "organisationId": {
+                    "name": "organisationId",
+                    "type": "uuid",
                     "primaryKey": false,
                     "notNull": false
                 },
@@ -573,11 +567,11 @@
             },
             "indexes": {},
             "foreignKeys": {
-                "exercise_entity_user_users_id_fk": {
-                    "name": "exercise_entity_user_users_id_fk",
+                "exercise_entity_organisationId_organisation_id_fk": {
+                    "name": "exercise_entity_organisationId_organisation_id_fk",
                     "tableFrom": "exercise_entity",
-                    "tableTo": "users",
-                    "columnsFrom": ["user"],
+                    "tableTo": "organisation",
+                    "columnsFrom": ["organisationId"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
                     "onUpdate": "no action"
@@ -905,9 +899,9 @@
                     "primaryKey": true,
                     "notNull": true
                 },
-                "user": {
-                    "name": "user",
-                    "type": "varchar",
+                "organisationId": {
+                    "name": "organisationId",
+                    "type": "uuid",
                     "primaryKey": false,
                     "notNull": true
                 },
@@ -930,6 +924,12 @@
                     "primaryKey": false,
                     "notNull": true
                 },
+                "templateStateString": {
+                    "name": "templateStateString",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
                 "participantKey": {
                     "name": "participantKey",
                     "type": "char(7)",
@@ -945,11 +945,11 @@
             },
             "indexes": {},
             "foreignKeys": {
-                "parallel_exercise_user_users_id_fk": {
-                    "name": "parallel_exercise_user_users_id_fk",
+                "parallel_exercise_organisationId_organisation_id_fk": {
+                    "name": "parallel_exercise_organisationId_organisation_id_fk",
                     "tableFrom": "parallel_exercise",
-                    "tableTo": "users",
-                    "columnsFrom": ["user"],
+                    "tableTo": "organisation",
+                    "columnsFrom": ["organisationId"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
                     "onUpdate": "no action"

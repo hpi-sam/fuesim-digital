@@ -159,20 +159,26 @@ export namespace Marketplace {
 
         export const GetUserRoleInCollection = new Route({
             response: z.object({
-                result: collectionMembershipRole.nullable()
-            })
-        })
+                result: collectionMembershipRole.nullable(),
+            }),
+        });
 
         export const AddCollectionOrganisation = new Route({
             request: z.object({
-                organisationId: organisationIdSchema
+                organisationId: organisationIdSchema,
             }),
             response: z.object({
                 result: z.object({
                     status: z.literal(['success']),
                 }),
             }),
-        })
+        });
+
+        export const SetCollectionOrganisationOwner = new Route({
+            request: z.object({
+                organisationId: organisationIdSchema,
+            }),
+        });
 
         export const GetCollectionOrganisations = new Route({
             response: z.object({
@@ -246,6 +252,12 @@ export namespace Marketplace {
         });
 
         export const LoadPublic = new Route({
+            response: z.object({
+                result: z.array(extendedCollectionVersionSchema),
+            }),
+        });
+
+        export const LoadForOrganisation = new Route({
             response: z.object({
                 result: z.array(extendedCollectionVersionSchema),
             }),
@@ -343,13 +355,13 @@ export namespace Marketplace {
         });
 
         class TypedSchema<D, T> {
-            constructor(public readonly schema: T) { }
+            constructor(public readonly schema: T) {}
 
             public readonly Type!: T extends z.ZodType
                 ? // if D is defined (override type), use D, otherwise infer from T
-                D extends unknown
-                ? Immutable<z.infer<T>>
-                : D
+                  D extends unknown
+                    ? Immutable<z.infer<T>>
+                    : D
                 : never;
 
             public readonly InputType!: T extends z.ZodType

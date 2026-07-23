@@ -1,9 +1,5 @@
 import { Component, inject, output, signal } from '@angular/core';
 import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
-import {
-    GetOrganisationsResponseData,
-    PostOrganisationInviteLinkResponseData,
-} from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
@@ -20,15 +16,13 @@ export class CreateInviteModalComponent {
     private readonly activeModal = inject(NgbActiveModal);
     private readonly messageService = inject(MessageService);
 
-    public  titleText!: string;
-    public  descriptionText!: string;
+    public titleText!: string;
+    public descriptionText!: string;
     public typeText!: string;
     public createInviteFn!: () => Promise<string>;
 
     public readonly created = output<boolean>();
-    readonly inviteLink = signal<string | null>(
-        null
-    );
+    readonly inviteLink = signal<string | null>(null);
 
     public async invite() {
         const inviteLink = await this.createInviteFn();

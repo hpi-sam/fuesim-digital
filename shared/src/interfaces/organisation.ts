@@ -46,6 +46,7 @@ export const getOrganisationDetailsResponseDataSchema = z.object({
     exercisesCount: z.int(),
     exerciseTemplatesCount: z.int(),
     parallelExercisesCount: z.int(),
+    collectionsCount: z.int(),
     members: z.array(
         z.object({
             id: organisationMembershipIdSchema,

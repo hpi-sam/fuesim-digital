@@ -94,29 +94,32 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
             .pipe(takeUntil(this.destroy$))
             .subscribe((params) => {
                 const fromLocation = params.get('from');
-                switch (fromLocation) {
-                    case 'archive':
-                        this.routerBackLink = {
-                            title: 'meinem Archiv',
-                            link: '/collections/archive',
-                            important: false,
-                            icon: null,
-                            queryParams: null,
-                        };
-                        break;
-                    default:
-                        if (exerciseKeySchema.safeParse(fromLocation).success) {
-                            this.routerBackLink = {
-                                title: 'der Übung',
-                                link: `/exercises/${fromLocation}`,
-                                important: true,
-                                icon: 'bi bi-map mx-1',
-                                queryParams: {
-                                    openmanagecollectionmodal: 'true',
-                                },
-                            };
-                        }
-                        break;
+                if (fromLocation === 'archive') {
+                    this.routerBackLink = {
+                        title: 'meinem Archiv',
+                        link: '/collections/archive',
+                        important: false,
+                        icon: null,
+                        queryParams: null,
+                    };
+                } else if (fromLocation?.startsWith('org-')) {
+                    this.routerBackLink = {
+                        title: 'der Organisation',
+                        link: `/organisations/${fromLocation.slice(4)}`,
+                        important: false,
+                        icon: null,
+                        queryParams: null,
+                    };
+                } else if (exerciseKeySchema.safeParse(fromLocation).success) {
+                    this.routerBackLink = {
+                        title: 'der Übung',
+                        link: `/exercises/${fromLocation}`,
+                        important: true,
+                        icon: 'bi bi-map mx-1',
+                        queryParams: {
+                            openmanagecollectionmodal: 'true',
+                        },
+                    };
                 }
             });
     }
@@ -152,13 +155,6 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
                 });
             }
         });
-    }
-
-    public async leaveCollection() {
-        await this.collectionService.leaveCollection(
-            this.collection.collectionEntityId
-        );
-        this.router.navigate(['/collections']);
     }
 
     public async viewDraftStateChanges() {

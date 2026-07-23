@@ -15,6 +15,8 @@ export class CollectionCardComponent {
     public readonly fromLocation = input<string>('mycollections');
     public readonly noLink = input(false);
     public readonly showArchiveButton = input(false);
+    public readonly showLeaveButton = input(false);
 
     public readonly archive = output();
+    public readonly leave = output();
 }

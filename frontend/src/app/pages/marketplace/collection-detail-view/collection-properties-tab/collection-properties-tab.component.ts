@@ -1,6 +1,5 @@
 import {
     Component,
-    computed,
     effect,
     inject,
     input,
@@ -10,31 +9,25 @@ import {
 import {
     collectionOrganisationRelationshipTypeAllowedValues,
     CollectionVersion,
-    OrganisationId,
 } from 'fuesim-digital-shared';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgbDropdownModule, NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../../core/exercise-element.service';
 import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
-import { CopyButtonComponent } from '../../../../shared/components/copy-button/copy-button.component';
-import { CollectionRelationshipTypeDisplayNamePipe } from '../../../../shared/pipes/collection-relationship-type-display-name.pipe';
 import { AuthService } from '../../../../core/auth.service';
 import { ConfirmationModalService } from '../../../../core/confirmation-modal/confirmation-modal.service';
-import { CollectionMemberItemComponent } from './collection-member-item/collection-member-item.component';
 import { ApiService } from '../../../../core/api.service';
 import { openCreateInviteModal } from '../../../../shared/components/create-invite-modal/open-create-invite-modal';
 import { openSelectOrganisationModal } from '../../shared/modals/select-organisation-modal/open-select-organisation-modal';
+import { CollectionMemberItemComponent } from './collection-member-item/collection-member-item.component';
 
 @Component({
     selector: 'app-collection-details-tab',
     imports: [
         FormsModule,
         DisplayValidationComponent,
-        CopyButtonComponent,
-        NgbTooltip,
         NgbDropdownModule,
-        CollectionRelationshipTypeDisplayNamePipe,
         CollectionMemberItemComponent,
     ],
     templateUrl: './collection-properties-tab.component.html',
@@ -61,9 +54,14 @@ export class CollectionDetailsTabComponent {
         }),
         loader: async ({ params: { collectionEntityId } }) =>
             (
-                await this.collectionService.getCollectionMembers(
-                    collectionEntityId
-                )
+                await this.collectionService
+                    .getCollectionMembers(collectionEntityId)
+                    .then((e) => e)
+                    .catch((err) => {
+                        // we may have lost permission to access this properties view
+                        location.reload();
+                        return [];
+                    })
             )
                 .sort((a, b) => b.name.localeCompare(a.name))
                 .sort((a, b) => Number(b.owner) - Number(a.owner)),
@@ -71,7 +69,9 @@ export class CollectionDetailsTabComponent {
 
     public readonly userIsEditor = resource({
         params: () => ({
-            membersData: this.members.hasValue() ? this.members.value() : undefined,
+            membersData: this.members.hasValue()
+                ? this.members.value()
+                : undefined,
         }),
         loader: async ({ params: { membersData: members } }) => {
             if (!members) return false;
@@ -105,28 +105,35 @@ export class CollectionDetailsTabComponent {
         });
     }
 
-    public async addOrganisation(){
-        const organisationId = await openSelectOrganisationModal(this.ngbModalService, {
-            descriptionText: "Bitte wählen Sie eine Organisation aus, die Sie zu dieser Sammlung hinzufügen möchten. Die Organisation wird als Betrachter hinzugefügt.",
-        })
+    public async addOrganisation() {
+        const organisationId = await openSelectOrganisationModal(
+            this.ngbModalService,
+            {
+                descriptionText:
+                    'Bitte wählen Sie eine Organisation aus, die Sie zu dieser Sammlung hinzufügen möchten. Die Organisation wird als Betrachter hinzugefügt.',
+            }
+        );
 
-        await this.collectionService.addOrganisationToCollection(organisationId, this.collection().entityId);
+        await this.collectionService.addOrganisationToCollection(
+            organisationId,
+            this.collection().entityId
+        );
         this.members.reload();
     }
 
     public async invite() {
-        openCreateInviteModal(
-            this.ngbModalService,
-            {
-                title: 'Mitglieder einladen',
-                description: `Sie können an dieser Stelle einen Zugriffscode erstellen, den sie an andere
+        openCreateInviteModal(this.ngbModalService, {
+            title: 'Mitglieder einladen',
+            description: `Sie können an dieser Stelle einen Zugriffscode erstellen, den sie an andere
                 Personen weitergeben können und welcher sieben Tage lang gültig ist.
                 Diese können dann über die Übungselemente-Startseite mit einer Organisation dieser Sammlung als Betrachter beitreten.
                 `,
-                type: 'Zugriffscode',
-                createInviteFn: () => this.collectionService.createCollectionInviteCode(this.collection().entityId).then((response) => response.code),
-            }
-        )
+            type: 'Zugriffscode',
+            createInviteFn: async () =>
+                this.collectionService
+                    .createCollectionInviteCode(this.collection().entityId)
+                    .then((response) => response.code),
+        });
     }
 
     public async revokeInviteCode() {

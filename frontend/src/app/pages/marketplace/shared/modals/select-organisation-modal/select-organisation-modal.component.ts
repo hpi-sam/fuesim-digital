@@ -1,24 +1,30 @@
-import { Component, effect, inject, output, signal } from "@angular/core";
-import { OrganisationId, organisationIdSchema } from "../../../../../../../../shared/dist/ids";
-import { HttpResourceRef } from "@angular/common/http";
-import { form, disabled, validateStandardSchema, FormField } from "@angular/forms/signals";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { postExerciseRequestDataSchema, GetOrganisationsResponseData } from "fuesim-digital-shared";
-import { ApiService } from "../../../../../core/api.service";
-import { AuthService } from "../../../../../core/auth.service";
-import { ExerciseService } from "../../../../../core/exercise.service";
-import { MessageService } from "../../../../../core/messages/message.service";
-import { z } from "zod";
-import { Subject } from "rxjs";
-import { DisplayModelValidationComponent } from "../../../../../shared/validation/display-model-validation/display-model-validation.component";
+import { Component, effect, inject, signal } from '@angular/core';
+import { HttpResourceRef } from '@angular/common/http';
+import {
+    form,
+    disabled,
+    validateStandardSchema,
+    FormField,
+} from '@angular/forms/signals';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+    GetOrganisationsResponseData,
+    OrganisationId,
+    organisationIdSchema,
+} from 'fuesim-digital-shared';
+import { z } from 'zod';
+import { Subject } from 'rxjs';
+import { ApiService } from '../../../../../core/api.service';
+import { AuthService } from '../../../../../core/auth.service';
+import { DisplayModelValidationComponent } from '../../../../../shared/validation/display-model-validation/display-model-validation.component';
 
 @Component({
     selector: 'app-select-organisation-modal',
     templateUrl: './select-organisation-modal.component.html',
     styleUrls: ['./select-organisation-modal.component.scss'],
-    imports: [FormField, DisplayModelValidationComponent]
+    imports: [FormField, DisplayModelValidationComponent],
 })
-export class  SelectOrganisationModalComponent {
+export class SelectOrganisationModalComponent {
     private readonly apiService = inject(ApiService);
     private readonly activeModal = inject(NgbActiveModal);
     private readonly authService = inject(AuthService);
@@ -39,9 +45,12 @@ export class  SelectOrganisationModalComponent {
             schemaPath.organisationId,
             () => this.organisations.isLoading() || this.organisationLocked()
         );
-        validateStandardSchema(schemaPath, z.object({
-            organisationId: organisationIdSchema
-        }));
+        validateStandardSchema(
+            schemaPath,
+            z.object({
+                organisationId: organisationIdSchema,
+            })
+        );
     });
 
     organisations: HttpResourceRef<GetOrganisationsResponseData | undefined>;

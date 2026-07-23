@@ -5,16 +5,11 @@ import {
 } from 'fuesim-digital-shared';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionSubscriptionData } from '../../../../core/exercise-element.service';
-import { FileInputDirective } from '../../../../shared/directives/file-input.directive';
 import { CollectionElementsListComponent } from '../../shared/collection-elements-list/collection-elements-list.component';
 
 @Component({
     selector: 'app-collection-elements-tab',
-    imports: [
-        NgbDropdownModule,
-        FileInputDirective,
-        CollectionElementsListComponent,
-    ],
+    imports: [NgbDropdownModule, CollectionElementsListComponent],
     styleUrl: './collection-elements-tab.component.scss',
     templateUrl: './collection-elements-tab.component.html',
 })

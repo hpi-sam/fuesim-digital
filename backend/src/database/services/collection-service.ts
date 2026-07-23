@@ -31,6 +31,7 @@ import {
     isMarketplaceElementContent,
     replaceDependencies,
     currentStateVersion,
+    extendedCollectionVersionReducer,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type { WritableDraft } from 'immer';
@@ -141,7 +142,7 @@ export class CollectionService {
         private readonly eventSubject = new Subject<
             typeof Marketplace.Collection.Events.SSEvent.Type
         >()
-    ) { }
+    ) {}
 
     public async initialize() {
         await this.collectionRepository.setDefaultCollectionData();
@@ -156,9 +157,7 @@ export class CollectionService {
     public async createCollectionInviteCode(
         collectionEntityId: CollectionEntityId
     ) {
-        return this.collectionRepository.createJoinCode(
-            collectionEntityId
-        );
+        return this.collectionRepository.createJoinCode(collectionEntityId);
     }
 
     public async revokeCollectionInviteCode(
@@ -198,9 +197,9 @@ export class CollectionService {
         // with different roles in the collection
         const highestOrganisationRole = collectionRoles.reduce<
             | [
-                OrganisationWithRole,
-                CollectionOrganisationRelationshipType | null,
-            ]
+                  OrganisationWithRole,
+                  CollectionOrganisationRelationshipType | null,
+              ]
             | null
         >((highestRole, currentRole) => {
             if (
@@ -272,13 +271,52 @@ export class CollectionService {
 
     public async addCollectionOrganisation(
         collectionEntityId: CollectionEntityId,
-        organisationId: OrganisationId,
+        organisationId: OrganisationId
     ) {
-        return await this.collectionRepository.setOrganisationCollectionViewer(
+        return this.collectionRepository.setOrganisationCollectionViewer(
             organisationId,
             collectionEntityId,
             { allowDowngrade: false }
-        )
+        );
+    }
+
+    public async setCollectionOrganisationOwner(
+        collectionEntityId: CollectionEntityId,
+        organisationId: OrganisationId
+    ) {
+        await this.collectionRepository.transaction(async (tx) => {
+            // Is the new User even part of the collection?
+            const isUserPartOfCollection =
+                await tx.getOrganisationRoleInCollection(
+                    collectionEntityId,
+                    organisationId
+                );
+            if (isUserPartOfCollection !== 'viewer') {
+                throw new Error(
+                    `Organisation with id ${organisationId} is not viewer of the collection with id ${collectionEntityId}`
+                );
+            }
+
+            // Switch over the owner
+            const previousOwner = await tx.getOwnerOfCollection(
+                undefined,
+                collectionEntityId
+            );
+            if (previousOwner !== null) {
+                if (previousOwner.organisationId === organisationId) {
+                    return;
+                }
+                await tx.setOrganisationCollectionViewer(
+                    previousOwner.organisationId,
+                    collectionEntityId,
+                    { allowDowngrade: true }
+                );
+            }
+            await this.collectionRepository.setOrganisationCollectionOwner(
+                organisationId,
+                collectionEntityId
+            );
+        });
     }
 
     public async getCollectionOrganisation(
@@ -455,8 +493,8 @@ export class CollectionService {
         opts: {
             throwOnDuplicate: boolean;
         } = {
-                throwOnDuplicate: true,
-            }
+            throwOnDuplicate: true,
+        }
     ) {
         return this.reduce(
             data.importTo,
@@ -747,19 +785,21 @@ export class CollectionService {
         const organisations =
             await this.organisationService.getOrganisationsForUser(user);
 
-        return (
-            await Promise.all(
-                organisations.map(async (organisation) =>
-                    this.collectionRepository.getLatestCollectionsForOrganisation(
-                        organisation.id,
-                        {
-                            allowDraftState: opts.includeDraftState,
-                            archived: opts.archived,
-                        }
+        return extendedCollectionVersionReducer(
+            (
+                await Promise.all(
+                    organisations.map(async (organisation) =>
+                        this.collectionRepository.getLatestCollectionsForOrganisation(
+                            organisation.id,
+                            {
+                                allowDraftState: opts.includeDraftState,
+                                archived: opts.archived,
+                            }
+                        )
                     )
                 )
-            )
-        ).flat();
+            ).flat()
+        );
     }
 
     public async getLatestPublicCollections(): Promise<
@@ -779,7 +819,7 @@ export class CollectionService {
         const publicCollections =
             await this.collectionRepository.getLatestPublicCollections();
 
-        return [
+        return extendedCollectionVersionReducer([
             ...userCollections,
             ...publicCollections.filter(
                 (publicCollection) =>
@@ -789,7 +829,25 @@ export class CollectionService {
                             publicCollection.entityId
                     )
             ),
-        ];
+        ]);
+    }
+
+    public async getLatestCollectionsForOrganisation(
+        organisationId: OrganisationId,
+        user: SessionInformation
+    ) {
+        const userOrgs =
+            await this.organisationService.getOrganisationsForUser(user);
+        if (!userOrgs.some((org) => org.id === organisationId)) {
+            throw new Error(
+                `User does not belong to organisation with id ${organisationId}`
+            );
+        }
+
+        return this.collectionRepository.getLatestCollectionsForOrganisation(
+            organisationId,
+            { allowDraftState: true }
+        );
     }
 
     public async getLatestCollectionById(
@@ -1225,10 +1283,10 @@ export class CollectionService {
         const transitiveElementReferences = (
             opts.transitive === true
                 ? await Promise.all(
-                    directElementReferences.map(async (directReference) =>
-                        this.getDependenciesOfElement(directReference)
-                    )
-                )
+                      directElementReferences.map(async (directReference) =>
+                          this.getDependenciesOfElement(directReference)
+                      )
+                  )
                 : []
         ).flat();
 

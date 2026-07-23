@@ -25,8 +25,11 @@ export class LeaveDraftCollectionGuard {
     ): Promise<GuardResult> {
         const collectionEntityId = currentRoute.params['collectionEntityId'];
 
-        const userRole = await this.collectionService.getUserRoleInCollection(collectionEntityId)
-        if(userRole !== 'admin') {
+        const userRole =
+            await this.collectionService.getUserRoleInCollection(
+                collectionEntityId
+            );
+        if (userRole !== 'admin') {
             // Since only admins can save a draft state, we don't need to show the modal for other users
             return true;
         }

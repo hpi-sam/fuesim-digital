@@ -49,6 +49,9 @@ export function checkCollectionOrganisationRole(
             roleCompare(desiredRole) >= 0,
         isAtMost: (desiredRole: CollectionOrganisationRelationshipType) =>
             roleCompare(desiredRole) <= 0,
+        /**
+         * The higher the index, the more permissions the role has.
+         */
         indexOf: () =>
             collectionOrganisationRelationshipTypeAllowedValues.indexOf(
                 currentRole

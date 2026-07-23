@@ -23,6 +23,7 @@ import { OrganisationTabSettingsComponent } from '../tabs/settings/organisation-
 import { OrganisationTabExercisesComponent } from '../tabs/exercises/organisation-tab-exercises.component.js';
 import { OrganisationTabExerciseTemplatesComponent } from '../tabs/exercise-templates/organisation-tab-exercise-templates.component.js';
 import { OrganisationTabParallelExercisesComponent } from '../tabs/parallel-exercises/organisation-tab-parallel-exercises.component.js';
+import { OrganisationTabExerciseElementsComponent } from '../tabs/exercise-elements/organisation-tab-exercise-elements.component';
 
 @Component({
     selector: 'app-organisation',
@@ -45,6 +46,7 @@ import { OrganisationTabParallelExercisesComponent } from '../tabs/parallel-exer
         OrganisationTabExercisesComponent,
         OrganisationTabExerciseTemplatesComponent,
         OrganisationTabParallelExercisesComponent,
+        OrganisationTabExerciseElementsComponent,
     ],
 })
 export class OrganisationComponent {

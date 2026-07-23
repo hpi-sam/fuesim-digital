@@ -6,22 +6,15 @@ import { CollectionService } from '../../../core/exercise-element.service';
 import { CollectionCardComponent } from '../shared/cards/collection-card/collection-card.component';
 import { openCreateCollectionModal } from '../shared/modals/create-collection-modal/open-create-collection-modal';
 import { AuthService } from '../../../core/auth.service';
-import { UserAccountNavbarItemComponent } from '../../../shared/components/user-account-navbar-item/user-account-navbar-item.component';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
-import { PromptModalComponent } from '../../../core/prompt-modal/prompt-modal.component';
 import { PromptModalService } from '../../../core/prompt-modal/prompt-modal.service';
-import { openSelectOrganisationModal } from '../shared/modals/select-organisation-modal/open-select-organisation-modal';
+import { showJoinCollectionWorkflow } from '../shared/modals/show-join-collection-workflow';
 
 @Component({
     selector: 'app-marketplace',
     templateUrl: './marketplace.component.html',
     styleUrl: './marketplace.component.scss',
-    imports: [
-        RouterLink,
-        NgbTooltip,
-        CollectionCardComponent,
-        UserAccountNavbarItemComponent,
-    ],
+    imports: [RouterLink, NgbTooltip, CollectionCardComponent],
 })
 export class MarketplaceComponent {
     private readonly confirmationService = inject(ConfirmationModalService);
@@ -55,28 +48,11 @@ export class MarketplaceComponent {
     }
 
     public async joinCollection() {
-        const promptResult = await this.promptService.prompt({
-            title: 'Sammlung beitreten',
-            description:
-                'Bitte geben Sie den Einladungscode ein, um der Sammlung beizutreten.',
-            placeholder: "Einladungscode",
-            confirmationButtonText: 'Beitreten',
-        })
-
-        if (promptResult.result !== true) return;
-
-        const collectionPreview = await this.collectionService.getJoinCodePreview(promptResult.value);
-
-        console.log(collectionPreview);
-
-        const organisationId = await openSelectOrganisationModal(this.ngbModalService, {
-            descriptionText: `Bitte wählen Sie die Organisation aus, mit der Sie der Sammlung "${collectionPreview.title}" beitreten möchten. Die Sammlung wird dann in dieser Organisation verfügbar sein.`,
-        })
-
-        console.log(organisationId);
-
-        await this.collectionService.joinCollectionByJoinCode(promptResult.value, organisationId);
-
+        showJoinCollectionWorkflow(
+            this.promptService,
+            this.collectionService,
+            this.ngbModalService
+        );
     }
 
     public async archiveCollection(collection: CollectionVersion) {

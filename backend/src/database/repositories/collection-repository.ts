@@ -15,6 +15,7 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     currentStateVersion,
+    extendedCollectionVersionReducer,
     getElementDependencies,
     replaceDependencies,
 } from 'fuesim-digital-shared';
@@ -31,6 +32,7 @@ import {
     count,
 } from 'drizzle-orm';
 import { castImmutable } from 'immer';
+import type { PgColumn } from 'drizzle-orm/pg-core';
 import {
     collectionDependencyMappingTable,
     elementCollectionMappingTable,
@@ -43,6 +45,10 @@ import {
 } from '../schema.js';
 import { defaultCollectionData } from '../default-data/collection-default-data.js';
 import { DAG } from '../../utils/dag.js';
+import type {
+    DatabaseConnection,
+    DatabaseTransaction,
+} from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
 
 function canEditCollection(collection: CollectionVersion): boolean {
@@ -271,7 +277,6 @@ export class CollectionRepository extends BaseRepository {
 
         return null;
     }
-
 
     public async getCollectionOrganisations(
         collectionEntityId: CollectionEntityId
@@ -1162,6 +1167,45 @@ export class CollectionRepository extends BaseRepository {
         return this.onlySingle(result);
     }
 
+    public selectOwnerOfCollection(
+        tx: DatabaseConnection | DatabaseTransaction,
+        collectionEntityId: PgColumn
+    ) {
+        return tx
+            .select()
+            .from(collectionOrganisationMappingTable)
+            .where(
+                and(
+                    eq(
+                        collectionOrganisationMappingTable.collection,
+                        collectionEntityId
+                    ),
+                    eq(collectionOrganisationMappingTable.owner, true)
+                )
+            )
+            .as('ownerOrganisation');
+    }
+
+    public async getOwnerOfCollection(
+        tx: DatabaseConnection | DatabaseTransaction | undefined,
+        collectionEntityId: CollectionEntityId
+    ) {
+        return this.onlySingle(
+            await (tx ?? this.databaseConnection)
+                .select()
+                .from(collectionOrganisationMappingTable)
+                .where(
+                    and(
+                        eq(
+                            collectionOrganisationMappingTable.collection,
+                            collectionEntityId
+                        ),
+                        eq(collectionOrganisationMappingTable.owner, true)
+                    )
+                )
+        );
+    }
+
     public async getLatestCollectionsForOrganisation(
         organisationId: OrganisationId,
         opts?: { allowDraftState?: boolean; archived?: boolean }
@@ -1178,8 +1222,23 @@ export class CollectionRepository extends BaseRepository {
                 .select({
                     ...getTableColumns(collectionTable),
                     elementCount: elementCounts.elementCount,
+                    ownerOrganisationId:
+                        sql<OrganisationId>`"ownerOrganisation"."organisationId"`.as(
+                            'ownerOrganisationId'
+                        ),
+                    userCollectionRelationships: {
+                        name: organisationTable.name,
+                        id: organisationTable.id,
+                    },
                 })
                 .from(collectionOrganisationMappingTable)
+                .leftJoin(
+                    organisationTable,
+                    eq(
+                        organisationTable.id,
+                        collectionOrganisationMappingTable.organisationId
+                    )
+                )
                 .innerJoin(
                     latestCollections,
                     eq(
@@ -1198,6 +1257,13 @@ export class CollectionRepository extends BaseRepository {
                         collectionTable.versionId
                     )
                 )
+                .leftJoin(
+                    this.selectOwnerOfCollection(
+                        tx.databaseConnection,
+                        collectionOrganisationMappingTable.collection
+                    ),
+                    sql`true`
+                )
                 .where(
                     and(
                         eq(
@@ -1208,21 +1274,27 @@ export class CollectionRepository extends BaseRepository {
                     )
                 );
 
-            const extendedCollections = await Promise.all(
-                result.map(async (collection) => {
-                    const relationship =
-                        await tx.getOrganisationRoleInCollection(
-                            collection.entityId,
-                            organisationId
-                        );
+            const extendedCollections = extendedCollectionVersionReducer(
+                await Promise.all(
+                    result.map(async (collection) => {
+                        const relationship =
+                            await tx.getOrganisationRoleInCollection(
+                                collection.entityId,
+                                organisationId
+                            );
 
-                    return {
-                        ...collection,
-                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- it can be null if the collection has no elements (leftJoin)
-                        elementCount: collection.elementCount ?? 0,
-                        relationship: relationship!,
-                    } satisfies ExtendedCollectionVersion;
-                })
+                        return {
+                            ...collection,
+                            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- it can be null if the collection has no elements (leftJoin)
+                            elementCount: collection.elementCount ?? 0,
+                            relationship: relationship!,
+                            userCollectionRelationships:
+                                collection.userCollectionRelationships
+                                    ? [collection.userCollectionRelationships]
+                                    : [],
+                        } satisfies ExtendedCollectionVersion;
+                    })
+                )
             );
 
             return extendedCollections;
@@ -1242,6 +1314,10 @@ export class CollectionRepository extends BaseRepository {
                 .select({
                     ...getTableColumns(collectionTable),
                     elementCount: elementCounts.elementCount,
+                    userCollectionRelationships: {
+                        name: organisationTable.name,
+                        id: organisationTable.id,
+                    },
                 })
                 .from(collectionTable)
                 .innerJoin(
@@ -1255,6 +1331,22 @@ export class CollectionRepository extends BaseRepository {
                         collectionTable.versionId
                     )
                 )
+                .leftJoin(
+                    collectionOrganisationMappingTable,
+                    and(
+                        eq(
+                            collectionOrganisationMappingTable.collection,
+                            collectionTable.entityId
+                        )
+                    )
+                )
+                .leftJoin(
+                    organisationTable,
+                    eq(
+                        organisationTable.id,
+                        collectionOrganisationMappingTable.organisationId
+                    )
+                )
                 .where(
                     and(
                         inArray(collectionTable.visibility, [
@@ -1265,14 +1357,30 @@ export class CollectionRepository extends BaseRepository {
                     )
                 );
 
-            return result.map(
-                (collection) =>
-                    ({
-                        ...collection,
-                        relationship: 'viewer',
-                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- it can be null if the collection has no elements (leftJoin)
-                        elementCount: collection.elementCount ?? 0,
-                    }) satisfies ExtendedCollectionVersion
+            return extendedCollectionVersionReducer(
+                await Promise.all(
+                    result.map(
+                        async (collection) =>
+                            ({
+                                ...collection,
+                                relationship: 'viewer',
+                                ownerOrganisationId: (
+                                    await this.getOwnerOfCollection(
+                                        tx.databaseConnection,
+                                        collection.entityId
+                                    )
+                                )?.organisationId,
+                                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- it can be null if the collection has no elements (leftJoin)
+                                elementCount: collection.elementCount ?? 0,
+                                userCollectionRelationships:
+                                    collection.userCollectionRelationships
+                                        ? [
+                                              collection.userCollectionRelationships,
+                                          ]
+                                        : [],
+                            }) satisfies ExtendedCollectionVersion
+                    )
+                )
             );
         });
     }

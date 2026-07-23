@@ -27,6 +27,7 @@ import { httpOrigin, websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
 import { LoadingModalService } from './loading-modal/loading-modal.service';
+import { PromptModalService } from './prompt-modal/prompt-modal.service';
 
 export interface CollectionSubscriptionData {
     collection: CollectionVersion;
@@ -45,6 +46,7 @@ export class CollectionService {
     private readonly messageService = inject(MessageService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly loadingModalService = inject(LoadingModalService);
+    private readonly promptService = inject(PromptModalService);
 
     private readonly socket: Socket<
         ServerToClientEvents,
@@ -734,9 +736,9 @@ export class CollectionService {
         collection: VersionedCollectionPartial
     ): Promise<
         | {
-            newerVersionAvailable: true;
-            latestVersion: VersionedCollectionPartial;
-        }
+              newerVersionAvailable: true;
+              latestVersion: VersionedCollectionPartial;
+          }
         | { newerVersionAvailable: false }
     > {
         const latestCollection =
@@ -846,7 +848,24 @@ export class CollectionService {
         return typedData.result;
     }
 
-    public async getUserRoleInCollection(collectionEntityId: CollectionEntityId) {
+    public async getCollectionsForOrganisation(organisationId: OrganisationId) {
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Collection.LoadForOrganisation.Response
+            >(`${this.ENDPOINT}/org/${organisationId}`)
+        );
+
+        const typedData =
+            Marketplace.Collection.LoadForOrganisation.responseSchema.parse(
+                data
+            );
+
+        return typedData.result;
+    }
+
+    public async getUserRoleInCollection(
+        collectionEntityId: CollectionEntityId
+    ) {
         const data = await lastValueFrom(
             this.httpClient.get<
                 typeof Marketplace.Collection.GetCollectionUserRole.Response
@@ -854,7 +873,9 @@ export class CollectionService {
         );
 
         const typedData =
-            Marketplace.Collection.GetCollectionUserRole.responseSchema.parse(data);
+            Marketplace.Collection.GetCollectionUserRole.responseSchema.parse(
+                data
+            );
 
         return typedData.result;
     }
@@ -867,9 +888,11 @@ export class CollectionService {
             await lastValueFrom(
                 this.httpClient.post(
                     `${this.ENDPOINT}/${collectionEntityId}/members`,
-                    Marketplace.Collection.AddCollectionOrganisation.requestSchema.encode({
-                        organisationId,
-                    }),
+                    Marketplace.Collection.AddCollectionOrganisation.requestSchema.encode(
+                        {
+                            organisationId,
+                        }
+                    ),
                     {
                         context: preventStatusErrorToastContext(),
                     }
@@ -881,11 +904,43 @@ export class CollectionService {
                 body: 'Die Organisation wurde erfolgreich zur Sammlung hinzugefügt.',
                 color: 'success',
             });
-        } catch (error) {
+        } catch {
             this.messageService.postError({
                 title: 'Fehler beim Hinzufügen der Organisation',
                 body: 'Die Organisation konnte nicht zur Sammlung hinzugefügt werden. Bitte versuchen Sie es erneut.',
-            })
+            });
+        }
+    }
+
+    public async setOrganisationCollectionOwner(
+        organisationId: OrganisationId,
+        collectionEntityId: CollectionEntityId
+    ) {
+        try {
+            await lastValueFrom(
+                this.httpClient.put(
+                    `${this.ENDPOINT}/${collectionEntityId}/members`,
+                    Marketplace.Collection.SetCollectionOrganisationOwner.requestSchema.encode(
+                        {
+                            organisationId,
+                        }
+                    ),
+                    {
+                        context: preventStatusErrorToastContext(),
+                    }
+                )
+            );
+
+            this.messageService.postMessage({
+                title: 'Besitzer geändert',
+                body: 'Die Organisation wurde erfolgreich als neuer Besitzer der Sammlung festgelegt.',
+                color: 'success',
+            });
+        } catch {
+            this.messageService.postError({
+                title: 'Fehler beim Ändern des Besitzers',
+                body: 'Die Organisation konnte nicht als neuer Besitzer der Sammlung festgelegt werden. Bitte versuchen Sie es erneut.',
+            });
         }
     }
 
@@ -941,12 +996,19 @@ export class CollectionService {
         return typedData.result;
     }
 
-    public async joinCollectionByJoinCode(joinCode: string, organisationId: OrganisationId) {
+    public async joinCollectionByJoinCode(
+        joinCode: string,
+        organisationId: OrganisationId
+    ) {
         const data = await lastValueFrom(
             this.httpClient.post<
                 typeof Marketplace.Collection.JoinByJoinCode.Response
-            >(`${this.ENDPOINT}/join`,
-                Marketplace.Collection.JoinByJoinCode.requestSchema.encode({ organisationId, joinCode })
+            >(
+                `${this.ENDPOINT}/join`,
+                Marketplace.Collection.JoinByJoinCode.requestSchema.encode({
+                    organisationId,
+                    joinCode,
+                })
             )
         );
 
@@ -965,7 +1027,6 @@ export class CollectionService {
 
         return typedData.result;
     }
-
 
     public async getCollectionMembers(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(

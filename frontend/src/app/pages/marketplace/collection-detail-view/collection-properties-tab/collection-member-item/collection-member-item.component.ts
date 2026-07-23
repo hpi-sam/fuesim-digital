@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, OnInit, output, resource } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    output,
+    resource,
+} from '@angular/core';
 import {
     CollectionVersion,
     Marketplace,
@@ -7,14 +14,13 @@ import {
 import { AuthService } from '../../../../../core/auth.service';
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
 import { CollectionService } from '../../../../../core/exercise-element.service';
-import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { ApiService } from '../../../../../core/api.service';
 
 @Component({
     selector: 'app-collection-member-item',
     templateUrl: './collection-member-item.component.html',
     styleUrl: './collection-member-item.component.scss',
-    imports: [NgbTooltip],
+    imports: [],
 })
 export class CollectionMemberItemComponent {
     private readonly authService = inject(AuthService);
@@ -24,7 +30,7 @@ export class CollectionMemberItemComponent {
     private readonly collectionService = inject(CollectionService);
     private readonly apiService = inject(ApiService);
 
-    public readonly refresh = output<void>();
+    public readonly refresh = output();
 
     public readonly member =
         input.required<
@@ -37,10 +43,9 @@ export class CollectionMemberItemComponent {
         params: () => ({
             memberId: this.member().id,
         }),
-        loader: async ({params: {memberId}}) => {
-            return await this.apiService.getOrganisation(memberId);
-        }
-    })
+        loader: async ({ params: { memberId } }) =>
+            this.apiService.getOrganisation(memberId),
+    });
 
     public readonly ownUserId = computed(
         () => this.authService.authData().user?.id
@@ -48,13 +53,13 @@ export class CollectionMemberItemComponent {
 
     public readonly canLeaveCollection = computed(() => {
         const orgData = this.organisationData;
-        if (!orgData) return false;
-        if (!orgData.hasValue) return false;
+        if (!orgData.hasValue()) return false;
 
         return (
-            orgData.value()?.userRole === 'editor' ||
-            orgData.value()?.userRole === 'admin'
-        ) && !this.member().owner;
+            (orgData.value().userRole === 'editor' ||
+                orgData.value().userRole === 'admin') &&
+            !this.member().owner
+        );
     });
 
     public async removeCollectionMember(
@@ -69,6 +74,26 @@ export class CollectionMemberItemComponent {
         await this.collectionService.removeCollectionMember(
             this.collection().entityId,
             organisationId
+        );
+        this.refresh.emit();
+    }
+
+    public async setCollectionOwner(
+        organisationId: OrganisationId,
+        userName: string
+    ) {
+        const confirmationResult = await this.confirmationModalService.confirm({
+            title: 'Besitzer ändern',
+            description: `Möchten Sie ${userName} wirklich als neuen Besitzer der Sammlung festlegen?
+            Dadurch verliert die vorherige Besitzer-Organisation den Bearbeitungs-Zugriff auf die Sammlung.`,
+            confirmationButtonText: 'Besitzer ändern',
+        });
+
+        if (!confirmationResult) return;
+
+        await this.collectionService.setOrganisationCollectionOwner(
+            organisationId,
+            this.collection().entityId
         );
         this.refresh.emit();
     }

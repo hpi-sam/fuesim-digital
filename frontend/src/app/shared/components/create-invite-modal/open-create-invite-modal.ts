@@ -1,5 +1,5 @@
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { CreateInviteModalComponent } from "./create-invite-modal.component";
+import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CreateInviteModalComponent } from './create-invite-modal.component';
 
 export function openCreateInviteModal(
     ngbModalService: NgbModal,
@@ -8,8 +8,8 @@ export function openCreateInviteModal(
         description: string;
         type: string;
         createInviteFn: () => Promise<string>;
-    }) {
-
+    }
+) {
     const modalRef = ngbModalService.open(CreateInviteModalComponent);
     const componentInstance =
         modalRef.componentInstance as CreateInviteModalComponent;

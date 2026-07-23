@@ -47,13 +47,12 @@ export class OrganisationTabMembersComponent {
             Personen weitergeben können und welcher sieben Tage lang gültig ist.
             Diese treten dann der Organisation "${this.organisation().name}" als
             Betrachter bei.`,
-            type: "Einladungslink",
-            createInviteFn: () =>
-                this.apiService.createOrganisationInviteLink(
-                    this.organisation()!.id
-                ).then((response) => response.inviteLink),
-
-        })
+            type: 'Einladungslink',
+            createInviteFn: async () =>
+                this.apiService
+                    .createOrganisationInviteLink(this.organisation().id)
+                    .then((response) => response.inviteLink),
+        });
     }
 
     async updateMembershipRole(

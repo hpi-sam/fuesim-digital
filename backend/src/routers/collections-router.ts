@@ -16,6 +16,7 @@ import {
     Marketplace,
     cloneDeepMutable,
     checkCollectionMembershipRole,
+    organisationIdSchema,
 } from 'fuesim-digital-shared';
 import { z } from 'zod';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
@@ -30,13 +31,13 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             validator: (value: string) => value is U,
             paramName: string
         ) =>
-            (req: ExpressRequest, named?: string): U => {
-                const collectionEntityId = req.params[named ?? paramName] ?? '';
-                if (!validator(collectionEntityId)) {
-                    throw new Error(`Invalid ${paramName}`);
-                }
-                return collectionEntityId;
-            };
+        (req: ExpressRequest, named?: string): U => {
+            const collectionEntityId = req.params[named ?? paramName] ?? '';
+            if (!validator(collectionEntityId)) {
+                throw new Error(`Invalid ${paramName}`);
+            }
+            return collectionEntityId;
+        };
 
     const getCollectionEntityId = reqParamValidator(
         isCollectionEntityId,
@@ -70,73 +71,73 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     ): RoleMiddlewareFunctionWithStrict => {
         const accessMiddlewareFunction =
             (strict: boolean = false) =>
-                async (
-                    req: ExpressRequest,
-                    res: ExpressResponse,
-                    next: NextFunction
-                ) => {
-                    const collectionEntityId = getCollectionEntityId(req);
+            async (
+                req: ExpressRequest,
+                res: ExpressResponse,
+                next: NextFunction
+            ) => {
+                const collectionEntityId = getCollectionEntityId(req);
 
-                    const collection =
-                        await collectionService.getLatestCollectionById(
-                            collectionEntityId,
-                            { draftState: true }
-                        );
+                const collection =
+                    await collectionService.getLatestCollectionById(
+                        collectionEntityId,
+                        { draftState: true }
+                    );
 
-                    if (!collection) {
-                        res.status(404).send({ error: 'Collection not found' });
-                        return;
-                    }
+                if (!collection) {
+                    res.status(404).send({ error: 'Collection not found' });
+                    return;
+                }
 
-                    const generallyAllowedVisibility = ['public', 'embedded'];
+                const generallyAllowedVisibility = ['public', 'embedded'];
 
-                    if (
-                        generallyAllowedVisibility.includes(collection.visibility)
-                    ) {
-                        next();
-                        return;
-                    }
-
-                    // We are not using the middleware here _before_,
-                    // because we want to allow access to PUBLIC/EMBEDDED collection
-                    // for users who are not logged in
-                    if (!req.session) {
-                        throw new PermissionDeniedError();
-                    }
-
-                    const relationship =
-                        await collectionService.getUserRoleInCollectionTransitive(
-                            collectionEntityId,
-                            req.session
-                        );
-
-                    if (!relationship) {
-                        res.status(403).send({
-                            error: 'You do not have access to this collection',
-                        });
-                        return;
-                    }
-
-                    if (strict && relationship !== lowestAllowedRole) {
-                        res.status(403).send({
-                            error: 'You do not have the required permissions to perform this action',
-                        });
-                        return;
-                    }
-
-                    const rolecheck =
-                        checkCollectionMembershipRole(relationship).isAtLeast(
-                            lowestAllowedRole
-                        );
-
-                    if (!rolecheck) {
-                        res.status(403).send({
-                            error: 'You do not have the required permissions to perform this action',
-                        });
-                        return;
-                    }
+                if (
+                    generallyAllowedVisibility.includes(collection.visibility)
+                ) {
                     next();
-                };
+                    return;
+                }
+
+                // We are not using the middleware here _before_,
+                // because we want to allow access to PUBLIC/EMBEDDED collection
+                // for users who are not logged in
+                if (!req.session) {
+                    throw new PermissionDeniedError();
+                }
+
+                const relationship =
+                    await collectionService.getUserRoleInCollectionTransitive(
+                        collectionEntityId,
+                        req.session
+                    );
+
+                if (!relationship) {
+                    res.status(403).send({
+                        error: 'You do not have access to this collection',
+                    });
+                    return;
+                }
+
+                if (strict && relationship !== lowestAllowedRole) {
+                    res.status(403).send({
+                        error: 'You do not have the required permissions to perform this action',
+                    });
+                    return;
+                }
+
+                const rolecheck =
+                    checkCollectionMembershipRole(relationship).isAtLeast(
+                        lowestAllowedRole
+                    );
+
+                if (!rolecheck) {
+                    res.status(403).send({
+                        error: 'You do not have the required permissions to perform this action',
+                    });
+                    return;
+                }
+                next();
+            };
 
         const wrapperFunction = accessMiddlewareFunction(false);
         return Object.assign(wrapperFunction, {
@@ -212,6 +213,30 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             })
         );
     });
+
+    publicRouter.get(
+        '/org/:organisationId',
+        isAuthenticatedMiddleware,
+        async (req, res) => {
+            const organisationId = organisationIdSchema.parse(
+                req.params['organisationId']
+            );
+
+            const result =
+                await collectionService.getLatestCollectionsForOrganisation(
+                    organisationId,
+                    req.session!
+                );
+
+            res.send(
+                Marketplace.Collection.LoadForOrganisation.responseSchema.encode(
+                    {
+                        result,
+                    }
+                )
+            );
+        }
+    );
 
     publicRouter.post('/join', isAuthenticatedMiddleware, async (req, res) => {
         const parsedBody =
@@ -292,7 +317,6 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             })
         );
     });
-
 
     /*
      * Edit Collection Metadata (e.g. title)
@@ -416,9 +440,11 @@ export function createCollectionsRouter(collectionService: CollectionService) {
                 );
 
             res.send(
-                Marketplace.Collection.GetCollectionUserRole.responseSchema.encode({
-                    result: role,
-                })
+                Marketplace.Collection.GetCollectionUserRole.responseSchema.encode(
+                    {
+                        result: role,
+                    }
+                )
             );
         }
     );
@@ -450,24 +476,47 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         async (req, res) => {
             const collectionEntityId = getCollectionEntityId(req);
 
-            const parsedBody = Marketplace.Collection.AddCollectionOrganisation.requestSchema.parse(
-                req.body
-            )
+            const parsedBody =
+                Marketplace.Collection.AddCollectionOrganisation.requestSchema.parse(
+                    req.body
+                );
 
             await collectionService.addCollectionOrganisation(
                 collectionEntityId,
-                parsedBody.organisationId,
+                parsedBody.organisationId
             );
 
             res.send(
-                Marketplace.Collection.AddCollectionOrganisation.responseSchema.encode({
-                    result: {
-                        status: 'success',
+                Marketplace.Collection.AddCollectionOrganisation.responseSchema.encode(
+                    {
+                        result: {
+                            status: 'success',
+                        },
                     }
-                })
-            )
+                )
+            );
+        }
+    );
 
-        })
+    publicRouter.put(
+        '/:collectionEntityId/members',
+        adminAccess,
+        async (req, res) => {
+            const collectionEntityId = getCollectionEntityId(req);
+
+            const parsedBody =
+                Marketplace.Collection.SetCollectionOrganisationOwner.requestSchema.parse(
+                    req.body
+                );
+
+            await collectionService.setCollectionOrganisationOwner(
+                collectionEntityId,
+                parsedBody.organisationId
+            );
+
+            res.send().status(204);
+        }
+    );
 
     // This endpoint is seperate from the delete members endpoint,
     // as it has a different permission requirement and to
@@ -953,7 +1002,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
                     elementEntityId,
                     collectionEntityId,
                     parsedBody.conflictResolution?.acceptedCascadingDeletions ??
-                    []
+                        []
                 );
             return res.send(
                 Marketplace.Element.Delete.responseSchema.encode({

@@ -17,11 +17,11 @@ export const versionedElementModelSchema = z
     })
     .partial();
 
-const _nonOptionalEntitySchema =
-    versionedElementModelSchema.shape.entity.nonoptional();
-export type VersionedElementModel = {
-    entity: z.infer<typeof _nonOptionalEntitySchema>;
-};
+export interface VersionedElementModel {
+    entity: z.infer<
+        ReturnType<typeof versionedElementModelSchema.shape.entity.nonoptional>
+    >;
+}
 
 export function getEntityFromElement(
     element: FuesimElement | Immutable<FuesimElement>

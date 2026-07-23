@@ -19,7 +19,7 @@ export const templateVersionContentSchema = z.discriminatedUnion('type', [
     mapImageTemplateSchema,
 ]);
 
-export const TemplateVersionContentAllowedTypes =
+export const templateVersionContentAllowedTypes =
     templateVersionContentSchema.options.map(
         (option) => option.shape.type.value
     );

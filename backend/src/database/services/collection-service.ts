@@ -1781,8 +1781,7 @@ export class CollectionService {
                     acc[element.entityId] = {
                         ...cloneDeepMutable(element.content),
                         entity: {
-                            versionId: element.versionId,
-                            entityId: element.entityId,
+                            ...element,
                             type: 'direct',
                         },
                     };
@@ -1795,8 +1794,7 @@ export class CollectionService {
                     acc[element.entityId] = {
                         ...cloneDeepMutable(element.content),
                         entity: {
-                            versionId: element.versionId,
-                            entityId: element.entityId,
+                            ...element,
                             type: 'direct',
                         },
                     };

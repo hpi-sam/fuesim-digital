@@ -18,7 +18,7 @@ import type {
     OrganisationMembershipRole,
     ParallelExerciseKey,
     OrganisationInviteLinkId,
-    VersionedElementContent,
+    TemplateVersionContent,
 } from 'fuesim-digital-shared';
 import {
     collectionVisibilityValues,
@@ -432,7 +432,7 @@ export const elementTable = pgTable(
         ),
         title: varchar().notNull(),
         description: varchar().notNull(),
-        content: json().$type<VersionedElementContent>().notNull(),
+        content: json().$type<TemplateVersionContent>().notNull(),
     },
     (table) => [
         unique('unique_template_version').on(table.entityId, table.version),

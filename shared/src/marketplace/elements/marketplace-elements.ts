@@ -47,7 +47,7 @@ export function isMarketplaceElementContent(
 
 export const versionedMarketplaceElementContentSchema = z.union(
     // We want to enforce "entity" (from versionedElementModelSchema)
-    // to be present in every option of versionedElementContentSchema
+    // to be present in every option of templateVersionContentSchema
     marketplaceElementContentSchema.options.map((option) =>
         z.object({
             ...option.shape,

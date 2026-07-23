@@ -19,7 +19,7 @@ import {
 } from '../marketplace/models/collection-elements.js';
 import { collectionVisibilitySchema } from '../marketplace/models/collection-visibility.js';
 import { templateVersionSchema } from '../marketplace/models/versioned-elements.js';
-import { versionedElementContentSchema } from '../marketplace/models/versioned-element-content.js';
+import { templateVersionContentSchema } from '../marketplace/models/versioned-element-content.js';
 import { organisationIdSchema } from '../ids.js';
 import { collectionMembershipRole } from '../marketplace/models/collection-relationship.js';
 import { Route, stringToDate } from './utils.js';
@@ -30,7 +30,7 @@ export namespace Marketplace {
     export namespace Element {
         export const Create = new Route({
             request: z.object({
-                data: z.array(versionedElementContentSchema),
+                data: z.array(templateVersionContentSchema),
             }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,
@@ -61,7 +61,7 @@ export namespace Marketplace {
 
         export const Edit = new Route({
             request: z.object({
-                data: versionedElementContentSchema,
+                data: templateVersionContentSchema,
                 conflictResolution: editConflictResolutionSchema.optional(),
             }),
             response: z.object({

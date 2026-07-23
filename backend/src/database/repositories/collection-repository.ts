@@ -8,7 +8,7 @@ import type {
     ElementVersionId,
     ExtendedCollectionVersion,
     Marketplace,
-    VersionedElementContent,
+    TemplateVersionContent,
     VersionedElementPartial,
     OrganisationId,
     CollectionOrganisationRelationshipType,
@@ -626,7 +626,7 @@ export class CollectionRepository extends BaseRepository {
 
     public async updateElementContent(
         elementVersionId: ElementVersionId,
-        data: VersionedElementContent
+        data: TemplateVersionContent
     ) {
         return this.transaction(async (tx) => {
             const isEditable =
@@ -828,7 +828,7 @@ export class CollectionRepository extends BaseRepository {
     }
 
     public async createElementVersion(data: {
-        content: VersionedElementContent;
+        content: TemplateVersionContent;
         version: number;
         entityId?: ElementEntityId;
     }): Promise<TemplateVersion | null> {
@@ -1543,7 +1543,7 @@ export class CollectionRepository extends BaseRepository {
      */
     public async UNSAFE_overwriteElements(
         stateVersion: number,
-        elementContents: VersionedElementContent[]
+        elementContents: TemplateVersionContent[]
     ): Promise<number> {
         return this.databaseConnection.transaction(async (tx) => {
             // from https://orm.drizzle.team/docs/guides/update-many-with-different-value

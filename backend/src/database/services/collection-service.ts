@@ -11,7 +11,7 @@ import type {
     Marketplace,
     ParticipantKey,
     VehicleTemplate,
-    VersionedElementContent,
+    TemplateVersionContent,
     VersionedElementPartial,
     OrganisationId,
     CollectionOrganisationRelationshipType,
@@ -740,7 +740,7 @@ export class CollectionService {
 
     public async createExerciseObjects(
         collectionEntityId: CollectionEntityId,
-        contents: VersionedElementContent[]
+        contents: TemplateVersionContent[]
     ) {
         return this.reduce(
             collectionEntityId,
@@ -1174,7 +1174,7 @@ export class CollectionService {
 
     public async updateElement(
         entityId: ElementEntityId,
-        content: VersionedElementContent,
+        content: TemplateVersionContent,
         resolutionStrategy?: Marketplace.Element.EditConflictResolution
     ) {
         return this.transaction(async (tx) => {

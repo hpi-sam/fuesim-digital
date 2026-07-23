@@ -11,7 +11,7 @@ export {
     versionedElementModelSchema,
 } from './versioned-element-model.js';
 
-export const versionedElementContentSchema = z.discriminatedUnion('type', [
+export const templateVersionContentSchema = z.discriminatedUnion('type', [
     vehicleTemplateSchema,
     alarmGroupSchema,
     personnelTemplateSchema,
@@ -19,25 +19,25 @@ export const versionedElementContentSchema = z.discriminatedUnion('type', [
     mapImageTemplateSchema,
 ]);
 
-export const versionedElementContentAllowedTypes =
-    versionedElementContentSchema.options.map(
+export const TemplateVersionContentAllowedTypes =
+    templateVersionContentSchema.options.map(
         (option) => option.shape.type.value
     );
 
-export type VersionedElementContent = Immutable<
-    z.infer<typeof versionedElementContentSchema>
+export type TemplateVersionContent = Immutable<
+    z.infer<typeof templateVersionContentSchema>
 >;
 
-export function isVersionedElementContent(
+export function isTemplateVersionContent(
     content: any
-): content is WritableDraft<VersionedElementContent> {
-    return versionedElementContentSchema.safeParse(content).success;
+): content is WritableDraft<TemplateVersionContent> {
+    return templateVersionContentSchema.safeParse(content).success;
 }
 
-export const definitelyVersionedElementContentSchema = z.union(
+export const definitelytemplateVersionContentSchema = z.union(
     // We want to enforce "entity" (from versionedElementModelSchema)
-    // to be present in every option of versionedElementContentSchema
-    versionedElementContentSchema.options.map((option) =>
+    // to be present in every option of templateVersionContentSchema
+    templateVersionContentSchema.options.map((option) =>
         z.object({
             ...option.shape,
             ...versionedElementModelSchema.shape,
@@ -45,6 +45,6 @@ export const definitelyVersionedElementContentSchema = z.union(
     )
 );
 
-export type DefinitelyVersionedElementContent = Immutable<
-    z.infer<typeof definitelyVersionedElementContentSchema>
+export type DefinitelyTemplateVersionContent = Immutable<
+    z.infer<typeof definitelytemplateVersionContentSchema>
 >;

@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import type { Immutable } from 'immer';
-import { versionedElementContentSchema } from './versioned-element-content.js';
+import { templateVersionContentSchema } from './versioned-element-content.js';
 import { stateVersionedEntitySchema } from './state-versioned-entity.js';
 import { versionedElementPartialSchema } from './versioned-id-schema.js';
 
@@ -9,7 +9,7 @@ export const templateVersionSchema = z.object({
     ...versionedElementPartialSchema.shape,
     title: z.string(),
     description: z.string(),
-    content: versionedElementContentSchema,
+    content: templateVersionContentSchema,
 });
 
 export type TemplateVersion = Immutable<z.infer<typeof templateVersionSchema>>;

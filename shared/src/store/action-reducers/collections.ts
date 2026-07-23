@@ -67,12 +67,6 @@ function addElement(
         entity: {
             entityId: element.entityId,
             versionId: element.versionId,
-            createdAt: element.createdAt,
-            description: element.description,
-            editedAt: element.editedAt,
-            stateVersion: element.stateVersion,
-            title: element.title,
-            version: element.version,
             type,
         },
     };

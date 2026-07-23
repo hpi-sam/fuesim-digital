@@ -3,12 +3,12 @@ import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { isElementVersionId } from '../marketplace/models/versioned-id-schema.js';
 import { cloneDeepMutable } from '../utils/clone-deep.js';
-import { versionedElementModelStateExtension } from '../marketplace/models/versioned-element-model.js';
+import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
 import { alarmGroupVehicleSchema } from './utils/alarm-group-vehicle.js';
 import { registerDependency } from './utils/dependency-registry.js';
 
 export const alarmGroupSchema = z.strictObject({
-    ...versionedElementModelStateExtension,
+    ...versionedElementModelSchema.shape,
     id: uuidSchema,
     type: z.literal('alarmGroup'),
     name: z.string(),

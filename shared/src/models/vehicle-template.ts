@@ -3,13 +3,13 @@ import type { Immutable } from 'immer';
 import { uuidSchema } from '../utils/uuid.js';
 import { cloneDeepMutable } from '../utils/clone-deep.js';
 import type { ElementVersionId } from '../marketplace/models/versioned-id-schema.js';
-import { versionedElementModelStateExtension } from '../marketplace/models/versioned-element-model.js';
+import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
 import { imagePropertiesSchema } from './utils/image-properties.js';
 import { registerEditableValue } from './utils/editable-values-registry.js';
 import { registerDependency } from './utils/dependency-registry.js';
 
 export const vehicleTemplateSchema = z.strictObject({
-    ...versionedElementModelStateExtension,
+    ...versionedElementModelSchema.shape,
     id: uuidSchema,
     type: z.literal('vehicleTemplate'),
     vehicleType: z.string(),

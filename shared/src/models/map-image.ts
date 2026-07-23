@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
-import { versionedElementModelStateExtension } from '../marketplace/models/versioned-element-model.js';
+import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
 import type { MapImageTemplate } from './map-image-template.js';
 import { positionSchema } from './utils/position/position.js';
 import {
@@ -12,7 +12,7 @@ import type { MapCoordinates } from './utils/position/map-coordinates.js';
 import { newMapPositionAt } from './utils/position/map-position.js';
 
 export const mapImageSchema = z.strictObject({
-    ...versionedElementModelStateExtension,
+    ...versionedElementModelSchema.shape,
     id: uuidSchema,
     type: z.literal('mapImage'),
     templateId: uuidSchema,

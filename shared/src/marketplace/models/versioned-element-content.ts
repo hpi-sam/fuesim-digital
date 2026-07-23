@@ -9,7 +9,6 @@ import { versionedElementModelSchema } from './versioned-element-model.js';
 export {
     type VersionedElementModel,
     versionedElementModelSchema,
-    versionedElementModelStateExtension,
 } from './versioned-element-model.js';
 
 export const versionedElementContentSchema = z.discriminatedUnion('type', [

@@ -1,7 +1,6 @@
 export * from './collection-visibility.js';
 export * from './collection.js';
 export * from './versioned-elements.js';
-export * from './versioned-elements-contentless.js';
 export * from './versioned-id-schema.js';
 export * from './versioned-element-model.js';
 export * from './versioned-element-content.js';

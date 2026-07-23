@@ -778,6 +778,59 @@ export class CollectionService {
         );
     }
 
+    /**
+     * This function is used for the integration of the marketplace into exercises,
+     * where we need to resolve the structure of a collection
+     * (direct, imports, and references) to be able to manage and remove elements
+     */
+    public async getCollectionVersionStructure(
+        collectionVersionId: CollectionVersionId
+    ): Promise<
+        (typeof Marketplace.Collection.GetElementStructureOfCollectionVersion.Response)['result']
+    > {
+        const collection =
+            await this.getCollectionVersionById(collectionVersionId);
+        if (!collection) {
+            throw new Error(
+                `Collection version with id ${collectionVersionId} not found`
+            );
+        }
+        // We do not allow draft state here, since we also do not allow draft state in an exercise
+        const elements = await this.getElementsOfCollectionVersion(
+            collectionVersionId,
+            { allowDraftState: false }
+        );
+
+        return {
+            title: collection.title,
+            version: collection.version,
+            direct: elements.direct.map((e) => ({
+                versionId: e.versionId,
+                entityId: e.entityId,
+            })),
+            imported: elements.imported.map((i) => ({
+                collection: {
+                    versionId: i.collection.versionId,
+                    entityId: i.collection.entityId,
+                },
+                elements: i.elements.map((e) => ({
+                    versionId: e.versionId,
+                    entityId: e.entityId,
+                })),
+            })),
+            references: elements.references.map((r) => ({
+                collection: {
+                    versionId: r.collection.versionId,
+                    entityId: r.collection.entityId,
+                },
+                elements: r.elements.map((e) => ({
+                    versionId: e.versionId,
+                    entityId: e.entityId,
+                })),
+            })),
+        };
+    }
+
     public async getLatestCollectionsForUser(
         user: SessionInformation,
         opts: { includeDraftState: boolean; archived?: boolean }

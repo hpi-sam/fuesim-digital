@@ -16,6 +16,7 @@ import {
     CollectionElements,
     CollectionMembershipRole,
     OrganisationId,
+    CollectionVersionStructureWithMetadata,
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
@@ -1074,5 +1075,58 @@ export class CollectionService {
             body: 'Sie haben die Sammlung verlassen und können nun nicht mehr auf die Inhalte zugreifen.',
             color: 'success',
         });
+    }
+
+    // Collection Structure ----------
+
+    private readonly collectionVersionStructureCache = new Map<
+        CollectionVersionId,
+        CollectionVersionStructureWithMetadata
+    >();
+
+    public async getCollectionVersionStructure(
+        collectionEntityId: CollectionEntityId,
+        collectionVersionId: CollectionVersionId
+    ) {
+        if (this.collectionVersionStructureCache.has(collectionVersionId)) {
+            return this.collectionVersionStructureCache.get(
+                collectionVersionId
+            )!;
+        }
+
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Collection.GetElementStructureOfCollectionVersion.Response
+            >(
+                `${this.ENDPOINT}/${collectionEntityId}/version/${collectionVersionId}/structure`
+            )
+        );
+
+        const parsedData =
+            Marketplace.Collection.GetElementStructureOfCollectionVersion.responseSchema.parse(
+                data
+            );
+
+        this.collectionVersionStructureCache.set(
+            collectionVersionId,
+            parsedData.result
+        );
+
+        return parsedData.result;
+    }
+
+    /**
+     * This should be fine to use, since the cache is only filled on init of the main exercise component.
+     * JUST DO NOT USE THIS OUTSIDE OF AN EXERCISE CONTEXT, since the cache may not be filled otherwise.
+     */
+    public getCollectionVersionStructureFromCache(
+        collectionVersionId: CollectionVersionId
+    ) {
+        if (!this.collectionVersionStructureCache.has(collectionVersionId)) {
+            throw new Error(
+                `Collection version structure for version ${collectionVersionId} not found in cache. This should only be used in an exercise context where the cache is filled on init.`
+            );
+        }
+        return this.collectionVersionStructureCache.get(collectionVersionId)!;
     }
 }

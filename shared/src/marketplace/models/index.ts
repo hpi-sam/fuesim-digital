@@ -9,4 +9,3 @@ export * from './collection-elements.js';
 export * from './state-versioned-entity.js';
 export * from './collection-relationship.js';
 export * from './collection-element-type.js';
-export * from './collection-state-reference.js';

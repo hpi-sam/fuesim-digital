@@ -10,7 +10,6 @@ import {
     checkCollectionOrganisationRole,
     collectionOrganisationRelationshipTypeSchema,
 } from './collection-relationship.js';
-import { templateVersionSchema } from './versioned-elements.js';
 
 export const collectionVersionSchema = z.object({
     ...stateVersionedEntitySchema.shape,
@@ -82,9 +81,3 @@ export function extendedCollectionVersionReducer(
         []
     );
 }
-
-export const collectionFullDataSchema = z.object({
-    ...extendedCollectionVersionSchema.shape,
-    dependsOn: z.array(collectionVersionSchema),
-    elements: z.array(templateVersionSchema),
-});

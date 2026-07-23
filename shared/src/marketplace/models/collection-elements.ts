@@ -3,6 +3,10 @@ import type { Immutable } from 'immer';
 import { collectionVersionSchema } from './collection.js';
 import { templateVersionSchema } from './versioned-elements.js';
 import type { CollectionElementType } from './collection-element-type.js';
+import {
+    versionedCollectionPartialSchema,
+    versionedElementPartialSchema,
+} from './versioned-id-schema.js';
 
 export const collectionElementsSingleSchema = z.strictObject({
     collection: collectionVersionSchema,
@@ -62,6 +66,36 @@ export const collectionElementsSchema = z.strictObject({
 
 export type CollectionElements = z.infer<typeof collectionElementsSchema>;
 
+export const collectionVersionStructureSchema = z.strictObject({
+    direct: z.array(versionedElementPartialSchema),
+    imported: z.array(
+        z.object({
+            collection: versionedCollectionPartialSchema,
+            elements: z.array(versionedElementPartialSchema),
+        })
+    ),
+    references: z.array(
+        z.object({
+            collection: versionedCollectionPartialSchema,
+            elements: z.array(versionedElementPartialSchema),
+        })
+    ),
+});
+
+export type CollectionVersionStructure = z.infer<
+    typeof collectionVersionStructureSchema
+>;
+
+export const collectionVersionStructureWithMetadataSchema = z.strictObject({
+    ...collectionVersionStructureSchema.shape,
+    title: z.string(),
+    version: z.number(),
+});
+
+export type CollectionVersionStructureWithMetadata = z.infer<
+    typeof collectionVersionStructureWithMetadataSchema
+>;
+
 export interface CollectionElementsAny<T = any, C = any> {
     direct: T[];
     imported: {
@@ -73,18 +107,6 @@ export interface CollectionElementsAny<T = any, C = any> {
         elements: T[];
     }[];
 }
-
-/* export const miniCollectionElementsSingleSchema = z.strictObject({
-    collection: collectionVersionSchema,
-    elements: z.array(miniTemplateVersionSchema),
-})
-export const miniCollectionElementsSchema = z.strictObject({
-    direct: z.array(miniTemplateVersionSchema),
-    imported: z.array(miniCollectionElementsSingleSchema),
-    references: z.array(miniCollectionElementsSingleSchema),
-} satisfies { [T in CollectionElementType]: unknown });
-
-export type MiniCollectionElements = z.infer<typeof miniCollectionElementsSchema>;*/
 
 export function gatherAllDirectCollectionElements<T = any>(
     elements: CollectionElementsAny<T>

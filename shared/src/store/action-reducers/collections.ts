@@ -13,9 +13,12 @@ import {
 import {
     type CollectionElements,
     collectionElementsSchema,
+    collectionVersionStructureSchema,
+    gatherAllCollectionElements,
 } from '../../marketplace/models/collection-elements.js';
 import type { TemplateVersion } from '../../marketplace/models/versioned-elements.js';
 import { collectionVersionSchema } from '../../marketplace/models/collection.js';
+import { versionedCollectionPartialSchema } from '../../marketplace/models/versioned-id-schema.js';
 
 export const addCollectionActionSchema = z.strictObject({
     type: z.literal('[Collection] Add Collection'),
@@ -40,8 +43,8 @@ export type UpgradeCollectionAction = Immutable<
 
 export const removeCollectionActionSchema = z.strictObject({
     type: z.literal('[Collection] Remove Collection'),
-    collectionVersion: collectionVersionSchema,
-    overwriteTemplates: collectionElementsSchema,
+    collectionVersion: versionedCollectionPartialSchema,
+    keepTemplates: collectionVersionStructureSchema,
     changeApplies: z.array(changeApplySchema),
 });
 
@@ -98,25 +101,10 @@ export namespace CollectionReducers {
         reducer: (draftState, data) => {
             addCollectionElements(draftState, data.elements);
 
-            draftState.selectedCollections.push(
-                cloneDeepMutable({
-                    ...data.collection,
-                    elements: {
-                        direct: data.elements.direct.map((element) => ({
-                            entityId: element.entityId,
-                            versionId: element.versionId,
-                        })),
-                        imported: data.elements.imported.map((element) => ({
-                            collection: element.collection,
-                            elements: element.elements,
-                        })),
-                        references: data.elements.references.map((element) => ({
-                            collection: element.collection,
-                            elements: element.elements,
-                        })),
-                    },
-                })
-            );
+            draftState.selectedCollections.push({
+                entityId: data.collection.entityId,
+                versionId: data.collection.versionId,
+            });
 
             return draftState;
         },
@@ -174,7 +162,25 @@ export namespace CollectionReducers {
         type: removeCollectionActionSchema.shape.type.value,
         actionSchema: removeCollectionActionSchema,
         reducer: (draftState, data) => {
-            overwriteStateTemplates(draftState, data.overwriteTemplates);
+            draftState.templates = Object.fromEntries(
+                Object.entries(draftState.templates)
+                    .map(([id, element]) => {
+                        if (!hasEntityProperties(element)) {
+                            return [id, element];
+                        }
+                        if (
+                            gatherAllCollectionElements(
+                                cloneDeepMutable(data.keepTemplates)
+                            ).some(
+                                (e) => e.versionId === element.entity.versionId
+                            )
+                        ) {
+                            return [id, element];
+                        }
+                        return [id, false];
+                    })
+                    .filter(([_, element]) => element !== false)
+            );
             applyAllChangeApplies(draftState, data.changeApplies);
 
             // Remove the collection from the selected collections in the state
@@ -184,7 +190,6 @@ export namespace CollectionReducers {
                         collection.entityId !== data.collectionVersion.entityId
                 );
 
-            // TODO: IMplement handlling addImportedCollections
             return draftState;
         },
         rights: 'trainer',

@@ -51,9 +51,10 @@ export class CollectionElementsListComponent {
 
     public readonly importingElements = signal<boolean>(false);
 
-    // INFO:
-    // This array defined the order in which the element types are displayed in the UI.
-    // Types not included in this array will NOT be displayed in the UI
+    /**
+     * This array defined the order in which the element types are displayed in the UI.
+     * Types not included in this array will NOT be displayed in the UI
+     */
     public visibleElementTypes: {
         type: MarketplaceElementContent['type'];
         create: () => void;

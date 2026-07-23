@@ -11,7 +11,10 @@ import {
     gatherAllReferencedCollectionElements,
 } from './models/collection-elements.js';
 
-import type { CollectionElements } from './models/collection-elements.js';
+import type {
+    CollectionElements,
+    CollectionElementsAny,
+} from './models/collection-elements.js';
 import type { ChangedTemplateVersion } from './collection-element-diff.js';
 
 export function getCollectionElementDiff(
@@ -224,16 +227,14 @@ export async function dependencyTreeConflictResolution(
     return { strictLevelCollections, groupedIds };
 }
 
-export async function getAllCollectionElements(
+export async function getAllCollectionElements<T extends CollectionElementsAny>(
     collections: VersionedCollectionPartial[],
-    elementRetriever: (
-        collection: VersionedCollectionPartial
-    ) => Promise<CollectionElements>
-): Promise<CollectionElements> {
+    elementRetriever: (collection: VersionedCollectionPartial) => Promise<T>
+): Promise<T> {
     const elements = await Promise.all(
         collections.map(async (collection) => elementRetriever(collection))
     );
-    return cloneDeepMutable(elements).reduce<WritableDraft<CollectionElements>>(
+    return cloneDeepMutable(elements).reduce<WritableDraft<T>>(
         (acc, collectionElements) => {
             acc.direct.push(...collectionElements.direct);
 
@@ -258,6 +259,6 @@ export async function getAllCollectionElements(
             }
             return acc;
         },
-        { direct: [], imported: [], references: [] }
-    );
+        { direct: [], imported: [], references: [] } as WritableDraft<T>
+    ) as T;
 }

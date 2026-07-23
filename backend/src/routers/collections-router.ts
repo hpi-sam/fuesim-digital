@@ -824,6 +824,28 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
+    // The structure of the collection should be open to the public
+    // to allow for the removal of collections from exercises
+    publicRouter.get(
+        '/:collectionEntityId/version/:collectionVersionId/structure',
+        async (req, res) => {
+            const collectionVersionId = getCollectionVersionId(req);
+
+            const collection =
+                await collectionService.getCollectionVersionStructure(
+                    collectionVersionId
+                );
+
+            res.send(
+                Marketplace.Collection.GetElementStructureOfCollectionVersion.responseSchema.encode(
+                    {
+                        result: collection,
+                    }
+                )
+            );
+        }
+    );
+
     publicRouter.get(
         '/:collectionEntityId/version/:collectionVersionId/dependencies',
         otherAccess,

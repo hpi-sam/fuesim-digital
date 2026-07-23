@@ -56,6 +56,7 @@ import { MapOperatorMapComponent } from '../shared/map-operator-map/map-operator
 import { openSelectCollectionModal } from '../../../marketplace/shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { LoadingModalService } from '../../../../core/loading-modal/loading-modal.service';
 import { openManageExerciseCollectionsModal } from '../shared/manage-exercise-collections/open-manage-exercise-collections-modal';
+import { CollectionService } from '../../../../core/exercise-element.service';
 
 @Component({
     selector: 'app-exercise',
@@ -90,6 +91,7 @@ export class ExerciseComponent implements OnDestroy, OnInit {
     private readonly loadingModalService = inject(LoadingModalService);
     private readonly activatedRoute = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly collectionService = inject(CollectionService);
     readonly location = inject(NgLocation);
 
     private readonly destroy = new Subject<void>();
@@ -114,29 +116,7 @@ export class ExerciseComponent implements OnDestroy, OnInit {
     );
 
     public ngOnInit() {
-        const selectedCollections = selectStateSnapshot(
-            selectSelectedCollections,
-            this.store
-        );
-        if (selectedCollections.length === 0) {
-            openSelectCollectionModal(this.modalService, {
-                showDependencyElements: true,
-                allowLeave: false,
-                allowCreate: true,
-                showInfoBanner: true,
-                selectionInfoText:
-                    'Möchten Sie die Elemente aus dieser Sammlung und ggf. enthaltenen Sammlungen zu der Übung hinzufügen?',
-                skipOnNoChoice: true,
-            }).then(async (result) => {
-                if (result === null) return;
-                this.loadingModalService.showLoading({
-                    title: 'Sammlung wird hinzugefügt',
-                    description: 'Ihre Übungselemente werden vorbereitet',
-                });
-                await this.exerciseService.addCollection(result);
-                this.loadingModalService.closeLoading();
-            });
-        }
+        this.initExercise();
         this.activatedRoute.queryParamMap
             .pipe(takeUntil(this.destroy))
             .subscribe((params) => {
@@ -153,6 +133,47 @@ export class ExerciseComponent implements OnDestroy, OnInit {
                     });
                 }
             });
+    }
+
+    private async initExercise() {
+        const selectedCollections = selectStateSnapshot(
+            selectSelectedCollections,
+            this.store
+        );
+        if (selectedCollections.length === 0) {
+            const result = await openSelectCollectionModal(this.modalService, {
+                showDependencyElements: true,
+                allowLeave: false,
+                allowCreate: true,
+                showInfoBanner: true,
+                selectionInfoText:
+                    'Möchten Sie die Elemente aus dieser Sammlung und ggf. enthaltenen Sammlungen zu der Übung hinzufügen?',
+                skipOnNoChoice: true,
+            });
+
+            if (result === null) return;
+            this.loadingModalService.showLoading({
+                title: 'Sammlung wird hinzugefügt',
+                description: 'Ihre Übungselemente werden vorbereitet',
+            });
+            await this.exerciseService.addCollection(result);
+            this.loadingModalService.closeLoading();
+            this.initExercise();
+        } else {
+            this.loadingModalService.showLoading({
+                title: 'Daten werden geladen',
+                description: 'Ihre Übungselemente werden vorbereitet',
+            });
+            await Promise.all(
+                selectedCollections.map(async (collection) =>
+                    this.collectionService.getCollectionVersionStructure(
+                        collection.entityId,
+                        collection.versionId
+                    )
+                )
+            );
+            this.loadingModalService.closeLoading();
+        }
     }
 
     readonly version: string = Package.version;

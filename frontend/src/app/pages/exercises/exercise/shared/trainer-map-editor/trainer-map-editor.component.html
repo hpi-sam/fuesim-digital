@@ -19,25 +19,26 @@
             collection of selectedCollections$();
             track collection.versionId
         ) {
-            <div class="sidebar-collection-section">
-                <span class="h5 mb-1 d-inline-block">{{
-                    collection.title
-                }}</span>
-                <div class="cards">
-                    @for (element of elements; track element.id) {
-                        @if (
-                            getCollectionsOfElement(element).includes(
-                                collection.entityId
-                            )
+            @let elementsOfCollection =
+                filterElementsToCollection(elements, collection.entityId);
+            @if (elementsOfCollection.length > 0) {
+                <div class="sidebar-collection-section">
+                    <span class="h5 mb-1 d-inline-block">{{
+                        getTitleOfCollectionVersion(collection.versionId)
+                    }}</span>
+                    <div class="cards">
+                        @for (
+                            element of elementsOfCollection;
+                            track element.id
                         ) {
                             <ng-template
                                 [ngTemplateOutlet]="handler"
                                 [ngTemplateOutletContext]="{ element: element }"
                             ></ng-template>
                         }
-                    }
+                    </div>
                 </div>
-            </div>
+            }
         }
 
         @let unversionedElements = getElementsWithoutCollection(elements);

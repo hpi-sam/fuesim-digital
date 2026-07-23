@@ -10,6 +10,13 @@
 
 <div class="modal-body">
     <div class="d-inline-block w-100 px-2 mb-2">
+        <div class="alert alert-secondary mb-3 d-flex align-items-center gap-3">
+            <i class="bi bi-info-circle"></i>
+            <span>
+                Fügen Sie Sammlungen hinzu, um die darin enthaltenen
+                Übungselemente in der Übung verwenden zu können.
+            </span>
+        </div>
         @if (selectedCollections().length === 0) {
             <div class="row row-cols-2">
                 <div class="col flex-grow-1 h-100">
@@ -50,15 +57,6 @@
                 </div>
             </div>
         } @else {
-            <div
-                class="alert alert-secondary mb-3 d-flex align-items-center gap-3"
-            >
-                <i class="bi bi-info-circle"></i>
-                <span>
-                    Fügen Sie Sammlungen hinzu, um die darin enthaltenen
-                    Übungselemente in der Übung verwenden zu können.
-                </span>
-            </div>
             <button
                 (click)="openCollectionSelectDialog()"
                 class="btn btn-outline-primary mb-3"
@@ -66,20 +64,23 @@
                 <i class="bi bi-folder-plus"></i>
                 Neue Sammlung hinzufügen
             </button>
-        }
-        @if (currentExerciseKey(); as currentExerciseKey) {
-            <h6 class="text-muted mt-2">Hinzugefügte Sammlungen:</h6>
-            <ul class="list-group">
-                @for (collection of selectedCollections(); track collection) {
-                    <li class="list-group-item">
-                        <app-exercise-collection-item-component
-                            class="w-100 d-block me-3"
-                            [exerciseKey]="currentExerciseKey"
-                            [collection]="collection"
-                        />
-                    </li>
-                }
-            </ul>
+            @if (currentExerciseKey(); as currentExerciseKey) {
+                <h6 class="text-muted mt-2">Hinzugefügte Sammlungen:</h6>
+                <ul class="list-group">
+                    @for (
+                        collection of selectedCollections();
+                        track collection
+                    ) {
+                        <li class="list-group-item">
+                            <app-exercise-collection-item-component
+                                class="w-100 d-block me-3"
+                                [exerciseKey]="currentExerciseKey"
+                                [collection]="collection"
+                            />
+                        </li>
+                    }
+                </ul>
+            }
         }
     </div>
 </div>

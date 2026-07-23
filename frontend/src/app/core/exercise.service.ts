@@ -295,7 +295,10 @@ export class ExerciseService {
             });
             return;
         }
-
+        await this.collectionService.getCollectionVersionStructure(
+            collection.entityId,
+            collection.versionId
+        );
         await this.proposeAction({
             type: '[Collection] Add Collection',
             elements: collectionElements,

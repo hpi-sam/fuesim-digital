@@ -27,6 +27,7 @@ import type {
     TechnicalChallengeTemplate,
     Element as FuesimElement,
     CollectionEntityId,
+    CollectionVersionId,
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -69,6 +70,7 @@ import { MapEditorCardComponent } from '../../../../../shared/components/map-edi
 import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group-overview-page.component';
 import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
 import { openManageExerciseCollectionsModal } from '../manage-exercise-collections/open-manage-exercise-collections-modal';
+import { CollectionService } from '../../../../../core/exercise-element.service';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -121,6 +123,7 @@ export class TrainerMapEditorComponent implements OnInit {
     readonly transferLinesService = inject(TransferLinesService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly messageService = inject(MessageService);
+    private readonly collectionService = inject(CollectionService);
 
     public readonly overwriteTrainerMap = signal<
         'alarmgroups' | 'hospitals' | null
@@ -245,6 +248,21 @@ export class TrainerMapEditorComponent implements OnInit {
         openManageExerciseCollectionsModal(this.ngbModalService);
     }
 
+    public getTitleOfCollectionVersion(collectionVersion: CollectionVersionId) {
+        return this.collectionService.getCollectionVersionStructureFromCache(
+            collectionVersion
+        ).title;
+    }
+
+    public filterElementsToCollection(
+        elements: FuesimElement[],
+        collectionEntityId: CollectionEntityId
+    ) {
+        return elements.filter((element) =>
+            this.getCollectionsOfElement(element).includes(collectionEntityId)
+        );
+    }
+
     public getCollectionsOfElement(
         element: FuesimElement
     ): CollectionEntityId[] {
@@ -254,7 +272,17 @@ export class TrainerMapEditorComponent implements OnInit {
             return [];
         }
 
-        return this.selectedCollections$()
+        const collectionElements = this.selectedCollections$().map(
+            (collection) => ({
+                collection,
+                elements:
+                    this.collectionService.getCollectionVersionStructureFromCache(
+                        collection.versionId
+                    ),
+            })
+        );
+
+        return collectionElements
             .filter(
                 (collection) =>
                     collection.elements.direct.some(
@@ -268,8 +296,9 @@ export class TrainerMapEditorComponent implements OnInit {
                         )
                     )
             )
-            .map((collection) => collection.entityId);
+            .map((collection) => collection.collection.entityId);
     }
+
     public getElementsWithoutCollection(
         elements: FuesimElement[]
     ): FuesimElement[] {

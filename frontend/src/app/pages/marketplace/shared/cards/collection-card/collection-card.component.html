@@ -35,6 +35,8 @@
                 track org.id
             ) {
                 <span class="badge text-bg-secondary ms-1">{{ org.name }}</span>
+            } @empty {
+                <span class="text-muted ms-1">Keine Organisationen</span>
             }
         </li>
     </ul>

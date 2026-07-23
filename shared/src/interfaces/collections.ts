@@ -15,6 +15,7 @@ import {
 import {
     collectionElementsSchema,
     collectionElementsSingleSchema,
+    collectionVersionStructureWithMetadataSchema,
 } from '../marketplace/models/collection-elements.js';
 import { collectionVisibilitySchema } from '../marketplace/models/collection-visibility.js';
 import { templateVersionSchema } from '../marketplace/models/versioned-elements.js';
@@ -352,6 +353,12 @@ export namespace Marketplace {
 
         export const GetElementsOfCollectionVersion = new Route({
             response: collectionElementsSchema,
+        });
+
+        export const GetElementStructureOfCollectionVersion = new Route({
+            response: z.object({
+                result: collectionVersionStructureWithMetadataSchema,
+            }),
         });
 
         class TypedSchema<D, T> {

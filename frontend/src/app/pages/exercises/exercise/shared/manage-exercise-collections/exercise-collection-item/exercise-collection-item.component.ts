@@ -6,7 +6,9 @@ import {
     gatherAllVisibleCollectionElements,
     cloneDeepMutable,
     ExerciseKey,
-    CollectionStateReference,
+    VersionedCollectionPartial,
+    CollectionVersionId,
+    CollectionVersionStructure,
     CollectionElements,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
@@ -22,7 +24,6 @@ import { AppState } from '../../../../../../state/app.state';
 import { LoadingModalService } from '../../../../../../core/loading-modal/loading-modal.service';
 import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
 import { MessageService } from '../../../../../../core/messages/message.service';
-import { selectTemplatesFromCollectionEntity } from '../../../../../../state/application/selectors/marketplace.selectors';
 import { openMarketplaceCollectionUpdateImpactModal } from '../../../../../marketplace/shared/modals/marketplace-collection-update-impact-modal/open-marketplace-collection-update-impact-modal';
 
 @Component({
@@ -41,7 +42,7 @@ export class ExerciseColletionItemComponent {
     private readonly confirmationModal = inject(ConfirmationModalService);
 
     public readonly exerciseKey = input.required<ExerciseKey>();
-    public readonly collection = input.required<CollectionStateReference>();
+    public readonly collection = input.required<VersionedCollectionPartial>();
 
     public readonly collectionDataRes = resource({
         params: () => ({
@@ -69,6 +70,14 @@ export class ExerciseColletionItemComponent {
         return gatherAllVisibleCollectionElements(collectionElements);
     }
 
+    public getCollectionVersionStructureCacheEntry(
+        collectionVersionId: CollectionVersionId
+    ) {
+        return this.collectionService.getCollectionVersionStructureFromCache(
+            collectionVersionId
+        );
+    }
+
     public async removeCollection() {
         try {
             const currentSelectedCollections = selectStateSnapshot(
@@ -76,16 +85,36 @@ export class ExerciseColletionItemComponent {
                 this.store
             );
 
+            const currentCollectionElementsStructure = await Promise.all(
+                currentSelectedCollections.map(async (c) => ({
+                    collection: c,
+                    structure:
+                        await this.collectionService.getCollectionVersionStructure(
+                            c.entityId,
+                            c.versionId
+                        ),
+                }))
+            );
+
             const filteredCollections = currentSelectedCollections.filter(
                 (c) => c.entityId !== this.collection().entityId
             );
 
-            const newFilteredElementsList: CollectionElements =
-                await getAllCollectionElements(filteredCollections, async (c) =>
-                    selectStateSnapshot(
-                        selectTemplatesFromCollectionEntity(c.entityId),
-                        this.store
-                    )
+            const newFilteredElementsList =
+                await getAllCollectionElements<CollectionVersionStructure>(
+                    filteredCollections,
+                    async (c) => {
+                        const structure =
+                            currentCollectionElementsStructure.find(
+                                (cs) => cs.collection.versionId === c.versionId
+                            )?.structure;
+                        if (!structure) {
+                            throw new Error(
+                                `Collection structure for collection ${c.entityId} version ${c.versionId} not found`
+                            );
+                        }
+                        return structure;
+                    }
                 );
 
             const confirmationResult = await this.confirmationModal.confirm({
@@ -99,7 +128,7 @@ export class ExerciseColletionItemComponent {
                 type: '[Collection] Remove Collection',
                 changeApplies: [],
                 collectionVersion: this.collection(),
-                overwriteTemplates: newFilteredElementsList,
+                keepTemplates: newFilteredElementsList,
             });
         } catch (error) {
             this.messageService.postError({
@@ -118,6 +147,11 @@ export class ExerciseColletionItemComponent {
                 description:
                     'Bitte warten Sie, während die neue Version der Sammlung geladen wird und die Auswirkungen von Änderungen berechnet werden.',
             });
+
+            await this.collectionService.getCollectionVersionStructure(
+                collection.entityId,
+                collection.versionId
+            );
 
             const selectedCollection = this.collection();
 
@@ -155,16 +189,17 @@ export class ExerciseColletionItemComponent {
                 return;
             }
 
-            const newTemplates = await getAllCollectionElements(
-                currentSelectedCollections.map((c) => {
-                    if (c.entityId === selectedCollection.entityId) {
-                        return newerCollectionVersionAvailable.latestVersion;
-                    }
-                    return c;
-                }),
-                async (c) =>
-                    this.collectionService.getElementsOfCollectionVersion(c)
-            );
+            const newTemplates =
+                await getAllCollectionElements<CollectionElements>(
+                    currentSelectedCollections.map((c) => {
+                        if (c.entityId === selectedCollection.entityId) {
+                            return newerCollectionVersionAvailable.latestVersion;
+                        }
+                        return c;
+                    }),
+                    async (c) =>
+                        this.collectionService.getElementsOfCollectionVersion(c)
+                );
 
             this.loadingModalService.closeLoading();
 

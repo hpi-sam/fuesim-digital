@@ -1057,8 +1057,9 @@ export class CollectionRepository extends BaseRepository {
                     elem.elements.content
                 );
                 for (const vId of dependencyVersionIds) {
-                    // Falls es NICHT enhtalten ist, dann ist es eine
-                    // externe Abhängigkeit, die wir nicht kopieren wollen
+                    // If the node is NOT in the dag, then it
+                    // is an external dependency,
+                    // which we do not want to copy
                     if (Object.keys(dag.getNodes()).includes(vId)) {
                         dag.addEdge(elem.elements.versionId, vId);
                     }

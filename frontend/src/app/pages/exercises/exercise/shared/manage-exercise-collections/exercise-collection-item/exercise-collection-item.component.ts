@@ -10,6 +10,8 @@ import {
     CollectionVersionId,
     CollectionVersionStructure,
     CollectionElements,
+    collectionElementStructureToFlatTemplateArray,
+    gatherAllCollectionElements,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -18,7 +20,10 @@ import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
-import { selectSelectedCollections } from '../../../../../../state/application/selectors/exercise.selectors';
+import {
+    selectSelectedCollections,
+    selectTemplates,
+} from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { AppState } from '../../../../../../state/app.state';
 import { LoadingModalService } from '../../../../../../core/loading-modal/loading-modal.service';
@@ -127,8 +132,22 @@ export class ExerciseColletionItemComponent {
             this.exerciseService.proposeAction({
                 type: '[Collection] Remove Collection',
                 changeApplies: [],
-                collectionVersion: this.collection(),
-                keepTemplates: newFilteredElementsList,
+                collectionVersion: {
+                    entityId: this.collection().entityId,
+                    versionId: this.collection().versionId,
+                },
+                overwriteTemplates:
+                    collectionElementStructureToFlatTemplateArray(
+                        newFilteredElementsList,
+                        (element) =>
+                            Object.values(
+                                selectStateSnapshot(selectTemplates, this.store)
+                            ).find(
+                                (template) =>
+                                    template.entity?.versionId ===
+                                    element.versionId
+                            )
+                    ),
             });
         } catch (error) {
             this.messageService.postError({
@@ -148,11 +167,6 @@ export class ExerciseColletionItemComponent {
                     'Bitte warten Sie, während die neue Version der Sammlung geladen wird und die Auswirkungen von Änderungen berechnet werden.',
             });
 
-            await this.collectionService.getCollectionVersionStructure(
-                collection.entityId,
-                collection.versionId
-            );
-
             const selectedCollection = this.collection();
 
             const newerCollectionVersionAvailable =
@@ -162,6 +176,11 @@ export class ExerciseColletionItemComponent {
             if (!newerCollectionVersionAvailable.newerVersionAvailable) {
                 return;
             }
+
+            await this.collectionService.getCollectionVersionStructure(
+                newerCollectionVersionAvailable.latestVersion.entityId,
+                newerCollectionVersionAvailable.latestVersion.versionId
+            );
 
             const newerCollectionElements =
                 await this.collectionService.getElementsOfCollectionVersion(
@@ -227,10 +246,20 @@ export class ExerciseColletionItemComponent {
 
             this.exerciseService.proposeAction({
                 type: '[Collection] Upgrade Collection',
-                collection: newCollectionData,
-                collectionElements: newerCollectionElements,
+                collection: {
+                    entityId: newCollectionData.entityId,
+                    versionId: newCollectionData.versionId,
+                },
                 changeApplies: [],
-                overwriteTemplates: newTemplates,
+                overwriteTemplates:
+                    collectionElementStructureToFlatTemplateArray(
+                        newTemplates,
+                        (element) =>
+                            gatherAllCollectionElements(newTemplates).find(
+                                (template) =>
+                                    template.versionId === element.versionId
+                            )?.content
+                    ),
             });
         } catch (error) {
             this.loadingModalService.closeLoading();

@@ -1,12 +1,24 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { uuid } from '../../utils/uuid.js';
 import { collectionVersionSchema } from './collection.js';
-import { templateVersionSchema } from './versioned-elements.js';
+import {
+    
+    templateVersionSchema,
+} from './versioned-elements.js';
 import type { CollectionElementType } from './collection-element-type.js';
+import type {
+    ElementVersionId,
+    VersionedElementPartial} from './versioned-id-schema.js';
 import {
     versionedCollectionPartialSchema,
     versionedElementPartialSchema,
 } from './versioned-id-schema.js';
+import type {
+    DefinitelyTemplateVersionContent,
+    TemplateVersionContent,
+} from './versioned-element-content.js';
 
 export const collectionElementsSingleSchema = z.strictObject({
     collection: collectionVersionSchema,
@@ -142,4 +154,55 @@ export function gatherAllCollectionElements<T = any>(
         ...gatherAllVisibleCollectionElements(elements),
         ...elements.references.flatMap((reference) => reference.elements),
     ];
+}
+
+export function collectionElementStructureToFlatTemplateArray(
+    elements: Immutable<CollectionVersionStructure>,
+    elementRetrievalFn: (
+        element: VersionedElementPartial
+    ) => Immutable<TemplateVersionContent> | undefined
+): DefinitelyTemplateVersionContent[] {
+    const allTemplates: {
+        [versionId in ElementVersionId]: DefinitelyTemplateVersionContent;
+    } = {};
+
+    const addElement = (
+        elementPartial: Immutable<VersionedElementPartial>,
+        type: CollectionElementType
+    ) => {
+        const mutableElement = cloneDeepMutable(
+            elementRetrievalFn(elementPartial)
+        );
+        if (mutableElement === undefined) {
+            throw new Error(
+                `Element with entityId ${elementPartial.entityId} and versionId ${elementPartial.versionId} not found`
+            );
+        }
+
+        allTemplates[elementPartial.versionId] = {
+            ...mutableElement,
+            id: uuid(),
+            entity: {
+                entityId: elementPartial.entityId,
+                versionId: elementPartial.versionId,
+                type,
+            },
+        };
+    };
+
+    for (const directElement of elements.direct) {
+        addElement(directElement, 'direct');
+    }
+    for (const elementType of ['imported', 'references'] as const) {
+        for (const collectionElements of elements[elementType]) {
+            for (const element of collectionElements.elements) {
+                addElement(element, elementType);
+            }
+        }
+    }
+
+    console.log('All templates gathered:', allTemplates);
+    console.log('All templates gathered:', Object.values(allTemplates));
+
+    return Object.values(allTemplates);
 }

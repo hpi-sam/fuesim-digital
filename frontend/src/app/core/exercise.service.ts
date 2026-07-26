@@ -15,6 +15,8 @@ import type {
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import {
+    collectionElementStructureToFlatTemplateArray,
+    gatherAllCollectionElements,
     joinExerciseResponseDataSchema,
     socketIoTransports,
     validateExerciseExport,
@@ -301,8 +303,17 @@ export class ExerciseService {
         );
         await this.proposeAction({
             type: '[Collection] Add Collection',
-            elements: collectionElements,
-            collection: collectionData,
+            overwriteTemplates: collectionElementStructureToFlatTemplateArray(
+                collectionElements,
+                (element) =>
+                    gatherAllCollectionElements(collectionElements).find(
+                        (template) => template.versionId === element.versionId
+                    )?.content
+            ),
+            collection: {
+                entityId: collectionData.entityId,
+                versionId: collectionData.versionId,
+            },
         });
         this.messageService.postMessage({
             title: 'Sammlung wurde hinzugefügt.',

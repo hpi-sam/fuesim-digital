@@ -17,6 +17,8 @@ import {
     CollectionMembershipRole,
     OrganisationId,
     CollectionVersionStructureWithMetadata,
+    collectionEntityIdSchema,
+    collectionVersionIdSchema,
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
@@ -1094,25 +1096,41 @@ export class CollectionService {
             )!;
         }
 
-        const data = await lastValueFrom(
-            this.httpClient.get<
-                typeof Marketplace.Collection.GetElementStructureOfCollectionVersion.Response
-            >(
-                `${this.ENDPOINT}/${collectionEntityId}/version/${collectionVersionId}/structure`
-            )
-        );
+        let structure: CollectionVersionStructureWithMetadata;
 
-        const parsedData =
-            Marketplace.Collection.GetElementStructureOfCollectionVersion.responseSchema.parse(
-                data
+        try {
+            const data = await lastValueFrom(
+                this.httpClient.get<
+                    typeof Marketplace.Collection.GetElementStructureOfCollectionVersion.Response
+                >(
+                    `${this.ENDPOINT}/${collectionEntityId}/version/${collectionVersionId}/structure`,
+                    {
+                        context: preventStatusErrorToastContext(),
+                    }
+                )
             );
+
+            structure =
+                Marketplace.Collection.GetElementStructureOfCollectionVersion.responseSchema.parse(
+                    data
+                ).result;
+        } catch (error) {
+            console.error(error);
+            structure = {
+                direct: [],
+                imported: [],
+                references: [],
+                title: 'Unbekannte Sammlung',
+                version: 1,
+            };
+        }
 
         this.collectionVersionStructureCache.set(
             collectionVersionId,
-            parsedData.result
+            structure
         );
 
-        return parsedData.result;
+        return structure;
     }
 
     /**
@@ -1129,4 +1147,13 @@ export class CollectionService {
         }
         return this.collectionVersionStructureCache.get(collectionVersionId)!;
     }
+
+    public readonly catchAllCollection: VersionedCollectionPartial = {
+        entityId: collectionEntityIdSchema.parse(
+            'collection_entity_b6e46e26-612b-47f7-bc93-419a9587c914'
+        ),
+        versionId: collectionVersionIdSchema.parse(
+            'collection_version_df5263d7-8cf8-4755-87a2-57367c83d99c'
+        ),
+    };
 }

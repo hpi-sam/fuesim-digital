@@ -427,27 +427,31 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    publicRouter.get(
-        '/:collectionEntityId/user-role',
-        isAuthenticatedMiddleware,
-        async (req, res) => {
-            const collectionEntityId = getCollectionEntityId(req);
-
-            const role =
-                await collectionService.getUserRoleInCollectionTransitive(
-                    collectionEntityId,
-                    req.session!
-                );
-
+    publicRouter.get('/:collectionEntityId/user-role', async (req, res) => {
+        if (req.session === undefined) {
             res.send(
                 Marketplace.Collection.GetCollectionUserRole.responseSchema.encode(
                     {
-                        result: role,
+                        result: null,
                     }
                 )
             );
+            return;
         }
-    );
+
+        const collectionEntityId = getCollectionEntityId(req);
+
+        const role = await collectionService.getUserRoleInCollectionTransitive(
+            collectionEntityId,
+            req.session
+        );
+
+        res.send(
+            Marketplace.Collection.GetCollectionUserRole.responseSchema.encode({
+                result: role,
+            })
+        );
+    });
 
     publicRouter.get(
         '/:collectionEntityId/members',
@@ -839,7 +843,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             res.send(
                 Marketplace.Collection.GetElementStructureOfCollectionVersion.responseSchema.encode(
                     {
-                        result: collection,
+                        result: cloneDeepMutable(collection),
                     }
                 )
             );

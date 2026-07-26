@@ -60,6 +60,7 @@ export class ElementCardComponent {
             editable: this.mode() === 'edit',
             showIndicator: this.effectiveIndicator(),
             small: this.small(),
+            showSecondaryActions: this.mode() !== 'static',
         };
     });
 

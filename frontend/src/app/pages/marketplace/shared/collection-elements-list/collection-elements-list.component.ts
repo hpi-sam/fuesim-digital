@@ -48,6 +48,7 @@ export class CollectionElementsListComponent {
     public readonly showImportedElements = input(false);
     public readonly allowCreation = input(false);
     public readonly smallCards = input(false);
+    public readonly staticMode = input(false);
 
     public readonly importingElements = signal<boolean>(false);
 

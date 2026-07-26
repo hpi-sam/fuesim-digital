@@ -22,6 +22,7 @@ export class GenericElementCardComponent {
     public readonly image = input<string>();
 
     public readonly editable = input<boolean>(true);
+    public readonly showSecondaryActions = input<boolean>(true);
 
     public readonly showIndicator = input<GenericElementCardIndicator>();
     public readonly small = input<boolean>(false);

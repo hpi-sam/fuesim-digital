@@ -54,7 +54,13 @@
                             [element]="exerciseObject"
                             [collectionElements]="collectionElements()"
                             [collection]="collection()"
-                            [mode]="editable() ? 'edit' : 'view'"
+                            [mode]="
+                                editable()
+                                    ? 'edit'
+                                    : staticMode()
+                                      ? 'static'
+                                      : 'view'
+                            "
                             [hideVersionHistory]="!editable()"
                             [showIndicator]="
                                 getElementCardIndicatorForChangeType(

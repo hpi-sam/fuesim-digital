@@ -9,10 +9,7 @@ import {
     hasEntityProperties,
     marketplaceElementsDefinitions,
 } from '../../marketplace/elements/marketplace-elements.js';
-import {
-    
-    versionedCollectionPartialSchema,
-} from '../../marketplace/models/versioned-id-schema.js';
+import { versionedCollectionPartialSchema } from '../../marketplace/models/versioned-id-schema.js';
 import { templateSchema } from '../../models/template.js';
 import type { DefinitelyTemplateVersionContent } from '../../marketplace/models/versioned-element-content.js';
 
@@ -116,10 +113,11 @@ function overwriteStateTemplates(
     overwriteTemplates: Immutable<DefinitelyTemplateVersionContent[]>
 ) {
     draftState.templates = Object.fromEntries([
-        ...Object.entries(draftState.templates).filter(([id, element]) => 
-            // we only want to keep templates that
-            // are not part of the marketplace
-             !hasEntityProperties(element)
+        ...Object.entries(draftState.templates).filter(
+            ([id, element]) =>
+                // we only want to keep templates that
+                // are not part of the marketplace
+                !hasEntityProperties(element)
         ),
         ...overwriteTemplates.map((template) => [template.id, template]),
     ]);

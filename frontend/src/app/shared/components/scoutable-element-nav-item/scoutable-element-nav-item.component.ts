@@ -20,6 +20,7 @@ import { FormsModule } from '@angular/forms';
 import type { UserGeneratedContent, Scoutable } from 'fuesim-digital-shared';
 import { form, validateStandardSchema } from '@angular/forms/signals';
 import { z } from 'zod';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 import { AppState } from '../../../state/app.state';
 import { ExerciseService } from '../../../core/exercise.service';
@@ -37,6 +38,7 @@ import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.di
         FormsModule,
         DisplayValidationComponent,
         AppSaveOnTypingDirective,
+        NgbTooltip,
     ],
 })
 export class ScoutableElementNavItemComponent implements OnInit {

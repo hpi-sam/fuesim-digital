@@ -128,8 +128,8 @@ Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-
     - **Simulationseinstellungen (Übungsleitung)**: Einstellungen zur [Simulation](../3_simulation/) von Übungsbestandteilen.
     - **Simulationsübersicht (Funker)**: Schließt die Übungsansicht und öffnet stattdessen die Ansicht für [Schnittstellenfunker](../3_simulation/) zur Kommunikation zwischen Teilnehmenden und simulierten Bereichen.
 - **Auswertung**
-    - **Statistik**: Fenster mit den [Statistiken](5_evaluation.md#statistiken) zur aktuellen Übung. Beinhaltet auch ein detailliertes Protokoll.
-    - **Aufzeichnung**: Schließt die Übungsansicht und öffnet stattdessen die Replay-Ansicht, in der die [Aufzeichnung](5_evaluation.md#aufzeichnung) der aktuellen Übung betrachtet werden kann.
+    - **Statistik**: Fenster mit den [Statistiken](6_evaluation.md#statistiken) zur aktuellen Übung. Beinhaltet auch ein detailliertes Protokoll.
+    - **Aufzeichnung**: Schließt die Übungsansicht und öffnet stattdessen die Replay-Ansicht, in der die [Aufzeichnung](6_evaluation.md#aufzeichnung) der aktuellen Übung betrachtet werden kann.
 
 ## Leitstellenansicht (für Teilnehmende)
 

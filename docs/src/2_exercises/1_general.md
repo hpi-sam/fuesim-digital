@@ -59,7 +59,7 @@ Ein Übungsleiter kann eine Übung jederzeit pausieren. Im pausierten Modus ist 
 In der FüSim Digital gibt es kein explizites Übungsende. Eine Übung kann lediglich pausiert werden.
 
 > [!TIP]
-> Es wird unbedingt empfohlen, die Übung auch am Ende zu pausieren, damit bei der [Auswertung](5_evaluation.md) nur die relevanten Zeiträume in Statistik und Zeitstrahl betrachtet werden.
+> Es wird unbedingt empfohlen, die Übung auch am Ende zu pausieren, damit bei der [Auswertung](6_evaluation.md) nur die relevanten Zeiträume in Statistik und Zeitstrahl betrachtet werden.
 
 ### Gelöscht
 
@@ -80,10 +80,10 @@ Die Optionen <kbd>Kompletten Verlauf</kbd> und <kbd>Aktuellen Zustand</kbd> erm�
 
 Der aktuelle Zustand umfasst dabei nur den Ist-Stand der aktuellen Übung zum Zeitpunkt des Exports. Diese Option ist dann nützlich, wenn die exportierte Übung als Vorlage für spätere Übungen verwendet werden soll.
 
-Der komplette Verlauf enthält dagegen zusätzlich ein vollständiges Protokoll aller bisherigen Aktionen durch Übungsleitende und Teilnehmende. Ein Export des Verlaufs ist dann sinnvoll, wenn eine abgeschlossene Übung für eine spätere [Auswertung](5_evaluation.md) gesichert werden soll.
+Der komplette Verlauf enthält dagegen zusätzlich ein vollständiges Protokoll aller bisherigen Aktionen durch Übungsleitende und Teilnehmende. Ein Export des Verlaufs ist dann sinnvoll, wenn eine abgeschlossene Übung für eine spätere [Auswertung](6_evaluation.md) gesichert werden soll.
 
 > [!NOTE]
-> Der Verlauf einer Übung umfasst auch ein Protokoll jedes einzelnen (Zwischen-)Schrittes während der Übungserstellung durch die Übungsleitung (z.B. das Platzieren, Verschieben, Löschen, Benennen und Umbenennen von Elementen). Da alle diese Schritte zum Zeitpunkt `0:00:00` passieren, kann dieses Erstellungsprotokoll nicht als [Aufzeichnung](5_evaluation.md#aufzeichnung) in der FüSim Digital abgespielt werden, es kann aber von technisch versierten Personen aus der `.json`-Datei ausgelesen werden.
+> Der Verlauf einer Übung umfasst auch ein Protokoll jedes einzelnen (Zwischen-)Schrittes während der Übungserstellung durch die Übungsleitung (z.B. das Platzieren, Verschieben, Löschen, Benennen und Umbenennen von Elementen). Da alle diese Schritte zum Zeitpunkt `0:00:00` passieren, kann dieses Erstellungsprotokoll nicht als [Aufzeichnung](6_evaluation.md#aufzeichnung) in der FüSim Digital abgespielt werden, es kann aber von technisch versierten Personen aus der `.json`-Datei ausgelesen werden.
 
 ### ~~Vorlagen exportieren~~
 

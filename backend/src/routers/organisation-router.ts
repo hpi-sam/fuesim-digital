@@ -124,8 +124,8 @@ export function createOrganisationRouter(
                     req.session!
                 );
 
-            res.attachment(`exercises-${id}.zip`);
-            archive.pipe(res);
+            res.attachment(archive.filename);
+            archive.archive.pipe(res);
         });
 
     router
@@ -140,8 +140,8 @@ export function createOrganisationRouter(
                     req.session!
                 );
 
-            res.attachment(`exercise-templates-${id}.zip`);
-            archive.pipe(res);
+            res.attachment(archive.filename);
+            archive.archive.pipe(res);
         });
 
     router

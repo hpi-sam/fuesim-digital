@@ -468,6 +468,7 @@ export class ExerciseService {
                 emitterId: actionWrapper.getAction().emitterId,
                 time: actionWrapper.getAction().index,
             })),
+            // TODO: Is this necessary?
         ].sort((a, b) => a.time - b.time);
     }
 

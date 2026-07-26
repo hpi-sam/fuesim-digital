@@ -1,11 +1,12 @@
-import type {
-    ExerciseType,
-    ExerciseTemplateId,
-    ExerciseState,
-    StateExport,
-    ParticipantKey,
-    TrainerKey,
-    OrganisationId,
+import {
+    type ExerciseType,
+    type ExerciseTemplateId,
+    type ExerciseState,
+    type StateExport,
+    type ParticipantKey,
+    type TrainerKey,
+    type OrganisationId,
+    slugify,
 } from 'fuesim-digital-shared';
 import { ZipArchive } from 'archiver';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
@@ -306,17 +307,16 @@ export class ExerciseManagerService {
         exercises: ExerciseEntry[],
         session?: SessionInformation
     ) {
+        const exports = await Promise.all(
+            exercises.map(async (ex) =>
+                this.exerciseService.getExport(ex.trainerKey, true, session)
+            )
+        );
         const archive = new ZipArchive();
-        for (const exercise of exercises) {
-            // eslint-disable-next-line no-await-in-loop
-            const stateExport = await this.exerciseService.getExport(
-                exercise.trainerKey,
-                true,
-                session
-            );
+        for (const [i, stateExport] of exports.entries()) {
             const buffer = Buffer.from(JSON.stringify(stateExport));
             archive.append(buffer, {
-                name: `exercise-state-${exercise.participantKey}.json`,
+                name: `exercise-state-${exercises[i]!.participantKey}.json`,
             });
         }
         await archive.finalize();
@@ -347,7 +347,10 @@ export class ExerciseManagerService {
             await this.exerciseRepository.getAllExercisesForOrganisation(
                 organisationId
             );
-        return this.buildExercisesArchive(exercises, session);
+        return {
+            archive: await this.buildExercisesArchive(exercises, session),
+            filename: `${slugify(organisation.name)}-exercises.zip`,
+        };
     }
 
     public async exportAllExerciseTemplatesForOrganisation(
@@ -375,6 +378,9 @@ export class ExerciseManagerService {
                 organisationId
             )
         ).map((exerciseTemplate) => exerciseTemplate.exercise);
-        return this.buildExercisesArchive(exercises, session);
+        return {
+            archive: await this.buildExercisesArchive(exercises, session),
+            filename: `${slugify(organisation.name)}-exercise-templates.zip`,
+        };
     }
 }

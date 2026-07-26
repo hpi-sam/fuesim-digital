@@ -1,10 +1,9 @@
 import { eq, asc } from 'drizzle-orm';
-import type { ExerciseId, ExerciseTimeline } from 'fuesim-digital-shared';
+import type { ExerciseId } from 'fuesim-digital-shared';
 import { type ActionEntry, actionTable } from '../schema.js';
 import type { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { BaseRepository } from './base-repository.js';
 import { DatabaseService } from './../services/database-service.js';
-import type { SessionInformation } from '../../auth/auth-service.js';
 
 export class ActionRepository extends BaseRepository {
     public async getActionsForExerciseId(exerciseId: ExerciseId) {

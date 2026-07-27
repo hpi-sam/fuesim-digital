@@ -54,7 +54,7 @@ import { addIsActiveToClient53 } from './53-add-is-active-to-client.js';
 import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loading-and-highlighting.js';
 import { vehicleLoadTimes55 } from './55-vehicle-load-times.js';
 import { vehicleCounters56 } from './56-vehicle-counters.js';
-import { technicalChallengesMeasuresExtendedScoutables57 } from './56-technical-challenges-measures-extended-scoutables.js';
+import { technicalChallengesMeasuresExtendedScoutables57 } from './57-technical-challenges-measures-extended-scoutables.js';
 import { addAlarmGroupVehicleType58 } from './58-add-alarm-group-vehicle-type.js';
 import { addCollections59 } from './59-add-collections.js';
 

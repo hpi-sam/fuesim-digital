@@ -545,6 +545,7 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     ) as { [key: StateMachineState['id']]: StateMachineState };
 
     return {
+        type: 'technicalChallengeTemplate',
         stateMachines: {
             [stateMachineId]: {
                 id: stateMachineId,

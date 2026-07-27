@@ -97,17 +97,16 @@
                                 <div
                                     class="card-header h4 d-flex align-content-center"
                                 >
-                                    <div class="pb-3">
-                                        Teilnehmende
-                                    </div>
+                                    <div class="pb-3">Teilnehmende</div>
                                 </div>
                                 <div class="card-body py-3">
-
                                     <h1 class="m-3 text-center">
                                         Aktuell
                                         {{ exerciseInstances.length }}
                                         Teilnehmende{{
-                                            exerciseInstances.length === 1 ? '(r)' : ''
+                                            exerciseInstances.length === 1
+                                                ? '(r)'
+                                                : ''
                                         }}
                                     </h1>
                                     <div class="h2 m-3 mt-5 text-center">
@@ -127,9 +126,10 @@
                                                     exerciseInstance.clientNames
                                                         .length > 0
                                                         ? exerciseInstance.clientNames.join(
-                                                            ', '
-                                                        )
-                                                        : "Übung " + exerciseInstance.participantKey
+                                                              ', '
+                                                          )
+                                                        : 'Übung ' +
+                                                          exerciseInstance.participantKey
                                                 }}
                                             </span>
                                         } @empty {
@@ -144,9 +144,7 @@
                                 <div
                                     class="card-header h4 d-flex align-content-center"
                                 >
-                                    <div class="pb-3">
-                                        Übung beitreten
-                                    </div>
+                                    <div class="pb-3">Übung beitreten</div>
                                     <div class="flex-grow-1"></div>
                                     <button
                                         app-copy-button

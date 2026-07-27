@@ -56,7 +56,7 @@ export abstract class ClientWrapper {
     ): InstanceType<T> | undefined {
         if (clientMap.get(socket)) {
             // Already registered
-            return clientMap.get(socket) as InstanceType<T>;
+            return;
         }
         // @ts-expect-error typing
         const wrapper = new wrapperClass(socket, services, repositories);

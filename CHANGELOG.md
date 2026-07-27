@@ -13,6 +13,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - There is now a banner that is displayed when the application is unable to start properly, informing the user about potential causes.
 - New participants joining a parallel exercise after it started now get fast-forwarded to be in sync with all other participants.
 
+### Changed
+
+- Menu items in header have ben put into a more logical order.
+
 ### Fixed
 
 - The deletion of alarm groups no longer breaks breaks measure templates that use them.

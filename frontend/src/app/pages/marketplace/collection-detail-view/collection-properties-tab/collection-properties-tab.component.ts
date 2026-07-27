@@ -138,10 +138,10 @@ export class CollectionDetailsTabComponent {
 
     public async revokeInviteCode() {
         const confirmationResult = await this.confirmationModalService.confirm({
-            title: 'Einladungslink widerrufen',
+            title: 'Alle Einladungscodes widerrufen',
             description:
-                'Möchten Sie den Einladungslink wirklich widerrufen? Dadurch verlieren alle Personen, die den Link haben, den Zugriff auf die Sammlung. Bereits eingeladene Personen können die Sammlung weiterhin nutzen.',
-            confirmationButtonText: 'Einladungslink widerrufen',
+                'Möchten Sie wirklich alle Einladungscode widerrufen? Dadurch können bereits verteilte Einladungscodes nicht mehr genutzt werden. Diese Aktion kann nicht rückgängig gemacht werden.',
+            confirmationButtonText: 'Alle Einladungscodes widerrufen',
         });
         if (!confirmationResult) return;
         await this.collectionService.revokeCollectionInviteCode(

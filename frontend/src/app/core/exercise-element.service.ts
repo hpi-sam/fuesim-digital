@@ -957,8 +957,8 @@ export class CollectionService {
         );
 
         this.messageService.postMessage({
-            title: 'Einladungslink widerrufen',
-            body: 'Der Einladungslink wurde widerrufen und ist nun ungültig.',
+            title: 'Einladungscode widerrufen',
+            body: 'Der Einladungscode wurde widerrufen und ist nun ungültig.',
             color: 'success',
         });
     }

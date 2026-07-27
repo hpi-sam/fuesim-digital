@@ -54,6 +54,10 @@ import { getDefaultTasks } from './data/default-state/tmp-default-technical-chal
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
+import {
+    catchAllHospitalId,
+    createCatchAllHospital,
+} from './data/default-state/catch-all-hospital.js';
 
 /**
  * **Important**
@@ -162,7 +166,9 @@ export function newExerciseState(
         taskTypes: getDefaultTasks(),
         technicalChallenges: {},
         transferPoints: {},
-        hospitals: {},
+        hospitals: {
+            [catchAllHospitalId]: createCatchAllHospital(),
+        },
         hospitalPatients: {},
         alarmGroups: {},
         clients: {},

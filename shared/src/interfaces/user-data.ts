@@ -14,7 +14,7 @@ export const getUserDataDumpDataSchema = z.object({
         description: z.string(),
         userRole: z.string(),
     }),
-    exercises: z.array(z.any()), // TODO: Why don't have zod schemas for these types? grrr...
+    exercises: z.array(z.any()),
     exerciseTemplates: z.array(z.any()),
     parallelExercises: z.array(z.any()),
 });

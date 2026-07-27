@@ -6,11 +6,7 @@ export function createUserdataRouter(userDataService: UserDataService): Router {
     const router = Router();
 
     router.get('/dump', isAuthenticatedMiddleware, async (req, res) => {
-        const userId = req.session?.user.id;
-        if (!userId) {
-            res.status(500);
-            return;
-        }
+        const userId = req.session!.user.id;
         res.status(200).json(await userDataService.getUserDataDump(userId));
     });
 

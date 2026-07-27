@@ -115,14 +115,7 @@ Users are able to download all user-related data directly when logged in. For th
 ### Inside the docker container
 
 ```bash
-
-```
-
-### Natively
-
-```bash
-$ cd backend
-$ npm run db:find-user demo // or "John"
+$ docker compose exec app node /usr/local/app/backend/dist/src/database/scripts/find-user.js demo // or "John"
 [
   {
     username: 'demo1',
@@ -130,10 +123,10 @@ $ npm run db:find-user demo // or "John"
     id: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
   }
 ]
-$ npm run db:delete-user-data xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+$ docker compose exec app node /usr/local/app/backend/dist/src/database/scripts/delete-user-data.js xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 Found user 'John Doe (demo1)'. Is this correct? (yes|no): y
 Found organisations of which 'John Doe' is the only admin.
-	- Private Inhalte (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+	- Private Inhalte (yyyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy)
 	- ... (...)
 If you continue, THESE AND ALL THEIR CONTENTS WILL BE DELETED!
 Continue? (yes|no): y
@@ -146,6 +139,14 @@ This operation will delete:
 	Parallel Exercises: xx
 Are you sure? (yes|no): y
 Success
+```
+
+### Natively
+
+```bash
+$ cd backend
+$ npm run db:find-user demo // or "John"
+$ npm run db:delete-user-data xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
 ## Before you commit

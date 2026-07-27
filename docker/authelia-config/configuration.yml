@@ -14,8 +14,8 @@ access_control:
     default_policy: 'one_factor'
 session:
     cookies:
-        - domain: 127.0.0.1
-          authelia_url: https://127.0.0.1:9091
+        - domain: authelia.localhost
+          authelia_url: https://authelia.localhost:9091
 notifier:
     filesystem:
         filename: '/secrets/notification.txt'
@@ -87,7 +87,10 @@ identity_providers:
               client_secret: '$pbkdf2-sha512$310000$bB3bu5juXUfr6Y1MBfTEOw$uBKK4tJMXfS0S3mA5cdPMKimN1u9mhZdVvqhJcsAkg3XZrueVTW5m77mS0l6SyUM8EF.36qQ461rGwQkuxBGFQ'
               public: false
               redirect_uris:
+                  # Non-docker dev (backend on :3201)
                   - 'http://localhost:3201/api/auth/oidc-callback'
+                  # Docker dev (app served by nginx on :80)
+                  - 'http://localhost/api/auth/oidc-callback'
               authorization_policy: 'one_factor'
               # https://www.authelia.com/integration/openid-connect/openid-connect-1.0-claims/#scope-definitions
               scopes:

@@ -198,8 +198,5 @@ export function collectionElementStructureToFlatTemplateArray(
         }
     }
 
-    console.log('All templates gathered:', allTemplates);
-    console.log('All templates gathered:', Object.values(allTemplates));
-
     return Object.values(allTemplates);
 }

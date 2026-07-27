@@ -24,15 +24,11 @@ export async function showJoinCollectionWorkflow(
         promptResult.value
     );
 
-    console.log(collectionPreview);
-
     const organisationId =
         preSelectedOrganisationId ??
         (await openSelectOrganisationModal(ngbModalService, {
             descriptionText: `Bitte wählen Sie die Organisation aus, mit der Sie der Sammlung "${collectionPreview.title}" beitreten möchten. Die Sammlung wird dann in dieser Organisation verfügbar sein.`,
         }));
-
-    console.log(organisationId);
 
     await collectionService.joinCollectionByJoinCode(
         promptResult.value,

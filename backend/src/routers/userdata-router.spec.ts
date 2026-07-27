@@ -1,5 +1,5 @@
+import { getUserDataDumpDataSchema } from 'fuesim-digital-shared';
 import { createTestUserSession, createTestEnvironment } from '../test/utils.js';
-import { getUserDataDumpDataSchema } from 'fuesim-digital-shared'
 
 describe('userdata router', () => {
     const environment = createTestEnvironment();
@@ -10,7 +10,9 @@ describe('userdata router', () => {
     });
     describe('GET /api/userdata/dump', () => {
         it('fails with 403 if not authenticated', async () => {
-            await environment.httpRequest('get', '/api/userdata/dump').expect(403);
+            await environment
+                .httpRequest('get', '/api/userdata/dump')
+                .expect(403);
         });
 
         it('returns a validly shaped object if authenticated', async () => {
@@ -18,7 +20,9 @@ describe('userdata router', () => {
                 .httpRequest('get', '/api/userdata/dump', session)
                 .expect(200);
 
-            expect(getUserDataDumpDataSchema.safeParse(response.body)).toBeDefined();
+            expect(
+                getUserDataDumpDataSchema.safeParse(response.body)
+            ).toBeDefined();
         });
     });
 });

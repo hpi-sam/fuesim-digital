@@ -103,7 +103,6 @@ CREATE TABLE "elements" (
 	CONSTRAINT "unique_template_id" UNIQUE("entityId","versionId")
 );
 --> statement-breakpoint
-ALTER TABLE "exercise_entity" RENAME COLUMN "user" TO "organisationId";--> statement-breakpoint
 ALTER TABLE "collection_dependency_mapping" ADD CONSTRAINT "collection_dependency_mapping_dependentCollectionVersionId_collections_versionId_fk" FOREIGN KEY ("dependentCollectionVersionId") REFERENCES "public"."collections"("versionId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "collection_dependency_mapping" ADD CONSTRAINT "collection_dependency_mapping_collectionVersionId_collections_versionId_fk" FOREIGN KEY ("collectionVersionId") REFERENCES "public"."collections"("versionId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "collection_organisation_mapping" ADD CONSTRAINT "collection_organisation_mapping_organisationId_organisation_id_fk" FOREIGN KEY ("organisationId") REFERENCES "public"."organisation"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

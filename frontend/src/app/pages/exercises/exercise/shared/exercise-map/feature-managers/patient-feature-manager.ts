@@ -1,4 +1,4 @@
-import type { Store } from '@ngrx/store';
+import { createSelector, type Store } from '@ngrx/store';
 import {
     type UUID,
     type Patient,
@@ -8,7 +8,7 @@ import {
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
 import { Fill, Stroke } from 'ol/style';
-import type { Subject } from 'rxjs';
+import { pairwise, startWith, takeUntil, type Subject } from 'rxjs';
 import { PatientPopupComponent } from '../shared/patient-popup/patient-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
@@ -33,6 +33,38 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
             destroy$,
             mapInteractionsManager
         );
+
+        // Register change handlers to show/hide ticket icon if configuration was changed
+        this.store
+            .select(
+                createSelector(
+                    selectConfiguration,
+                    selectVisiblePatients,
+                    (configuration, patients) => ({
+                        ticketsEnabled:
+                            configuration.patientTicketMode !== 'none',
+                        patients,
+                    })
+                )
+            )
+            .pipe(
+                startWith({
+                    ticketsEnabled: true,
+                    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+                    patients: {} as { [key: UUID]: Patient },
+                }),
+                pairwise(),
+                takeUntil(destroy$)
+            )
+            .subscribe(([oldData, newData]) => {
+                if (oldData.ticketsEnabled !== newData.ticketsEnabled) {
+                    Object.values(newData.patients).forEach((newPatient) => {
+                        const oldPatient = oldData.patients[newPatient.id];
+                        if (oldPatient)
+                            this.onElementChanged(oldPatient, newPatient);
+                    });
+                }
+            });
     }
     private readonly popupHelper = new ImagePopupHelper(this.olMap, this.layer);
 
@@ -130,7 +162,11 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
                 ),
             ];
 
-            if (patient.ticket !== '')
+            const ticketsEnabled =
+                selectStateSnapshot(selectConfiguration, store)
+                    .patientTicketMode !== 'none';
+
+            if (ticketsEnabled && patient.ticket !== '')
                 styles.push(
                     this.ticketImageStyleHelper.getStyle(
                         feature as Feature,

@@ -15,15 +15,6 @@
                         Übungen
                     </a>
                 </li>
-                <li ngbNavItem="exercise_templates" class="nav-item mx-2">
-                    <a
-                        ngbNavLink
-                        class="nav-link"
-                        routerLink="/exercises/templates"
-                    >
-                        Übungsvorlagen
-                    </a>
-                </li>
                 @if (exerciseConfig()?.parallelExercisesEnabled) {
                     <li ngbNavItem="parallel" class="nav-item mx-2">
                         <a
@@ -35,6 +26,15 @@
                         </a>
                     </li>
                 }
+                <li ngbNavItem="exercise_templates" class="nav-item mx-2">
+                    <a
+                        ngbNavLink
+                        class="nav-link"
+                        routerLink="/exercises/templates"
+                    >
+                        Übungsvorlagen
+                    </a>
+                </li>
                 <li ngbNavItem="organisations" class="nav-item mx-2">
                     <a ngbNavLink class="nav-link" routerLink="/organisations">
                         Organisationen

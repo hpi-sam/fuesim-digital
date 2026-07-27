@@ -17,6 +17,7 @@ import type {
 import {
     collectionElementStructureToFlatTemplateArray,
     gatherAllCollectionElements,
+    getAllCollectionElements,
     joinExerciseResponseDataSchema,
     socketIoTransports,
     validateExerciseExport,
@@ -49,6 +50,7 @@ import {
 import {
     selectActiveClients,
     selectExerciseState,
+    selectSelectedCollections,
 } from '../state/application/selectors/exercise.selectors';
 import {
     selectCurrentMainRole,
@@ -285,10 +287,25 @@ export class ExerciseService {
     public async addCollection(collection: VersionedCollectionPartial) {
         const collectionData =
             await this.collectionService.getCollectionVersion(collection);
-        const collectionElements =
-            await this.collectionService.getElementsOfCollectionVersion(
-                collection
-            );
+
+        const currentSelectedCollections = selectStateSnapshot(
+            selectSelectedCollections,
+            this.store
+        );
+
+        const collectionElements = await getAllCollectionElements(
+            [
+                ...currentSelectedCollections.filter(
+                    (f) => f.entityId !== collection.entityId
+                ),
+                {
+                    entityId: collection.entityId,
+                    versionId: collection.versionId,
+                },
+            ],
+            async (c) =>
+                this.collectionService.getElementsOfCollectionVersion(c)
+        );
 
         if (collectionData === null) {
             this.messageService.postError({
@@ -301,6 +318,7 @@ export class ExerciseService {
             collection.entityId,
             collection.versionId
         );
+
         await this.proposeAction({
             type: '[Collection] Add Collection',
             overwriteTemplates: collectionElementStructureToFlatTemplateArray(

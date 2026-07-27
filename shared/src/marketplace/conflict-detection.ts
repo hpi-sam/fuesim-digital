@@ -227,6 +227,14 @@ export async function dependencyTreeConflictResolution(
     return { strictLevelCollections, groupedIds };
 }
 
+/**
+ * This function is used to generate a combined list of collection elements from
+ * multiple collections. This is used for the input parameter of the action reducers
+ * handling the collection elements. Those reducers take in an array of elements
+ * which overwrite the existing ones. As such, we need to generate a
+ * CollectionElements structure which contains all elements from the given
+ * collections.
+ */
 export async function getAllCollectionElements<T extends CollectionElementsAny>(
     collections: VersionedCollectionPartial[],
     elementRetriever: (collection: VersionedCollectionPartial) => Promise<T>

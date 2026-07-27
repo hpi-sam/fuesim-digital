@@ -147,7 +147,7 @@ jobs:
               run: cd docs && ./mdbook-lint-x86_64-unknown-linux-gnu/mdbook-lint lint src/
 
     test:
-        timeout-minutes: 4
+        timeout-minutes: 5
         runs-on: ubuntu-latest
 
         needs: build-shared

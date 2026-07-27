@@ -4,6 +4,7 @@
             type="button"
             class="btn btn-sm btn-outline-secondary mb-2"
             (click)="closeView.emit()"
+            data-cy="hospitalsBackToMapButton"
         >
             <i class="bi bi-arrow-left me-1"></i>
             <i class="bi bi-map me-1"></i> Zurück zur Karte
@@ -16,7 +17,7 @@
         <button
             class="ms-3 btn btn-outline-primary"
             (click)="addHospital()"
-            data-cy="alarmGroupAddButton"
+            data-cy="hospitalAddButton"
         >
             <i class="bi bi-plus"></i> Hinzufügen
         </button>

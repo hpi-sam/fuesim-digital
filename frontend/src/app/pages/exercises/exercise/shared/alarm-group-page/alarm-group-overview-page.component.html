@@ -4,6 +4,7 @@
             type="button"
             class="btn btn-sm btn-outline-secondary mb-2"
             (click)="closeView.emit()"
+            data-cy="alarmGroupBackToMapButton"
         >
             <i class="bi bi-arrow-left me-1"></i>
             <i class="bi bi-map me-1"></i> Zurück zur Karte
@@ -20,6 +21,7 @@
                     type="button"
                     class="btn btn-outline-primary"
                     ngbDropdownToggle
+                    data-cy="alarmGroupAddButton"
                 >
                     <i class="bi bi-plus"></i> Hinzufügen
                 </button>
@@ -27,7 +29,7 @@
                     <button
                         ngbDropdownItem
                         (click)="addEmptyAlarmGroup()"
-                        data-cy="alarmGroupAddButton"
+                        data-cy="alarmGroupAddEmptyButton"
                     >
                         <i class="bi bi-plus-square-dotted me-2"></i>
                         Leere Alarmgruppe

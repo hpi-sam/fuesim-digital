@@ -675,7 +675,12 @@
                     (hide)="overwriteTrainerMap.set(null)"
                 >
                     <h5 ngbAccordionHeader>
-                        <button ngbAccordionButton>Alarmgruppen</button>
+                        <button
+                            ngbAccordionButton
+                            data-cy="alarmGroupsAccordionButton"
+                        >
+                            Alarmgruppen
+                        </button>
                     </h5>
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
@@ -735,7 +740,12 @@
                     (hide)="overwriteTrainerMap.set(null)"
                 >
                     <h5 ngbAccordionHeader>
-                        <button ngbAccordionButton>Krankenhäuser</button>
+                        <button
+                            ngbAccordionButton
+                            data-cy="hospitalsAccordionButton"
+                        >
+                            Krankenhäuser
+                        </button>
                     </h5>
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>

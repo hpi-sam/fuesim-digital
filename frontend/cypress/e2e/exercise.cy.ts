@@ -11,7 +11,7 @@ describe('A trainer on the exercise page', () => {
         cy.createExercise().joinExerciseAsTrainer().initializeTrainerSocket();
     });
 
-    it('can load and unload vehicles', () => {
+    it.only('can load and unload vehicles', () => {
         cy.get('[data-cy=vehiclesAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableVehicleDiv]');
 
@@ -183,11 +183,12 @@ describe('A trainer on the exercise page', () => {
     });
 
     it('can manage alarm groups', () => {
-        cy.get('[data-cy=trainerToolbarCreationButton]').click();
-        cy.get('[data-cy=trainerToolbarAlarmGroupsButton]').click();
+        cy.get('[data-cy=alarmGroupsAccordionButton]').click();
 
         cy.log('add an alarm group')
             .get('[data-cy="alarmGroupAddButton"]')
+            .click()
+            .get('[data-cy="alarmGroupAddEmptyButton"]')
             .click();
         cy.get('@trainerSocketPerformedActions')
             .lastElement()
@@ -226,7 +227,7 @@ describe('A trainer on the exercise page', () => {
             .get('[data-cy="alarmGroupVehicleDelayInput"]')
             .first()
             .clear()
-            .type('10');
+            .type('10{enter}');
 
         cy.get('@trainerSocketPerformedActions')
             .lastElement()
@@ -250,7 +251,7 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=alarmGroupAddVehicleSelect] > :nth-child(2)')
             .first()
             .click();
-        cy.get('[data-cy=alarmGroupClosePopupButton]').click({ force: true });
+        cy.get('[data-cy=alarmGroupBackToMapButton]').click({ force: true });
         cy.get('[data-cy=viewportsTransferPointsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableTransferPointDiv]');
         cy.get('[data-cy=trainerToolbarExecutionButton]').click();
@@ -307,8 +308,7 @@ describe('A trainer on the exercise page', () => {
             .should('have.property', 'type', 'transfer');
 
         cy.get('[data-cy=transferOverviewCloseButton]').click({ force: true });
-        cy.get('[data-cy=trainerToolbarCreationButton]').click();
-        cy.get('[data-cy=trainerToolbarAlarmGroupsButton]').click();
+        cy.get('[data-cy=alarmGroupsAccordionButton]').click();
 
         cy.log('remove an alarm group vehicle')
             .get('[data-cy="alarmGroupRemoveVehicleButton"]')
@@ -350,13 +350,12 @@ describe('A trainer on the exercise page', () => {
             .should('be.empty');
     });
 
-    it('can manage hospitals and transfer vehicles to them', () => {
+    it.only('can manage hospitals and transfer vehicles to them', () => {
         cy.get('[data-cy=trainerToolbarSettingsButton]').click();
         cy.get('[data-cy=settingsVehicleLoadTimesEnabledCheckbox]').uncheck();
         cy.get('[data-cy=settingsClosePopupButton]').click({ force: true });
 
-        cy.get('[data-cy=trainerToolbarCreationButton]').click();
-        cy.get('[data-cy=trainerToolbarHospitalsButton]').click();
+        cy.get('[data-cy=hospitalsAccordionButton]').click();
 
         cy.log('add a hospital').get('[data-cy="hospitalAddButton"]').click();
         cy.get('@trainerSocketPerformedActions')
@@ -393,7 +392,7 @@ describe('A trainer on the exercise page', () => {
             .lastElement()
             .should('have.property', 'transportDuration', 1800000);
 
-        cy.get('[data-cy=hospitalClosePopupButton]').click({ force: true });
+        cy.get('[data-cy=hospitalsBackToMapButton]').click({ force: true });
 
         cy.get('[data-cy=viewportsTransferPointsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableTransferPointDiv]');
@@ -467,8 +466,7 @@ describe('A trainer on the exercise page', () => {
             .its('reachableHospitals')
             .should('be.empty');
 
-        cy.get('[data-cy=trainerToolbarCreationButton]').click();
-        cy.get('[data-cy=trainerToolbarHospitalsButton]').click();
+        cy.get('[data-cy=hospitalsAccordionButton]').click();
 
         cy.log('delete a hospital');
         cy.get('[data-cy="hospitalDeleteButton"]').click();

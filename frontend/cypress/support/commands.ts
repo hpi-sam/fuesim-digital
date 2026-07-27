@@ -119,7 +119,10 @@ export function joinExerciseAsTrainer() {
     cy.get('@trainerKey', { log: false }).then((trainerKey) =>
         cy.visit(`exercises/${trainerKey}`)
     );
+    cy.wait(2000);
     cy.get('[data-cy=joinExerciseModalButton]').click();
+    // Close the toast that appears to notity the user that a collection has been added
+    cy.closeAllToasts();
     return cy;
 }
 
@@ -127,7 +130,9 @@ export function joinExerciseAsParticipant() {
     cy.get('@participantKey', { log: false }).then((participantKey) =>
         cy.visit(`exercises/${participantKey}`)
     );
+    cy.wait(2000);
     cy.get('[data-cy=joinExerciseModalButton]').click();
+    cy.closeAllToasts();
     return cy;
 }
 

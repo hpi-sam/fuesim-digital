@@ -28,6 +28,7 @@ import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot'
 import { MeasureCardComponent } from '../../editor-panel/measure-card/measure-card.component';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component';
 
 @Component({
     selector: 'app-measures-overview-modal',
@@ -41,6 +42,7 @@ import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/ap
         FormsModule,
         AppSaveOnTypingDirective,
         NgbTooltip,
+        HelpButtonComponent,
     ],
 })
 export class MeasuresOverviewModalComponent {

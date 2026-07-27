@@ -35,5 +35,6 @@ export class ExerciseTemplateListComponent {
 
     async createExerciseTemplate(fileList?: FileList) {
         await this.exerciseService.createExerciseTemplate(fileList);
+        this.exerciseTemplates.reload();
     }
 }

@@ -440,5 +440,11 @@ export class ExerciseService {
         if (fileList) {
             await componentInstance.importFile(fileList);
         }
+
+        return new Promise<void>((resolve) => {
+            componentInstance.created.subscribe(() => {
+                resolve();
+            });
+        });
     }
 }

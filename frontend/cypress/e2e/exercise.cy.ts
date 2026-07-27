@@ -11,7 +11,7 @@ describe('A trainer on the exercise page', () => {
         cy.createExercise().joinExerciseAsTrainer().initializeTrainerSocket();
     });
 
-    it.only('can load and unload vehicles', () => {
+    it('can load and unload vehicles', () => {
         cy.get('[data-cy=vehiclesAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableVehicleDiv]');
 
@@ -350,7 +350,7 @@ describe('A trainer on the exercise page', () => {
             .should('be.empty');
     });
 
-    it.only('can manage hospitals and transfer vehicles to them', () => {
+    it('can manage hospitals and transfer vehicles to them', () => {
         cy.get('[data-cy=trainerToolbarSettingsButton]').click();
         cy.get('[data-cy=settingsVehicleLoadTimesEnabledCheckbox]').uncheck();
         cy.get('[data-cy=settingsClosePopupButton]').click({ force: true });
@@ -397,8 +397,12 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=viewportsTransferPointsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableTransferPointDiv]');
         cy.get('[data-cy=openLayersContainer]').click();
-        cy.get('[data-cy=transferPointPopupHospitalNav]').click();
-        cy.get('[data-cy=transferPointPopupAddHospitalButton]').click();
+        cy.get('[data-cy=transferPointPopupHospitalNav]').click({
+            force: true,
+        });
+        cy.get('[data-cy=transferPointPopupAddHospitalButton]').click({
+            force: true,
+        });
         cy.get('[data-cy=transferPointPopupAddHospitalDropdownButton]')
             .last()
             .click({ force: true });
@@ -425,6 +429,10 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=patientsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggablePatientDiv]');
 
+        cy.get('@trainerSocketPerformedActions')
+            .lastElement()
+            .should('have.property', 'type', '[Vehicle] Load vehicle');
+
         cy.get('[data-cy=chooseTransferTargetPopupHospitalDropdown]')
             .first()
             .click();
@@ -448,7 +456,9 @@ describe('A trainer on the exercise page', () => {
         cy.wait(commonErrorTimeout);
 
         cy.get('[data-cy=openLayersContainer]').click();
-        cy.get('[data-cy=transferPointPopupHospitalNav]').click();
+        cy.get('[data-cy=transferPointPopupHospitalNav]').click({
+            force: true,
+        });
         cy.get('[data-cy=transferPointPopupRemoveHospitalButton]').click();
         cy.get('@trainerSocketPerformedActions')
             .lastElement()

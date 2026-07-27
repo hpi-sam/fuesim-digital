@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { uuid } from '../../utils/uuid.js';
 import { collectionVersionSchema } from './collection.js';
 import { templateVersionSchema } from './versioned-elements.js';
 import type { CollectionElementType } from './collection-element-type.js';
@@ -179,7 +178,7 @@ export function collectionElementStructureToFlatTemplateArray(
 
         allTemplates[elementPartial.versionId] = {
             ...mutableElement,
-            id: uuid(),
+            id: elementPartial.versionId,
             entity: {
                 entityId: elementPartial.entityId,
                 versionId: elementPartial.versionId,

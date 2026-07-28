@@ -40,6 +40,7 @@ import { OrganisationService } from '../database/services/organisation-service.j
 import { OrganisationRepository } from '../database/repositories/organisation-repository.js';
 import { CollectionRepository } from '../database/repositories/collection-repository.js';
 import { CollectionService } from '../database/services/collection-service.js';
+import { UserDataService } from '../database/services/userdata-service.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
@@ -225,6 +226,7 @@ export function createTestEnvironment(): TestEnvironment {
     let parallelExerciseRepository: ParallelExerciseRepository;
     let organisationService: OrganisationService;
     let organisationRepository: OrganisationRepository;
+    let userDataService: UserDataService;
 
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
@@ -283,6 +285,13 @@ export function createTestEnvironment(): TestEnvironment {
             exerciseService,
             organisationRepository
         );
+        userDataService = new UserDataService(
+            exerciseRepository,
+            sessionRepository,
+            userRepository,
+            parallelExerciseRepository,
+            organisationRepository
+        );
 
         const repositories: Repositories = {
             exerciseRepository,
@@ -302,6 +311,7 @@ export function createTestEnvironment(): TestEnvironment {
             databaseService,
             organisationService,
             collectionService,
+            userDataService,
         };
         environment.init(repositories, services);
     });

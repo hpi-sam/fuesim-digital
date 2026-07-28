@@ -10,4 +10,5 @@ if ${DFM_USE_DB}; then
 fi
 
 nginx
-NODE_ENV=production node dist/src/index.js
+# Default to production, but allow overriding NODE_ENV, e.g. for testing locally with docker.
+NODE_ENV=${NODE_ENV:-production} node dist/src/index.js

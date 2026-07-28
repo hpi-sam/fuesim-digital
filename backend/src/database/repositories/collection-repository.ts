@@ -252,6 +252,34 @@ export class CollectionRepository extends BaseRepository {
         return null;
     }
 
+    public async getOrganisationCollections(
+        organisationId: OrganisationId,
+        owner: boolean | null = null
+    ) {
+        const baseQuery = this.databaseConnection
+            .select({
+                collectionId: collectionOrganisationMappingTable.collection,
+                owner: collectionOrganisationMappingTable.owner,
+            })
+            .from(collectionOrganisationMappingTable);
+        return owner === null
+            ? baseQuery.where(
+                  eq(
+                      collectionOrganisationMappingTable.organisationId,
+                      organisationId
+                  )
+              )
+            : baseQuery.where(
+                  and(
+                      eq(
+                          collectionOrganisationMappingTable.organisationId,
+                          organisationId
+                      ),
+                      eq(collectionOrganisationMappingTable.owner, owner)
+                  )
+              );
+    }
+
     public async getCollectionOrganisations(
         collectionEntityId: CollectionEntityId
     ) {

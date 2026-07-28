@@ -5,6 +5,7 @@ import type { ExerciseManagerService } from './exercise-manager-service.js';
 import type { ExerciseService } from './exercise-service.js';
 import type { OrganisationService } from './organisation-service.js';
 import type { ParallelExerciseService } from './parallel-exercise-service.js';
+import type { UserDataService } from './userdata-service.js';
 
 export interface Services {
     databaseService: DatabaseService;
@@ -14,4 +15,5 @@ export interface Services {
     organisationService: OrganisationService;
     authService: AuthService;
     collectionService: CollectionService;
+    userDataService: UserDataService;
 }

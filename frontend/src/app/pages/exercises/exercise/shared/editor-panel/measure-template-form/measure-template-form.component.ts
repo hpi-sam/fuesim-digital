@@ -29,6 +29,7 @@ import { castDraft, type WritableDraft } from 'immer';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
 import { DisplayModelValidationComponent } from '../../../../../../shared/validation/display-model-validation/display-model-validation.component';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component';
 import {
     emptyPropertyDefaults,
     MeasureTemplateValues,
@@ -49,6 +50,7 @@ import { AlarmPropertyEditorComponent } from './alarm-property-editor/alarm-prop
         FormField,
         AlarmPropertyEditorComponent,
         NgbTooltip,
+        HelpButtonComponent,
     ],
 })
 export class MeasureTemplateFormComponent implements OnChanges {
@@ -81,6 +83,29 @@ export class MeasureTemplateFormComponent implements OnChanges {
 
     public humanReadablePropertyName(property: MeasurePropertyType) {
         return measurePropertyTypeToGermanNameDictionary[property];
+    }
+
+    public propertyHelpUrl(property: MeasurePropertyType) {
+        return `2_exercises/3_exercise_elements.html#${this.propertyHelpAnchor(property)}`;
+    }
+
+    private propertyHelpAnchor(property: MeasurePropertyType) {
+        switch (property) {
+            case 'manualConfirm':
+                return 'manuelle-bestätigung';
+            case 'response':
+                return 'rückmeldung';
+            case 'delay':
+                return 'verzögerung';
+            case 'alarm':
+                return 'alarmierung';
+            case 'eocLog':
+                return 'einsatztagebucheintrag';
+            case 'drawFreehand':
+                return 'freihandzeichnung';
+            case 'drawLine':
+                return 'linienzeichnung';
+        }
     }
 
     ngOnChanges(changes: SimpleChangesGeneric<this>): void {

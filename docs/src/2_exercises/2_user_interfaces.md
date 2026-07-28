@@ -121,6 +121,7 @@ Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-
 - **Erstellung**
     - **Alarmgruppen**: In diesem Fenster können [Alarmgruppen](3_exercise_elements.md#alarmgruppen) erstellt, bearbeitet und wieder gelöscht werden.
     - **Krankenhäuser**: In diesem Fenster können [Krankenhäuser](3_exercise_elements.md#krankenhäuser) erstellt, bearbeitet und wieder gelöscht werden.
+    - **Maßnahmen**: In diesem Fenster können [Maßnahmen](3_exercise_elements.md#maßnahmen) erstellt, bearbeitet und wieder gelöscht werden.
 - **Durchführung**
     - **Teilnehmende**: Fenster zur [Verwaltung der Übungsteilnehmenden](4_conduction.md#teilnehmende-verwalten).
     - **Transferübersicht**: Fenster zur [Verwaltung von laufenden Transfers](4_conduction.md#transfers-verwalten) zwischen Transferpunkten
@@ -128,8 +129,8 @@ Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-
     - **Simulationseinstellungen (Übungsleitung)**: Einstellungen zur [Simulation](../3_simulation/) von Übungsbestandteilen.
     - **Simulationsübersicht (Funker)**: Schließt die Übungsansicht und öffnet stattdessen die Ansicht für [Schnittstellenfunker](../3_simulation/) zur Kommunikation zwischen Teilnehmenden und simulierten Bereichen.
 - **Auswertung**
-    - **Statistik**: Fenster mit den [Statistiken](5_evaluation.md#statistiken) zur aktuellen Übung. Beinhaltet auch ein detailliertes Protokoll.
-    - **Aufzeichnung**: Schließt die Übungsansicht und öffnet stattdessen die Replay-Ansicht, in der die [Aufzeichnung](5_evaluation.md#aufzeichnung) der aktuellen Übung betrachtet werden kann.
+    - **Statistik**: Fenster mit den [Statistiken](6_evaluation.md#statistiken) zur aktuellen Übung. Beinhaltet auch ein detailliertes Protokoll.
+    - **Aufzeichnung**: Schließt die Übungsansicht und öffnet stattdessen die Replay-Ansicht, in der die [Aufzeichnung](6_evaluation.md#aufzeichnung) der aktuellen Übung betrachtet werden kann.
 
 ## Leitstellenansicht (für Teilnehmende)
 

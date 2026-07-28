@@ -79,9 +79,16 @@
                         <div
                             class="d-flex align-items-center justify-content-between property-header"
                         >
-                            <h6 class="mb-0">
-                                {{ humanReadablePropertyName(property.type) }}
-                            </h6>
+                            <div class="d-flex align-items-center">
+                                <h6 class="mb-0">
+                                    {{
+                                        humanReadablePropertyName(property.type)
+                                    }}
+                                </h6>
+                                <app-help-button
+                                    [url]="propertyHelpUrl(property.type)"
+                                />
+                            </div>
                             <div class="d-flex align-items-center gap-1">
                                 <button
                                     type="button"

@@ -51,4 +51,11 @@ export class SessionRepository extends BaseRepository {
             .delete(sessionTable)
             .where(lte(sessionTable.expiresAt, new Date()));
     }
+
+    public async getAllSessionsByUser(userId: string) {
+        return this.databaseConnection
+            .select()
+            .from(sessionTable)
+            .where(eq(sessionTable.userId, userId));
+    }
 }

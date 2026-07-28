@@ -148,6 +148,12 @@ export class DeleteFeatureManager implements FeatureManager<Point> {
                 });
                 return true;
             }
+            case 'technicalChallenge':
+                this.exerciseService.proposeAction({
+                    type: '[TechnicalChallenge] Delete technical challenge',
+                    technicalChallengeId: id,
+                });
+                return true;
             default: {
                 return false;
             }

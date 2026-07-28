@@ -75,6 +75,11 @@ const markTechnicalChallengeStateAsViewedActionSchema = z.strictObject({
     stateId: stateMachineStateSchema.shape.id,
 });
 
+const deleteTechnicalChallengeActionSchema = z.strictObject({
+    type: z.literal('[TechnicalChallenge] Delete technical challenge'),
+    technicalChallengeId: uuidSchema,
+});
+
 export namespace TechnicalChallengeActionReducers {
     export const addTechnicalChallenge: ActionReducer<
         Immutable<z.infer<typeof createTechnicalChallengeActionSchema>>
@@ -238,5 +243,22 @@ export namespace TechnicalChallengeActionReducers {
             return draftState;
         },
         rights: 'participant',
+    };
+    export const deleteTechnicalChallenge: ActionReducer<
+        Immutable<z.infer<typeof deleteTechnicalChallengeActionSchema>>
+    > = {
+        type: deleteTechnicalChallengeActionSchema.shape.type.value,
+        actionSchema: deleteTechnicalChallengeActionSchema,
+        reducer: (draftState, { technicalChallengeId }) => {
+            if (technicalChallengeId in draftState.technicalChallenges) {
+                delete draftState.technicalChallenges[technicalChallengeId];
+            } else {
+                throw new ReducerError(
+                    `Could not delete technical challenge with id ${technicalChallengeId}`
+                );
+            }
+            return draftState;
+        },
+        rights: 'trainer',
     };
 }

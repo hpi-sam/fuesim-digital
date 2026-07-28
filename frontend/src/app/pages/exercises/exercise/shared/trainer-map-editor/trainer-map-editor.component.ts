@@ -1,4 +1,4 @@
-import { OnInit, inject, Component, Signal, signal } from '@angular/core';
+import { OnInit, inject, Component, computed, signal } from '@angular/core';
 import {
     NgbModal,
     NgbAccordionDirective,
@@ -15,8 +15,6 @@ import {
     transferPointImage,
     validateExerciseExport,
     viewportImage,
-    getDefaultTechnicalChallengeTemplate,
-    getBasementExplosionTechnicalChallenge,
     bystanderCategories,
     scoutableMapImageTemplate,
     getEntityFromElement,
@@ -57,6 +55,7 @@ import {
     selectExerciseState,
     selectAlarmgroupTemplates,
     selectSelectedCollections,
+    selectTechnicalChallengeTemplates,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
@@ -71,6 +70,7 @@ import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group
 import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
 import { openManageExerciseCollectionsModal } from '../manage-exercise-collections/open-manage-exercise-collections-modal';
 import { CollectionService } from '../../../../../core/exercise-element.service';
+import { openEditTechnicalChallengeTemplateModal } from '../editor-panel/edit-technical-challenge-template-modal/open-edit-technical-challenge-template-modal.js';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -163,12 +163,14 @@ export class TrainerMapEditorComponent implements OnInit {
         selectSelectedCollections
     );
 
-    public readonly technicalChallengeTemplates: Signal<
-        TechnicalChallengeTemplate[]
-    > = signal([
-        getDefaultTechnicalChallengeTemplate(),
-        getBasementExplosionTechnicalChallenge(),
-    ]);
+    public readonly technicalChallengeTemplates = computed<
+        readonly TechnicalChallengeTemplate[]
+    >(() => {
+        const templates = this.store.selectSignal(
+            selectTechnicalChallengeTemplates
+        );
+        return Object.values(templates());
+    });
 
     public patientCategories$?: Observable<{
         [key in FilterCategory]?: PatientCategory[];
@@ -224,6 +226,13 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public editMapImageTemplate(mapImageTemplateId: UUID) {
         openEditImageTemplateModal(this.ngbModalService, mapImageTemplateId);
+    }
+
+    public editTechnicalChallengeTemplate(technicalChallengeTemplateId: UUID) {
+        openEditTechnicalChallengeTemplateModal(
+            this.ngbModalService,
+            technicalChallengeTemplateId
+        );
     }
 
     public setCurrentCategory(

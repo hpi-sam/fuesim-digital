@@ -21,7 +21,6 @@ import {
     defaultViewportSize,
     newTransferPoint,
     newPatientFromTemplate,
-    CreateTechnicalChallengeAction,
     newTechnicalChallengeFromTemplate,
     hasEntityProperties,
 } from 'fuesim-digital-shared';
@@ -362,7 +361,7 @@ export class DragElementService {
                 this.exerciseService.proposeAction({
                     type: '[TechnicalChallenge] Create technical challenge',
                     technicalChallenge,
-                } satisfies CreateTechnicalChallengeAction);
+                });
                 createdElement = technicalChallenge;
                 break;
             }

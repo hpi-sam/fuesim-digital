@@ -519,6 +519,11 @@
                                             [imageUrl]="template.image.url"
                                             [title]="template.name"
                                             [enableEditButton]="true"
+                                            (elementEdit)="
+                                                editTechnicalChallengeTemplate(
+                                                    template.id
+                                                )
+                                            "
                                         >
                                         </app-map-editor-card>
                                     }

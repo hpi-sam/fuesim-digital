@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
 import { personnelSchema } from '../../models/personnel.js';
 import type { ActionReducer } from '../action-reducer.js';
@@ -31,18 +32,12 @@ const createTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Create technical challenge'),
     technicalChallenge: technicalChallengeSchema,
 });
-export type CreateTechnicalChallengeAction = z.infer<
-    typeof createTechnicalChallengeActionSchema
->;
 
 const moveTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Move technical challenge'),
     technicalChallengeId: uuidSchema,
     targetPosition: mapCoordinatesSchema,
 });
-export type MoveTechnicalChallengeAction = z.infer<
-    typeof moveTechnicalChallengeActionSchema
->;
 
 const assignTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal(
@@ -80,34 +75,41 @@ const markTechnicalChallengeStateAsViewedActionSchema = z.strictObject({
     stateId: stateMachineStateSchema.shape.id,
 });
 
-export namespace TechnicalChallengeActionReducers {
-    export const addTechnicalChallenge: ActionReducer<CreateTechnicalChallengeAction> =
-        {
-            type: '[TechnicalChallenge] Create technical challenge',
-            actionSchema: createTechnicalChallengeActionSchema,
-            reducer: (draftState, action) => {
-                draftState.technicalChallenges[action.technicalChallenge.id] =
-                    cloneDeepMutable(action.technicalChallenge);
-                return draftState;
-            },
-            rights: 'trainer',
-        };
-    export const moveTechnicalChallenge: ActionReducer<MoveTechnicalChallengeAction> =
-        {
-            type: '[TechnicalChallenge] Move technical challenge',
-            actionSchema: moveTechnicalChallengeActionSchema,
-            reducer: (draftState, { technicalChallengeId, targetPosition }) => {
-                changePositionWithId(
-                    technicalChallengeId,
-                    newMapPositionAt(targetPosition),
-                    'technicalChallenge',
-                    draftState
-                );
+const deleteTechnicalChallengeActionSchema = z.strictObject({
+    type: z.literal('[TechnicalChallenge] Delete technical challenge'),
+    technicalChallengeId: uuidSchema,
+});
 
-                return draftState;
-            },
-            rights: 'trainer',
-        };
+export namespace TechnicalChallengeActionReducers {
+    export const addTechnicalChallenge: ActionReducer<
+        Immutable<z.infer<typeof createTechnicalChallengeActionSchema>>
+    > = {
+        type: '[TechnicalChallenge] Create technical challenge',
+        actionSchema: createTechnicalChallengeActionSchema,
+        reducer: (draftState, action) => {
+            draftState.technicalChallenges[action.technicalChallenge.id] =
+                cloneDeepMutable(action.technicalChallenge);
+            return draftState;
+        },
+        rights: 'trainer',
+    };
+    export const moveTechnicalChallenge: ActionReducer<
+        Immutable<z.infer<typeof moveTechnicalChallengeActionSchema>>
+    > = {
+        type: '[TechnicalChallenge] Move technical challenge',
+        actionSchema: moveTechnicalChallengeActionSchema,
+        reducer: (draftState, { technicalChallengeId, targetPosition }) => {
+            changePositionWithId(
+                technicalChallengeId,
+                newMapPositionAt(targetPosition),
+                'technicalChallenge',
+                draftState
+            );
+
+            return draftState;
+        },
+        rights: 'trainer',
+    };
     export const assignPersonnelToTechnicalChallenge: ActionReducer<
         z.infer<typeof assignTechnicalChallengeActionSchema>
     > = {
@@ -241,5 +243,22 @@ export namespace TechnicalChallengeActionReducers {
             return draftState;
         },
         rights: 'participant',
+    };
+    export const deleteTechnicalChallenge: ActionReducer<
+        Immutable<z.infer<typeof deleteTechnicalChallengeActionSchema>>
+    > = {
+        type: deleteTechnicalChallengeActionSchema.shape.type.value,
+        actionSchema: deleteTechnicalChallengeActionSchema,
+        reducer: (draftState, { technicalChallengeId }) => {
+            if (technicalChallengeId in draftState.technicalChallenges) {
+                delete draftState.technicalChallenges[technicalChallengeId];
+            } else {
+                throw new ReducerError(
+                    `Could not delete technical challenge with id ${technicalChallengeId}`
+                );
+            }
+            return draftState;
+        },
+        rights: 'trainer',
     };
 }

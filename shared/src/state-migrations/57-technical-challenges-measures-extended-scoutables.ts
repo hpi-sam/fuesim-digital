@@ -91,6 +91,7 @@ export const technicalChallengesMeasuresExtendedScoutables57: Migration = {
         };
 
         state.technicalChallenges = {};
+        state.technicalChallengeTemplates = {};
         state.taskTypes = {};
         state.measures = {};
         state.measureTemplates = {};

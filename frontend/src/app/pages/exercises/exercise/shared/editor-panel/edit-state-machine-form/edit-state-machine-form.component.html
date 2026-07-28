@@ -1,0 +1,32 @@
+<div class="form-group">
+    <label class="form-label">Name</label>
+    <input
+        type="text"
+        class="form-control"
+        [formField]="stateMachineForm.name"
+    />
+</div>
+
+<div class="form-group mt-2">
+    <label class="form-label">Zustände</label>
+    <div class="d-flex overflow-scroll gap-2">
+        @for (state of stateMachineForm.states; track $index) {
+            <div class="card" style="min-width: 18em">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">{{ state.title().value() }}</h5>
+                    <h6 class="card-subtitle text-muted">Erkundungstext:</h6>
+                    <div class="card-text">
+                        <app-user-generated-content-editor
+                            [(userGeneratedContent)]="
+                                state.userGeneratedContent().value
+                            "
+                            (userGeneratedContentChange)="state().markAsDirty()"
+                        ></app-user-generated-content-editor>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="form-group"></div>

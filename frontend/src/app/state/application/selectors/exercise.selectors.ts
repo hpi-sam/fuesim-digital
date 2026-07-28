@@ -95,6 +95,9 @@ export const selectOperationalSections = selectPropertyFactory(
 export const selectTechnicalChallenges = selectPropertyFactory(
     'technicalChallenges'
 );
+export const selectTechnicalChallengeTemplates = selectPropertyFactory(
+    'technicalChallengeTemplates'
+);
 export const selectVehicleTemplates = selectTemplatesFactory('vehicleTemplate');
 export const selectPersonnelTemplates =
     selectTemplatesFactory('personnelTemplate');
@@ -172,6 +175,8 @@ export const createSelectClient =
 export const createSelectVehicleTemplate = createSelectElementFromMapFactory(
     selectVehicleTemplates
 );
+export const createSelectTechnicalChallengeTemplate =
+    createSelectElementFromMapFactory(selectTechnicalChallengeTemplates);
 export const createSelectMaterialTemplate = createSelectElementFromMapFactory(
     selectMaterialTemplates
 );

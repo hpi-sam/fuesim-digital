@@ -52,6 +52,8 @@ import {
 } from './data/default-state/catch-all-hospital.js';
 import { templateSchema } from './models/template.js';
 import { versionedCollectionPartialSchema } from './marketplace/models/versioned-id-schema.js';
+import { defaultTechnicalChallengeTemplates } from './data/default-state/technical-challenge-templates.js';
+import { technicalChallengeTemplateSchema } from './models/technical-challenge/technical-challenge-template.js';
 
 /**
  * **Important**
@@ -95,6 +97,10 @@ export const exerciseStateSchema = z.strictObject({
     taskTypes: z.record(uuidSchema, taskTypeSchema),
 
     technicalChallenges: z.record(uuidSchema, technicalChallengeSchema),
+    technicalChallengeTemplates: z.record(
+        uuidSchema,
+        technicalChallengeTemplateSchema
+    ),
 
     transferPoints: z.record(uuidSchema, transferPointSchema),
 
@@ -172,6 +178,7 @@ export function newExerciseState(
         operationalSections: {},
         patientCategories: defaultPatientCategories,
         measureTemplates: defaultMeasureTemplateCategories,
+        technicalChallengeTemplates: defaultTechnicalChallengeTemplates,
         scoutables: {},
         templates: {},
         eocLog: [],

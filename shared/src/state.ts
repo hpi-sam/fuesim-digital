@@ -46,6 +46,10 @@ import { taskTypeSchema } from './models/task-type.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
+import {
+    catchAllHospitalId,
+    createCatchAllHospital,
+} from './data/default-state/catch-all-hospital.js';
 import { templateSchema } from './models/template.js';
 import { versionedCollectionPartialSchema } from './marketplace/models/versioned-id-schema.js';
 
@@ -157,7 +161,9 @@ export function newExerciseState(
         taskTypes: getDefaultTasks(),
         technicalChallenges: {},
         transferPoints: {},
-        hospitals: {},
+        hospitals: {
+            [catchAllHospitalId]: createCatchAllHospital(),
+        },
         hospitalPatients: {},
         alarmGroups: {},
         clients: {},

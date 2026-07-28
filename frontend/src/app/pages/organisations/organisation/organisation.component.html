@@ -73,16 +73,16 @@
                     />
                 </ng-template>
             </ng-container>
-            <ng-container ngbNavItem="exercise-templates">
+            <ng-container ngbNavItem="parallel-exercises">
                 <a ngbNavLink>
                     <i class="bi bi-box-seam me-1"></i>
-                    Übungsvorlagen
+                    Parallelübungen
                     <span class="badge text-bg-secondary ms-1">{{
-                        org.exerciseTemplatesCount
+                        org.parallelExercisesCount
                     }}</span>
                 </a>
                 <ng-template ngbNavContent>
-                    <app-organisation-tab-exercise-templates
+                    <app-organisation-tab-parallel-exercises
                         [organisation]="org"
                         (update)="reload()"
                     />
@@ -103,16 +103,16 @@
                     />
                 </ng-template>
             </ng-container>
-            <ng-container ngbNavItem="parallel-exercises">
+            <ng-container ngbNavItem="exercise-templates">
                 <a ngbNavLink>
                     <i class="bi bi-box-seam me-1"></i>
-                    Parallelübungen
+                    Übungsvorlagen
                     <span class="badge text-bg-secondary ms-1">{{
-                        org.parallelExercisesCount
+                        org.exerciseTemplatesCount
                     }}</span>
                 </a>
                 <ng-template ngbNavContent>
-                    <app-organisation-tab-parallel-exercises
+                    <app-organisation-tab-exercise-templates
                         [organisation]="org"
                         (update)="reload()"
                     />

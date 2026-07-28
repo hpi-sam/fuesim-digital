@@ -17,6 +17,7 @@ import type { Services } from './database/services/index.js';
 import { createParallelExerciseRouter } from './routers/parallel-exercise-router.js';
 import { createOrganisationRouter } from './routers/organisation-router.js';
 import { createCollectionsRouter } from './routers/collections-router.js';
+import { createUserdataRouter } from './routers/userdata-router.js';
 
 declare global {
     namespace Express {
@@ -61,7 +62,10 @@ export class ApiHttpServer {
 
         app.use(
             '/api/organisations/',
-            createOrganisationRouter(services.organisationService)
+            createOrganisationRouter(
+                services.organisationService,
+                services.exerciseManagerService
+            )
         );
 
         app.use(
@@ -72,6 +76,11 @@ export class ApiHttpServer {
         app.use(
             '/api/collections',
             createCollectionsRouter(services.collectionService)
+        );
+
+        app.use(
+            '/api/userdata',
+            createUserdataRouter(services.userDataService)
         );
 
         app.use(errorHandler);

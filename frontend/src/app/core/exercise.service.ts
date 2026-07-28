@@ -13,6 +13,7 @@ import type {
     OrganisationId,
     GetExerciseTemplateResponseData,
     VersionedCollectionPartial,
+    ParticipantKey,
 } from 'fuesim-digital-shared';
 import {
     collectionElementStructureToFlatTemplateArray,
@@ -60,6 +61,7 @@ import {
 import { selectStateSnapshot } from '../state/get-state-snapshot';
 import { CreateExerciseModalComponent } from '../pages/exercises/shared/create-exercise-modal/create-exercise-modal.component.js';
 import { CreateExerciseTemplateModalComponent } from '../pages/exercises/shared/create-exercise-template-modal/create-exercise-template-modal.component.js';
+import { saveBlob } from '../shared/functions/save-blob.js';
 import { websocketOrigin } from './api-origins';
 import {
     saveReconnectToken,
@@ -503,5 +505,20 @@ export class ExerciseService {
         if (fileList) {
             await componentInstance.importFile(fileList);
         }
+    }
+
+    public async exportExercise(
+        exerciseKey: ExerciseKey,
+        withHistory: boolean
+    ) {
+        const exportData = await this.apiService.getExport(
+            exerciseKey,
+            withHistory
+        );
+        const blob = new Blob([JSON.stringify(exportData)]);
+        const participantKey = exportData.currentState[
+            'participantKey'
+        ] as ParticipantKey;
+        saveBlob(blob, `exercise-state-${participantKey}.json`);
     }
 }

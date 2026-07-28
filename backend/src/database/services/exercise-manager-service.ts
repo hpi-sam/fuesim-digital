@@ -1,15 +1,18 @@
-import type {
-    ExerciseType,
-    ExerciseTemplateId,
-    ExerciseState,
-    StateExport,
-    ParticipantKey,
-    TrainerKey,
-    OrganisationId,
+import {
+    type ExerciseType,
+    type ExerciseTemplateId,
+    type ExerciseState,
+    type StateExport,
+    type ParticipantKey,
+    type TrainerKey,
+    type OrganisationId,
+    slugify,
 } from 'fuesim-digital-shared';
+import { ZipArchive } from 'archiver';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
+    type ExerciseEntry,
     type ExerciseInsert,
     type ExerciseTemplateDetailsEntryWithUserRole,
     type ExerciseTemplateInsert,
@@ -298,5 +301,86 @@ export class ExerciseManagerService {
         return this.exerciseService.getExercisesViewportsById(
             exerciseTemplate.exercise.id
         );
+    }
+
+    public async buildExercisesArchive(
+        exercises: ExerciseEntry[],
+        session?: SessionInformation
+    ) {
+        const exports = await Promise.all(
+            exercises.map(async (ex) =>
+                this.exerciseService.getExport(ex.trainerKey, true, session)
+            )
+        );
+        const archive = new ZipArchive();
+        for (const [i, stateExport] of exports.entries()) {
+            const buffer = Buffer.from(JSON.stringify(stateExport));
+            archive.append(buffer, {
+                name: `exercise-state-${exercises[i]!.participantKey}.json`,
+            });
+        }
+        await archive.finalize();
+        return archive;
+    }
+
+    public async exportAllExercisesForOrganisation(
+        organisationId: OrganisationId,
+        session: SessionInformation
+    ) {
+        const organisation =
+            await this.organisationRepository.getOrganisationById(
+                organisationId
+            );
+        if (!organisation) {
+            throw new NotFoundError();
+        }
+        const isMember =
+            await this.organisationRepository.isMemberOfOrganisationById(
+                organisationId,
+                session.user.id
+            );
+        if (!isMember) {
+            throw new PermissionDeniedError();
+        }
+
+        const exercises =
+            await this.exerciseRepository.getAllExercisesForOrganisation(
+                organisationId
+            );
+        return {
+            archive: await this.buildExercisesArchive(exercises, session),
+            filename: `${slugify(organisation.name)}-exercises.zip`,
+        };
+    }
+
+    public async exportAllExerciseTemplatesForOrganisation(
+        organisationId: OrganisationId,
+        session: SessionInformation
+    ) {
+        const organisation =
+            await this.organisationRepository.getOrganisationById(
+                organisationId
+            );
+        if (!organisation) {
+            throw new NotFoundError();
+        }
+        const isMember =
+            await this.organisationRepository.isMemberOfOrganisationById(
+                organisationId,
+                session.user.id
+            );
+        if (!isMember) {
+            throw new PermissionDeniedError();
+        }
+
+        const exercises = (
+            await this.exerciseRepository.getAllExerciseTemplatesForOrganisation(
+                organisationId
+            )
+        ).map((exerciseTemplate) => exerciseTemplate.exercise);
+        return {
+            archive: await this.buildExercisesArchive(exercises, session),
+            filename: `${slugify(organisation.name)}-exercise-templates.zip`,
+        };
     }
 }

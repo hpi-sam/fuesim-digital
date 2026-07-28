@@ -10,11 +10,7 @@ import {
     NgbDropdownItem,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import {
-    StateExport,
-    exportPatientsToCSV,
-    currentStateVersion,
-} from 'fuesim-digital-shared';
+import { exportPatientsToCSV } from 'fuesim-digital-shared';
 import { Subject, takeUntil } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AsyncPipe, Location as NgLocation } from '@angular/common';
@@ -199,29 +195,6 @@ export class ExerciseComponent implements OnDestroy, OnInit {
         });
     }
 
-    public async exportExerciseWithHistory() {
-        const history = await this.apiService.exerciseHistory();
-        const currentState = selectStateSnapshot(
-            selectExerciseState,
-            this.store
-        );
-        const blob = new Blob([
-            JSON.stringify({
-                type: 'complete',
-                fileVersion: 1,
-                dataVersion: currentStateVersion,
-                currentState,
-                history: {
-                    actionHistory: history.actionsWrappers.map(
-                        (actionWrapper) => actionWrapper.action
-                    ),
-                    initialState: history.initialState,
-                },
-            } satisfies StateExport),
-        ]);
-        saveBlob(blob, `exercise-state-${currentState.participantKey}.json`);
-    }
-
     public partialExport() {
         openPartialExportModal(this.modalService);
     }
@@ -234,23 +207,6 @@ export class ExerciseComponent implements OnDestroy, OnInit {
         const csvContent = exportPatientsToCSV(currentState);
         const blob = new Blob([csvContent]);
         saveBlob(blob, `patienten-${currentState.participantKey}.csv`);
-    }
-
-    public exportExerciseState() {
-        const currentState = selectStateSnapshot(
-            selectExerciseState,
-            this.store
-        );
-        const blob = new Blob([
-            JSON.stringify({
-                type: 'complete',
-                fileVersion: 1,
-                dataVersion: currentStateVersion,
-                currentState,
-                history: undefined,
-            } satisfies StateExport),
-        ]);
-        saveBlob(blob, `exercise-state-${currentState.participantKey}.json`);
     }
 
     ngOnDestroy(): void {

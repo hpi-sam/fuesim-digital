@@ -51,15 +51,51 @@
                 Öffnen
             </a>
             <div class="flex-grow-1"></div>
-            @if (exercise.userRole !== 'viewer') {
+            <div ngbDropdown>
                 <button
-                    class="btn btn-outline-danger"
-                    (click)="deleteExercise()"
+                    type="button"
+                    class="btn btn-outline-primary"
+                    ngbDropdownToggle
                 >
-                    <i class="bi bi-trash me-2"></i>
-                    Löschen
+                    Mehr
                 </button>
-            }
+                <div ngbDropdownMenu>
+                    <button
+                        ngbDropdownItem
+                        (click)="
+                            exerciseService.exportExercise(
+                                exercise.trainerKey,
+                                true
+                            )
+                        "
+                    >
+                        <i class="bi-clock-history me-2"> </i>
+                        Kompletten Verlauf exportieren
+                    </button>
+                    <button
+                        ngbDropdownItem
+                        (click)="
+                            exerciseService.exportExercise(
+                                exercise.trainerKey,
+                                false
+                            )
+                        "
+                    >
+                        <i class="bi-cloud-download me-2"> </i>
+                        Aktuellen Zustand exportieren
+                    </button>
+                    @if (exercise.userRole !== 'viewer') {
+                        <button
+                            class="text-danger"
+                            ngbDropdownItem
+                            (click)="deleteExercise()"
+                        >
+                            <i class="bi bi-trash me-2"></i>
+                            Löschen
+                        </button>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 }

@@ -10,36 +10,36 @@
                 <li ngbNavItem="start" class="nav-item mx-2">
                     <a ngbNavLink class="nav-link" routerLink="/">Start</a>
                 </li>
-
-                <li ngbNavItem="single-exercises" class="nav-item mx-2">
-                    <a ngbNavLink class="nav-link" routerLink="/exercises"
-                        >Übungen</a
-                    >
+                <li ngbNavItem="exercises" class="nav-item mx-2">
+                    <a ngbNavLink class="nav-link" routerLink="/exercises/">
+                        Übungen
+                    </a>
                 </li>
-
-                <li ngbNavItem="parallel-exercises" class="nav-item mx-2">
-                    <a
-                        ngbNavLink
-                        class="nav-link"
-                        routerLink="/exercises/parallel"
-                        >Parallelübungen</a
-                    >
-                </li>
-
-                <li ngbNavItem="templates" class="nav-item mx-2">
+                @if (exerciseConfig()?.parallelExercisesEnabled) {
+                    <li ngbNavItem="parallel" class="nav-item mx-2">
+                        <a
+                            ngbNavLink
+                            class="nav-link"
+                            routerLink="/exercises/parallel"
+                        >
+                            Parallelübungen
+                        </a>
+                    </li>
+                }
+                <li ngbNavItem="exercise_templates" class="nav-item mx-2">
                     <a
                         ngbNavLink
                         class="nav-link"
                         routerLink="/exercises/templates"
-                        >Übungsvorlagen</a
                     >
+                        Übungsvorlagen
+                    </a>
                 </li>
-
-                <li ngbNavItem="collections" class="nav-item mx-2">
-                    <a ngbNavLink class="nav-link" routerLink="/collections"
-                        >Übungselemente</a
-                    >
-                </li>
+            <li ngbNavItem="collections" class="nav-item mx-2">
+                <a ngbNavLink class="nav-link" routerLink="/collections"
+                >Übungselemente</a
+                >
+            </li>
             }
         </ul>
 

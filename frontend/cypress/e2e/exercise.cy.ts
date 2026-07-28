@@ -68,6 +68,9 @@ describe('A trainer on the exercise page', () => {
     });
 
     it('can interact with the map', () => {
+        cy.get('[data-cy=draggableViewportDiv]', { timeout: 20000 }).should(
+            'be.visible'
+        );
         cy.log('drag a viewport to the map').dragToMap(
             '[data-cy=draggableViewportDiv]'
         );

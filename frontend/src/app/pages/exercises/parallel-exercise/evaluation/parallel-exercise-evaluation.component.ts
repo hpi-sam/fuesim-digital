@@ -15,6 +15,7 @@ import { HttpResourceRef } from '@angular/common/http';
 import { ParallelExerciseService } from '../../../../core/parallel-exercise.service';
 import { ApiService } from '../../../../core/api.service';
 import { EvalResultStatusBadgeComponent } from '../../exercise/shared/didactic-overview/result-status-badge/eval-result-status-badge.component';
+import { TechnicalChallengeDetailsComponent } from '../../../../shared/components/technical-challenge-details/technical-challenge-details.component';
 
 @Component({
     selector: 'app-parallel-exercise-evaluation',
@@ -126,6 +127,9 @@ export class ParallelExerciseEvaluationComponent {
     ) {
         const result = exerciseInstance.evalResults[criterion.id];
         return result ?? null;
+    }
+    public getBackgroundColor(rowIndex: number) {
+        return rowIndex % 2 !== 0;
     }
     public getRootCriteriaMap = getRootCriteriaMap;
     public getNumFromEvalResult = getNumFromEvalResult;

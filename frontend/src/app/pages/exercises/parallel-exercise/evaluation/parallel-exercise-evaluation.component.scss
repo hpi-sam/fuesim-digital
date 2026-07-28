@@ -1,0 +1,23 @@
+.headcol {
+    position: absolute;
+    width: 390px;
+    left: 0;
+    top: auto;
+    padding-top: 12px;
+}
+th,
+td {
+    margin: 0;
+    height: 50px;
+}
+th.grey,
+th.grey {
+    background-color: rgba($color: #000000, $alpha: 0.1);
+}
+.container {
+    width: 1000px;
+    /* This is to fix the headcol */
+    margin-left: 390px;
+    overflow-x: scroll;
+    overflow-y: scroll;
+}

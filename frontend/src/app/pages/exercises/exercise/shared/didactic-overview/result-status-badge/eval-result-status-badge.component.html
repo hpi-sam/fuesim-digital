@@ -1,10 +1,28 @@
-<span
+<!-- <span
     class="badge rounded-pill"
     [ngStyle]="{
         'background-color': this.color(),
         'background-opacity': this.bgOpacity(),
     }"
 >
+    @if (this.isCompleted() !== undefined) {
+        @if (this.isCompleted()) {
+            ja
+        } @else {
+            nein
+        }
+    }
+    @if (this.leftNumResult(); as leftNum) {
+        @if (this.rightNumResult(); as rightNum) {
+            {{ leftNum + '/' + rightNum }}
+        }
+    }
+    @if (this.singleNum(); as num) {
+        {{ num }}
+    }
+</span> -->
+<span>
+    <i class="bi bi-circle-fill" [style]="{ color: this.color() }"></i>
     @if (this.isCompleted() !== undefined) {
         @if (this.isCompleted()) {
             ja

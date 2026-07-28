@@ -118,7 +118,7 @@ export class EvalCriterionCreationCardComponent {
                 );
             }
         });
-        this.tickSubscribtion = sub;
+        this.tickSubscribtion?.add(sub);
         effect(() => {
             this.criterionForm
                 .subCriteria()
@@ -197,7 +197,8 @@ export class EvalCriterionCreationCardComponent {
         patientStatusInput: 'black',
         patientTargetStatusMap: {},
         technicalChallengeId: '',
-        targetTechnicalChallengeState: '',
+        targetStateMachineIds: [],
+        targetStateMachineStateIds: {},
         targetPatients: [],
         targetScoutableId: '',
         subCriteria: [],
@@ -255,9 +256,13 @@ export class EvalCriterionCreationCardComponent {
     public readonly selectedTempSubResults = signal<EvalResult[]>([]);
 
     private async createCriteria(criteria: EvalCriterion[]) {
+        if (criteria.length < 1) {
+            console.log('ERROR: Trying to create 0 criteria in creation card.');
+            return;
+        }
         await this.exerciseService.proposeAction({
-            type: '[EvalCriterion] New Criterions',
-            criterions: criteria,
+            type: '[EvalCriterion] New Criteria',
+            criteria: criteria,
         });
     }
     public addCriteriaToCart(criteria: EvalCriterion[]) {
@@ -285,10 +290,13 @@ export class EvalCriterionCreationCardComponent {
         }
         switch (criterionType) {
             case 'reachTechnicalChallengeStateEvalCriterion': {
-                const stateId = this.criterionForm
-                    .targetTechnicalChallengeState()
+                const machineIds = this.criterionForm
+                    .targetStateMachineIds()
                     .value();
-                if (stateId !== '') {
+                const stateIds = this.criterionForm
+                    .targetStateMachineStateIds()
+                    .value();
+                if (machineIds.length > 0) {
                     const technicalChallengeId =
                         this.criterionForm.technicalChallengeId().value() !== ''
                             ? this.criterionForm.technicalChallengeId().value()
@@ -298,7 +306,8 @@ export class EvalCriterionCreationCardComponent {
                         ? newReachTechnicalChallengeStateEvalCriterion(
                               this.criterionForm.name().value(),
                               technicalChallengeId,
-                              stateId,
+                              machineIds,
+                              stateIds,
                               isVisisbleForParticipants,
                               asDraft
                           )

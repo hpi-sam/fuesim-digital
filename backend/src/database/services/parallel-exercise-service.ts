@@ -6,6 +6,8 @@ import type {
     ParallelExerciseKey,
     ExerciseId,
     OrganisationId,
+} from 'fuesim-digital-shared';
+import {
     getEvalResultsByActionHistory,
     newEvalResultContext,
     parallelExerciseInstanceSummarySchema,

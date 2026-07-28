@@ -5,26 +5,29 @@ import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { evalCriterionSchema } from '../../models/eval-criteria/criterion-categories.js';
 import { getElement } from './utils/get-element.js';
+import { Immutable } from 'immer';
 
 const createNewCriterionsActionSchema = z.strictObject({
-    type: z.literal('[EvalCriterion] New Criterions'),
-    criterions: z.array(evalCriterionSchema).min(1),
+    type: z.literal('[EvalCriterion] New Criteria'),
+    criteria: z.array(evalCriterionSchema).min(1),
 });
-export type NewCriterionAction = z.infer<
-    typeof createNewCriterionsActionSchema
+export type NewCriterionAction = Immutable<
+    z.infer<typeof createNewCriterionsActionSchema>
 >;
 const updateCriterionActionSchema = z.strictObject({
     type: z.literal('[EvalCriterion] Update Criterion'),
     id: uuidSchema,
     newCriterion: evalCriterionSchema,
 });
-export type UpdateCriterionAction = z.infer<typeof updateCriterionActionSchema>;
+export type UpdateCriterionAction = Immutable<
+    z.infer<typeof updateCriterionActionSchema>
+>;
 export namespace EvalCriterionActionReducers {
-    export const createNewCriterions: ActionReducer<NewCriterionAction> = {
+    export const createNewCriteria: ActionReducer<NewCriterionAction> = {
         type: createNewCriterionsActionSchema.shape.type.value,
         actionSchema: createNewCriterionsActionSchema,
-        reducer: (draftState, { criterions }) => {
-            for (const criterion of criterions) {
+        reducer: (draftState, { criteria }) => {
+            for (const criterion of criteria) {
                 const criterionClone = cloneDeepMutable(criterion);
                 draftState.evalCriteria[criterion.id] = criterionClone;
             }

@@ -2,8 +2,9 @@ import type {
     EvalCriterion,
     Patient,
     PatientStatus,
+    StateMachineId,
+    StateMachineStateId,
     TechnicalChallengeId,
-    TechnicalChallengeStateId,
     UUID,
 } from 'fuesim-digital-shared';
 
@@ -14,7 +15,10 @@ export interface InputData {
     patientStatusInput: PatientStatus;
     patientTargetStatusMap: { [id: UUID]: PatientStatus };
     technicalChallengeId: TechnicalChallengeId | '';
-    targetTechnicalChallengeState: TechnicalChallengeStateId | '';
+    targetStateMachineIds: StateMachineId[];
+    targetStateMachineStateIds: {
+        [targetStateMachineId: StateMachineId]: StateMachineStateId;
+    };
     targetPatients: Patient[];
     targetScoutableId: UUID | '';
     subCriteria: EvalCriterion[];

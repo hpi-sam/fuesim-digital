@@ -1,3 +1,5 @@
+ntp:
+    disable_failure: true
 authentication_backend:
     password_reset:
         disable: true

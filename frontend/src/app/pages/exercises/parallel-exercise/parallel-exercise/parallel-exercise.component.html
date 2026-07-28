@@ -109,7 +109,8 @@
                 <nav #nav="ngbNav" ngbNav class="nav-tabs">
                     <ng-container ngbNavItem ngbNavItem="participants">
                         <a ngbNavLink data-cy="paralellExerciseParticipantsNav"
-                            >Teilnehmenden Übersicht</a
+                            ><i class="bi bi-people"></i> Teilnehmenden
+                            Übersicht</a
                         >
                         <ng-template ngbNavContent>
                             <div class="card">
@@ -165,7 +166,8 @@
                         <a
                             ngbNavLink
                             data-cy="paralellExerciseDidacticOverviewNav"
-                            >Auswertung</a
+                            ><i class="bi bi-card-checklist"></i
+                            >&nbsp;Auswertung</a
                         >
                         <ng-template ngbNavContent>
                             <app-parallel-exercise-evaluation />

@@ -1,159 +1,95 @@
 <div class="card">
     <div class="card-header h4">Auswertung</div>
-    <!-- TODO @JohannesPotzi @Jogius : make this scroll horizonatlly and make the criterion column sticky-->
-    <div
-        class="container-fluid d-flex flex-column h-100"
-        style="overflow: auto"
-    >
-        <div class="flex-fill row">
-            <!-- Criterion Column -->
-            <div class="col-1 rounded-0 rounded-end" style="min-width: 400px">
-                <table class="table table-striped mb-0">
-                    <thead>
-                        <tr>
-                            <th style="min-width: 390px">Kriterium</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="min-height: 150px">Ist Aktiv:</td>
-                        </tr>
-                        @if (this.atLeastOneInstanceIsActive()) {
-                            <tr>
-                                <td><span>Öffnen: </span></td>
-                            </tr>
+    <!-- TODO @JohannesPotzi @Jogius : make this look better. -->
+    <div class="container">
+        <table class="table table-striped mb-0">
+            <!-- Participants -->
+            <tr>
+                <th class="headcol" [class.grey]="false"></th>
+                @for (
+                    exerciseInstance of exerciseInstances();
+                    track exerciseInstance.participantKey
+                ) {
+                    <td [class.grey]="false">
+                        <code class="me-2">{{
+                            exerciseInstance.participantKey
+                        }}</code>
+                        <button
+                            app-copy-button
+                            class="btn btn-light btn-sm"
+                            [value]="getParticipantUrl(exerciseInstance)"
+                        ></button>
+                    </td>
+                }
+            </tr>
+            <!-- Open exercise buttons -->
+            <tr>
+                <th class="headcol" [class.grey]="true">Öffnen:</th>
+                @for (
+                    exerciseInstance of exerciseInstances();
+                    track exerciseInstance.participantKey
+                ) {
+                    <td [class.grey]="true">
+                        @if (exerciseInstance.isActive) {
+                            <a
+                                [routerLink]="`/exercises/${exerciseInstance.trainerKey}`"
+                                class="badge bg-primary ms-1"
+                            >
+                                Öffnen
+                            </a>
+                        } @else {
+                            <span class="badge bg-opacity-50 bg-black"
+                                >inaktiv</span
+                            >
                         }
-                        @for (
-                            criterion of this.rootCriteria();
-                            track criterion.id
-                        ) {
-                            <tr>
-                                <td>{{ criterion.name }}</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <!-- participant columns -->
-            <div
-                class="card col rounded-0 rounded-end"
-                style="overflow-x: auto"
-            >
-                <table class="table table-striped mb-0">
-                    <thead>
-                        <tr>
-                            @for (
-                                exerciseInstance of exerciseInstances();
-                                track exerciseInstance.participantKey
-                            ) {
-                                <th style="min-width: 100px; max-width: 100px">
-                                    <code class="me-2">{{
+                    </td>
+                }
+            </tr>
+            <!-- Criteria -->
+            @for (criterion of this.rootCriteria(); track $index) {
+                <tr>
+                    <th
+                        class="headcol"
+                        [class.grey]="getBackgroundColor($index)"
+                    >
+                        {{ criterion.name }}
+                    </th>
+                    <!-- Results -->
+                    @for (
+                        exerciseInstance of exerciseInstances();
+                        track exerciseInstance.participantKey
+                    ) {
+                        <td [class.grey]="getBackgroundColor($index)">
+                            @let res =
+                                getResOfCriterionFromInstance(
+                                    criterion,
+                                    exerciseInstance
+                                );
+                            @if (res && resultsMap(); as globalResultsMap) {
+                                @if (
+                                    globalResultsMap[
                                         exerciseInstance.participantKey
-                                    }}</code>
-                                    <button
-                                        app-copy-button
-                                        class="btn btn-light btn-sm"
-                                        [value]="
-                                            getParticipantUrl(exerciseInstance)
-                                        "
-                                    ></button>
-                                </th>
-                            }
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            @for (
-                                exerciseInstance of exerciseInstances();
-                                track exerciseInstance.participantKey
-                            ) {
-                                <td>
-                                    @if (exerciseInstance.isActive) {
-                                        <!-- TODO @JohannesPotzi @Jogius : make this placement nicer. -->
-                                        <span class="badge bg-success"
-                                            >aktiv</span
-                                        >
-                                    } @else {
-                                        <span
-                                            class="badge bg-opacity-50 bg-black"
-                                            >inaktiv</span
-                                        >
-                                    }
-                                </td>
-                            }
-                        </tr>
-                        @if (this.atLeastOneInstanceIsActive()) {
-                            <tr>
-                                @for (
-                                    exerciseInstance of exerciseInstances();
-                                    track exerciseInstance.participantKey
+                                    ];
+                                    as instanceResultsMap
                                 ) {
-                                    <td>
-                                        @if (exerciseInstance.isActive) {
-                                            <a
-                                                [routerLink]="`/exercises/${exerciseInstance.trainerKey}`"
-                                                class="badge bg-primary ms-1"
-                                            >
-                                                Öffnen
-                                            </a>
-                                        } @else {
-                                            <span></span>
-                                        }
-                                    </td>
+                                    <app-eval-result-status-badge
+                                        [result]="res"
+                                        [resultsMap]="instanceResultsMap"
+                                    />
                                 }
-                            </tr>
-                        }
-                        @for (
-                            criterion of this.rootCriteria();
-                            track criterion.id
-                        ) {
-                            <tr>
-                                <!-- Results -->
-                                @for (
-                                    exerciseInstance of exerciseInstances();
-                                    track exerciseInstance.participantKey
-                                ) {
-                                    <td>
-                                        @let res =
-                                            getResOfCriterionFromInstance(
-                                                criterion,
-                                                exerciseInstance
-                                            );
-                                        @if (
-                                            res && resultsMap();
-                                            as globalResultsMap
-                                        ) {
-                                            @if (
-                                                globalResultsMap[
-                                                    exerciseInstance
-                                                        .participantKey
-                                                ];
-                                                as instanceResultsMap
-                                            ) {
-                                                <app-eval-result-status-badge
-                                                    [result]="res"
-                                                    [resultsMap]="
-                                                        instanceResultsMap
-                                                    "
-                                                />
-                                            }
-                                        }
-                                    </td>
-                                }
-                            </tr>
-                        }
-                        @if (this.exerciseInstances().length === 0) {
-                            <tr>
-                                <!-- TODO @JohannesPotzi @Jogius : dynamic colspan? -->
-                                <td colspan="3" class="text-muted">
-                                    Es sind noch keine Teilnehmenden der Übung
-                                    beigetreten.
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+
+            @if (this.exerciseInstances().length === 0) {
+                <tr>
+                    <td colspan="3" class="text-muted">
+                        Es sind noch keine Teilnehmenden der Übung beigetreten.
+                    </td>
+                </tr>
+            }
+        </table>
     </div>
 </div>

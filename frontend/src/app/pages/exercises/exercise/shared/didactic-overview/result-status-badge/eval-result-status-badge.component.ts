@@ -14,7 +14,7 @@ import { selectEvalResults } from '../../../../../../state/application/selectors
     selector: 'app-eval-result-status-badge',
     templateUrl: './eval-result-status-badge.component.html',
     styleUrls: ['./eval-result-status-badge.component.scss'],
-    imports: [NgStyle],
+    imports: [],
 })
 export class EvalResultStatusBadgeComponent {
     private readonly store = inject<Store<AppState>>(Store);

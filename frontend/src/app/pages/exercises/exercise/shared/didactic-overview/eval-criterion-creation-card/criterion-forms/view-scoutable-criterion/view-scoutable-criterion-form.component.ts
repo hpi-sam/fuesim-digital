@@ -52,12 +52,7 @@ export class ViewScoutableEvalCriterionFormComponent {
         )
     );
     public readonly technicalChallenges = computed(() =>
-        Object.values(
-            this.store.selectSignal(selectTechnicalChallenges)()
-        ).filter((tc) => {
-            const currentState = currentStateOf(tc);
-            return currentState.viewedByParticipants;
-        })
+        Object.values(this.store.selectSignal(selectTechnicalChallenges)())
     );
 
     public selectScoutable(id: UUID) {

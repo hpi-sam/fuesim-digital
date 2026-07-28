@@ -9,7 +9,6 @@ import {
     type UUID,
     type EvalResult,
     type TechnicalChallengeId,
-    type TechnicalChallengeStateId,
     getNumFromEvalResult,
     isTemporalEvalCriterionType,
     statusNames,
@@ -106,15 +105,6 @@ export class DidacticOverviewComponent {
         return this.technicalChallenges()
             .filter((tc) => tc.id === id)
             .at(0)?.name;
-    }
-    public getTechnicalChallengeStateTitlebyId(
-        tcId: TechnicalChallengeId,
-        stateId: TechnicalChallengeStateId
-    ) {
-        const tcWithId = this.technicalChallenges()
-            .filter((tc) => tc.id === tcId)
-            .at(0);
-        return tcWithId?.states[stateId]?.title;
     }
     public getNumFromEvalResult = getNumFromEvalResult;
     public getRootCriteriaMap = getRootCriteriaMap;

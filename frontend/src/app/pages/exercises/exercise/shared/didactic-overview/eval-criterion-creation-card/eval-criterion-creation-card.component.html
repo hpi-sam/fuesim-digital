@@ -258,9 +258,14 @@
                 }
                 @case ('reachTechnicalChallengeStateEvalCriterion') {
                     <app-reach-technical-challenge-state-criterion-form
-                        (targetTechnicalChallengeStateOut)="
+                        (targetStateMachineIdsOut)="
                             this.criterionForm
-                                .targetTechnicalChallengeState()
+                                .targetStateMachineIds()
+                                .value.set($event)
+                        "
+                        (targetStateMachineStateIdsOut)="
+                            this.criterionForm
+                                .targetStateMachineStateIds()
                                 .value.set($event)
                         "
                         (technicalChallengeIdOut)="

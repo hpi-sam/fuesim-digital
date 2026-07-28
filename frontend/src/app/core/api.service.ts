@@ -15,7 +15,6 @@ import {
     postJoinParallelExerciseResponseDataSchema,
     PostParallelExerciseRequestData,
     TrainerKey,
-    type ExerciseTimeline,
     type PatchExerciseTemplateRequestData,
     ExerciseTemplateId,
     ParallelExerciseId,
@@ -32,12 +31,14 @@ import {
     OrganisationMembershipRole,
     getExerciseTemplateResponseDataSchema,
     PostExerciseRequestData,
+    stateExportSchema,
+    ExerciseTimeline,
 } from 'fuesim-digital-shared';
-import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
+import { freeze } from 'immer';
 import type { AppState } from '../state/app.state';
-import { selectExerciseKey } from '../state/application/selectors/application.selectors';
-import { selectStateSnapshot } from '../state/get-state-snapshot';
+import { selectStateSnapshot } from '../state/get-state-snapshot.js';
+import { selectExerciseKey } from '../state/application/selectors/application.selectors.js';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 
@@ -57,6 +58,21 @@ export class ApiService {
                 .post(`${httpOrigin}/api/exercise`, data)
                 .pipe(map((v) => getExerciseResponseDataSchema.parse(v)))
         );
+    }
+
+    public async getExport(exerciseKey: ExerciseKey, withHistory: boolean) {
+        const params = new URLSearchParams(
+            withHistory
+                ? {
+                      withHistory: '',
+                  }
+                : {}
+        ).toString();
+        return lastValueFrom(
+            this.httpClient.get(
+                `${httpOrigin}/api/exercise/${exerciseKey}/export?${params}`
+            )
+        ).then((v) => stateExportSchema.parse(v));
     }
 
     public async exerciseHistory() {

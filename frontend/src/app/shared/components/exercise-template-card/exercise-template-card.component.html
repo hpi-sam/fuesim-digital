@@ -106,16 +106,55 @@
                         Neue Übung
                     </button>
                 }
-
-                <div class="flex-grow-1"></div>
-                <button
-                    class="btn btn-outline-danger"
-                    (click)="deleteExerciseTemplate()"
-                >
-                    <i class="bi bi-trash me-2"></i>
-                    Löschen
-                </button>
             }
+
+            <div class="flex-grow-1"></div>
+
+            <div ngbDropdown>
+                <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    ngbDropdownToggle
+                >
+                    Mehr
+                </button>
+                <div ngbDropdownMenu>
+                    <button
+                        ngbDropdownItem
+                        (click)="
+                            exerciseService.exportExercise(
+                                exerciseTemplate.trainerKey,
+                                true
+                            )
+                        "
+                    >
+                        <i class="bi-clock-history me-2"> </i>
+                        Kompletten Verlauf exportieren
+                    </button>
+                    <button
+                        ngbDropdownItem
+                        (click)="
+                            exerciseService.exportExercise(
+                                exerciseTemplate.trainerKey,
+                                false
+                            )
+                        "
+                    >
+                        <i class="bi-cloud-download me-2"> </i>
+                        Aktuellen Zustand exportieren
+                    </button>
+                    @if (exerciseTemplate.userRole !== 'viewer') {
+                        <button
+                            class="text-danger"
+                            ngbDropdownItem
+                            (click)="deleteExerciseTemplate()"
+                        >
+                            <i class="bi bi-trash me-2"></i>
+                            Löschen
+                        </button>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 }

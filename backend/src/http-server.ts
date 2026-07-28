@@ -62,7 +62,10 @@ export class ApiHttpServer {
 
         app.use(
             '/api/organisations/',
-            createOrganisationRouter(services.organisationService)
+            createOrganisationRouter(
+                services.organisationService,
+                services.exerciseManagerService
+            )
         );
 
         app.use('/api/auth', createAuthRouter(services.authService));

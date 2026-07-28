@@ -7,6 +7,7 @@ import { Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import {
     NgbDropdown,
+    NgbDropdownButtonItem,
     NgbDropdownItem,
     NgbDropdownMenu,
     NgbDropdownToggle,
@@ -18,6 +19,7 @@ import { ConfirmationModalService } from '../../../core/confirmation-modal/confi
 import { InlineTextEditorComponent } from '../inline-text-editor/inline-text-editor.component';
 import { CreateParallelExerciseModalComponent } from '../../../pages/exercises/shared/create-parallel-exercise-modal/create-parallel-exercise-modal.component';
 import { OrganisationBadgeComponent } from '../../../pages/organisations/shared/organisation-badge/organisation-badge.component.js';
+import { ExerciseService } from '../../../core/exercise.service.js';
 
 @Component({
     selector: 'app-exercise-template-card',
@@ -32,6 +34,7 @@ import { OrganisationBadgeComponent } from '../../../pages/organisations/shared/
         NgbDropdownMenu,
         NgbDropdownItem,
         OrganisationBadgeComponent,
+        NgbDropdownButtonItem,
     ],
 })
 export class ExerciseTemplateCardComponent {
@@ -43,6 +46,7 @@ export class ExerciseTemplateCardComponent {
     );
     private readonly ngbModalService = inject(NgbModal);
     protected readonly exerciseConfig = this.apiService.exerciseConfig.value;
+    readonly exerciseService = inject(ExerciseService);
 
     readonly exerciseTemplate = input<GetExerciseTemplateDetailsResponseData>();
     readonly updated = output();

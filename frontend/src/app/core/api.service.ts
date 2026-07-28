@@ -33,6 +33,7 @@ import {
     PostExerciseRequestData,
     stateExportSchema,
     ExerciseTimeline,
+    getBannerDataSchema,
 } from 'fuesim-digital-shared';
 import { lastValueFrom, map } from 'rxjs';
 import { freeze } from 'immer';
@@ -295,6 +296,12 @@ export class ApiService {
                 undefined
             )
         ).then(postJoinParallelExerciseResponseDataSchema.parse);
+    }
+
+    public getBanner() {
+        return httpResource(() => `${httpOrigin}/api/banner/`, {
+            parse: getBannerDataSchema.parse,
+        });
     }
 
     public async createOrganisation(data: PostOrganisationRequestData) {

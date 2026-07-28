@@ -83,6 +83,17 @@ export class ApiHttpServer {
             createUserdataRouter(services.userDataService)
         );
 
+        app.use('/api/banner', (req, res) => {
+            res.json(
+                Config.bannerType === null
+                    ? null
+                    : {
+                          type: Config.bannerType,
+                          message: Config.bannerMessage,
+                      }
+            );
+        });
+
         app.use(errorHandler);
 
         this.httpServer = app.listen(Config.httpPort, () => {

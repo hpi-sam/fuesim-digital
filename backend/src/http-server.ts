@@ -59,6 +59,17 @@ export class ApiHttpServer {
 
         app.use('/api/auth', createAuthRouter(services.authService));
 
+        app.use('/api/banner', (req, res) => {
+            res.json(
+                Config.bannerType === null
+                    ? null
+                    : {
+                          type: Config.bannerType,
+                          message: Config.bannerMessage,
+                      }
+            );
+        });
+
         app.use(errorHandler);
 
         this.httpServer = app.listen(Config.httpPort, () => {

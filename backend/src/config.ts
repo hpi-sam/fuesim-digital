@@ -43,6 +43,10 @@ export class Config {
 
     private static _parallelExercisesEnabled?: boolean;
 
+    private static _bannerType?: string;
+
+    private static _bannerMessage?: string;
+
     public static get websocketPort(): number {
         this.throwIfNotInitialized();
         return this._websocketPort!;
@@ -143,6 +147,14 @@ export class Config {
         return this._parallelExercisesEnabled!;
     }
 
+    public static get bannerType(): string | null {
+        return this._bannerType ?? null;
+    }
+
+    public static get bannerMessage(): string | null {
+        return this._bannerMessage ?? null;
+    }
+
     private static createTCPPortValidator() {
         return makeValidator((x) => {
             const int = Number.parseInt(x);
@@ -223,6 +235,8 @@ export class Config {
             DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
             DFM_DEV_NO_WAITING_ROOM: bool({ default: false }),
             DFM_PARALLEL_EXERCISES_ENABLED: bool({ default: true }),
+            DFM_BANNER_TYPE: str({ default: undefined }),
+            DFM_BANNER_MESSAGE: str({ default: undefined }),
         });
     }
 
@@ -310,6 +324,8 @@ export class Config {
         this._parallelExercisesEnabled = testing
             ? true
             : env.DFM_PARALLEL_EXERCISES_ENABLED;
+        this._bannerType = env.DFM_BANNER_TYPE;
+        this._bannerMessage = env.DFM_BANNER_MESSAGE;
         this.isInitialized = true;
     }
 }

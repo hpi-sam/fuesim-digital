@@ -10,7 +10,6 @@ import type {
     ExtendedCollectionVersion,
     Marketplace,
     ParticipantKey,
-    VehicleTemplate,
     TemplateVersionContent,
     VersionedElementPartial,
     OrganisationId,
@@ -18,6 +17,7 @@ import type {
     ExerciseState,
     CollectionMembershipRole,
     CollectionVisibility,
+    AlarmGroup,
 } from 'fuesim-digital-shared';
 import {
     applyMigrations,
@@ -1857,78 +1857,131 @@ export class CollectionService {
 
     public async upgradeAllElementStateVersionsToLatest(): Promise<number> {
         return this.collectionRepository.transaction(async (tx) => {
-            const allElements = await tx.UNSAFE_getAllElements();
+            const unsafeAllElements = await tx.UNSAFE_getAllElements();
 
-            const allElementVersions = new Set<number>();
-            allElements.forEach((element) =>
-                allElementVersions.add(element.stateVersion)
-            );
+            const allElementVersions: { [version: string]: TemplateVersion[] } =
+                {};
 
-            if (allElementVersions.size === 0) return 0;
-            if (allElementVersions.size > 1) {
-                throw new Error(
-                    `There are multiple stateversions present in the element table. This should not happen and indicates a problem with the migration script.`
+            unsafeAllElements.forEach((element) => {
+                allElementVersions[element.stateVersion.toString()] ??= [];
+                allElementVersions[element.stateVersion.toString()]!.push(
+                    element
                 );
-            }
-            const currentElementVersion = allElementVersions
-                .values()
-                .next().value!;
-            if (currentStateVersion === currentElementVersion) {
-                return 0;
-            }
-
-            let state = cloneDeepMutable(
-                newExerciseState(
-                    '123456' as ParticipantKey
-                ) as WritableDraft<ExerciseState>
-            );
-
-            // TODO: Change this as soon as we have the new state structure with step 2 of marketplace
-            state = Object.assign(state, {
-                templates: allElements.reduce<{
-                    [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
-                }>((acc, element) => {
-                    if (element.content.type !== 'vehicleTemplate') return acc;
-                    acc[element.entityId] = {
-                        ...cloneDeepMutable(element.content),
-                        entity: {
-                            ...element,
-                            type: 'direct',
-                        },
-                    };
-                    return acc;
-                }, {}),
-                alarmGroups: allElements.reduce<{
-                    [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
-                }>((acc, element) => {
-                    if (element.content.type !== 'vehicleTemplate') return acc;
-                    acc[element.entityId] = {
-                        ...cloneDeepMutable(element.content),
-                        entity: {
-                            ...element,
-                            type: 'direct',
-                        },
-                    };
-                    return acc;
-                }, {}),
-            } satisfies { [T in keyof ExerciseState]?: any });
-
-            // Asserted value as we check for set-size of =1 above
-            const migratedState = applyMigrations(currentElementVersion, {
-                currentState: state,
-                history: undefined,
             });
 
-            const affectedElementCount = await tx.UNSAFE_overwriteElements(
-                currentStateVersion,
-                [
-                    ...Object.values(
-                        migratedState.currentState.templates
-                    ).filter(isMarketplaceElementContent),
-                ]
+            delete allElementVersions[currentStateVersion.toString()];
+
+            if (Object.keys(allElementVersions).length > 1) {
+                console.warn(
+                    `There are multiple stateversions (excluding currentStateVersion) present in the element table. This should not happen and indicates a problem with the migration script.`
+                );
+                console.warn(
+                    `The following stateversions (excluding currentStateVersion) are present: ${Object.keys(
+                        allElementVersions
+                    ).join(', ')}`
+                );
+            }
+
+            let combinedAffectedElementCount = 0;
+
+            const migrateStateVersion = async (
+                currentElementVersion: number
+            ) => {
+                const allElementsOfStateVersion =
+                    allElementVersions[currentElementVersion.toString()];
+
+                if (
+                    allElementsOfStateVersion === undefined ||
+                    allElementsOfStateVersion.length === 0
+                ) {
+                    throw new Error(
+                        `No elements to migrate found for state version ${currentElementVersion}`
+                    );
+                }
+
+                let state = cloneDeepMutable(
+                    newExerciseState(
+                        '123456' as ParticipantKey
+                    ) as WritableDraft<ExerciseState>
+                );
+
+                state = Object.assign(state, {
+                    templates: allElementsOfStateVersion.reduce<{
+                        [T in ElementVersionId]: WritableDraft<TemplateVersionContent>;
+                    }>((acc, element) => {
+                        if (element.content.type === 'alarmGroup') return acc;
+                        acc[element.versionId] = {
+                            ...cloneDeepMutable(element.content),
+                            entity: {
+                                entityId: element.entityId,
+                                versionId: element.versionId,
+                                type: 'direct',
+                            },
+                        };
+                        return acc;
+                    }, {}),
+                    alarmGroups: allElementsOfStateVersion.reduce<{
+                        [T in ElementVersionId]: WritableDraft<AlarmGroup>;
+                    }>((acc, element) => {
+                        if (element.content.type !== 'alarmGroup') return acc;
+                        acc[element.versionId] = {
+                            ...cloneDeepMutable(element.content),
+                            entity: {
+                                entityId: element.entityId,
+                                versionId: element.versionId,
+                                type: 'direct',
+                            },
+                        };
+                        return acc;
+                    }, {}),
+                } satisfies { [T in keyof ExerciseState]?: any });
+
+                const migratedState = applyMigrations(currentElementVersion, {
+                    currentState: state,
+                    history: undefined,
+                });
+
+                const affectedElementCount = await tx.UNSAFE_overwriteElements(
+                    currentStateVersion,
+                    [
+                        ...Object.values(
+                            migratedState.currentState.templates
+                        ).filter(isMarketplaceElementContent),
+                        ...Object.values(
+                            migratedState.currentState.alarmGroups
+                        ).filter(isMarketplaceElementContent),
+                    ]
+                );
+
+                combinedAffectedElementCount += affectedElementCount;
+
+                return affectedElementCount;
+            };
+
+            await Promise.all(
+                Object.entries(allElementVersions).map(
+                    async ([oldStateVersion]) =>
+                        migrateStateVersion(Number.parseInt(oldStateVersion))
+                )
             );
 
-            return affectedElementCount;
+            const allMigratedElements = await tx.UNSAFE_getAllElements();
+
+            const allMigratedElementStateVersions = new Set<number>();
+            allMigratedElements.forEach((element) => {
+                allMigratedElementStateVersions.add(element.stateVersion);
+            });
+
+            if (
+                allMigratedElementStateVersions.size > 1 ||
+                !allMigratedElementStateVersions.has(currentStateVersion)
+            ) {
+                throw new Error(
+                    'More than one element state version or no current state version found after migration. This should not happen and indicates a problem with the migration script.'
+                );
+            }
+
+            return combinedAffectedElementCount;
         });
     }
 }

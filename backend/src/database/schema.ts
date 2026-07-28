@@ -423,6 +423,7 @@ export const collectionDependencyMappingTable = pgTable(
     ]
 );
 
+// Make sure this type is up to date with the TemplateVersion type
 export const elementTable = pgTable(
     'elements',
     {

@@ -1556,18 +1556,23 @@ export class CollectionRepository extends BaseRepository {
 
             sqlChunks.push(sql`(case`);
 
-            for (const content of elementContents) {
-                if (content.entity?.versionId === undefined) {
+            for (const unsafeContent of elementContents) {
+                const versionId = unsafeContent.entity?.versionId;
+                if (versionId === undefined) {
                     console.error(
                         'versionId is required for UNSAFE_overwriteElements',
-                        content
+                        unsafeContent
                     );
                     continue;
                 }
+
+                const safeContent = { ...unsafeContent };
+                delete safeContent.entity;
+
                 sqlChunks.push(
-                    sql`when ${elementTable.versionId} = ${content.entity.versionId} then ${JSON.stringify(content)}::jsonb`
+                    sql`when ${elementTable.versionId} = ${versionId} then ${JSON.stringify(safeContent)}::jsonb`
                 );
-                ids.push(content.entity.versionId);
+                ids.push(versionId);
             }
 
             sqlChunks.push(sql`end)`);

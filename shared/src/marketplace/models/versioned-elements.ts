@@ -4,6 +4,7 @@ import { templateVersionContentSchema } from './versioned-element-content.js';
 import { stateVersionedEntitySchema } from './state-versioned-entity.js';
 import { versionedElementPartialSchema } from './versioned-id-schema.js';
 
+// Make sure this type is up to date with the schema
 export const templateVersionSchema = z.object({
     ...stateVersionedEntitySchema.shape,
     ...versionedElementPartialSchema.shape,

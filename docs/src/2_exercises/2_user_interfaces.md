@@ -121,6 +121,7 @@ Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-
 - **Erstellung**
     - **Alarmgruppen**: In diesem Fenster können [Alarmgruppen](3_exercise_elements.md#alarmgruppen) erstellt, bearbeitet und wieder gelöscht werden.
     - **Krankenhäuser**: In diesem Fenster können [Krankenhäuser](3_exercise_elements.md#krankenhäuser) erstellt, bearbeitet und wieder gelöscht werden.
+    - **Maßnahmen**: In diesem Fenster können [Maßnahmen](3_exercise_elements.md#maßnahmen) erstellt, bearbeitet und wieder gelöscht werden.
 - **Durchführung**
     - **Teilnehmende**: Fenster zur [Verwaltung der Übungsteilnehmenden](4_conduction.md#teilnehmende-verwalten).
     - **Transferübersicht**: Fenster zur [Verwaltung von laufenden Transfers](4_conduction.md#transfers-verwalten) zwischen Transferpunkten

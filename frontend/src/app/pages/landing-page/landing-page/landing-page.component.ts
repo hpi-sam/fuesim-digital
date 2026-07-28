@@ -1,4 +1,12 @@
-import { Component, inject, resource, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    Pipe,
+    resource,
+    signal,
+    PipeTransform,
+    SecurityContext,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
     isAccessKey,
@@ -14,6 +22,7 @@ import {
     validate,
     validateAsync,
 } from '@angular/forms/signals';
+import { DomSanitizer } from '@angular/platform-browser';
 import { AuthService } from '../../../core/auth.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
@@ -23,6 +32,18 @@ import { FileInputDirective } from '../../../shared/directives/file-input.direct
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { DisplayModelValidationComponent } from '../../../shared/validation/display-model-validation/display-model-validation.component';
 import { HelpButtonComponent } from '../../../help-button/help-button.component.js';
+
+@Pipe({
+    name: 'sanitizeHtml',
+    standalone: true,
+})
+export class SanitizeHtmlPipe implements PipeTransform {
+    private readonly sanitizer = inject(DomSanitizer);
+
+    transform(html: string) {
+        return this.sanitizer.sanitize(SecurityContext.HTML, html);
+    }
+}
 
 @Component({
     selector: 'app-landing-page',
@@ -38,6 +59,7 @@ import { HelpButtonComponent } from '../../../help-button/help-button.component.
         FormField,
         DisplayModelValidationComponent,
         HelpButtonComponent,
+        SanitizeHtmlPipe,
     ],
 })
 export class LandingPageComponent {
@@ -47,6 +69,7 @@ export class LandingPageComponent {
     readonly auth = inject(AuthService);
 
     protected readonly exerciseConfig = this.apiService.exerciseConfig.value;
+    protected readonly banner = this.apiService.getBanner();
 
     public loginUrl = this.auth.loginUrl;
 

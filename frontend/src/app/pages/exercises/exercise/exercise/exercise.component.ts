@@ -31,6 +31,7 @@ import {
     selectParticipantKey,
     selectExerciseState,
     selectSelectedCollections,
+    selectTemplates,
 } from '../../../../state/application/selectors/exercise.selectors';
 import { selectOwnClient } from '../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../state/get-state-snapshot';
@@ -136,7 +137,16 @@ export class ExerciseComponent implements OnDestroy, OnInit {
             selectSelectedCollections,
             this.store
         );
-        if (selectedCollections.length === 0) {
+
+        const templatesInState = selectStateSnapshot(
+            selectTemplates,
+            this.store
+        );
+
+        if (
+            selectedCollections.length === 0 &&
+            Object.keys(templatesInState).length === 0
+        ) {
             const result = await openSelectCollectionModal(this.modalService, {
                 showDependencyElements: true,
                 allowLeave: false,

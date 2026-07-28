@@ -16,7 +16,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Changed
 
-- Menu items in header have ben put into a more logical order.
+- Menu items in header are now in a more logical order.
+- The Parallel Exercise overview page is now structured with tabs.
 
 ### Fixed
 

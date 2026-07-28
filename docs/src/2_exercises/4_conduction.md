@@ -26,7 +26,7 @@ In der FüSim Digital gibt es kein explizites Übungsende. Eine Übung kann ledi
 Es ist demzufolge Aufgabe der Übungsleitung, das Ende der Übung gegenüber den Teilnehmenden auf geeignete Weise zu kommunizieren.
 
 > [!WARNING]
-> Es wird unbedingt empfohlen, die Übung auch am Ende zu pausieren, damit bei der [Auswertung](5_evaluation.md) nur die relevanten Zeiträume in Statistik und Zeitstrahl betrachtet werden.
+> Es wird unbedingt empfohlen, die Übung auch am Ende zu pausieren, damit bei der [Auswertung](6_evaluation.md) nur die relevanten Zeiträume in Statistik und Zeitstrahl betrachtet werden.
 
 ### Löschen
 

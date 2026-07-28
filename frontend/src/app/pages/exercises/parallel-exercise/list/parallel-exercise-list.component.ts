@@ -7,6 +7,8 @@ import { ApiService } from '../../../../core/api.service';
 import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { ParallelExerciseCardComponent } from '../../../../shared/components/parallel-exercise-card/parallel-exercise-card.component';
+import { FileInputDirective } from '../../../../shared/directives/file-input.directive.js';
+import { HelpButtonComponent } from '../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-parallel-exercise-list',
@@ -17,6 +19,8 @@ import { ParallelExerciseCardComponent } from '../../../../shared/components/par
         RouterLink,
         FooterComponent,
         ParallelExerciseCardComponent,
+        FileInputDirective,
+        HelpButtonComponent,
     ],
 })
 export class ParallelExerciseListComponent {

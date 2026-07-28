@@ -9,22 +9,26 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Added
 
-- There are now notifications when viewing an exercise replay whenever a measure is taken or a scoutable element is viewed.
+- Organisations were introduced for managing content together with other users. It's possible to manage several organisations and invite other users to them.
+- Exercise element collections were introduced to manage and share exercise elements (e.g., vehicles, alarm groups, etc.) outside of exercises.
+- With technical challenges, it is now possible to include dynamically changing situations like technical rescue or fire extinguishing. To solve them, participants can assign personnel and give them pre-defined tasks. Currently, there are two premade technical challenges. This feature will be extended with an editor in a later software version to enable trainers to create their own challenges.
+- Measures were added to allow trainers to configure several global actions that participants can take (e.g., giving a status report, drawing a danger zone, requesting additional units).
 - There is now a banner that is displayed when the application is unable to start properly, informing the user about potential causes.
 - New participants joining a parallel exercise after it started now get fast-forwarded to be in sync with all other participants.
 - Users can now export all their user-related data when logged in.
-- Add new way to manage and share exercise elements via a new Collections-Feature
+- Exercises and exercise templates can be exported from the exercise manager.
+- It is possible to export all exercises/exercise templates in an organisation as a ZIP file.
 
 ### Changed
 
 - Menu items in header are now in a more logical order.
-- The Parallel Exercise overview page is now structured with tabs.
+- The parallel exercise overview page is now structured with tabs.
+- Exercises, exercises templates, and parallel exercises are no longer coupled to a user, but to an organisation. Each user therefore has a private organisation for their personal content.
+- When participants view scoutables, this is tracked and shown to the trainer with a green speech bubble/magnifying glass. Also, the information appears in the log.
 
 ### Fixed
 
-- The deletion of alarm groups no longer breaks breaks measure templates that use them.
-- Elements are now only marked scoutable once their name or content is specified, and can be marked as unscoutable again.
-- The measures toolbar no longer interferes with map interactions.
+- Elements are now only marked scoutable once their name or content is specified, and can be marked as not scoutable again.
 - Show exercise import validation error messages in a readable format.
 - Exercise instances in a parallel exercise are now created based on the state the exercise template was in when the parallel exercise was created.
 

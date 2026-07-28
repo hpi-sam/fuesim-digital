@@ -75,6 +75,10 @@ export function replaceDependencies<Model extends FuesimCombined>(
 ): Immutable<Model> {
     const checker = getDependencyChecker(data.type);
     if (!checker) {
+        console.warn(
+            'No dependency registry entry found for model type',
+            data.type
+        );
         return data;
     }
     return checker.replace(cloneDeepMutable(data), replace) as Immutable<Model>;

@@ -209,6 +209,16 @@ export class ApiService {
         });
     }
 
+    public async getOrganisation(id: OrganisationId) {
+        const data = await lastValueFrom(
+            this.httpClient.get(`${httpOrigin}/api/organisations/${id}`)
+        );
+
+        const parsedData = getOrganisationDetailsResponseDataSchema.parse(data);
+
+        return parsedData;
+    }
+
     public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
             this.httpClient.post(`${httpOrigin}/api/exercise_templates`, data)

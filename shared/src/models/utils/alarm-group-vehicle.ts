@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
+import type { UUID } from '../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
 
 export const alarmGroupVehicleSchema = z.strictObject({
     id: uuidSchema,

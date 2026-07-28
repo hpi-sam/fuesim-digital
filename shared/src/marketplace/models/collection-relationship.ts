@@ -1,12 +1,22 @@
 import { z } from 'zod';
-import { collectionEntityIdSchema } from './versioned-id-schema.js';
+import type { Immutable } from 'immer';
+import { organisationMembershipRoleSchema } from '../../interfaces/organisation.js';
 
 // INFO: This is sorted by permission level, so the order matters
+// The higher the index, the more permissions the role has.
 export const collectionOrganisationRelationshipTypeAllowedValues = [
-    'owner',
-    'viewer',
     'other',
+    'viewer',
+    'owner',
 ] as const;
+
+export const collectionOrganisationRelationshipTypeDisplayNames: {
+    [key in CollectionOrganisationRelationshipType]: string;
+} = {
+    owner: 'Besitzer',
+    viewer: 'Betrachter',
+    other: 'Andere',
+};
 
 export const collectionOrganisationRelationshipTypeSchema = z.enum(
     collectionOrganisationRelationshipTypeAllowedValues
@@ -39,6 +49,9 @@ export function checkCollectionOrganisationRole(
             roleCompare(desiredRole) >= 0,
         isAtMost: (desiredRole: CollectionOrganisationRelationshipType) =>
             roleCompare(desiredRole) <= 0,
+        /**
+         * The higher the index, the more permissions the role has.
+         */
         indexOf: () =>
             collectionOrganisationRelationshipTypeAllowedValues.indexOf(
                 currentRole
@@ -46,58 +59,37 @@ export function checkCollectionOrganisationRole(
     };
 }
 
-/// ///////////////// DEPRECATED //////////////////////
-// INFO: This is sorted by permission level, so the order matters
-export const collectionRelationshipTypeAllowedValues = [
-    // assined, when collection is public and user has no specific role
+export const collectionMembershipRoleAllowedValues = [
     'other',
-    'viewer',
-    'editor',
-    'admin',
+    ...organisationMembershipRoleSchema.values,
 ] as const;
-export const collectionRelationshipTypeSchema = z.enum(
-    collectionRelationshipTypeAllowedValues
+export const collectionMembershipRole = z.literal(
+    collectionMembershipRoleAllowedValues
 );
-export type CollectionRelationshipType = z.infer<
-    typeof collectionRelationshipTypeSchema
+
+export type CollectionMembershipRole = Immutable<
+    z.infer<typeof collectionMembershipRole>
 >;
 
-export const collectionRelationshipDtoSchema = z.strictObject({
-    id: z.string(),
-    collection: collectionEntityIdSchema,
-    userId: z.string(),
-    role: collectionRelationshipTypeSchema,
-});
-export type CollectionRelationshipDto = z.infer<
-    typeof collectionRelationshipDtoSchema
->;
-
-export const collectionRelationshipTypesDisplayNames: {
-    [key in (typeof collectionRelationshipTypeAllowedValues)[number]]: string;
-} = {
-    other: 'Sonstige',
-    viewer: 'Betrachter',
-    editor: 'Bearbeiter',
-    admin: 'Besitzer',
-};
-
-export function checkCollectionRole(currentRole: CollectionRelationshipType) {
-    const roleCompare = (desiredRole: CollectionRelationshipType): number => {
+export function checkCollectionMembershipRole(
+    currentRole: CollectionMembershipRole
+) {
+    const roleCompare = (desiredRole: CollectionMembershipRole): number => {
         const desiredRoleIndex =
-            collectionRelationshipTypeAllowedValues.indexOf(desiredRole);
+            collectionMembershipRoleAllowedValues.indexOf(desiredRole);
         const currentRoleIndex =
-            collectionRelationshipTypeAllowedValues.indexOf(currentRole);
+            collectionMembershipRoleAllowedValues.indexOf(currentRole);
         return currentRoleIndex - desiredRoleIndex;
     };
 
     return {
-        isStrictly: (desiredRole: CollectionRelationshipType) =>
+        isStrictly: (desiredRole: CollectionMembershipRole) =>
             roleCompare(desiredRole) === 0,
-        isAtLeast: (desiredRole: CollectionRelationshipType) =>
+        isAtLeast: (desiredRole: CollectionMembershipRole) =>
             roleCompare(desiredRole) >= 0,
-        isAtMost: (desiredRole: CollectionRelationshipType) =>
+        isAtMost: (desiredRole: CollectionMembershipRole) =>
             roleCompare(desiredRole) <= 0,
         indexOf: () =>
-            collectionRelationshipTypeAllowedValues.indexOf(currentRole),
+            collectionMembershipRoleAllowedValues.indexOf(currentRole),
     };
 }

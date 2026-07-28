@@ -10,6 +10,7 @@ import {
     type OrganisationInsert,
     type OrganisationInviteLinkInsert,
     parallelExerciseTable,
+    collectionOrganisationMappingTable,
 } from '../schema.js';
 import {
     organisationInviteLinkTable,
@@ -40,6 +41,13 @@ export class OrganisationRepository extends BaseRepository {
             parallelExercisesCount: this.databaseConnection.$count(
                 parallelExerciseTable,
                 eq(parallelExerciseTable.organisationId, organisationTable.id)
+            ),
+            collectionsCount: this.databaseConnection.$count(
+                collectionOrganisationMappingTable,
+                eq(
+                    collectionOrganisationMappingTable.organisationId,
+                    organisationTable.id
+                )
             ),
         };
     }

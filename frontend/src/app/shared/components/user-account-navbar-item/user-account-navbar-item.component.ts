@@ -5,6 +5,7 @@ import {
     NgbDropdownMenu,
     NgbDropdownItem,
 } from '@ng-bootstrap/ng-bootstrap';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { environment } from '../../../../environments/environment.js';
 import { ApiService } from '../../../core/api.service';
@@ -14,7 +15,13 @@ import { saveBlob } from '../../functions/save-blob';
     selector: 'app-user-account-navbar-item',
     templateUrl: './user-account-navbar-item.component.html',
     styleUrls: ['./user-account-navbar-item.component.scss'],
-    imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, NgbDropdownItem],
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownItem,
+        RouterLink,
+    ],
 })
 export class UserAccountNavbarItemComponent {
     readonly auth = inject(AuthService);

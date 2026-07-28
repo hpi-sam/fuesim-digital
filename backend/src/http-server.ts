@@ -68,7 +68,10 @@ export class ApiHttpServer {
             )
         );
 
-        app.use('/api/auth', createAuthRouter(services.authService));
+        app.use(
+            '/api/auth',
+            createAuthRouter(services.authService, services.organisationService)
+        );
 
         app.use(
             '/api/collections',

@@ -8,13 +8,18 @@ import type {
     ElementVersionId,
     ExtendedCollectionVersion,
     Marketplace,
-    VersionedElementContent,
+    TemplateVersionContent,
     VersionedElementPartial,
     OrganisationId,
     CollectionOrganisationRelationshipType,
 } from 'fuesim-digital-shared';
-import { currentStateVersion } from 'fuesim-digital-shared';
-import type { InferInsertModel, SQL } from 'drizzle-orm';
+import {
+    currentStateVersion,
+    extendedCollectionVersionReducer,
+    getElementDependencies,
+    replaceDependencies,
+} from 'fuesim-digital-shared';
+import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
 import {
     eq,
     desc,
@@ -27,6 +32,7 @@ import {
     count,
 } from 'drizzle-orm';
 import { castImmutable } from 'immer';
+import type { PgColumn } from 'drizzle-orm/pg-core';
 import {
     collectionDependencyMappingTable,
     elementCollectionMappingTable,
@@ -34,11 +40,21 @@ import {
     elementTable,
     collectionJoinCodesTable,
     collectionOrganisationMappingTable,
-    userTable,
     organisationTable,
+    exerciseTable,
 } from '../schema.js';
 import { defaultCollectionData } from '../default-data/collection-default-data.js';
+import { DAG } from '../../utils/dag.js';
+import type {
+    DatabaseConnection,
+    DatabaseTransaction,
+} from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
+
+function canEditCollection(collection: CollectionVersion): boolean {
+    if (collection.draftState) return true;
+    return false;
+}
 
 export class CollectionRepository extends BaseRepository {
     public readonly INVITE_CODE_VALIDITY_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 DAYS
@@ -157,6 +173,20 @@ export class CollectionRepository extends BaseRepository {
         );
     }
 
+    public async getExercisesUsingCollection(
+        collectionEntitiyId: CollectionEntityId
+    ) {
+        return this.databaseConnection.execute<
+            InferSelectModel<typeof exerciseTable>
+        >(
+            sql`
+                   SELECT ${exerciseTable}.*
+                   FROM ${exerciseTable}, json_array_elements("currentStateString"->'selectedCollections') AS t
+                   WHERE t->>'entityId' = ${collectionEntitiyId}
+               `
+        );
+    }
+
     public async getJoinCode(collectionEntityId: CollectionEntityId) {
         return this.onlySingle(
             await this.databaseConnection
@@ -168,11 +198,7 @@ export class CollectionRepository extends BaseRepository {
         );
     }
 
-    public async getOrCreateJoinCode(collectionEntityId: CollectionEntityId) {
-        const existingCode = await this.getJoinCode(collectionEntityId);
-        if (existingCode && existingCode.expiresAt > new Date()) {
-            return existingCode;
-        }
+    public async createJoinCode(collectionEntityId: CollectionEntityId) {
         return this.onlySingleStrict(
             await this.databaseConnection
                 .insert(collectionJoinCodesTable)
@@ -288,13 +314,15 @@ export class CollectionRepository extends BaseRepository {
                 id: organisationTable.id,
                 name: organisationTable.name,
                 owner: collectionOrganisationMappingTable.owner,
+                personalOrganisationOf:
+                    organisationTable.personalOrganisationOf,
             })
             .from(collectionOrganisationMappingTable)
             .innerJoin(
-                userTable,
+                organisationTable,
                 eq(
                     collectionOrganisationMappingTable.organisationId,
-                    userTable.id
+                    organisationTable.id
                 )
             )
             .where(
@@ -373,7 +401,7 @@ export class CollectionRepository extends BaseRepository {
                         elementCollectionMappingTable.collectionVersionId,
                 })
                 .from(elementCollectionMappingTable)
-                .groupBy(elementCollectionMappingTable.elementVersionId)
+                .groupBy(elementCollectionMappingTable.collectionVersionId)
         );
     }
 
@@ -433,7 +461,8 @@ export class CollectionRepository extends BaseRepository {
     public async getOrCreateDraftStateCollectionVersion(
         collectionEntityId: CollectionEntityId
     ): Promise<[CollectionVersion, boolean]> {
-        const result = this.onlySingle(
+        // check if there exists a collection version in draftstate
+        const draftStateCollectionVersion = this.onlySingle(
             await this.databaseConnection
                 .select()
                 .from(collectionTable)
@@ -445,7 +474,7 @@ export class CollectionRepository extends BaseRepository {
                 )
         );
 
-        if (result === null) {
+        if (draftStateCollectionVersion === null) {
             const latestVersion = this.strict(
                 await this.getLatestCollectionByEntityId(collectionEntityId)
             );
@@ -476,7 +505,7 @@ export class CollectionRepository extends BaseRepository {
             return [newCollection, true];
         }
 
-        return [this.strict(result), false];
+        return [this.strict(draftStateCollectionVersion), false];
     }
 
     public async getCollectionVersionDirectDependencies(
@@ -605,7 +634,7 @@ export class CollectionRepository extends BaseRepository {
         const collection = this.strict(
             await this.getCollectionByVersionId(collectionVersionId)
         );
-        if (!collection.draftState) {
+        if (!canEditCollection(collection)) {
             throw new Error(
                 'Cannot edit collection that is not in draft state'
             );
@@ -625,9 +654,9 @@ export class CollectionRepository extends BaseRepository {
 
     public async updateElementContent(
         elementVersionId: ElementVersionId,
-        data: VersionedElementContent
+        data: TemplateVersionContent
     ) {
-        return this.databaseConnection.transaction(async (tx) => {
+        return this.transaction(async (tx) => {
             const isEditable =
                 await this.checkElementVersionEditable(elementVersionId);
             if (!isEditable) {
@@ -636,7 +665,7 @@ export class CollectionRepository extends BaseRepository {
                 );
             }
 
-            const result = await tx
+            const result = await tx.databaseConnection
                 .update(elementTable)
                 .set({
                     content: data,
@@ -805,14 +834,17 @@ export class CollectionRepository extends BaseRepository {
     }
 
     public async createFirstCollectionVersion(
-        title: string,
+        data: {
+            title: string;
+            description: string;
+        },
         draftState: boolean = false
     ) {
         const result = await this.databaseConnection
             .insert(collectionTable)
             .values({
-                title,
-                description: '',
+                title: data.title,
+                description: data.description,
                 stateVersion: currentStateVersion,
                 version: 1,
                 visibility: 'private',
@@ -824,7 +856,7 @@ export class CollectionRepository extends BaseRepository {
     }
 
     public async createElementVersion(data: {
-        content: VersionedElementContent;
+        content: TemplateVersionContent;
         version: number;
         entityId?: ElementEntityId;
     }): Promise<TemplateVersion | null> {
@@ -872,14 +904,14 @@ export class CollectionRepository extends BaseRepository {
         isBaseReference: boolean = true
     ) {
         // Check if the Set is in draft state, otherwise we cannot add the element to it
-        const set = this.onlySingleStrict(
+        const collection = this.onlySingleStrict(
             await this.databaseConnection
                 .select()
                 .from(collectionTable)
                 .where(eq(collectionTable.versionId, collectionVersionId))
         );
 
-        if (!set.draftState) {
+        if (!canEditCollection(collection)) {
             throw new Error(
                 'Can only add exercise objects to sets in draft state'
             );
@@ -912,7 +944,7 @@ export class CollectionRepository extends BaseRepository {
         return this.databaseConnection
             .insert(elementCollectionMappingTable)
             .values({
-                collectionEntityId: set.entityId,
+                collectionEntityId: collection.entityId,
                 collectionVersionId,
                 elementEntityId: element.entityId,
                 elementVersionId,
@@ -1013,71 +1045,120 @@ export class CollectionRepository extends BaseRepository {
             versionId: CollectionVersionId;
         };
     }) {
-        const { source, target } = data;
         await this.databaseConnection.transaction(async (tx) => {
             const targetSet = this.onlySingleStrict(
                 await tx
                     .select()
                     .from(collectionTable)
-                    .where(eq(collectionTable.versionId, target.versionId))
+                    .where(eq(collectionTable.versionId, data.target.versionId))
             );
 
-            if (!targetSet.draftState) {
+            if (!canEditCollection(targetSet)) {
                 throw new Error(
                     'Can only copy exercise objects to sets in draft state'
                 );
             }
 
-            const latestElements = this.latestElements();
-
-            const createdElements = await tx
-                .with(latestElements)
-                .insert(elementTable)
-                .select(
-                    tx
-                        .select({
-                            // WARNING: This is order-sensitive, based on the order in the schema
-                            // and requires ALL fields (even defaulted ones) to be selected
-                            versionId:
-                                sql`'element_version_' || uuid_generate_v4()`.as(
-                                    'versionId'
-                                ),
-                            entityId:
-                                sql`'element_entity_' || uuid_generate_v4()`.as(
-                                    'entityId'
-                                ),
-                            version: sql<number>`1`.as('version'),
-                            stateVersion: latestElements.stateVersion,
-                            createdAt: sql`now()`.as('createdAt'),
-                            editedAt: sql`now()`.as('editedAt'),
-                            title: latestElements.title,
-                            description: latestElements.description,
-                            content: latestElements.content,
-                        } satisfies {
-                            [K in keyof typeof elementTable.$inferInsert]: any;
-                        })
-                        .from(latestElements)
-                        .innerJoin(
-                            elementCollectionMappingTable,
-                            eq(
-                                latestElements.versionId,
-                                elementCollectionMappingTable.elementVersionId
-                            )
-                        )
-                        .where(
-                            eq(
-                                elementCollectionMappingTable.collectionVersionId,
-                                source.versionId
-                            )
-                        )
+            const allCopyableElements = await tx
+                .select()
+                .from(elementTable)
+                .innerJoin(
+                    elementCollectionMappingTable,
+                    eq(
+                        elementCollectionMappingTable.elementVersionId,
+                        elementTable.versionId
+                    )
                 )
-                .returning();
+                .where(
+                    eq(
+                        elementCollectionMappingTable.collectionVersionId,
+                        data.source.versionId
+                    )
+                );
 
-            if (createdElements.length > 0) {
+            const dag = new DAG(
+                allCopyableElements.map((m) => String(m.elements.versionId))
+            );
+
+            for (const elem of allCopyableElements) {
+                const dependencyVersionIds = getElementDependencies(
+                    elem.elements.content
+                );
+                for (const vId of dependencyVersionIds) {
+                    // If the node is NOT in the dag, then it
+                    // is an external dependency,
+                    // which we do not want to copy
+                    if (Object.keys(dag.getNodes()).includes(vId)) {
+                        dag.addEdge(elem.elements.versionId, vId);
+                    }
+                }
+            }
+
+            // These are now sorted in the order so that elements that are being
+            // dependend upon receive their new versionId, so that we can use
+            // that new versionId then as a replacement in those elements that
+            // depend on the old versionId
+            const topSortedElementIds = dag.topsort(undefined);
+
+            // Mapping from old versionIds to the newly assigned versionIds
+            const versionIdMapping: { [oldId in string]?: ElementVersionId } =
+                {};
+
+            const createdElementIds: VersionedElementPartial[] = [];
+
+            for (const sortedElementId of topSortedElementIds) {
+                const element = allCopyableElements.find(
+                    (f) => f.elements.versionId === sortedElementId
+                );
+                if (element === undefined) {
+                    throw new Error('previously existing element not found');
+                }
+
+                const newElementContent = replaceDependencies(
+                    element.elements.content,
+                    Object.entries(versionIdMapping).map((m) => ({
+                        old: m[0] as ElementVersionId,
+                        new: m[1]!,
+                    }))
+                );
+
+                // we need this await here in the for loop to prevent
+                // possible race condidtions with the mapping assignment
+                // eslint-disable-next-line no-await-in-loop
+                const sqlReturn = await tx
+                    .insert(elementTable)
+                    .values({
+                        title: element.elements.title,
+                        description: element.elements.description,
+                        stateVersion: element.elements.stateVersion,
+                        version: 1,
+                        content: newElementContent,
+                    })
+                    .returning();
+
+                const newElement = sqlReturn.at(0);
+
+                if (newElement === undefined) {
+                    throw new Error('element could not be created');
+                }
+
+                // Save the new Mapping so that we can replace
+                // old dependencies to the old versionId for coming
+                // elements to be copied (thats why topsort ;) )
+                versionIdMapping[sortedElementId] = newElement.versionId;
+
+                createdElementIds.push({
+                    entityId: newElement.entityId,
+                    versionId: newElement.versionId,
+                });
+            }
+
+            // Attach the newly created elements to the collection
+            if (createdElementIds.length > 0) {
                 await tx.insert(elementCollectionMappingTable).values(
-                    createdElements.map((element) => ({
-                        collectionEntityId: target.entityId,
-                        collectionVersionId: target.versionId,
+                    createdElementIds.map((element) => ({
+                        collectionEntityId: data.target.entityId,
+                        collectionVersionId: data.target.versionId,
                         elementEntityId: element.entityId,
                         elementVersionId: element.versionId,
                         isBaseReference: false,
@@ -1115,6 +1196,45 @@ export class CollectionRepository extends BaseRepository {
         return this.onlySingle(result);
     }
 
+    public selectOwnerOfCollection(
+        tx: DatabaseConnection | DatabaseTransaction,
+        collectionEntityId: PgColumn
+    ) {
+        return tx
+            .select()
+            .from(collectionOrganisationMappingTable)
+            .where(
+                and(
+                    eq(
+                        collectionOrganisationMappingTable.collection,
+                        collectionEntityId
+                    ),
+                    eq(collectionOrganisationMappingTable.owner, true)
+                )
+            )
+            .as('ownerOrganisation');
+    }
+
+    public async getOwnerOfCollection(
+        tx: DatabaseConnection | DatabaseTransaction | undefined,
+        collectionEntityId: CollectionEntityId
+    ) {
+        return this.onlySingle(
+            await (tx ?? this.databaseConnection)
+                .select()
+                .from(collectionOrganisationMappingTable)
+                .where(
+                    and(
+                        eq(
+                            collectionOrganisationMappingTable.collection,
+                            collectionEntityId
+                        ),
+                        eq(collectionOrganisationMappingTable.owner, true)
+                    )
+                )
+        );
+    }
+
     public async getLatestCollectionsForOrganisation(
         organisationId: OrganisationId,
         opts?: { allowDraftState?: boolean; archived?: boolean }
@@ -1131,8 +1251,23 @@ export class CollectionRepository extends BaseRepository {
                 .select({
                     ...getTableColumns(collectionTable),
                     elementCount: elementCounts.elementCount,
+                    ownerOrganisationId:
+                        sql<OrganisationId>`"ownerOrganisation"."organisationId"`.as(
+                            'ownerOrganisationId'
+                        ),
+                    userCollectionRelationships: {
+                        name: organisationTable.name,
+                        id: organisationTable.id,
+                    },
                 })
                 .from(collectionOrganisationMappingTable)
+                .leftJoin(
+                    organisationTable,
+                    eq(
+                        organisationTable.id,
+                        collectionOrganisationMappingTable.organisationId
+                    )
+                )
                 .innerJoin(
                     latestCollections,
                     eq(
@@ -1144,12 +1279,19 @@ export class CollectionRepository extends BaseRepository {
                     collectionTable,
                     eq(collectionTable.versionId, latestCollections.versionId)
                 )
-                .innerJoin(
+                .leftJoin(
                     elementCounts,
                     eq(
                         elementCounts.collectionVersionId,
                         collectionTable.versionId
                     )
+                )
+                .leftJoin(
+                    this.selectOwnerOfCollection(
+                        tx.databaseConnection,
+                        collectionOrganisationMappingTable.collection
+                    ),
+                    sql`true`
                 )
                 .where(
                     and(
@@ -1161,19 +1303,27 @@ export class CollectionRepository extends BaseRepository {
                     )
                 );
 
-            const extendedCollections = await Promise.all(
-                result.map(async (collection) => {
-                    const relationship =
-                        await tx.getOrganisationRoleInCollection(
-                            collection.entityId,
-                            organisationId
-                        );
+            const extendedCollections = extendedCollectionVersionReducer(
+                await Promise.all(
+                    result.map(async (collection) => {
+                        const relationship =
+                            await tx.getOrganisationRoleInCollection(
+                                collection.entityId,
+                                organisationId
+                            );
 
-                    return {
-                        ...collection,
-                        relationship: relationship!,
-                    } satisfies ExtendedCollectionVersion;
-                })
+                        return {
+                            ...collection,
+                            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- it can be null if the collection has no elements (leftJoin)
+                            elementCount: collection.elementCount ?? 0,
+                            relationship: relationship!,
+                            userCollectionRelationships:
+                                collection.userCollectionRelationships
+                                    ? [collection.userCollectionRelationships]
+                                    : [],
+                        } satisfies ExtendedCollectionVersion;
+                    })
+                )
             );
 
             return extendedCollections;
@@ -1193,6 +1343,10 @@ export class CollectionRepository extends BaseRepository {
                 .select({
                     ...getTableColumns(collectionTable),
                     elementCount: elementCounts.elementCount,
+                    userCollectionRelationships: {
+                        name: organisationTable.name,
+                        id: organisationTable.id,
+                    },
                 })
                 .from(collectionTable)
                 .innerJoin(
@@ -1206,6 +1360,22 @@ export class CollectionRepository extends BaseRepository {
                         collectionTable.versionId
                     )
                 )
+                .leftJoin(
+                    collectionOrganisationMappingTable,
+                    and(
+                        eq(
+                            collectionOrganisationMappingTable.collection,
+                            collectionTable.entityId
+                        )
+                    )
+                )
+                .leftJoin(
+                    organisationTable,
+                    eq(
+                        organisationTable.id,
+                        collectionOrganisationMappingTable.organisationId
+                    )
+                )
                 .where(
                     and(
                         inArray(collectionTable.visibility, [
@@ -1216,12 +1386,30 @@ export class CollectionRepository extends BaseRepository {
                     )
                 );
 
-            return result.map(
-                (collection) =>
-                    ({
-                        ...collection,
-                        relationship: 'viewer',
-                    }) satisfies ExtendedCollectionVersion
+            return extendedCollectionVersionReducer(
+                await Promise.all(
+                    result.map(
+                        async (collection) =>
+                            ({
+                                ...collection,
+                                relationship: 'viewer',
+                                ownerOrganisationId: (
+                                    await this.getOwnerOfCollection(
+                                        tx.databaseConnection,
+                                        collection.entityId
+                                    )
+                                )?.organisationId,
+                                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- it can be null if the collection has no elements (leftJoin)
+                                elementCount: collection.elementCount ?? 0,
+                                userCollectionRelationships:
+                                    collection.userCollectionRelationships
+                                        ? [
+                                              collection.userCollectionRelationships,
+                                          ]
+                                        : [],
+                            }) satisfies ExtendedCollectionVersion
+                    )
+                )
             );
         });
     }
@@ -1383,7 +1571,7 @@ export class CollectionRepository extends BaseRepository {
      */
     public async UNSAFE_overwriteElements(
         stateVersion: number,
-        elementContents: VersionedElementContent[]
+        elementContents: TemplateVersionContent[]
     ): Promise<number> {
         return this.databaseConnection.transaction(async (tx) => {
             // from https://orm.drizzle.team/docs/guides/update-many-with-different-value
@@ -1396,18 +1584,23 @@ export class CollectionRepository extends BaseRepository {
 
             sqlChunks.push(sql`(case`);
 
-            for (const content of elementContents) {
-                if (content.entity?.versionId === undefined) {
+            for (const unsafeContent of elementContents) {
+                const versionId = unsafeContent.entity?.versionId;
+                if (versionId === undefined) {
                     console.error(
                         'versionId is required for UNSAFE_overwriteElements',
-                        content
+                        unsafeContent
                     );
                     continue;
                 }
+
+                const safeContent = { ...unsafeContent };
+                delete safeContent.entity;
+
                 sqlChunks.push(
-                    sql`when ${elementTable.versionId} = ${content.entity.versionId} then ${JSON.stringify(content)}::jsonb`
+                    sql`when ${elementTable.versionId} = ${versionId} then ${JSON.stringify(safeContent)}::jsonb`
                 );
-                ids.push(content.entity.versionId);
+                ids.push(versionId);
             }
 
             sqlChunks.push(sql`end)`);

@@ -12,9 +12,13 @@ import type {
     UUID,
     OrganisationId,
     GetExerciseTemplateResponseData,
+    VersionedCollectionPartial,
     ParticipantKey,
 } from 'fuesim-digital-shared';
 import {
+    collectionElementStructureToFlatTemplateArray,
+    gatherAllCollectionElements,
+    getAllCollectionElements,
     joinExerciseResponseDataSchema,
     socketIoTransports,
     validateExerciseExport,
@@ -47,6 +51,7 @@ import {
 import {
     selectActiveClients,
     selectExerciseState,
+    selectSelectedCollections,
 } from '../state/application/selectors/exercise.selectors';
 import {
     selectCurrentMainRole,
@@ -68,6 +73,7 @@ import { OptimisticActionHandler } from './optimistic-action-handler';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
 import { AuthService } from './auth.service.js';
 import { ApiService } from './api.service.js';
+import { CollectionService } from './exercise-element.service';
 
 /**
  * This Service deals with the state synchronization of a live exercise.
@@ -82,6 +88,7 @@ import { ApiService } from './api.service.js';
 export class ExerciseService {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly messageService = inject(MessageService);
+    private readonly collectionService = inject(CollectionService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly authService = inject(AuthService);
     private readonly apiService = inject(ApiService);
@@ -277,6 +284,62 @@ export class ExerciseService {
 
         // TODO: throw if `response.success` is false
         return this.optimisticActionHandler.proposeAction(action, optimistic);
+    }
+
+    public async addCollection(collection: VersionedCollectionPartial) {
+        const collectionData =
+            await this.collectionService.getCollectionVersion(collection);
+
+        const currentSelectedCollections = selectStateSnapshot(
+            selectSelectedCollections,
+            this.store
+        );
+
+        const collectionElements = await getAllCollectionElements(
+            [
+                ...currentSelectedCollections.filter(
+                    (f) => f.entityId !== collection.entityId
+                ),
+                {
+                    entityId: collection.entityId,
+                    versionId: collection.versionId,
+                },
+            ],
+            async (c) =>
+                this.collectionService.getElementsOfCollectionVersion(c)
+        );
+
+        if (collectionData === null) {
+            this.messageService.postError({
+                title: 'Sammlung konnte nicht hinzugefügt werden',
+                body: 'Die Sammlung konnte nicht geladen werden. Möglicherweise haben Sie keinen Zugriff auf die Sammlung.',
+            });
+            return;
+        }
+        await this.collectionService.getCollectionVersionStructure(
+            collection.entityId,
+            collection.versionId
+        );
+
+        await this.proposeAction({
+            type: '[Collection] Add Collection',
+            overwriteTemplates: collectionElementStructureToFlatTemplateArray(
+                collectionElements,
+                (element) =>
+                    gatherAllCollectionElements(collectionElements).find(
+                        (template) => template.versionId === element.versionId
+                    )?.content
+            ),
+            collection: {
+                entityId: collectionData.entityId,
+                versionId: collectionData.versionId,
+            },
+        });
+        this.messageService.postMessage({
+            title: 'Sammlung wurde hinzugefügt.',
+            body: 'Sie können die Elemente der Sammlung nun in der Übung verwenden.',
+            color: 'success',
+        });
     }
 
     private readonly stopNotifications$ = new Subject<void>();

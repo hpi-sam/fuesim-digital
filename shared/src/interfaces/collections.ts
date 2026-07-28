@@ -6,8 +6,8 @@ import {
     collectionVersionIdSchema,
     elementEntityIdSchema,
     elementVersionIdSchema,
+    versionedCollectionPartialSchema,
 } from '../marketplace/models/versioned-id-schema.js';
-import { collectionRelationshipTypeSchema } from '../marketplace/models/collection-relationship.js';
 import {
     collectionVersionSchema,
     extendedCollectionVersionSchema,
@@ -15,11 +15,13 @@ import {
 import {
     collectionElementsSchema,
     collectionElementsSingleSchema,
+    collectionVersionStructureWithMetadataSchema,
 } from '../marketplace/models/collection-elements.js';
 import { collectionVisibilitySchema } from '../marketplace/models/collection-visibility.js';
 import { templateVersionSchema } from '../marketplace/models/versioned-elements.js';
-import { versionedElementContentSchema } from '../marketplace/models/versioned-element-content.js';
+import { templateVersionContentSchema } from '../marketplace/models/versioned-element-content.js';
 import { organisationIdSchema } from '../ids.js';
+import { collectionMembershipRole } from '../marketplace/models/collection-relationship.js';
 import { Route, stringToDate } from './utils.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -28,7 +30,7 @@ export namespace Marketplace {
     export namespace Element {
         export const Create = new Route({
             request: z.object({
-                data: z.array(versionedElementContentSchema),
+                data: z.array(templateVersionContentSchema),
             }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,
@@ -59,7 +61,7 @@ export namespace Marketplace {
 
         export const Edit = new Route({
             request: z.object({
-                data: versionedElementContentSchema,
+                data: templateVersionContentSchema,
                 conflictResolution: editConflictResolutionSchema.optional(),
             }),
             response: z.object({
@@ -123,7 +125,10 @@ export namespace Marketplace {
 
         export const Create = new Route({
             request: z.object({
-                title: z.string().trim().nonempty(),
+                title: z
+                    .string()
+                    .trim()
+                    .nonempty('Bitte geben Sie einen Titel ein'),
                 organisationId: organisationIdSchema,
             }),
             response: z.object({
@@ -131,13 +136,17 @@ export namespace Marketplace {
             }),
         });
 
-        export const GetCollectionRole = new Route({
+        export const GetCollectionUserRole = new Route({
             response: z.object({
-                result: collectionRelationshipTypeSchema.nullable(),
+                result: collectionMembershipRole.nullable(),
             }),
         });
 
         export const JoinByJoinCode = new Route({
+            request: z.object({
+                joinCode: z.string().trim().nonempty(),
+                organisationId: organisationIdSchema,
+            }),
             response: z.object({
                 result: collectionEntityIdSchema,
             }),
@@ -149,28 +158,51 @@ export namespace Marketplace {
             }),
         });
 
+        export const GetUserRoleInCollection = new Route({
+            response: z.object({
+                result: collectionMembershipRole.nullable(),
+            }),
+        });
+
+        export const AddCollectionOrganisation = new Route({
+            request: z.object({
+                organisationId: organisationIdSchema,
+            }),
+            response: z.object({
+                result: z.object({
+                    status: z.literal(['success']),
+                }),
+            }),
+        });
+
+        export const SetCollectionOrganisationOwner = new Route({
+            request: z.object({
+                organisationId: organisationIdSchema,
+            }),
+        });
+
         export const GetCollectionOrganisations = new Route({
             response: z.object({
                 result: z.array(
                     z.object({
-                        id: z.string(),
+                        id: organisationIdSchema,
                         name: z.string(),
                         owner: z.boolean(),
+                        personalOrganisationOf: z.string().nullable(),
                     })
                 ),
             }),
         });
 
-        export const PatchCollectionMember = new Route({
+        export const RemoveCollectionOrganisation = new Route({
             request: z.object({
-                userId: z.string(),
-                role: collectionRelationshipTypeSchema,
+                organisationId: organisationIdSchema,
             }),
         });
 
-        export const DeleteCollectionMember = new Route({
-            request: z.object({
-                userId: z.string(),
+        export const GetCollectionDependencies = new Route({
+            response: z.object({
+                result: z.array(versionedCollectionPartialSchema),
             }),
         });
 
@@ -189,6 +221,12 @@ export namespace Marketplace {
         export const DeleteInviteCode = new Route({
             response: z.object({
                 status: z.literal(['success']),
+            }),
+        });
+
+        export const LeaveCollection = new Route({
+            request: z.object({
+                organisationId: organisationIdSchema,
             }),
         });
 
@@ -220,6 +258,12 @@ export namespace Marketplace {
             }),
         });
 
+        export const LoadForOrganisation = new Route({
+            response: z.object({
+                result: z.array(extendedCollectionVersionSchema),
+            }),
+        });
+
         export const LoadUsable = new Route({
             response: z.object({
                 result: z.array(extendedCollectionVersionSchema),
@@ -238,7 +282,7 @@ export namespace Marketplace {
 
         export const GetCollectionVersion = new Route({
             response: z.object({
-                result: collectionVersionSchema,
+                result: collectionVersionSchema.nullable(),
             }),
         });
 
@@ -254,6 +298,7 @@ export namespace Marketplace {
                 acceptedElementChanges: z.array(elementVersionIdSchema),
             }),
             response: z.object({
+                importedSet: collectionElementsSingleSchema,
                 newCollectionVersionId: collectionVersionIdSchema,
             }),
         });
@@ -281,10 +326,14 @@ export namespace Marketplace {
 
         export const Duplicate = new Route({
             request: z.object({
+                title: z
+                    .string()
+                    .trim()
+                    .nonempty('Bitte geben Sie einen Titel ein'),
                 targetOrganisationId: organisationIdSchema,
             }),
             response: z.object({
-                createdSet: collectionVersionSchema,
+                createdCollection: collectionVersionSchema,
             }),
         });
 
@@ -304,6 +353,12 @@ export namespace Marketplace {
 
         export const GetElementsOfCollectionVersion = new Route({
             response: collectionElementsSchema,
+        });
+
+        export const GetElementStructureOfCollectionVersion = new Route({
+            response: z.object({
+                result: collectionVersionStructureWithMetadataSchema,
+            }),
         });
 
         class TypedSchema<D, T> {
@@ -362,7 +417,7 @@ export namespace Marketplace {
                     elements: collectionElementsSchema,
                     publishedCollection: collectionVersionSchema,
                     publishedElements: collectionElementsSchema,
-                    userRelationship: collectionRelationshipTypeSchema,
+                    userRelationship: collectionMembershipRole,
                 })
             );
 

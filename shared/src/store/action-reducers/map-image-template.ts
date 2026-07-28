@@ -9,6 +9,7 @@ import {
 } from '../../models/map-image-template.js';
 import { type UUID } from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { getTemplates } from '../../models/template.js';
 
 export const addMapImageTemplateActionSchema = z.strictObject({
     type: z.literal('[MapImageTemplate] Add mapImageTemplate'),
@@ -42,12 +43,16 @@ export namespace MapImageTemplatesActionReducers {
             type: addMapImageTemplateActionSchema.shape.type.value,
             actionSchema: addMapImageTemplateActionSchema,
             reducer: (draftState, { mapImageTemplate }) => {
-                if (draftState.mapImageTemplates[mapImageTemplate.id]) {
+                if (
+                    getTemplates(draftState, 'mapImageTemplate')[
+                        mapImageTemplate.id
+                    ]
+                ) {
                     throw new ReducerError(
                         `MapImageTemplate with id ${mapImageTemplate.id} already exists`
                     );
                 }
-                draftState.mapImageTemplates[mapImageTemplate.id] =
+                draftState.templates[mapImageTemplate.id] =
                     cloneDeepMutable(mapImageTemplate);
                 return draftState;
             },
@@ -73,7 +78,7 @@ export namespace MapImageTemplatesActionReducers {
             actionSchema: deleteMapImageTemplateActionSchema,
             reducer: (draftState, { id }) => {
                 getMapImageTemplate(draftState, id);
-                delete draftState.mapImageTemplates[id];
+                delete draftState.templates[id];
                 return draftState;
             },
             rights: 'trainer',
@@ -84,7 +89,7 @@ function getMapImageTemplate(
     state: WritableDraft<ExerciseState>,
     id: UUID
 ): WritableDraft<MapImageTemplate> {
-    const mapImageTemplate = state.mapImageTemplates[id];
+    const mapImageTemplate = getTemplates(state, 'mapImageTemplate')[id];
     if (!mapImageTemplate) {
         throw new ReducerError(`MapImageTemplate with id ${id} does not exist`);
     }

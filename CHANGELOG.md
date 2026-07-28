@@ -13,6 +13,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - There is now a banner that is displayed when the application is unable to start properly, informing the user about potential causes.
 - New participants joining a parallel exercise after it started now get fast-forwarded to be in sync with all other participants.
 - Users can now export all their user-related data when logged in.
+- Add new way to manage and share exercise elements via a new Collections-Feature
 
 ### Changed
 

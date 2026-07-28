@@ -68,7 +68,6 @@ describe('A trainer on the exercise page', () => {
     });
 
     it('can interact with the map', () => {
-        cy.get('[data-cy=viewportsTransferPointsAccordionButton]').click();
         cy.log('drag a viewport to the map').dragToMap(
             '[data-cy=draggableViewportDiv]'
         );

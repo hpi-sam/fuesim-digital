@@ -27,27 +27,29 @@
             </div>
             <div class="col-lg-5 col-md-12">
                 <div class="card bg-secondary-subtle">
-                    <div class="card-body row mb-0 p-3 px-4">
+                    <div
+                        class="card-body row mb-0 p-3 px-4 align-items-stretch"
+                    >
                         @let exerciseInstances =
                             parallelExerciseService.exerciseInstances();
                         @let leadingExercise = exerciseInstances[0];
-                        <div class="col h2">
-                            <span
-                                class="badge rounded-pill bg-light text-dark state-badge h-100 px-3 m-0 d-flex align-items-center"
+                        <div class="col h2 mb-0">
+                            <div
+                                class="badge rounded-pill bg-light text-dark state-badge h-100 w-100 px-3 m-0 d-flex align-items-center justify-content-center"
                             >
-                                <span class="text-center w-100">
+                                <div>
                                     <i class="bi bi-people me-1"></i>
                                     {{ exerciseInstances.length }}
-                                </span>
-                            </span>
+                                </div>
+                            </div>
                         </div>
                         @if (leadingExercise) {
                             <app-exercise-state-badge-inner
-                                class="col h1"
+                                class="col h1 mb-0"
                                 [exerciseStatus]="leadingExercise.currentStatus"
                                 [currentTime]="leadingExercise.currentTime"
                             />
-                            <div class="col h2">
+                            <div class="col h2 mb-0">
                                 @if (exercise.userRole !== 'viewer') {
                                     @if (
                                         leadingExercise.currentStatus !==
@@ -55,7 +57,7 @@
                                     ) {
                                         <button
                                             type="button"
-                                            class="btn btn-primary btn-lg rounded-pill w-100 h-100 px-3 m-0"
+                                            class="btn btn-primary btn-lg w-100 h-100 px-3 m-0"
                                             (click)="
                                                 parallelExerciseService.startParallelExercise()
                                             "
@@ -65,7 +67,7 @@
                                     } @else {
                                         <button
                                             type="button"
-                                            class="btn btn-primary btn-lg rounded-pill w-100 h-100 px-3 m-0"
+                                            class="btn btn-primary btn-lg w-100 h-100 px-3 m-0"
                                             (click)="
                                                 parallelExerciseService.pauseParallelExercise()
                                             "
@@ -76,9 +78,9 @@
                                 }
                             </div>
                         } @else {
-                            <div class="col w-100 h-100">
-                                <p class="h2 text-danger text-center">
-                                    Warte auf Teilnehmende.
+                            <div class="col mb-0">
+                                <p class="h4 text-center mb-0">
+                                    Warte auf Teilnehmende
                                 </p>
                             </div>
                         }
@@ -91,14 +93,10 @@
             <ng-container ngbNavItem="invite">
                 <a ngbNavLink>Teilnehmende einladen</a>
                 <ng-template ngbNavContent>
-                    <div class="row my-5">
-                        <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-md-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div
-                                    class="card-header h4 d-flex align-content-center"
-                                >
-                                    <div class="pb-3">Teilnehmende</div>
-                                </div>
+                                <h2 class="card-header h4">Teilnehmende</h2>
                                 <div class="card-body py-3">
                                     <h1 class="m-3 text-center">
                                         Aktuell
@@ -139,16 +137,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-md-12 col-lg-6 mb-4">
                             <div class="card h-100">
                                 <div
-                                    class="card-header h4 d-flex align-content-center"
+                                    class="card-header d-flex align-items-center"
                                 >
-                                    <div class="pb-3">Übung beitreten</div>
+                                    <h2 class="h4 mb-0">Übung beitreten</h2>
                                     <div class="flex-grow-1"></div>
                                     <button
                                         app-copy-button
-                                        class="btn bt-lg btn-outline-secondary"
+                                        class="btn btn-outline-secondary"
                                         [value]="participantUrl()"
                                         text="Teilnehmerlink"
                                         ngbTooltip="Link kopieren"
@@ -196,9 +194,10 @@
                 <a ngbNavLink>Teilnehmende verwalten</a>
                 <ng-template ngbNavContent>
                     <div class="card row my-5">
-                        <div class="card-header h4">
-                            Teilnehmende
-                            <span class="badge bg-secondary float-end">
+                        <div class="card-header d-flex align-items-center">
+                            <h2 class="h4 mb-0">Teilnehmende</h2>
+                            <div class="flex-grow-1"></div>
+                            <span class="badge bg-secondary">
                                 <i class="bi bi-people me-1"></i>
                                 {{
                                     parallelExerciseService.exerciseInstances()

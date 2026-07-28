@@ -23,6 +23,7 @@ import {
     PatchParallelExerciseRequestData,
     ParallelExerciseKey,
     getExerciseConfigResponseDataSchema,
+    getBannerDataSchema,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -220,5 +221,11 @@ export class ApiService {
                 undefined
             )
         ).then(postJoinParallelExerciseResponseDataSchema.parse);
+    }
+
+    public getBanner() {
+        return httpResource(() => `${httpOrigin}/api/banner/`, {
+            parse: getBannerDataSchema.parse,
+        });
     }
 }

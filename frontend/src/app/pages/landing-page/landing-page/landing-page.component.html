@@ -1,6 +1,14 @@
 <app-header />
 
 <main class="container">
+    @if (banner.hasValue()) {
+        @let bannerValue = banner.value();
+        <div
+            [class]="'alert alert-' + bannerValue.type"
+            role="alert"
+            [innerHTML]="bannerValue.message | sanitizeHtml"
+        ></div>
+    }
     <div class="row mb-4 d-flex">
         <div class="col">
             <div class="p-4 bg-light rounded-3 h-100">

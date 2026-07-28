@@ -327,13 +327,13 @@ Maßnahmen sind kein festes Repertoire, sondern ein Baukasten: Jede Übungsleitu
 Aus diesen Bausteinen lassen sich beliebige weitere Maßnahmen bilden, zum Beispiel die Festlegung eines Bereitstellungsraums ([Freihandzeichnung](#freihandzeichnung) + [Einsatztagebucheintrag](#einsatztagebucheintrag)), die Anforderung eines Fachberaters ([Manuelle Bestätigung](#manuelle-bestätigung) + [Verzögerung](#verzögerung) + [Rückmeldung](#rückmeldung)) oder eine Rückfrage bei der Einsatzleitung ([Manuelle Bestätigung](#manuelle-bestätigung) + [Verzögerung](#verzögerung) + [Rückmeldung](#rückmeldung) mit vorbereiteter Antwort).
 
 > [!TIP]
-> Kategorien sollten nach der Art der Handlung benannt werden, nicht nach dem technischen Schritt-Typ – also z. B. „Nachforderungen“, „Meldungen“ und „Raumordnung“. Für die Teilnehmenden sind die Kategorien die oberste Ebene der Maßnahmenleiste und damit ihr wichtigster Orientierungspunkt.
+> Kategorien sollten nach der Art der Handlung benannt werden – also z. B. „Nachforderungen“, „Meldungen“ oder „Raumordnung“ – und nicht nach dem Schritt-Typ. Für die Teilnehmenden sind die Kategorien die oberste Ebene der Maßnahmenleiste und damit ihr wichtigster Orientierungspunkt.
 
 > [!TIP]
-Eine Übung auch vollständig ohne Maßnahmen durchgeführt werden. Die Maßnahmenleiste erst erscheint, wenn mindestens eine Maßnahme vorhanden ist.
+Eine Übung kann auch vollständig ohne Maßnahmen durchgeführt werden. Die Maßnahmenleiste erscheint nur, wenn mindestens eine Maßnahme vorhanden ist.
 
 > [!NOTE]
-> Es gibt keine gesonderte Übersicht über die bereits ausgeführten Maßnahmen. Jede Ausführung erzeugt jedoch einen Eintrag im [Log](5_evaluation.md#log) mit der Kennzeichnung „Maßnahme“, sodass sich der Ablauf im Nachhinein nachvollziehen lässt. Mit der für eine der nächsten Versionen geplanten didaktischen Übersicht soll zudem eine automatische Kontrolle von bestimmten Maßnahmendurchführungen ermöglicht werden.
+> Es gibt keine gesonderte Übersicht über die bereits ausgeführten Maßnahmen. Jede Ausführung erzeugt jedoch einen Eintrag im [Log](5_evaluation.md#log) mit der Kennzeichnung „Maßnahme“, sodass sich der Ablauf im Nachhinein nachvollziehen lässt. Mit der für eine der nächsten Versionen geplanten didaktischen Übersicht soll zudem eine automatische Kontrolle bestimmter Maßnahmendurchführungen ermöglicht werden.
 
 ### Einstellungsmöglichkeiten
 

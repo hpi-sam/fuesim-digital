@@ -320,7 +320,7 @@ Mit einem Klick auf eine Maßnahme wird diese gestartet. Die Schritte der Maßna
 Maßnahmen sind kein festes Repertoire, sondern ein Baukasten: Jede Übungsleitung stellt sich aus den verfügbaren Schritt-Typen die Maßnahmen zusammen, die zum jeweiligen Szenario und Lernziel passen. Beispiele für mögliche Maßnahmen sind:
 
 - **Stichworterhöhung** – eine [Verzögerung](#verzögerung) von 30 Sekunden, gefolgt von einer [Alarmierung](#alarmierung). Die Teilnehmenden fordern eigenständig Kräfte nach, müssen aber – wie im echten Einsatz – kurz auf die Rückmeldung der Leitstelle warten. Diese Maßnahmenkonfiguration ist das Grundmuster für alle Maßnahmen, bei denen die Teilnehmenden etwas anfordern, das nicht sofort verfügbar ist.
-- **Kurzmeldung abgeben** – ein [Einsatztagebucheintrag](#einsatztagebucheintrag), der bearbeitbar ist und bestätigt werden muss. Die Teilnehmenden formulieren eine Lagemeldung selbst; sie erscheint anschließend im Einsatztagebuch und steht damit auch für die [Auswertung](5_evaluation.md) zur Verfügung. Diese Maßnahmenkonfiguration ist das Grundmuster für alle Maßnahmen, bei denen die Teilnehmenden etwas melden oder dokumentieren sollen.
+- **Kurzmeldung abgeben** – ein [Einsatztagebucheintrag](#einsatztagebucheintrag), der bearbeitbar ist und bestätigt werden muss. Die Teilnehmenden formulieren eine Lagemeldung selbst; sie erscheint anschließend im Einsatztagebuch und steht damit auch für die [Auswertung](6_evaluation.md) zur Verfügung. Diese Maßnahmenkonfiguration ist das Grundmuster für alle Maßnahmen, bei denen die Teilnehmenden etwas melden oder dokumentieren sollen.
 - **Gefahrenbereich einzeichnen** – eine [Freihandzeichnung](#freihandzeichnung) mit aktivierter Option _Vorherige Maßnahme ersetzen?_. Die Teilnehmenden markieren den Gefahrenbereich; zeichnen sie ihn später erneut, ersetzt die neue Fläche die alte, statt sich mit ihr zu überlagern. Diese Maßnahmenkonfiguration ist das Grundmuster für alle Maßnahmen, bei denen eine Entscheidung räumlich dargestellt wird und sich im Laufe der Übung ändern kann.
 - **Absperrung anordnen** – eine [Linienzeichnung](#linienzeichnung), gefolgt von einer [Verzögerung](#verzögerung). Die Teilnehmenden legen die Absperrgrenze fest und warten anschließend darauf, dass die Polizei sie „umsetzt“.
 
@@ -330,10 +330,10 @@ Aus diesen Bausteinen lassen sich beliebige weitere Maßnahmen bilden, zum Beisp
 > Kategorien sollten nach der Art der Handlung benannt werden – also z. B. „Nachforderungen“, „Meldungen“ oder „Raumordnung“ – und nicht nach dem Schritt-Typ. Für die Teilnehmenden sind die Kategorien die oberste Ebene der Maßnahmenleiste und damit ihr wichtigster Orientierungspunkt.
 
 > [!TIP]
-Eine Übung kann auch vollständig ohne Maßnahmen durchgeführt werden. Die Maßnahmenleiste erscheint nur, wenn mindestens eine Maßnahme vorhanden ist.
+> Eine Übung kann auch vollständig ohne Maßnahmen durchgeführt werden. Die Maßnahmenleiste erscheint nur, wenn mindestens eine Maßnahme vorhanden ist.
 
 > [!NOTE]
-> Es gibt keine gesonderte Übersicht über die bereits ausgeführten Maßnahmen. Jede Ausführung erzeugt jedoch einen Eintrag im [Log](5_evaluation.md#log) mit der Kennzeichnung „Maßnahme“, sodass sich der Ablauf im Nachhinein nachvollziehen lässt. Mit der für eine der nächsten Versionen geplanten didaktischen Übersicht soll zudem eine automatische Kontrolle bestimmter Maßnahmendurchführungen ermöglicht werden.
+> Es gibt keine gesonderte Übersicht über die bereits ausgeführten Maßnahmen. Jede Ausführung erzeugt jedoch einen Eintrag im [Log](6_evaluation.md#log) mit der Kennzeichnung „Maßnahme“, sodass sich der Ablauf im Nachhinein nachvollziehen lässt. Mit der für eine der nächsten Versionen geplanten didaktischen Übersicht soll zudem eine automatische Kontrolle bestimmter Maßnahmendurchführungen ermöglicht werden.
 
 ### Einstellungsmöglichkeiten
 
@@ -395,7 +395,7 @@ Wählen die Teilnehmenden <kbd>Abbrechen</kbd>, wird die gesamte Maßnahme abgeb
 
 #### Rückmeldung
 
-Den Teilnehmenden wird ein fester Text angezeigt, beispielsweise eine simulierte Antwort der Leitstelle oder einer nachgeordneten Führungskraft. Mit dem Schritt "Rückmeldung" kann zudem der Erkundungsvorgang mit abgebildet werden, da allgemeine Beobachtungen (wie z.B. das Wetter oder die Windrichtung) besser als Maßnahme statt mit einem an eine Kartenposition gebundenen Erkundungselement dargestellt sind.
+Den Teilnehmenden wird ein fester Text angezeigt, beispielsweise eine simulierte Antwort der Leitstelle oder einer nachgeordneten Führungskraft. Mit dem Schritt "Rückmeldung" kann zudem der Erkundungsvorgang mit abgebildet werden, da allgemeine Beobachtungen (wie z.B. das Wetter oder die Windrichtung) besser als Maßnahme statt mit einem an eine Kartenposition gebundenen [Erkundungselement](#erkundungselemente) dargestellt sind.
 
 - <kbd>**Hinweistext**</kbd>
 - <kbd>**Rückmeldung**</kbd>: Der anzuzeigende Text.
@@ -525,4 +525,4 @@ Zeichnungen haben keine eigenen Einstellungen. Die Strich- und Füllfarbe werden
 
 Zeichnungen bilden Führungsentscheidungen ab, die sich auf den Raum beziehen: den Gefahrenbereich, die Absperrgrenze, den Bereitstellungsraum, die Lage der Patientenablage oder die Anfahrts- und Abfahrtswege.
 
-Da mit jeder Zeichnung ein Log-Eintrag der zugehörigen Maßnahme entsteht, lässt sich in der [Auswertung](5_evaluation.md) auch nachvollziehen, wann eine Entscheidung getroffen wurde – etwa, wie lange es gedauert hat, bis der Gefahrenbereich festgelegt war.
+Da mit jeder Zeichnung ein Log-Eintrag der zugehörigen Maßnahme entsteht, lässt sich in der [Auswertung](6_evaluation.md) auch nachvollziehen, wann eine Entscheidung getroffen wurde – etwa, wie lange es gedauert hat, bis der Gefahrenbereich festgelegt war.

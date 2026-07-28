@@ -52,9 +52,8 @@ export namespace MapImageTemplatesActionReducers {
                         `MapImageTemplate with id ${mapImageTemplate.id} already exists`
                     );
                 }
-                getTemplates(draftState, 'mapImageTemplate')[
-                    mapImageTemplate.id
-                ] = cloneDeepMutable(mapImageTemplate);
+                draftState.templates[mapImageTemplate.id] =
+                    cloneDeepMutable(mapImageTemplate);
                 return draftState;
             },
             rights: 'trainer',
@@ -79,7 +78,7 @@ export namespace MapImageTemplatesActionReducers {
             actionSchema: deleteMapImageTemplateActionSchema,
             reducer: (draftState, { id }) => {
                 getMapImageTemplate(draftState, id);
-                delete getTemplates(draftState, 'mapImageTemplate')[id];
+                delete draftState.templates[id];
                 return draftState;
             },
             rights: 'trainer',

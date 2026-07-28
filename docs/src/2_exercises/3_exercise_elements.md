@@ -175,6 +175,34 @@ Patienten können während der laufenden Übung auch von Teilnehmenden verschobe
 
 Die medizinischen Details und das manuelle Auswählen einer Sichtungsfarbe durch Teilnehmende im Tab <kbd>Vorsichtung</kbd> ermöglichen, dass Teilnehmende die Besatzung eines ersteintreffenden Rettungsmittels spielen und entsprechend die Vorsicht übernehmen müssen. Sobald weitere Kräfte eintreffen, sollten die Teilnehmenden allerdings die Rolle einer Führungskraft einnehmen und die unterstellten Einsatzkräfte vorsichten lassen. Dazu muss, wie bei der medizinischen Behandlung, das entsprechende Personal neben die Patienten geschoben werden, bis eine Verbindungslinie erscheint. Pro Patient wird eine Minute zur Vorsichtung benötigt.
 
+## Technische Herausforderungen
+
+> [!WARNING]
+> Das Erstellen von eigenen technischen Herausforderungen ist derzeit noch in Entwicklung.
+> Es gibt im Moment nur eine geringe Menge an Vorlagen und die Bearbeitung ist nur sehr eingeschränkt möglich.
+
+Neben Patienten kann es viele weitere Herausforderungen in einem Einsatz geben.
+Technische Herausforderungen sind in der FüSim Digital der Überbegriff für Kartenelemente, wo von Personal konkrete Aufgaben erfüllt werden müssen.
+
+![Übungsleitendenansicht einer technischen Herausforderung](exercise_elements_technical_challenge_overview.png)
+
+### Interaktion auf der Übungskarte
+
+Analog zu den Ansichten kann mit einem anhaltenden Klick (oder einer Berührung auf einem Touch-Gerät) auf die Fläche oder
+den Rand eine technische Herausforderung verschoben werden.
+Wird die Ecke angeklickt oder berührt, kann die Größe geändert werden.
+
+Teilnehmende können Personal per Drag-and-Drop auf die technischen Herausforderungen ziehen und bekommen dann mögliche Aufgaben angezeigt.
+
+![Zuweisen einer Aufgabe](exercise_elements_technical_challenge_assignment.png)
+
+Teilnehmende sehen, wenn sie eine technische Herausforderung anklicken, ein Pop-up mit den dynamischen Erkundungstexten aller Teilherausforderungen.
+Siehe [Erkundungselemente](#erkundungselemente) für Details.
+
+### Einstellungsmöglichkeiten
+
+Bei Vorlagen von technischen Herausforderungen kann man eigene Erkundungstexte für die verschiedenen Zustände aller Teilherausforderungen einstellen.
+
 ## Bilder
 
 Bei den Bildern handelt es sich um frei platzierbare, dekorative Übungselemente.

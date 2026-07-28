@@ -61,30 +61,30 @@ export namespace StateMachineTesting {
     // --- Contents ---
     const initialContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
-        content: '<p>Ein brennender PKW. Der Lenker ist eingeklemmt.</p>',
+        content: '<p>Ein brennender PKW. Der Fahrer ist eingeklemmt.</p>',
     };
     const onlyExtinguishedContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
-        content: '<p>Ein gelöschter PKW. Der Lenker ist eingeklemmt.</p>',
+        content: '<p>Ein gelöschter PKW. Der Fahrer ist eingeklemmt.</p>',
     };
     const onlyDeadContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
         content:
-            '<p>Ein brennender PKW. Der Lenker schaut schwer verletzt aus und reagiert nicht.</p>',
+            '<p>Ein brennender PKW. Der Fahrer sieht schwer verletzt aus und reagiert nicht.</p>',
     };
     const onlyTreatedContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
-        content: '<p>Ein brennender PKW. Der Lenker wurde bereits befreit.</p>',
+        content: '<p>Ein brennender PKW. Der Fahrer wurde bereits befreit.</p>',
     };
     const patientDeadButExtinguishedContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
         content:
-            '<p>Der PKW ist gelöscht. Der Patient gibt keine Lebenszeichen von sich.</p>',
+            '<p>Der PKW ist gelöscht. Der Fahrer gibt keine Lebenszeichen von sich.</p>',
     };
     const treatedAndExtinguishedContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
         content:
-            '<p>Der PKW ist gelöscht. Der Lenker wurde erfolgreich befreit.</p>',
+            '<p>Der PKW ist gelöscht. Der Fahrer wurde erfolgreich befreit.</p>',
     };
     const burnedOutAndPatientDeadContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
@@ -94,7 +94,7 @@ export namespace StateMachineTesting {
     const burnedOutButRescuedContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
         content:
-            '<p>Ein ausgebrannter PKW. Der Lenker wurde bereits befreit.</p>',
+            '<p>Ein ausgebrannter PKW. Der Fahrer wurde bereits befreit.</p>',
     };
 
     // --- States ---
@@ -452,7 +452,7 @@ export namespace StateMachineTesting {
         {
             type: 'userGeneratedContent',
             content:
-                '<p>Die vermisste Person wurde lokalisiert. Sie ist unter Trümmern eingeklemmt und benötigt technische Befreiung.</p>',
+                '<p>Die vermisste Person wurde lokalisiert. Sie ist unter Trümmern eingeklemmt und benötigt technische Rettung.</p>',
         }
     );
     export const sm2PersonMissing = newTechnicalChallengeState(
@@ -549,7 +549,7 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
         stateMachines: {
             [stateMachineId]: {
                 id: stateMachineId,
-                name: 'Beispiel Automat',
+                name: 'Brand',
                 initialStateId: initialState.id,
                 currentStateId: initialState.id,
                 states,

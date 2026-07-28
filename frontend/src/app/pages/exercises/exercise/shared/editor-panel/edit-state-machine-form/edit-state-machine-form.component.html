@@ -13,8 +13,7 @@
         @for (state of stateMachineForm.states; track $index) {
             <div class="card" style="min-width: 18em">
                 <div class="card-body">
-                    <h5 class="card-title">{{ state.title().value() }}</h5>
-                    <hr />
+                    <h5 class="card-title mb-2">{{ state.title().value() }}</h5>
                     <h6 class="card-subtitle text-muted">Erkundungstext:</h6>
                     <div class="card-text">
                         <app-user-generated-content-editor

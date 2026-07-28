@@ -1,5 +1,6 @@
 import { createSelector } from '@ngrx/store';
 import type {
+    Drawing,
     MapImage,
     Material,
     Patient,
@@ -11,6 +12,7 @@ import type {
     WithPosition,
     RestrictedZone,
     Viewport,
+    TechnicalChallenge,
 } from 'fuesim-digital-shared';
 import {
     newMapCoordinatesAt,
@@ -18,6 +20,8 @@ import {
     isOnMap,
     isInViewport,
     isElementGenericScoutable,
+    scoutableImages,
+    currentStateOf,
 } from 'fuesim-digital-shared';
 
 import { pickBy } from 'lodash-es';
@@ -27,6 +31,7 @@ import type { ScoutableIndicator } from '../../../shared/types/scoutable-indicat
 import { selectOwnClientId } from './application.selectors';
 import {
     selectClients,
+    selectDrawings,
     selectRestrictedZones,
     selectMapImages,
     selectMaterials,
@@ -38,6 +43,7 @@ import {
     selectViewports,
     selectScoutables,
     scoutableElementSelectors,
+    selectTechnicalChallenges,
 } from './exercise.selectors';
 
 /**
@@ -122,12 +128,16 @@ export const selectVisibleMapImages = selectVisibleElementsFactory<MapImage>(
     // TODO: MapImages could get very big. Therefore its size must be taken into account. The current implementation is a temporary solution.
     (element, viewport) => true
 );
+export const selectVisibleTechnicalChallenges =
+    selectVisibleElementsFactory<TechnicalChallenge>(selectTechnicalChallenges);
 export const selectVisibleTransferPoints =
     selectVisibleElementsFactory<TransferPoint>(selectTransferPoints);
 export const selectVisibleSimulatedRegions =
     selectVisibleElementsFactory<SimulatedRegion>(selectSimulatedRegions);
 export const selectVisibleRestrictedZones =
     selectVisibleElementsFactory<RestrictedZone>(selectRestrictedZones);
+export const selectVisibleDrawings =
+    selectVisibleElementsFactory<Drawing>(selectDrawings);
 
 export const selectVisibleCateringLines = createSelector(
     selectRestrictedViewport,
@@ -174,9 +184,16 @@ export const selectVisibleScoutableIndicators = createSelector(
     selectCurrentMainRole,
     selectScoutables,
     selectRestrictedViewport,
+    selectVisibleTechnicalChallenges,
     ...scoutableElementSelectors,
-    (currentRole, scoutables, viewport, ...elementSelectors) =>
-        elementSelectors
+    (
+        currentRole,
+        scoutables,
+        viewport,
+        technicalChallenges,
+        ...elementSelectors
+    ) => {
+        const normalScoutables = elementSelectors
             .flatMap((selector) =>
                 Object.values(selector)
                     .filter(
@@ -186,8 +203,15 @@ export const selectVisibleScoutableIndicators = createSelector(
                             // Hide the indicator for map images that already have the generic scoutable icon as image
                             !isElementGenericScoutable(element)
                     )
-                    .map((element): ScoutableIndicator => {
+                    .map((element): ScoutableIndicator | null => {
                         const scoutable = scoutables[element.scoutableId!]!;
+
+                        if (
+                            currentRole === 'participant' &&
+                            !scoutable.isVisibleForParticipants
+                        ) {
+                            return null;
+                        }
                         const elementPos = currentCoordinatesOf(element);
 
                         let offset;
@@ -202,31 +226,73 @@ export const selectVisibleScoutableIndicators = createSelector(
                             elementPos.x + offset.x,
                             elementPos.y + offset.y
                         );
+
+                        const imageKey1 =
+                            scoutable.viewedByParticipants &&
+                            currentRole !== 'participant'
+                                ? 'viewed'
+                                : 'unviewed';
+                        console.log(
+                            imageKey1,
+                            currentRole,
+                            scoutable.viewedByParticipants
+                        );
+                        const imageKey2 =
+                            element.type === 'patient' ? 'patient' : 'generic';
                         return {
                             id: `${scoutable.id}:${element.id}`,
                             position: indicatorPos,
                             scoutableElementType: element.type,
                             scoutableElementId: element.id,
-                            isVisibleForParticipants:
-                                scoutable.isVisibleForParticipants,
+                            imageUrl: scoutableImages[imageKey1][imageKey2],
                             height,
                         };
                     })
             )
-            /* for performance, we dont select indicators out of view. */
+            /* for performance, we don't select indicators out of view. */
             .filter(
                 (scoutableIndicator) =>
+                    scoutableIndicator !== null &&
                     (!viewport ||
-                        isInViewport(viewport, scoutableIndicator.position)) &&
-                    (scoutableIndicator.isVisibleForParticipants ||
-                        currentRole === 'trainer')
-            )
-            .reduce<{ [id: `${UUID}:${UUID}`]: ScoutableIndicator }>(
-                (scoutableIndicatorsObject, scoutableIndicator) => {
-                    scoutableIndicatorsObject[scoutableIndicator.id] =
-                        scoutableIndicator;
-                    return scoutableIndicatorsObject;
-                },
-                {}
-            )
+                        isInViewport(viewport, scoutableIndicator.position))
+            );
+        const technicalChallengeScoutables: ScoutableIndicator[] =
+            Object.values(technicalChallenges).map((challenge) => {
+                const allStateMachinesViewed = Object.values(
+                    challenge.stateMachines
+                )
+                    .map(currentStateOf)
+                    .every((currentState) => currentState.viewedByParticipants);
+
+                const offset = { x: challenge.size.width, y: 0 };
+                const elementPos = currentCoordinatesOf(challenge);
+
+                const position = newMapCoordinatesAt(
+                    elementPos.x + offset.x,
+                    elementPos.y + offset.y
+                );
+
+                const viewStatus =
+                    allStateMachinesViewed && currentRole === 'trainer'
+                        ? 'viewed'
+                        : 'unviewed';
+
+                return {
+                    id: `${challenge.id}:${challenge.id}`,
+                    position,
+                    scoutableElementType: 'technicalChallenge',
+                    scoutableElementId: challenge.id,
+                    imageUrl: scoutableImages[viewStatus].generic,
+                    height: 50,
+                };
+            });
+
+        return [...normalScoutables, ...technicalChallengeScoutables].reduce<{
+            [id: `${UUID}:${UUID}`]: ScoutableIndicator;
+        }>((scoutableIndicatorsObject, scoutableIndicator) => {
+            scoutableIndicatorsObject[scoutableIndicator!.id] =
+                scoutableIndicator!;
+            return scoutableIndicatorsObject;
+        }, {});
+    }
 );

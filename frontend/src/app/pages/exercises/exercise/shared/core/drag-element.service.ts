@@ -6,7 +6,9 @@ import type {
     ImageProperties,
     MapImageTemplate,
     PatientCategory,
+    TechnicalChallengeTemplate,
     VehicleTemplate,
+    VersionedElementModel,
 } from 'fuesim-digital-shared';
 import {
     uuid,
@@ -19,11 +21,14 @@ import {
     defaultViewportSize,
     newTransferPoint,
     newPatientFromTemplate,
+    newTechnicalChallengeFromTemplate,
+    hasEntityProperties,
 } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Pixel } from 'ol/pixel';
+import { Immutable } from 'immer';
 import type { SimulatedRegionDragTemplate } from '../editor-panel/templates/simulated-region';
 import { reconstituteSimulatedRegionTemplate } from '../editor-panel/templates/simulated-region';
 import type { FeatureManager } from '../exercise-map/utility/feature-manager';
@@ -35,8 +40,10 @@ import {
     selectMaterialTemplates,
     selectPersonnelTemplates,
     selectExerciseState,
+    selectCurrentTime,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
+import { MessageService } from '../../../../../core/messages/message.service';
 
 @Injectable({
     providedIn: 'root',
@@ -45,6 +52,7 @@ import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
  * This service handles the adding of elements via drag and drop from the trainer map editor to the map
  */
 export class DragElementService {
+    private readonly messageService = inject(MessageService);
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
 
@@ -72,6 +80,7 @@ export class DragElementService {
     private dragElement?: HTMLImageElement;
     private imageDimensions?: { width: number; height: number };
     private transferringTemplate?: TransferTemplate;
+    private transferringEntityVersion?: VersionedElementModel['entity'];
 
     /**
      * Should be called on the mousedown event of the element to be dragged
@@ -90,6 +99,11 @@ export class DragElementService {
             return;
         }
         this.transferringTemplate = transferTemplate;
+        console.log(transferTemplate);
+        if (hasEntityProperties(transferTemplate.template)) {
+            this.transferringEntityVersion = transferTemplate.template.entity;
+        }
+
         // Create the drag image
         const imageProperties = transferTemplate.template.image;
         const zoom = this.olMap!.getView().getZoom()!;
@@ -165,6 +179,11 @@ export class DragElementService {
         if (
             !this.coordinatesAreInElement(this.olMap.getTargetElement(), event)
         ) {
+            this.messageService.postMessage({
+                color: 'info',
+                title: 'Element nicht hinzugefügt',
+                body: 'Ziehen Sie das Element auf die Karte, um es hinzuzufügen.',
+            });
             return;
         }
         // Get the position of the mouse on the map
@@ -175,7 +194,7 @@ export class DragElementService {
         ];
         const position = { x, y };
         // create the element
-        let createdElement: Element | null = null;
+        let createdElement: Immutable<Element> | null = null;
         switch (this.transferringTemplate.type) {
             case 'vehicle':
                 {
@@ -190,7 +209,8 @@ export class DragElementService {
                             selectPersonnelTemplates,
                             this.store
                         ),
-                        position
+                        position,
+                        this.transferringEntityVersion
                     );
                     this.exerciseService.proposeAction(
                         {
@@ -328,8 +348,23 @@ export class DragElementService {
                 }
                 break;
 
-            default:
+            case 'technicalChallenge': {
+                const currentTime = selectStateSnapshot(
+                    selectCurrentTime,
+                    this.store
+                );
+                const technicalChallenge = newTechnicalChallengeFromTemplate(
+                    this.transferringTemplate.template,
+                    currentTime
+                );
+                technicalChallenge.position = newMapPositionAt(position);
+                this.exerciseService.proposeAction({
+                    type: '[TechnicalChallenge] Create technical challenge',
+                    technicalChallenge,
+                });
+                createdElement = technicalChallenge;
                 break;
+            }
         }
 
         this.executeDropSideEffects(pixel, createdElement, event);
@@ -337,7 +372,7 @@ export class DragElementService {
 
     private executeDropSideEffects(
         pixel: Pixel,
-        createdElement: Element | null,
+        createdElement: Immutable<Element> | null,
         event: MouseEvent
     ) {
         if (
@@ -383,7 +418,7 @@ export class DragElementService {
     }
 }
 
-type TransferTemplate =
+export type TransferTemplate =
     | {
           type: 'mapImage';
           template: MapImageTemplate;
@@ -399,6 +434,10 @@ type TransferTemplate =
     | {
           type: 'simulatedRegion';
           template: SimulatedRegionDragTemplate;
+      }
+    | {
+          type: 'technicalChallenge';
+          template: TechnicalChallengeTemplate;
       }
     | {
           type: 'transferPoint';

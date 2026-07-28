@@ -45,8 +45,8 @@ import { generalizeMaterialsPersonnel44 } from './44-generalize-materials-person
 import { addRestrictedZones45 } from './45-add-restricted-zones.js';
 import { limitedAlarmgroups46 } from './46-limited-alarm-groups.js';
 import { participantIdToKey47 } from './47-participant-id-to-key.js';
-import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
+import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addScoutables50 } from './50-add-scoutables.js';
 import { addUUIDtoAddEocLogEntryAction51 } from './51-add-uuid-to-add-eoc-log-action.js';
 import { fixInfinity52 } from './52-fix-infinity.js';
@@ -54,6 +54,9 @@ import { addIsActiveToClient53 } from './53-add-is-active-to-client.js';
 import { configVehicleLoadingAndHighlighting54 } from './54-config-vehicle-loading-and-highlighting.js';
 import { vehicleLoadTimes55 } from './55-vehicle-load-times.js';
 import { vehicleCounters56 } from './56-vehicle-counters.js';
+import { technicalChallengesMeasuresExtendedScoutables57 } from './57-technical-challenges-measures-extended-scoutables.js';
+import { addAlarmGroupVehicleType58 } from './58-add-alarm-group-vehicle-type.js';
+import { addCollections59 } from './59-add-collections.js';
 
 /**
  * Migrate a single action
@@ -76,6 +79,7 @@ type MigrateStateFunction = (state: object) => void;
 export interface Migration {
     action: MigrateActionFunction | null;
     state: MigrateStateFunction | null;
+    unmigratableActions?: true | undefined;
 }
 
 export const migrations: {
@@ -136,4 +140,7 @@ export const migrations: {
     54: configVehicleLoadingAndHighlighting54,
     55: vehicleLoadTimes55,
     56: vehicleCounters56,
+    57: technicalChallengesMeasuresExtendedScoutables57,
+    58: addAlarmGroupVehicleType58,
+    59: addCollections59,
 };

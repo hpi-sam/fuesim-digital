@@ -1,5 +1,5 @@
 import type { AbstractControl } from '@angular/forms';
-import { isURL } from 'class-validator';
+import { z } from 'zod';
 
 export namespace CustomValidators {
     export function exactMatchValidator(stringToMatch: string) {
@@ -10,7 +10,7 @@ export namespace CustomValidators {
     }
     export function urlValidator() {
         return (control: AbstractControl) =>
-            !control.value || isURL(control.value)
+            !control.value || z.url().safeParse(control.value).success
                 ? null
                 : { url: true as const };
     }

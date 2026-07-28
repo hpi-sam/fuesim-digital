@@ -20,6 +20,7 @@ export interface MessageConfig {
             | 'secondary'
             | 'success'
             | 'warning';
+        action: () => void;
     };
     /**
      * The styling of the message

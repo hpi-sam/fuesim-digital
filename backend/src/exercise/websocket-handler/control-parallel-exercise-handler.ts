@@ -22,14 +22,39 @@ export function registerControlParallelExerciseHandler(
         }
         switch (action) {
             case 'start':
-                clientWrapper.start();
+                clientWrapper
+                    .start()
+                    .then(() => {
+                        callback({
+                            success: true,
+                        });
+                    })
+                    .catch((e) => {
+                        console.warn(e);
+                        callback({
+                            success: false,
+                            message: 'Starting the exercise failed.',
+                            expected: false,
+                        });
+                    });
                 break;
             case 'pause':
-                clientWrapper.pause();
+                clientWrapper
+                    .pause()
+                    .then(() => {
+                        callback({
+                            success: true,
+                        });
+                    })
+                    .catch((e) => {
+                        console.warn(e);
+                        callback({
+                            success: false,
+                            message: 'Pausing the exercise failed.',
+                            expected: false,
+                        });
+                    });
                 break;
         }
-        callback({
-            success: true,
-        });
     });
 }

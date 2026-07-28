@@ -2,6 +2,7 @@ import type { UserRepository } from '../database/repositories/user-repository.js
 import type { SessionRepository } from '../database/repositories/session-repository.js';
 import type { SessionEntry } from '../database/schema.js';
 import { PeriodicEventHandler } from '../exercise/periodic-events/periodic-event-handler.js';
+import type { OrganisationService } from '../database/services/organisation-service.js';
 import { OidcService } from './oidc-service.js';
 
 export interface SessionInformation {
@@ -18,7 +19,8 @@ export class AuthService {
 
     public constructor(
         private readonly userRepository: UserRepository,
-        private readonly sessionRepository: SessionRepository
+        private readonly sessionRepository: SessionRepository,
+        private readonly organisationService: OrganisationService
     ) {
         this.oidcService = new OidcService(this);
 
@@ -99,5 +101,9 @@ export class AuthService {
 
     public async clearExpiredSessions() {
         await this.sessionRepository.deleteExpiredSessions();
+    }
+
+    public async onLoginSuccess(user: OidcService.UserInfo) {
+        await this.organisationService.ensurePersonalOrganisation(user);
     }
 }

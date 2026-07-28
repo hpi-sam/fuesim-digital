@@ -27,6 +27,7 @@ import { SimulatedRegionFeatureManager } from '../feature-managers/simulated-reg
 import { TransferLinesFeatureManager } from '../feature-managers/transfer-lines-feature-manager';
 import { TransferPointFeatureManager } from '../feature-managers/transfer-point-feature-manager';
 import { VehicleFeatureManager } from '../feature-managers/vehicle-feature-manager';
+import { TechnicalChallengeFeatureManager } from '../feature-managers/technical-challenge-feature-manager';
 import { ViewportFeatureManager } from '../feature-managers/viewport-feature-manager';
 import { RestrictedZoneFeatureManager } from '../feature-managers/restricted-zone-feature-manager';
 import type { AppState } from '../../../../../../state/app.state';
@@ -42,10 +43,13 @@ import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot'
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import { ScoutableIndicatorsFeatureManager } from '../feature-managers/scoutable-indicators-feature-manager';
 import type { MessageService } from '../../../../../../core/messages/message.service';
+import type { DrawingInteractionService } from '../../../../../../core/drawing-interaction.service';
+import { DrawingFeatureManager } from '../feature-managers/drawing-feature-manager';
 import type { FeatureManager } from './feature-manager';
 import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
 import { SatelliteLayerManager } from './satellite-layer-manager';
+import { DrawingInteractionHandler } from './drawing-interaction-handler';
 import type { PopupService } from './popup.service';
 
 export const olMapCoordinatesSchema = z.object({
@@ -89,7 +93,8 @@ export class OlMapManager {
         private readonly transferLinesService: TransferLinesService,
         private readonly popupManager: PopupManager,
         private readonly popupService: PopupService,
-        private readonly messageService: MessageService
+        private readonly messageService: MessageService,
+        private readonly drawingInteractionService: DrawingInteractionService
     ) {
         this._olMap = new OlMap({
             interactions: new Collection<Interaction>(),
@@ -117,6 +122,7 @@ export class OlMapManager {
             this.olMap.getInteractions(),
             store,
             popupManager,
+            popupService,
             this.olMap,
             this.layerFeatureManagerDictionary,
             this.destroy$
@@ -132,6 +138,13 @@ export class OlMapManager {
 
         // the mapInteractionsManager needs to be set and the satelliteLayer needs to be added before this is possible
         this.registerFeatureManagers();
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const _drawingInteractionHandler = new DrawingInteractionHandler(
+            this._olMap,
+            this.drawingInteractionService,
+            this.destroy$
+        );
 
         this.registerViewportRestriction();
 
@@ -358,12 +371,27 @@ export class OlMapManager {
         const scoutableIndicatorsFeatureManger =
             new ScoutableIndicatorsFeatureManager(this.store, this.olMap, this);
 
+        const drawingFeatureManager = new DrawingFeatureManager(
+            this.olMap,
+            this.exerciseService,
+            this.store
+        );
+
         const restrictedZoneFeatureManager = new RestrictedZoneFeatureManager(
             this.olMap,
             this.exerciseService,
             this.store,
             this.popupService
         );
+
+        const technicalChallengeFeatureManager =
+            new TechnicalChallengeFeatureManager(
+                this.olMap,
+                this,
+                this.exerciseService,
+                this.store,
+                this.popupService
+            );
 
         const viewportFeatureManager = new ViewportFeatureManager(
             this.olMap,
@@ -393,6 +421,8 @@ export class OlMapManager {
             transferLinesFeatureManager,
             simulatedRegionFeatureManager,
             mapImageFeatureManager,
+            drawingFeatureManager,
+            technicalChallengeFeatureManager,
             transferPointFeatureManager,
             vehicleFeatureManager,
             cateringLinesFeatureManager,
@@ -446,6 +476,14 @@ export class OlMapManager {
         this.featureNameFeatureManagerDictionary.set(
             'restrictedZone',
             restrictedZoneFeatureManager
+        );
+        this.featureNameFeatureManagerDictionary.set(
+            'technicalChallenge',
+            technicalChallengeFeatureManager
+        );
+        this.featureNameFeatureManagerDictionary.set(
+            'drawing',
+            drawingFeatureManager
         );
         this.featureNameFeatureManagerDictionary.set(
             'delete',

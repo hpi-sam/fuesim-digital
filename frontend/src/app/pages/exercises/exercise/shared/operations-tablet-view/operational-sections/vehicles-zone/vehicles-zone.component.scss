@@ -1,51 +1,6 @@
 @use 'bootstrap/scss/bootstrap' as bootstrap;
 @use './../_variables.scss' as vars;
 
-.scroll-wrapper {
-    position: relative;
-}
-
-.scroll-btn {
-    position: absolute;
-    z-index: 10;
-
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.scroll-btn.left,
-.scroll-btn.right {
-    top: 50%;
-    transform: translateY(-50%);
-    width: 2rem;
-    height: 3rem;
-}
-
-.scroll-btn.top,
-.scroll-btn.bottom {
-    transform: translateX(-50%);
-    left: 50%;
-    width: 3rem;
-    height: 2rem;
-}
-
-.scroll-btn.left {
-    left: 0.5rem;
-}
-.scroll-btn.right {
-    right: 0.5rem;
-}
-
-.scroll-btn.top {
-    top: 0.5rem;
-}
-.scroll-btn.bottom {
-    bottom: 0.5rem;
-}
-
 .vehicle-zone {
     row-gap: vars.$vehicleTagGap;
     column-gap: vars.$vehicleTagGap;

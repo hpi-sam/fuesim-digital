@@ -5,34 +5,43 @@ import type {
     ExerciseTimeline,
     ParticipantKey,
     TrainerKey,
+    ExerciseState,
+    PostExerciseRequestData,
+    OrganisationId,
 } from 'fuesim-digital-shared';
 import {
     isTrainerKey,
-    ExerciseState,
     migrateStateExport,
     validateExerciseExport,
     ReducerError,
+    newExerciseState,
+    currentStateVersion,
 } from 'fuesim-digital-shared';
+import { z, ZodError } from 'zod';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { ActiveExercise } from '../../exercise/active-exercise.js';
 import { pushAll } from '../../utils/array.js';
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type { ExerciseInsert } from '../schema.js';
+import {
+    type ExerciseDetailsEntryWithUserRole,
+    type ExerciseInsert,
+} from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
     ApiError,
     NotFoundError,
     PermissionDeniedError,
 } from '../../utils/http.js';
-import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
+import type { OrganisationRepository } from '../repositories/organisation-repository.js';
 import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 
 export class ExerciseService {
     public constructor(
         private readonly exerciseRepository: ExerciseRepository,
-        private readonly actionRepository: ActionRepository
+        private readonly actionRepository: ActionRepository,
+        private readonly organisationRepository: OrganisationRepository
     ) {}
 
     private readonly exerciseMap = new Map<
@@ -40,7 +49,7 @@ export class ExerciseService {
         ActiveExercise
     >();
 
-    public getExerciseByKey(
+    public async getExerciseByKey(
         exerciseKey: ExerciseKey,
         session?: SessionInformation
     ) {
@@ -51,7 +60,12 @@ export class ExerciseService {
 
         if (
             exercise.template &&
-            (exercise.template.user !== session?.user.id ||
+            (!session ||
+                !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                    exercise.template.organisationId,
+                    session.user.id,
+                    ['editor', 'admin']
+                )) ||
                 !isTrainerKey(exerciseKey))
         ) {
             throw new PermissionDeniedError();
@@ -59,8 +73,48 @@ export class ExerciseService {
         return exercise;
     }
 
+    public getExerciseById(exerciseId: ExerciseId) {
+        const exercise = this.exerciseMap.get(exerciseId);
+        if (!exercise) {
+            throw new NotFoundError();
+        }
+        return exercise;
+    }
+
     public getAllExercises() {
         return new Set(this.exerciseMap.values());
+    }
+
+    public async getAllExercisesForUser(
+        session: SessionInformation,
+        organisationId?: OrganisationId
+    ): Promise<ExerciseDetailsEntryWithUserRole[]> {
+        if (organisationId) {
+            const organisation =
+                await this.organisationRepository.getOrganisationById(
+                    organisationId
+                );
+            if (!organisation) {
+                throw new PermissionDeniedError();
+            }
+            const userRole =
+                await this.organisationRepository.getOrganisationMembershipRoleForUserById(
+                    organisationId,
+                    session.user.id
+                );
+            if (!userRole) {
+                throw new PermissionDeniedError();
+            }
+            return (
+                await this.exerciseRepository.getAllExercisesForOrganisation(
+                    organisationId
+                )
+            ).map((exercise) => ({
+                ...exercise,
+                userRole,
+            }));
+        }
+        return this.exerciseRepository.getAllExercisesForUser(session.user.id);
     }
 
     public loadExercise(activeExercise: ActiveExercise) {
@@ -80,8 +134,48 @@ export class ExerciseService {
         this.exerciseMap.delete(exercise.exercise.id);
     }
 
+    public async createExercise(
+        data: PostExerciseRequestData,
+        session?: SessionInformation
+    ) {
+        const { importObject, ...parsedData } = data;
+
+        if (session) {
+            // Logged in user
+            if (!data.organisationId) {
+                throw new ApiError();
+            }
+            const isEditorOrAdmin =
+                await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                    data.organisationId,
+                    session.user.id,
+                    ['editor', 'admin']
+                );
+            if (!isEditorOrAdmin) {
+                throw new PermissionDeniedError();
+            }
+        } else {
+            // Anonymous exercise
+            if (data.organisationId) {
+                throw new PermissionDeniedError();
+            }
+        }
+
+        let exercise;
+        if (!importObject) {
+            exercise = await this.createExerciseFromBlank(parsedData);
+        } else {
+            exercise = await this.createExerciseFromFile(
+                parsedData,
+                importObject
+            );
+        }
+
+        return exercise;
+    }
+
     public async createExerciseFromBlank(
-        optionalData: Partial<ExerciseInsert> = {}
+        data: Partial<ExerciseInsert>
     ): Promise<ActiveExercise> {
         return this.exerciseRepository.transaction(
             async (exerciseRepository) => {
@@ -95,16 +189,16 @@ export class ExerciseService {
                     await accessKeyRepository.generateKey<TrainerKey>(8);
 
                 const initialState: ExerciseState = {
-                    ...ExerciseState.create(participantKey),
-                    type: optionalData.templateId ? 'template' : 'standalone',
+                    ...newExerciseState(participantKey),
+                    type: data.templateId ? 'template' : 'standalone',
                 };
                 const exerciseInsert = {
-                    ...optionalData,
+                    ...data,
                     participantKey,
                     trainerKey,
                     initialStateString: initialState,
                     currentStateString: initialState,
-                    stateVersion: ExerciseState.currentStateVersion,
+                    stateVersion: currentStateVersion,
                 } satisfies ExerciseInsert;
 
                 const exerciseEntry =
@@ -119,8 +213,8 @@ export class ExerciseService {
     }
 
     public async createExerciseFromFile(
-        file: StateExport,
-        optionalData: Partial<ExerciseInsert> = {}
+        data: Partial<ExerciseInsert>,
+        file: StateExport
     ): Promise<ActiveExercise> {
         return this.exerciseRepository.transaction(
             async (exerciseRepository) => {
@@ -137,34 +231,31 @@ export class ExerciseService {
                         await accessKeyRepository.generateKey<TrainerKey>(8);
 
                     const migratedImportObject = migrateStateExport(file);
-                    const validationErrors =
-                        validateExerciseExport(migratedImportObject);
-                    if (validationErrors.length > 0) {
-                        throw new ValidationErrorWrapper(validationErrors);
-                    }
+                    validateExerciseExport(migratedImportObject);
 
-                    const newInitialState =
-                        migratedImportObject.history?.initialState ??
-                        migratedImportObject.currentState;
-                    const newCurrentState = migratedImportObject.currentState;
+                    const newInitialState = {
+                        ...(migratedImportObject.history?.initialState ??
+                            migratedImportObject.currentState),
+                        participantKey,
+                    };
+                    const newCurrentState = {
+                        ...migratedImportObject.currentState,
+                        participantKey,
+                    };
 
-                    // Set new participant id
-                    newInitialState.participantKey = participantKey;
-                    newCurrentState.participantKey = participantKey;
-
-                    const exerciseType = optionalData.templateId
+                    const exerciseType = data.templateId
                         ? 'template'
                         : 'standalone';
                     newInitialState.type = exerciseType;
                     newCurrentState.type = exerciseType;
 
                     const exerciseInsert = {
-                        ...optionalData,
+                        ...data,
                         participantKey,
                         trainerKey,
                         initialStateString: newInitialState,
                         currentStateString: newCurrentState,
-                        stateVersion: ExerciseState.currentStateVersion,
+                        stateVersion: currentStateVersion,
                     } satisfies ExerciseInsert;
                     const exerciseEntry =
                         await exerciseRepository.createExercise(exerciseInsert);
@@ -195,14 +286,14 @@ export class ExerciseService {
 
                     return activeExercise;
                 } catch (err) {
-                    if (err instanceof ValidationErrorWrapper) {
+                    if (err instanceof ZodError) {
                         throw new ApiError(
-                            `The validation of the import failed: ${err.errors}`
+                            `Die Importdatei hat ein ungültiges Format: \n ${z.prettifyError(err)}`
                         );
                     }
                     if (err instanceof ReducerError) {
                         throw new ApiError(
-                            `Error importing exercise: ${err.message}`
+                            `Es ist ein Fehler beim Importieren aufgetreten: ${err.message}`
                         );
                     }
                     throw err;
@@ -277,7 +368,10 @@ export class ExerciseService {
             throw new PermissionDeniedError();
         }
 
-        const activeExercise = this.getExerciseByKey(exerciseKey, session);
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
 
         const exerciseEntry = await this.exerciseRepository.getExerciseById(
             activeExercise.exercise.id
@@ -289,8 +383,19 @@ export class ExerciseService {
         if (exerciseEntry.template) {
             throw new PermissionDeniedError();
         }
-        if (exerciseEntry.user && exerciseEntry.user !== session?.user.id) {
-            throw new PermissionDeniedError();
+        if (exerciseEntry.organisationId) {
+            if (!session) {
+                throw new PermissionDeniedError();
+            }
+            const isEditorOrAdmin =
+                await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                    exerciseEntry.organisationId,
+                    session.user.id,
+                    ['editor', 'admin']
+                );
+            if (!isEditorOrAdmin) {
+                throw new PermissionDeniedError();
+            }
         }
 
         await this.deleteExerciseById(activeExercise.exercise.id);
@@ -353,12 +458,10 @@ export class ExerciseService {
         }
     }
 
-    public async getTimeline(
-        exerciseKey: ExerciseKey,
-        session?: SessionInformation
-    ): Promise<ExerciseTimeline> {
-        const activeExercise = this.getExerciseByKey(exerciseKey, session);
-        const completeHistory: ExerciseTimeline['actionsWrappers'] = [
+    public async getActionHistoryForExerciseId(
+        activeExercise: ActiveExercise
+    ): Promise<ExerciseTimeline['actionsWrappers']> {
+        return [
             ...(
                 await this.actionRepository.getActionsForExerciseId(
                     activeExercise.exercise.id
@@ -373,14 +476,52 @@ export class ExerciseService {
                 emitterId: actionWrapper.getAction().emitterId,
                 time: actionWrapper.getAction().index,
             })),
-        ]
             // TODO: Is this necessary?
-            .sort((a, b) => a.time - b.time);
+        ].sort((a, b) => a.time - b.time);
+    }
+
+    public async getTimeline(
+        exerciseKey: ExerciseKey,
+        session?: SessionInformation
+    ): Promise<ExerciseTimeline> {
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
 
         return {
             initialState: activeExercise.exercise.initialStateString,
-            actionsWrappers: completeHistory,
+            actionsWrappers:
+                await this.getActionHistoryForExerciseId(activeExercise),
         };
+    }
+
+    public async getExport(
+        exerciseKey: ExerciseKey,
+        withHistory: boolean = false,
+        session?: SessionInformation
+    ): Promise<StateExport> {
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
+
+        const history = withHistory
+            ? {
+                  actionHistory: (
+                      await this.getActionHistoryForExerciseId(activeExercise)
+                  ).map((actionWrapper) => actionWrapper.action),
+                  initialState: activeExercise.exercise.initialStateString,
+              }
+            : undefined;
+
+        return {
+            type: 'complete',
+            fileVersion: 1,
+            dataVersion: currentStateVersion,
+            currentState: activeExercise.exercise.currentStateString,
+            history,
+        } satisfies StateExport;
     }
 
     public getExercisesViewportsById(id: ExerciseId) {

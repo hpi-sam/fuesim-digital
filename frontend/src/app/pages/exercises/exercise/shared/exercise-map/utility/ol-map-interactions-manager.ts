@@ -19,6 +19,7 @@ import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot'
 import type { FeatureManager } from './feature-manager';
 import type { PopupManager } from './popup-manager';
 import { TranslateInteraction } from './translate-interaction';
+import type { PopupService } from './popup.service';
 
 export class OlMapInteractionsManager {
     private readonly featureLayers: VectorLayer[] = [];
@@ -37,6 +38,7 @@ export class OlMapInteractionsManager {
         private readonly mapInteractions: Collection<Interaction>,
         private readonly store: Store<AppState>,
         private readonly popupManager: PopupManager,
+        private readonly popupService: PopupService,
         private readonly olMap: OlMap,
         private readonly layerFeatureManagerDictionary: Map<
             VectorLayer,
@@ -178,7 +180,7 @@ export class OlMapInteractionsManager {
                 droppedFeature.getId() as UUID
             )
         ) {
-            this.popupManager.togglePopup(undefined);
+            this.popupService.dismissPopup();
         }
 
         this.olMap.forEachFeatureAtPixel(pixel, (droppedOnFeature, layer) => {

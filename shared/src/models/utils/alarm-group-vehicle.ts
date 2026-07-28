@@ -1,8 +1,11 @@
 import { z } from 'zod';
-import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
+import type { Immutable } from 'immer';
+import type { UUID } from '../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
 
 export const alarmGroupVehicleSchema = z.strictObject({
     id: uuidSchema,
+    type: z.literal('alarmGroupVehicle'),
     vehicleTemplateId: uuidSchema,
     /**
      * The time in ms until the vehicle arrives
@@ -10,17 +13,21 @@ export const alarmGroupVehicleSchema = z.strictObject({
     time: z.number().nonnegative(),
     name: z.string(),
 });
-export type AlarmGroupVehicle = z.infer<typeof alarmGroupVehicleSchema>;
+export type AlarmGroupVehicle = Immutable<
+    z.infer<typeof alarmGroupVehicleSchema>
+>;
 
 export function newAlarmGroupVehicle(
     vehicleTemplateId: UUID,
     time: number,
-    name: string
+    name: string,
+    id?: string
 ) {
     return {
-        id: uuid(),
+        id: id ?? uuid(),
+        type: 'alarmGroupVehicle',
         vehicleTemplateId,
         time,
         name,
-    };
+    } satisfies AlarmGroupVehicle;
 }

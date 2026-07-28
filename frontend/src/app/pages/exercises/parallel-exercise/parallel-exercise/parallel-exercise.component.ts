@@ -1,6 +1,15 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
-import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { NgClass } from '@angular/common';
+import {
+    NgbTooltip,
+    NgbNav,
+    NgbNavContent,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
 import {
     GetParallelExerciseResponseData,
     PatchParallelExerciseRequestData,
@@ -28,6 +37,13 @@ import { CopyButtonComponent } from '../../../../shared/components/copy-button/c
         FooterComponent,
         NgbTooltip,
         InlineTextEditorComponent,
+        NgClass,
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbNavContent,
+        NgbNavOutlet,
         CopyButtonComponent,
     ],
 })
@@ -36,6 +52,8 @@ export class ParallelExerciseComponent {
     private readonly route = inject(ActivatedRoute);
     public readonly parallelExerciseService = inject(ParallelExerciseService);
 
+    activeTab = 'invite';
+
     parallelExercise: HttpResourceRef<
         GetParallelExerciseResponseData | undefined
     >;
@@ -43,6 +61,7 @@ export class ParallelExerciseComponent {
         () =>
             `${location.origin}/exercises/parallel/join/${this.parallelExercise.value()?.participantKey}`
     );
+    readonly serviceUrl = computed(() => `${location.origin}/`);
 
     async patchParallelExercise(data: PatchParallelExerciseRequestData) {
         const parallelExercise = this.parallelExercise.value();

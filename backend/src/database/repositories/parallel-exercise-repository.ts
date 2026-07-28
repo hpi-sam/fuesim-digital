@@ -2,8 +2,15 @@ import { eq, desc, getTableColumns } from 'drizzle-orm';
 import type {
     ParallelExerciseKey,
     ParallelExerciseId,
+    OrganisationId,
 } from 'fuesim-digital-shared';
-import type { ParallelExercise, ParallelExerciseInsert } from '../schema.js';
+import {
+    organisationMembershipTable,
+    organisationTable,
+    type ParallelExerciseDetailsEntry,
+    type ParallelExerciseInsert,
+    type ParallelExerciseDetailsEntryWithUserRole,
+} from '../schema.js';
 import {
     exerciseTable,
     parallelExerciseTable,
@@ -15,7 +22,8 @@ export class ParallelExerciseRepository extends BaseRepository {
     private getColumns() {
         return {
             ...getTableColumns(parallelExerciseTable),
-            template: { ...getTableColumns(exerciseTemplateTable) },
+            template: getTableColumns(exerciseTemplateTable),
+            organisation: getTableColumns(organisationTable),
         };
     }
 
@@ -26,12 +34,16 @@ export class ParallelExerciseRepository extends BaseRepository {
             .innerJoin(
                 exerciseTemplateTable,
                 eq(exerciseTemplateTable.id, parallelExerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(parallelExerciseTable.organisationId, organisationTable.id)
             );
     }
 
     public async getParallelExerciseById(
         id: ParallelExerciseId
-    ): Promise<ParallelExercise | null> {
+    ): Promise<ParallelExerciseDetailsEntry | null> {
         return this.onlySingle(
             await this.parallelExerciseQuery.where(
                 eq(parallelExerciseTable.id, id)
@@ -41,7 +53,7 @@ export class ParallelExerciseRepository extends BaseRepository {
 
     public async getParallelExerciseByParticipantKey(
         key: ParallelExerciseKey
-    ): Promise<ParallelExercise | null> {
+    ): Promise<ParallelExerciseDetailsEntry | null> {
         return this.onlySingle(
             await this.parallelExerciseQuery.where(
                 eq(parallelExerciseTable.participantKey, key)
@@ -49,11 +61,50 @@ export class ParallelExerciseRepository extends BaseRepository {
         );
     }
 
-    public async getParallelExercisesOfOwner(
+    public async getParallelExercisesForUser(
         userId: string
-    ): Promise<ParallelExercise[]> {
-        return this.parallelExerciseQuery
-            .where(eq(parallelExerciseTable.user, userId))
+    ): Promise<ParallelExerciseDetailsEntryWithUserRole[]> {
+        const subquery = this.databaseConnection
+            .select()
+            .from(organisationMembershipTable)
+            .where(eq(organisationMembershipTable.userId, userId))
+            .as('memberships');
+        return this.databaseConnection
+            .select({ ...this.getColumns(), userRole: subquery.role })
+            .from(parallelExerciseTable)
+            .innerJoin(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.id, parallelExerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(parallelExerciseTable.organisationId, organisationTable.id)
+            )
+            .innerJoin(
+                subquery,
+                eq(
+                    subquery.organisationId,
+                    parallelExerciseTable.organisationId
+                )
+            )
+            .orderBy(desc(parallelExerciseTable.createdAt));
+    }
+
+    public async getParallelExercisesForOrganisation(
+        organisationId: OrganisationId
+    ): Promise<ParallelExerciseDetailsEntry[]> {
+        return this.databaseConnection
+            .select(this.getColumns())
+            .from(parallelExerciseTable)
+            .innerJoin(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.id, parallelExerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(parallelExerciseTable.organisationId, organisationTable.id)
+            )
+            .where(eq(parallelExerciseTable.organisationId, organisationId))
             .orderBy(desc(parallelExerciseTable.createdAt));
     }
 

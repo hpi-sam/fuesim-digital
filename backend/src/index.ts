@@ -1,7 +1,6 @@
-import * as util from 'node:util';
 import { ReducerError } from 'fuesim-digital-shared';
+import { ZodError } from 'zod';
 import { DatabaseService } from './database/services/database-service.js';
-import { ValidationErrorWrapper } from './utils/validation-error-wrapper.js';
 import { RestoreError } from './utils/restore-error.js';
 import { Config } from './config.js';
 import { FuesimServer } from './fuesim-server.js';
@@ -17,6 +16,11 @@ import type { Repositories } from './database/repositories/index.js';
 import { ParallelExerciseRepository } from './database/repositories/parallel-exercise-repository.js';
 import type { Services } from './database/services/index.js';
 import { ParallelExerciseService } from './database/services/parallel-exercise-service.js';
+import { OrganisationService } from './database/services/organisation-service.js';
+import { OrganisationRepository } from './database/repositories/organisation-repository.js';
+import { CollectionRepository } from './database/repositories/collection-repository.js';
+import { CollectionService } from './database/services/collection-service.js';
+import { UserDataService } from './database/services/userdata-service.js';
 
 async function main() {
     Config.initialize();
@@ -53,27 +57,56 @@ async function main() {
         parallelExerciseRepository: new ParallelExerciseRepository(
             databaseService.databaseConnection
         ),
+        organisationRepository: new OrganisationRepository(
+            databaseService.databaseConnection
+        ),
+        collectionRepository: new CollectionRepository(
+            databaseService.databaseConnection
+        ),
     };
 
     const exerciseService = new ExerciseService(
         repositories.exerciseRepository,
-        repositories.actionRepository
+        repositories.actionRepository,
+        repositories.organisationRepository
     );
     const exerciseManagerService = new ExerciseManagerService(
         repositories.exerciseRepository,
-        exerciseService
+        exerciseService,
+        repositories.organisationRepository
     );
     const parallelExerciseService = new ParallelExerciseService(
         repositories.parallelExerciseRepository,
+        repositories.exerciseRepository,
         exerciseManagerService,
-        exerciseService
+        exerciseService,
+        repositories.organisationRepository
     );
+    const organisationService = new OrganisationService(
+        repositories.organisationRepository,
+        repositories.userRepository
+    );
+    const collectionService = new CollectionService(
+        exerciseService,
+        organisationService,
+        repositories.collectionRepository
+    );
+    const userDataService = new UserDataService(
+        repositories.exerciseRepository,
+        repositories.sessionRepository,
+        repositories.userRepository,
+        repositories.parallelExerciseRepository,
+        repositories.organisationRepository
+    );
+
+    await collectionService.initialize();
 
     let authService: AuthService;
     try {
         authService = await new AuthService(
             repositories.userRepository,
-            repositories.sessionRepository
+            repositories.sessionRepository,
+            organisationService
         ).initialize();
     } catch (e: unknown) {
         console.error('Error initializing AuthService:');
@@ -86,6 +119,9 @@ async function main() {
         exerciseService,
         parallelExerciseService,
         databaseService,
+        organisationService,
+        collectionService,
+        userDataService,
     };
 
     if (Config.useDb) {
@@ -101,10 +137,10 @@ async function main() {
             );
         } catch (e: unknown) {
             console.error('❌ An error occurred while loading exercises.');
-            if (e instanceof ValidationErrorWrapper) {
+            if (e instanceof ZodError) {
                 console.error(
                     'The validation of the exercises and actions in the database failed:',
-                    util.inspect(e.errors, false, null, true)
+                    e.message
                 );
                 return;
             } else if (e instanceof ReducerError) {
@@ -121,10 +157,30 @@ async function main() {
             }
             throw e;
         }
+
+        await organisationService.ensurePersonalOrganisationsForAllUsers();
+
+        // Upgrading Element StateVersions
+        try {
+            const startTime = performance.now();
+            const versionCount =
+                await collectionService.upgradeAllElementStateVersionsToLatest();
+            const endTime = performance.now();
+            console.log(
+                `✅ Successfully upgraded ${versionCount} Element StateVersions in ${(
+                    endTime - startTime
+                ).toFixed(3)} ms.`
+            );
+        } catch (e: unknown) {
+            console.error(
+                '❌ An error occurred while upgrading Element StateVersions.'
+            );
+            throw e;
+        }
     }
 
     // eslint-disable-next-line no-new
-    new FuesimServer(services);
+    new FuesimServer(services, repositories);
 }
 
 main();

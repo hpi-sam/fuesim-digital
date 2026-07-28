@@ -1,0 +1,200 @@
+<div class="modal-header">
+    <h4>{{ title }}</h4>
+    @if (userAvailableCollections.isLoading()) {
+        <div class="spinner-border"></div>
+    }
+    @if (allowLeave) {
+        <button class="btn-close ml-auto" (click)="close(null)"></button>
+    }
+</div>
+<div class="modal-body">
+    @if (selectedCollectionData.value(); as collectionData) {
+        @let collection = collectionData[0];
+        @let collectionElements = collectionData[1];
+
+        @if (collection === null || collectionElements === null) {
+            <div class="alert alert-danger">
+                Die ausgewählte Sammlung konnte nicht geladen werden.<br />
+                Möglicherweise wurde die Sammlung gelöscht oder Sie haben keine
+                Berechtigung, diese anzuzeigen. <br />
+                Bitte versuchen Sie es erneut.
+            </div>
+        } @else {
+            <div class="d-flex align-items-center">
+                <h3 class="d-flex align-items-center mb-0">
+                    {{ collection.title }}
+                    <a
+                        [href]="
+                            '/collections/' +
+                            collection.entityId +
+                            '?from=exercise'
+                        "
+                        target="_blank"
+                        class="btn btn-link"
+                        ><i class="bi bi-box-arrow-up-right"></i
+                    ></a>
+                </h3>
+            </div>
+            <span class="text-muted mb-2 d-block">{{ selectionInfoText }}</span>
+            @if (!isDisallowedCollection(collection)) {
+                <div class="d-flex justify-content-start gap-2">
+                    <button
+                        class="btn btn-outline-secondary"
+                        (click)="selectCollection(null)"
+                    >
+                        <i class="bi bi-arrow-left"></i>
+                        Andere Sammlung auswählen
+                    </button>
+                    <button
+                        class="btn btn-primary ml-auto pulsating"
+                        (click)="close(collection)"
+                        data-cy="confirmCollectionSelectionButton"
+                    >
+                        Diese Elemente verwenden
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            } @else {
+                <div class="alert alert-warning">
+                    Die ausgewählte Sammlung kann nicht in der folgenden Übung
+                    verwendet werden. Ggf. wird diese bereits verwendet. <br />
+                    Bitte wählen Sie eine andere Sammlung aus.
+                </div>
+                <button
+                    class="btn btn-outline-secondary"
+                    (click)="selectCollection(null)"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                    Andere Sammlung auswählen
+                </button>
+            }
+            <hr />
+            <div ngbAccordion>
+                <div ngbAccordionItem>
+                    <h2 ngbAccordionHeader>
+                        <button ngbAccordionButton>
+                            <i class="bi bi-eye me-1"></i>
+                            <em>Vorschau der Elemente</em>
+                        </button>
+                    </h2>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div
+                                    class="alert alert-info d-flex align-items-center gap-2"
+                                >
+                                    <i class="bi bi-patch-exclamation"></i>
+                                    <span>
+                                        <b>
+                                            Dies ist nur eine Vorschau der
+                                            Elemente. </b
+                                        ><br />
+                                        Wählen Sie die Sammlung über den obigen
+                                        Knopf aus, um diese Elemente in der
+                                        Übung verwenden zu können.
+                                    </span>
+                                </div>
+                                <app-collection-elements-list
+                                    [collection]="collection"
+                                    [collectionElements]="collectionData[1]"
+                                    [editable]="false"
+                                    [showImportedElements]="
+                                        showDependencyElements
+                                    "
+                                    [smallCards]="true"
+                                    [staticMode]="true"
+                                />
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    } @else {
+        @if (allowCreate) {
+            <div
+                class="d-flex justify-content-start align-items-center gap-2 mb-3"
+            >
+                <a
+                    class="btn btn-outline-secondary"
+                    routerLink="/collections"
+                    target="_blank"
+                >
+                    <i class="bi bi-folder-plus"></i>
+                    Neue Sammlung erstellen
+                </a>
+                <button
+                    class="btn btn-link"
+                    (click)="userAvailableCollections.reload()"
+                >
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+        }
+        @if (showInfoBanner) {
+            <div class="alert alert-secondary mt-3 d-flex gap-2" role="alert">
+                <i class="bi bi-info-circle"></i>
+                <span class="d-block text-muted">
+                    Wählen Sie eine Sammlung aus, deren Elemente Sie in der
+                    Übung verwenden möchten.
+                </span>
+            </div>
+        }
+        @if (userAvailableCollections.hasValue()) {
+            <div class="card">
+                <ul
+                    class="list-group list-group-flush"
+                    data-cy="availableCollectionsList"
+                >
+                    @for (
+                        collection of userAvailableCollections.value();
+                        track collection.versionId
+                    ) {
+                        <li
+                            class="list-group-item d-flex justify-content-between align-items-center"
+                            (click)="selectCollection(collection)"
+                            [class.disabled]="
+                                isDisallowedCollection(collection)
+                            "
+                            data-cy="availableCollectionItem"
+                            [attr.data-entity]="collection.entityId"
+                            [attr.data-visibility]="collection.visibility"
+                        >
+                            <div class="d-flex flex-column">
+                                <span>{{ collection.title }}</span>
+                                <small class="text-muted">
+                                    {{ collection.elementCount }} Elemente
+                                </small>
+                            </div>
+                            @if (isDisallowedCollection(collection)) {
+                                <button
+                                    class="btn btn-outline-secondary"
+                                    ngbTooltip="Diese Sammlung kann nicht ausgewählt werden, da sie bereits in der Übung verwendet wird oder sonstige Konflikte auftreten würden."
+                                    disabled
+                                >
+                                    Kann nicht ausgewählt werden
+                                    <i class="bi bi-x-octagon ms-1"></i>
+                                </button>
+                            } @else {
+                                <button
+                                    class="btn btn-outline-primary"
+                                    data-cy="selectCollectionButton"
+                                >
+                                    Auswählen
+                                    <i class="bi bi-chevron-right ms-1"></i>
+                                </button>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    }
+</div>
+@if (allowLeave) {
+    <div class="modal-footer justify-content-start">
+        <button class="btn btn-outline-danger" (click)="close(null)">
+            Abbrechen
+        </button>
+    </div>
+}

@@ -4,8 +4,7 @@
         "outDir": "./dist",
         "rootDir": ".",
         "types": ["jest", "node"],
-        "sourceMap": true, // For debugging
-        "emitDecoratorMetadata": true // For typeorm - See https://github.com/typeorm/typeorm/issues/2897
+        "sourceMap": true // For debugging
     },
     "references": [],
     "include": ["src/**/*", "test/**/*", "drizzle.config.ts"],

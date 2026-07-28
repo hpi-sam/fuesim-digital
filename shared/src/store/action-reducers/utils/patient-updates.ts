@@ -1,54 +1,48 @@
-import { IsNumber, IsUUID, Min } from 'class-validator';
+import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     type HealthPoints,
     healthPointsSchema,
 } from '../../../models/utils/health-points.js';
-import { type UUID, uuidValidationOptions } from '../../../utils/uuid.js';
-import { IsZodSchema } from '../../../utils/validators/is-zod-object.js';
+import { type UUID, uuidSchema } from '../../../utils/uuid.js';
+import { patientHealthStateSchema } from '../../../models/patient-health-state.js';
 
-export class PatientUpdate {
+export const patientUpdateSchema = z.strictObject({
     /**
      * The id of the patient
      */
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
+    id: uuidSchema,
     /**
      * The new {@link HealthPoints} the patient should have
      */
-    @IsZodSchema(healthPointsSchema)
-    public readonly nextHealthPoints: HealthPoints;
-
+    nextHealthPoints: healthPointsSchema,
     /**
      * The next {@link PatientHealthState} the patient should be in
      */
-    @IsUUID(4, uuidValidationOptions)
-    public readonly nextStateId: UUID;
-
+    nextStateId: patientHealthStateSchema.shape.id,
     /**
      * The new state time of the patient
      */
-    @IsNumber()
-    public readonly nextStateTime: number;
-
+    nextStateTime: z.number(),
     /**
      * The new time a patient was treated overall
      */
-    @IsNumber()
-    @Min(0)
-    public treatmentTime: number;
+    treatmentTime: z.number().nonnegative(),
+});
+export type PatientUpdate = Immutable<z.infer<typeof patientUpdateSchema>>;
 
-    constructor(
-        id: UUID,
-        nextHealthPoints: HealthPoints,
-        nextStateId: UUID,
-        nextStateTime: number,
-        treatmentTime: number
-    ) {
-        this.id = id;
-        this.nextHealthPoints = nextHealthPoints;
-        this.nextStateId = nextStateId;
-        this.nextStateTime = nextStateTime;
-        this.treatmentTime = treatmentTime;
-    }
+export function newPatientUpdate(
+    id: UUID,
+    nextHealthPoints: HealthPoints,
+    nextStateId: UUID,
+    nextStateTime: number,
+    treatmentTime: number
+): PatientUpdate {
+    return {
+        id,
+        nextHealthPoints,
+        nextStateId,
+        nextStateTime,
+        treatmentTime,
+    };
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { ExerciseRadiogram } from '../../models/radiogram/exercise-radiogram.js';
 import { exerciseRadiogramSchema } from '../../models/radiogram/exercise-radiogram.js';
 import { publishRadiogram } from '../../models/radiogram/radiogram-helpers-mutable.js';
@@ -11,8 +12,8 @@ export const publishRadiogramActivityStateSchema = z.strictObject({
     type: z.literal('publishRadiogramActivity'),
     radiogram: exerciseRadiogramSchema,
 });
-export type PublishRadiogramActivityState = z.infer<
-    typeof publishRadiogramActivityStateSchema
+export type PublishRadiogramActivityState = Immutable<
+    z.infer<typeof publishRadiogramActivityStateSchema>
 >;
 
 export function newPublishRadiogramActivityState(

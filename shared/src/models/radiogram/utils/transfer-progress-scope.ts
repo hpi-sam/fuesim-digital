@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 /**
  * Defines the scope of the radiogram on the transfer progress.
@@ -10,4 +11,6 @@ export const transferProgressScopeSchema = z.literal([
     'singleRegion',
     'transportManagement',
 ]);
-export type TransferProgressScope = z.infer<typeof transferProgressScopeSchema>;
+export type TransferProgressScope = Immutable<
+    z.infer<typeof transferProgressScopeSchema>
+>;

@@ -2,146 +2,251 @@
 <main class="container">
     @if (parallelExercise.hasValue()) {
         @let exercise = parallelExercise.value();
-        <h1 class="mb-4 d-flex align-items-center">
-            <div>Parallelübung:&nbsp;</div>
-            <app-inline-text-editor
-                class="flex-grow-1"
-                [required]="true"
-                [value]="exercise.name"
-                name="Name der Paralellübung"
-                (update)="
-                    patchParallelExercise({
-                        name: $event,
-                    })
-                "
-                [singleLine]="true"
-            />
-        </h1>
+
         <div class="row mb-4 align-items-stretch">
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-header h4">Steuerung</div>
-                    <div class="card-body">
-                        <div class="d-flex">
-                            @let leadingExercise =
-                                parallelExerciseService.exerciseInstances()[0];
-                            @if (leadingExercise) {
-                                <app-exercise-state-badge-inner
-                                    class="h1"
-                                    [exerciseStatus]="
-                                        leadingExercise.currentStatus
-                                    "
-                                    [currentTime]="leadingExercise.currentTime"
-                                />
-                                <div class="flex-grow-1"></div>
-                                @if (
-                                    leadingExercise.currentStatus !== 'running'
-                                ) {
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary"
-                                        (click)="
-                                            parallelExerciseService.startParallelExercise()
-                                        "
-                                    >
-                                        Start
-                                    </button>
-                                } @else {
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary"
-                                        (click)="
-                                            parallelExerciseService.pauseParallelExercise()
-                                        "
-                                    >
-                                        Pause
-                                    </button>
-                                }
-                            } @else {
-                                <div class="alert alert-info" role="alert">
-                                    Um die Übung zu starten, warten Sie, bis
-                                    Teilnehmende beigetreten sind.
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-header h4 d-flex align-content-center">
-                        <div>
-                            Teilnehmenden-PIN:
-                            <span class="font-monospace fw-bold">{{
-                                exercise.participantKey
-                            }}</span>
-                        </div>
-                        <div class="flex-grow-1"></div>
-                        <button
-                            app-copy-button
-                            class="btn btn-outline-secondary"
-                            [value]="participantUrl()"
-                            text="Teilnehmerlink"
-                            ngbTooltip="Link kopieren"
-                            container="body"
-                        ></button>
-                    </div>
-                    <div class="card-body d-flex justify-content-center py-0">
-                        <qr-code
-                            [value]="participantUrl()"
-                            size="350"
-                            errorCorrectionLevel="M"
+            <div class="col-lg-7 col-md-12">
+                <h1 class="mb-4 d-flex align-items-center">
+                    <div>Parallelübung:&nbsp;</div>
+                    @if (exercise.userRole !== 'viewer') {
+                        <app-inline-text-editor
+                            class="flex-grow-1"
+                            [required]="true"
+                            [value]="exercise.name"
+                            name="Name der Paralellübung"
+                            (update)="
+                                patchParallelExercise({
+                                    name: $event,
+                                })
+                            "
+                            [singleLine]="true"
                         />
+                    } @else {
+                        {{ exercise.name }}
+                    }
+                </h1>
+            </div>
+            <div class="col-lg-5 col-md-12">
+                <div class="card bg-secondary-subtle">
+                    <div
+                        class="card-body row mb-0 p-3 px-4 align-items-stretch"
+                    >
+                        @let exerciseInstances =
+                            parallelExerciseService.exerciseInstances();
+                        @let leadingExercise = exerciseInstances[0];
+                        <div class="col h2 mb-0">
+                            <div
+                                class="badge rounded-pill bg-light text-dark state-badge h-100 w-100 px-3 m-0 d-flex align-items-center justify-content-center"
+                            >
+                                <div>
+                                    <i class="bi bi-people me-1"></i>
+                                    {{ exerciseInstances.length }}
+                                </div>
+                            </div>
+                        </div>
+                        @if (leadingExercise) {
+                            <app-exercise-state-badge-inner
+                                class="col h1 mb-0"
+                                [exerciseStatus]="leadingExercise.currentStatus"
+                                [currentTime]="leadingExercise.currentTime"
+                            />
+                            <div class="col h2 mb-0">
+                                @if (exercise.userRole !== 'viewer') {
+                                    @if (
+                                        leadingExercise.currentStatus !==
+                                        'running'
+                                    ) {
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary btn-lg w-100 h-100 px-3 m-0"
+                                            (click)="
+                                                parallelExerciseService.startParallelExercise()
+                                            "
+                                        >
+                                            Start
+                                        </button>
+                                    } @else {
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary btn-lg w-100 h-100 px-3 m-0"
+                                            (click)="
+                                                parallelExerciseService.pauseParallelExercise()
+                                            "
+                                        >
+                                            Pause
+                                        </button>
+                                    }
+                                }
+                            </div>
+                        } @else {
+                            <div class="col mb-0">
+                                <p class="h4 text-center mb-0">
+                                    Warte auf Teilnehmende
+                                </p>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header h4">
-                        Teilnehmende
-                        <span class="badge bg-secondary float-end">
-                            <i class="bi bi-people me-1"></i>
-                            {{
-                                parallelExerciseService.exerciseInstances()
-                                    .length
-                            }}
-                        </span>
+        <nav #nav="ngbNav" ngbNav class="nav-tabs" [(activeId)]="activeTab">
+            <ng-container ngbNavItem="invite">
+                <a ngbNavLink>Teilnehmende einladen</a>
+                <ng-template ngbNavContent>
+                    <div class="row">
+                        <div class="col-md-12 col-lg-6 mb-4">
+                            <div class="card h-100">
+                                <h2 class="card-header h4">Teilnehmende</h2>
+                                <div class="card-body py-3">
+                                    <h1 class="m-3 text-center">
+                                        Aktuell
+                                        {{ exerciseInstances.length }}
+                                        Teilnehmende{{
+                                            exerciseInstances.length === 1
+                                                ? '(r)'
+                                                : ''
+                                        }}
+                                    </h1>
+                                    <div class="h2 m-3 mt-5 text-center">
+                                        @for (
+                                            exerciseInstance of parallelExerciseService.exerciseInstances();
+                                            track exerciseInstance.participantKey
+                                        ) {
+                                            <span
+                                                class="badge m-2"
+                                                [ngClass]="
+                                                    exerciseInstance.isActive
+                                                        ? 'bg-primary'
+                                                        : 'bg-secondary'
+                                                "
+                                            >
+                                                {{
+                                                    exerciseInstance.clientNames
+                                                        .length > 0
+                                                        ? exerciseInstance.clientNames.join(
+                                                              ', '
+                                                          )
+                                                        : 'Übung ' +
+                                                          exerciseInstance.participantKey
+                                                }}
+                                            </span>
+                                        } @empty {
+                                            <span class="display-1"> :-( </span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-6 mb-4">
+                            <div class="card h-100">
+                                <div
+                                    class="card-header d-flex align-items-center"
+                                >
+                                    <h2 class="h4 mb-0">Übung beitreten</h2>
+                                    <div class="flex-grow-1"></div>
+                                    <button
+                                        app-copy-button
+                                        class="btn btn-outline-secondary"
+                                        [value]="participantUrl()"
+                                        text="Teilnehmerlink"
+                                        ngbTooltip="Link kopieren"
+                                        container="body"
+                                    ></button>
+                                </div>
+
+                                <div class="card-body py-3">
+                                    <h2 class="text-center m-0 p-0">
+                                        Scanne den QR-Code ...
+                                    </h2>
+                                    <div
+                                        class="w-100 m-0 p-0 d-flex justify-content-center"
+                                    >
+                                        <qr-code
+                                            [value]="participantUrl()"
+                                            size="400"
+                                            errorCorrectionLevel="M"
+                                        />
+                                    </div>
+
+                                    <h2 class="text-center m-0 p-0">
+                                        ... oder gib die Übungs-PIN
+                                    </h2>
+                                    <h1 class="text-center m-0 p-0 display-3">
+                                        <span class="font-monospace fw-bold"
+                                            >{{ exercise.participantKey }}
+                                        </span>
+                                    </h1>
+                                    <h2 class="text-center m-0 p-0">
+                                        auf
+                                        <a href="{{ serviceUrl() }} ">{{
+                                            serviceUrl()
+                                        }}</a>
+                                        ein.
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <table class="table table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Teilnehmenden-PIN</th>
-                                <th>Name(n)</th>
-                                <th>Letzte Aktion</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (
-                                exerciseInstance of parallelExerciseService.exerciseInstances();
-                                track exerciseInstance.participantKey
-                            ) {
-                                <tr
-                                    app-parallel-exercise-instance-row
-                                    [exerciseInstance]="exerciseInstance"
-                                ></tr>
-                            } @empty {
+                </ng-template>
+            </ng-container>
+
+            <ng-container ngbNavItem="participants">
+                <a ngbNavLink>Teilnehmende verwalten</a>
+                <ng-template ngbNavContent>
+                    <div class="card row my-5">
+                        <div class="card-header d-flex align-items-center">
+                            <h2 class="h4 mb-0">Teilnehmende</h2>
+                            <div class="flex-grow-1"></div>
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-people me-1"></i>
+                                {{
+                                    parallelExerciseService.exerciseInstances()
+                                        .length
+                                }}
+                            </span>
+                        </div>
+                        <table class="table table-striped mb-0">
+                            <thead>
                                 <tr>
-                                    <td colspan="3" class="text-muted">
-                                        Es sind noch keine Teilnehmenden der
-                                        Übung beigetreten.
-                                    </td>
+                                    <th></th>
+                                    <th>Teilnehmenden-PIN</th>
+                                    <th>Name(n)</th>
+                                    <th>Letzte Aktion</th>
+                                    <th></th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+                            </thead>
+                            <tbody>
+                                @for (
+                                    exerciseInstance of parallelExerciseService.exerciseInstances();
+                                    track exerciseInstance.participantKey
+                                ) {
+                                    <tr
+                                        app-parallel-exercise-instance-row
+                                        [exerciseInstance]="exerciseInstance"
+                                    ></tr>
+                                } @empty {
+                                    <tr>
+                                        <td colspan="3" class="text-muted">
+                                            Es sind noch keine Teilnehmenden der
+                                            Übung beigetreten.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-template>
+            </ng-container>
+
+            <!--
+                <ng-container ngbNavItem="overview">
+                    <a ngbNavLink>Didaktische Übersicht</a>
+                    <ng-template ngbNavContent> </ng-template>
+                </ng-container>
+            -->
+        </nav>
+
+        <div [ngbNavOutlet]="nav" class="mt-2 mb-5"></div>
     } @else if (parallelExercise.isLoading()) {
         <div class="row row-cols-3">
             @for (_ of [1, 2, 3]; track $index) {

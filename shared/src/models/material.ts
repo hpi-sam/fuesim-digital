@@ -1,13 +1,16 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { uuidSetSchema } from '../utils/uuid-set.js';
+import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
 import type { MaterialTemplate } from './material-template.js';
 import { canCaterForSchema } from './utils/cater-for.js';
 import { imagePropertiesSchema } from './utils/image-properties.js';
 import { type Position, positionSchema } from './utils/position/position.js';
 
 export const materialSchema = z.strictObject({
+    ...versionedElementModelSchema.shape,
     id: uuidSchema,
     type: z.literal('material'),
     templateId: uuidSchema,
@@ -32,16 +35,17 @@ export const materialSchema = z.strictObject({
 
     image: imagePropertiesSchema,
 });
-export type Material = z.infer<typeof materialSchema>;
+export type Material = Immutable<z.infer<typeof materialSchema>>;
 
 export function newMaterialFromTemplate(
     materialTemplate: MaterialTemplate,
     vehicleId: UUID,
     vehicleName: string,
-    position: Position
+    position: Position,
+    id?: UUID
 ): Material {
     return {
-        id: uuid(),
+        id: id ?? uuid(),
         type: 'material',
         templateId: materialTemplate.id,
         typeName: materialTemplate.name,

@@ -34,13 +34,33 @@ export async function createParallelExercise(
     session: string,
     template?: GetExerciseTemplateResponseData
 ) {
-    const exerciseTemplate =
-        template ?? (await createExerciseTemplate(environment, session));
+    let exerciseTemplate;
+    if (!template) {
+        const userInfo =
+            (await environment.services.authService.getDataFromSessionToken(
+                session
+            ))!.user;
+        const personalOrganisation =
+            await environment.services.organisationService.ensurePersonalOrganisation(
+                userInfo
+            );
+        exerciseTemplate = await createExerciseTemplate(
+            environment,
+            session,
+            personalOrganisation.id
+        );
+    } else {
+        exerciseTemplate = template;
+    }
+    const exerciseId =
+        (await environment.repositories.exerciseRepository.getExerciseTemplateById(
+            exerciseTemplate.id
+        ))!.exercise.id;
 
     const viewport = createViewport(
         environment.services.exerciseService
             .TESTING_getExerciseMap()
-            .get(exerciseTemplate.trainerKey)!
+            .get(exerciseId)!
     );
     const response = await environment
         .httpRequest('post', '/api/parallel_exercises/', session)

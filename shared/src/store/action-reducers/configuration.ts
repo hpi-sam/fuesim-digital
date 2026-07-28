@@ -1,106 +1,108 @@
-import { IsBoolean, IsString } from 'class-validator';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { IsValue } from '../../utils/validators/is-value.js';
+import { z } from 'zod';
+import type { Immutable } from 'immer';
+import type { ActionReducer } from '../action-reducer.js';
 import {
-    type TileMapProperties,
     tileMapPropertiesSchema,
-    type OperationsMapProperties,
     operationsMapPropertiesSchema,
 } from '../../models/utils/map-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import {
-    ExerciseConfiguration,
-    exerciseConfigurationSchema,
-} from '../../models/exercise-configuration.js';
+import { exerciseConfigurationSchema } from '../../models/exercise-configuration.js';
 
-export class SetTileMapPropertiesAction implements Action {
-    @IsValue('[Configuration] Set tileMapProperties' as const)
-    public readonly type = '[Configuration] Set tileMapProperties';
+export const setTileMapPropertiesActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set tileMapProperties'),
+    tileMapProperties: tileMapPropertiesSchema,
+});
+export type SetTileMapPropertiesAction = Immutable<
+    z.infer<typeof setTileMapPropertiesActionSchema>
+>;
 
-    @IsZodSchema(tileMapPropertiesSchema)
-    public readonly tileMapProperties!: TileMapProperties;
-}
+export const setOperationsMapPropertiesActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set operationsMapProperties'),
+    operationsMapProperties: operationsMapPropertiesSchema,
+});
+export type SetOperationsMapPropertiesAction = Immutable<
+    z.infer<typeof setOperationsMapPropertiesActionSchema>
+>;
 
-export class SetOperationsMapPropertiesAction implements Action {
-    @IsValue('[Configuration] Set operationsMapProperties' as const)
-    public readonly type = '[Configuration] Set operationsMapProperties';
+export const setPretriageEnabledActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set pretriageEnabled'),
+    pretriageEnabled: exerciseConfigurationSchema.shape.pretriageEnabled,
+});
+export type SetPretriageEnabledAction = Immutable<
+    z.infer<typeof setPretriageEnabledActionSchema>
+>;
 
-    @IsZodSchema(operationsMapPropertiesSchema)
-    public readonly operationsMapProperties!: OperationsMapProperties;
-}
+export const setBluePatientsEnabledFlagActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set bluePatientsEnabled'),
+    bluePatientsEnabled: exerciseConfigurationSchema.shape.bluePatientsEnabled,
+});
+export type SetBluePatientsEnabledFlagAction = Immutable<
+    z.infer<typeof setBluePatientsEnabledFlagActionSchema>
+>;
 
-export class SetPretriageEnabledAction implements Action {
-    @IsValue('[Configuration] Set pretriageEnabled' as const)
-    public readonly type = '[Configuration] Set pretriageEnabled';
+export const setPatientIdentifierPrefixActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set patientIdentifierPrefix'),
+    patientIdentifierPrefix:
+        exerciseConfigurationSchema.shape.patientIdentifierPrefix,
+});
+export type SetPatientIdentifierPrefixAction = Immutable<
+    z.infer<typeof setPatientIdentifierPrefixActionSchema>
+>;
 
-    @IsBoolean()
-    public readonly pretriageEnabled!: boolean;
-}
+export const setVehicleStatusHighlightEnabledActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set vehicleStatusHighlightEnabled'),
+    vehicleStatusHighlightEnabled:
+        exerciseConfigurationSchema.shape.vehicleStatusHighlight,
+});
+export type SetVehicleStatusHighlightEnabled = Immutable<
+    z.infer<typeof setVehicleStatusHighlightEnabledActionSchema>
+>;
 
-export class SetBluePatientsEnabledFlagAction implements Action {
-    @IsValue('[Configuration] Set bluePatientsEnabled' as const)
-    public readonly type = '[Configuration] Set bluePatientsEnabled';
+export const setVehicleStatusInPatientStatusColorEnabledSchema = z.strictObject(
+    {
+        type: z.literal(
+            '[Configuration] Set vehicleStatusInPatientStatusColorEnabled'
+        ),
+        vehicleStatusInPatientStatusColor:
+            exerciseConfigurationSchema.shape.vehicleStatusInPatientStatusColor,
+    }
+);
+export type SetVehicleStatusInPatientStatusColorEnabled = Immutable<
+    z.infer<typeof setVehicleStatusInPatientStatusColorEnabledSchema>
+>;
 
-    @IsBoolean()
-    public readonly bluePatientsEnabled!: boolean;
-}
+export const setHighlightRelatedElementsActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set highlightRelatedElements'),
+    highlightRelatedElements:
+        exerciseConfigurationSchema.shape.highlightRelatedElements,
+});
+export type SetHighlightRelatedElements = Immutable<
+    z.infer<typeof setHighlightRelatedElementsActionSchema>
+>;
 
-export class SetPatientIdentifierPrefixAction implements Action {
-    @IsValue('[Configuration] Set patientIdentifierPrefix' as const)
-    public readonly type = '[Configuration] Set patientIdentifierPrefix';
+export const setVehicleLoadTimesEnabledActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set vehicleLoadTimesEnabled'),
+    vehicleLoadTimesEnabled:
+        exerciseConfigurationSchema.shape.vehicleLoadTimesEnabled,
+});
+export type SetVehicleLoadTimesEnabled = Immutable<
+    z.infer<typeof setVehicleLoadTimesEnabledActionSchema>
+>;
 
-    @IsString()
-    public readonly patientIdentifierPrefix!: string;
-}
-
-export class SetVehicleStatusHighlightEnabled implements Action {
-    @IsValue('[Configuration] Set vehicleStatusHighlightEnabled' as const)
-    public readonly type = '[Configuration] Set vehicleStatusHighlightEnabled';
-
-    @IsBoolean()
-    public readonly vehicleStatusHighlightEnabled!: boolean;
-}
-
-export class SetVehicleStatusInPatientStatusColorEnabled implements Action {
-    @IsValue(
-        '[Configuration] Set vehicleStatusInPatientStatusColorEnabled' as const
-    )
-    public readonly type =
-        '[Configuration] Set vehicleStatusInPatientStatusColorEnabled';
-
-    @IsBoolean()
-    public readonly vehicleStatusInPatientStatusColor!: boolean;
-}
-
-export class SetVehicleLoadTimesEnabled implements Action {
-    @IsValue('[Configuration] Set vehicleLoadTimesEnabled' as const)
-    public readonly type = '[Configuration] Set vehicleLoadTimesEnabled';
-
-    @IsBoolean()
-    public readonly vehicleLoadTimesEnabled!: boolean;
-}
-
-export class SetHighlightRelatedElements implements Action {
-    @IsValue('[Configuration] Set highlightRelatedElements' as const)
-    public readonly type = '[Configuration] Set highlightRelatedElements';
-
-    @IsZodSchema(exerciseConfigurationSchema.shape.highlightRelatedElements)
-    public readonly highlightRelatedElements!: ExerciseConfiguration['highlightRelatedElements'];
-}
-
-export class SetParticipantLoadAllEnabled implements Action {
-    @IsValue('[Configuration] Set participantLoadAllEnabled' as const)
-    public readonly type = '[Configuration] Set participantLoadAllEnabled';
-
-    @IsBoolean()
-    public readonly participantLoadAllEnabled!: boolean;
-}
+export const setParticipantLoadAllEnabledActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set participantLoadAllEnabled'),
+    participantLoadAllEnabled:
+        exerciseConfigurationSchema.shape.participantLoadAllEnabled,
+});
+export type SetParticipantLoadAllEnabled = Immutable<
+    z.infer<typeof setParticipantLoadAllEnabledActionSchema>
+>;
 
 export namespace ConfigurationActionReducers {
     export const setTileMapProperties: ActionReducer<SetTileMapPropertiesAction> =
         {
-            action: SetTileMapPropertiesAction,
+            type: setTileMapPropertiesActionSchema.shape.type.value,
+            actionSchema: setTileMapPropertiesActionSchema,
             reducer: (draftState, { tileMapProperties }) => {
                 draftState.configuration.tileMapProperties =
                     cloneDeepMutable(tileMapProperties);
@@ -111,7 +113,8 @@ export namespace ConfigurationActionReducers {
 
     export const setOperationsMapProperties: ActionReducer<SetOperationsMapPropertiesAction> =
         {
-            action: SetOperationsMapPropertiesAction,
+            type: setOperationsMapPropertiesActionSchema.shape.type.value,
+            actionSchema: setOperationsMapPropertiesActionSchema,
             reducer: (draftState, { operationsMapProperties }) => {
                 draftState.configuration.operationsMapProperties =
                     operationsMapProperties;
@@ -121,7 +124,8 @@ export namespace ConfigurationActionReducers {
         };
 
     export const setPretriageFlag: ActionReducer<SetPretriageEnabledAction> = {
-        action: SetPretriageEnabledAction,
+        type: setPretriageEnabledActionSchema.shape.type.value,
+        actionSchema: setPretriageEnabledActionSchema,
         reducer: (draftState, { pretriageEnabled }) => {
             draftState.configuration.pretriageEnabled = pretriageEnabled;
             return draftState;
@@ -131,7 +135,8 @@ export namespace ConfigurationActionReducers {
 
     export const setBluePatientsFlag: ActionReducer<SetBluePatientsEnabledFlagAction> =
         {
-            action: SetBluePatientsEnabledFlagAction,
+            type: setBluePatientsEnabledFlagActionSchema.shape.type.value,
+            actionSchema: setBluePatientsEnabledFlagActionSchema,
             reducer: (draftState, { bluePatientsEnabled }) => {
                 draftState.configuration.bluePatientsEnabled =
                     bluePatientsEnabled;
@@ -142,7 +147,8 @@ export namespace ConfigurationActionReducers {
 
     export const setPatientIdentifierPrefix: ActionReducer<SetPatientIdentifierPrefixAction> =
         {
-            action: SetPatientIdentifierPrefixAction,
+            type: setPatientIdentifierPrefixActionSchema.shape.type.value,
+            actionSchema: setPatientIdentifierPrefixActionSchema,
             reducer(draftState, { patientIdentifierPrefix }) {
                 draftState.configuration.patientIdentifierPrefix =
                     patientIdentifierPrefix;
@@ -153,7 +159,8 @@ export namespace ConfigurationActionReducers {
 
     export const setVehicleStatusHighlight: ActionReducer<SetVehicleStatusHighlightEnabled> =
         {
-            action: SetVehicleStatusHighlightEnabled,
+            type: setVehicleStatusHighlightEnabledActionSchema.shape.type.value,
+            actionSchema: setVehicleStatusHighlightEnabledActionSchema,
             reducer(draftState, { vehicleStatusHighlightEnabled }) {
                 draftState.configuration.vehicleStatusHighlight =
                     vehicleStatusHighlightEnabled;
@@ -164,7 +171,9 @@ export namespace ConfigurationActionReducers {
 
     export const setVehicleStatusInSkColor: ActionReducer<SetVehicleStatusInPatientStatusColorEnabled> =
         {
-            action: SetVehicleStatusInPatientStatusColorEnabled,
+            type: setVehicleStatusInPatientStatusColorEnabledSchema.shape.type
+                .value,
+            actionSchema: setVehicleStatusInPatientStatusColorEnabledSchema,
             reducer(draftState, { vehicleStatusInPatientStatusColor }) {
                 draftState.configuration.vehicleStatusInPatientStatusColor =
                     vehicleStatusInPatientStatusColor;
@@ -175,7 +184,8 @@ export namespace ConfigurationActionReducers {
 
     export const setVehicleLoadTimesEnabled: ActionReducer<SetVehicleLoadTimesEnabled> =
         {
-            action: SetVehicleLoadTimesEnabled,
+            type: setVehicleLoadTimesEnabledActionSchema.shape.type.value,
+            actionSchema: setVehicleLoadTimesEnabledActionSchema,
             reducer(draftState, { vehicleLoadTimesEnabled }) {
                 draftState.configuration.vehicleLoadTimesEnabled =
                     vehicleLoadTimesEnabled;
@@ -186,7 +196,8 @@ export namespace ConfigurationActionReducers {
 
     export const setHighlightRelatedElements: ActionReducer<SetHighlightRelatedElements> =
         {
-            action: SetHighlightRelatedElements,
+            type: setHighlightRelatedElementsActionSchema.shape.type.value,
+            actionSchema: setHighlightRelatedElementsActionSchema,
             reducer(draftState, { highlightRelatedElements }) {
                 draftState.configuration.highlightRelatedElements =
                     highlightRelatedElements;
@@ -197,7 +208,8 @@ export namespace ConfigurationActionReducers {
 
     export const setParticipantLoadAllEnabled: ActionReducer<SetParticipantLoadAllEnabled> =
         {
-            action: SetParticipantLoadAllEnabled,
+            type: setParticipantLoadAllEnabledActionSchema.shape.type.value,
+            actionSchema: setParticipantLoadAllEnabledActionSchema,
             reducer(draftState, { participantLoadAllEnabled }) {
                 draftState.configuration.participantLoadAllEnabled =
                     participantLoadAllEnabled;

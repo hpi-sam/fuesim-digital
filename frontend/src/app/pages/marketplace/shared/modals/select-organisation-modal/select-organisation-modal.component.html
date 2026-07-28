@@ -1,0 +1,34 @@
+<div class="modal-header">
+    <h4 class="modal-title">Organisation auswählen</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    <p>
+        {{ descriptionText }}
+    </p>
+    <div class="form-group mb-2">
+        <label class="form-label">Organisation</label>
+        <select
+            [formField]="selectOrgaForm.organisationId"
+            class="form-control"
+            [class.placeholder]="organisations.isLoading()"
+        >
+            @for (org of organisations.value(); track org.id) {
+                <option [value]="org.id">
+                    {{ org.name }}
+                </option>
+            }
+        </select>
+        <app-display-model-validation
+            [field]="selectOrgaForm.organisationId()"
+        />
+    </div>
+
+    <button
+        class="btn btn-primary"
+        [disabled]="selectOrgaForm().invalid()"
+        (click)="selectOrganisation()"
+    >
+        Organisation auswählen
+    </button>
+</div>

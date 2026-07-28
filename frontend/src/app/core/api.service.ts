@@ -4,10 +4,10 @@ import { Store } from '@ngrx/store';
 import {
     exerciseExistsResponseDataSchema,
     ExerciseKey,
-    exerciseKeysSchema,
+    getExerciseResponseDataSchema,
     getExercisesResponseDataSchema,
-    getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
+    getOrganisationDetailsResponseDataSchema,
     getExerciseTemplateViewportsResponseDataSchema,
     getParallelExerciseResponseDataSchema,
     getParallelExercisesResponseDataSchema,
@@ -15,21 +15,31 @@ import {
     postJoinParallelExerciseResponseDataSchema,
     PostParallelExerciseRequestData,
     TrainerKey,
-    type ExerciseTimeline,
-    type StateExport,
     type PatchExerciseTemplateRequestData,
     ExerciseTemplateId,
     ParallelExerciseId,
     PatchParallelExerciseRequestData,
+    getOrganisationsResponseDataSchema,
+    PostOrganisationRequestData,
+    getOrganisationResponseDataSchema,
+    OrganisationId,
+    PatchOrganisationRequestData,
+    postOrganisationInviteLinkResponseDataSchema,
     ParallelExerciseKey,
     getExerciseConfigResponseDataSchema,
+    OrganisationMembershipId,
+    OrganisationMembershipRole,
+    getExerciseTemplateResponseDataSchema,
+    PostExerciseRequestData,
+    stateExportSchema,
+    ExerciseTimeline,
     getBannerDataSchema,
 } from 'fuesim-digital-shared';
-import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
+import { freeze } from 'immer';
 import type { AppState } from '../state/app.state';
-import { selectExerciseKey } from '../state/application/selectors/application.selectors';
-import { selectStateSnapshot } from '../state/get-state-snapshot';
+import { selectStateSnapshot } from '../state/get-state-snapshot.js';
+import { selectExerciseKey } from '../state/application/selectors/application.selectors.js';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 
@@ -43,20 +53,27 @@ export class ApiService {
 
     readonly exerciseConfig = this.getExerciseConfigResource();
 
-    public async createExercise() {
+    public async createExercise(data: PostExerciseRequestData) {
         return lastValueFrom(
             this.httpClient
-                .post(`${httpOrigin}/api/exercise`, {})
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
+                .post(`${httpOrigin}/api/exercise`, data)
+                .pipe(map((v) => getExerciseResponseDataSchema.parse(v)))
         );
     }
 
-    public async importExercise(exportedState: StateExport) {
+    public async getExport(exerciseKey: ExerciseKey, withHistory: boolean) {
+        const params = new URLSearchParams(
+            withHistory
+                ? {
+                      withHistory: '',
+                  }
+                : {}
+        ).toString();
         return lastValueFrom(
-            this.httpClient
-                .post(`${httpOrigin}/api/exercise`, exportedState)
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
-        );
+            this.httpClient.get(
+                `${httpOrigin}/api/exercise/${exerciseKey}/export?${params}`
+            )
+        ).then((v) => stateExportSchema.parse(v));
     }
 
     public async exerciseHistory() {
@@ -91,10 +108,33 @@ export class ApiService {
             parse: getExercisesResponseDataSchema.parse,
         });
     }
+
+    public async getExercises(params?: { organisationId: OrganisationId }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(`${httpOrigin}/api/exercises/?${queryParams}`)
+        ).then(getExercisesResponseDataSchema.parse);
+    }
+
     public getExerciseTemplatesResource() {
         return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
             parse: getExerciseTemplatesResponseDataSchema.parse,
         });
+    }
+
+    public async getExerciseTemplates(params?: {
+        organisationId: OrganisationId;
+    }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(
+                `${httpOrigin}/api/exercise_templates/?${queryParams}`
+            )
+        ).then(getExerciseTemplatesResponseDataSchema.parse);
     }
 
     public getExerciseConfigResource() {
@@ -117,16 +157,32 @@ export class ApiService {
             }
         );
     }
+
     public async getParallelExercise(id: ParallelExerciseId) {
         return lastValueFrom(
             this.httpClient.get(`${httpOrigin}/api/parallel_exercises/${id}`)
         ).then(getParallelExerciseResponseDataSchema.parse);
     }
+
     public getParallelExercisesResource() {
         return httpResource(() => `${httpOrigin}/api/parallel_exercises/`, {
             parse: getParallelExercisesResponseDataSchema.parse,
         });
     }
+
+    public async getParallelExercises(params?: {
+        organisationId: OrganisationId;
+    }) {
+        const queryParams = params
+            ? new URLSearchParams(params).toString()
+            : '';
+        return lastValueFrom(
+            this.httpClient.get(
+                `${httpOrigin}/api/parallel_exercises/?${queryParams}`
+            )
+        ).then(getParallelExercisesResponseDataSchema.parse);
+    }
+
     public async getExerciseTemplateViewportsById(id: ExerciseTemplateId) {
         return lastValueFrom(
             this.httpClient.get(
@@ -135,18 +191,38 @@ export class ApiService {
         ).then(getExerciseTemplateViewportsResponseDataSchema.parse);
     }
 
+    public getOrganisationsResource() {
+        return httpResource(() => `${httpOrigin}/api/organisations/`, {
+            parse: getOrganisationsResponseDataSchema.parse,
+        });
+    }
+    public getOrganisationsAsEditorResource() {
+        return httpResource(
+            () => `${httpOrigin}/api/organisations/?role=editor`,
+            {
+                parse: getOrganisationsResponseDataSchema.parse,
+            }
+        );
+    }
+    public getOrganisationResource(id: OrganisationId) {
+        return httpResource(() => `${httpOrigin}/api/organisations/${id}`, {
+            parse: getOrganisationDetailsResponseDataSchema.parse,
+        });
+    }
+
+    public async getOrganisation(id: OrganisationId) {
+        const data = await lastValueFrom(
+            this.httpClient.get(`${httpOrigin}/api/organisations/${id}`)
+        );
+
+        const parsedData = getOrganisationDetailsResponseDataSchema.parse(data);
+
+        return parsedData;
+    }
+
     public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
             this.httpClient.post(`${httpOrigin}/api/exercise_templates`, data)
-        ).then(getExerciseTemplateResponseDataSchema.parse);
-    }
-
-    public async importExerciseTemplate(exportedState: StateExport) {
-        return lastValueFrom(
-            this.httpClient.post(
-                `${httpOrigin}/api/exercise_templates/import`,
-                exportedState
-            )
         ).then(getExerciseTemplateResponseDataSchema.parse);
     }
 
@@ -155,12 +231,11 @@ export class ApiService {
         data: PatchExerciseTemplateRequestData
     ) {
         return lastValueFrom(
-            this.httpClient
-                .patch(`${httpOrigin}/api/exercise_templates/${id}`, data)
-                .pipe(
-                    map((v) => getExerciseTemplateResponseDataSchema.parse(v))
-                )
-        );
+            this.httpClient.patch(
+                `${httpOrigin}/api/exercise_templates/${id}`,
+                data
+            )
+        ).then(getExerciseTemplateResponseDataSchema.parse);
     }
 
     public async createExerciseFromTemplate(templateId: ExerciseTemplateId) {
@@ -170,7 +245,7 @@ export class ApiService {
                     `${httpOrigin}/api/exercise_templates/${templateId}/new`,
                     {}
                 )
-                .pipe(map((v) => exerciseKeysSchema.parse(v)))
+                .pipe(map((v) => getExerciseResponseDataSchema.parse(v)))
         );
     }
 
@@ -227,5 +302,81 @@ export class ApiService {
         return httpResource(() => `${httpOrigin}/api/banner/`, {
             parse: getBannerDataSchema.parse,
         });
+    }
+
+    public async createOrganisation(data: PostOrganisationRequestData) {
+        return lastValueFrom(
+            this.httpClient.post(`${httpOrigin}/api/organisations/`, data)
+        ).then(getOrganisationResponseDataSchema.parse);
+    }
+
+    public async patchOrganisation(
+        id: OrganisationId,
+        data: PatchOrganisationRequestData
+    ) {
+        return lastValueFrom(
+            this.httpClient
+                .patch(`${httpOrigin}/api/organisations/${id}`, data)
+                .pipe(map((v) => getOrganisationResponseDataSchema.parse(v)))
+        );
+    }
+
+    public async createOrganisationInviteLink(id: OrganisationId) {
+        return lastValueFrom(
+            this.httpClient.post(
+                `${httpOrigin}/api/organisations/${id}/invite_links`,
+                {}
+            )
+        ).then(postOrganisationInviteLinkResponseDataSchema.parse);
+    }
+
+    public async joinOrganisation(token: string) {
+        return lastValueFrom(
+            this.httpClient.post(
+                `${httpOrigin}/api/organisations/join/${token}`,
+                {}
+            )
+        ).then(getOrganisationResponseDataSchema.parse);
+    }
+
+    public async updateOrganisationMembershipRole(
+        id: OrganisationMembershipId,
+        role: OrganisationMembershipRole
+    ) {
+        return lastValueFrom(
+            this.httpClient.patch(
+                `${httpOrigin}/api/organisations/memberships/${id}`,
+                { role }
+            )
+        );
+    }
+
+    public async deleteOrganisationMembership(id: OrganisationMembershipId) {
+        return lastValueFrom(
+            this.httpClient.delete(
+                `${httpOrigin}/api/organisations/memberships/${id}`
+            )
+        );
+    }
+
+    public async leaveOrganisation(id: OrganisationId) {
+        return lastValueFrom(
+            this.httpClient.post(
+                `${httpOrigin}/api/organisations/${id}/leave`,
+                {}
+            )
+        );
+    }
+
+    public async deleteOrganisation(id: OrganisationId) {
+        return lastValueFrom(
+            this.httpClient.delete(`${httpOrigin}/api/organisations/${id}`)
+        );
+    }
+
+    public async downloadUserdataDump() {
+        return lastValueFrom(
+            this.httpClient.get(`${httpOrigin}/api/userdata/dump`)
+        );
     }
 }

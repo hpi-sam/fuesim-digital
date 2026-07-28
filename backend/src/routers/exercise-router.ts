@@ -1,14 +1,20 @@
 import {
     exerciseExistsResponseDataSchema,
     getExerciseConfigResponseDataSchema,
+    getExerciseResponseDataSchema,
+    getExercisesResponseDataSchema,
     isExerciseKey,
     isTrainerKey,
+    organisationIdSchema,
+    postExerciseRequestDataSchema,
+    stateExportSchema,
 } from 'fuesim-digital-shared';
-import { isEmpty } from 'lodash-es';
 import { Router } from 'express';
+import { castDraft } from 'immer';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ApiError, NotFoundError } from '../utils/http.js';
 import { Config } from '../config.js';
+import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 
 export function createExerciseRouter(exerciseService: ExerciseService): Router {
     const router = Router();
@@ -22,21 +28,28 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
         );
     });
 
-    router.post('/exercise', async (req, res) => {
-        const optionalData = req.session
-            ? { user: req.session.user.id }
-            : undefined;
-        const exercise = isEmpty(req.body)
-            ? await exerciseService.createExerciseFromBlank(optionalData)
-            : await exerciseService.createExerciseFromFile(
-                  req.body,
-                  optionalData
-              );
+    router.get('/exercises/', isAuthenticatedMiddleware, async (req, res) => {
+        const orgIdRes = organisationIdSchema.safeParse(
+            req.query['organisationId']
+        );
+        const exercises = await exerciseService.getAllExercisesForUser(
+            req.session!,
+            orgIdRes.success ? orgIdRes.data : undefined
+        );
 
-        res.status(201).send({
-            participantKey: exercise.participantKey,
-            trainerKey: exercise.trainerKey,
-        });
+        res.send(getExercisesResponseDataSchema.encode(exercises));
+    });
+
+    router.post('/exercise', async (req, res) => {
+        const data = postExerciseRequestDataSchema.parse(req.body);
+        const exercise = await exerciseService.createExercise(
+            data,
+            req.session
+        );
+
+        res.status(201).send(
+            getExerciseResponseDataSchema.encode(exercise.exercise)
+        );
     });
 
     router
@@ -47,7 +60,7 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
             }
             let exercise = null;
             try {
-                exercise = exerciseService.getExerciseByKey(
+                exercise = await exerciseService.getExerciseByKey(
                     req.params.exerciseKey,
                     req.session
                 );
@@ -78,6 +91,19 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
             );
             res.status(204).send();
         });
+
+    router.get('/exercise/:exerciseKey/export', async (req, res) => {
+        if (!isExerciseKey(req.params.exerciseKey)) {
+            throw new ApiError();
+        }
+        const withHistory = 'withHistory' in req.query;
+        const stateExport = await exerciseService.getExport(
+            req.params.exerciseKey,
+            withHistory,
+            req.session
+        );
+        res.send(stateExportSchema.encode(castDraft(stateExport)));
+    });
 
     router.get('/exercise/:exerciseKey/history', async (req, res) => {
         if (!isExerciseKey(req.params.exerciseKey)) {

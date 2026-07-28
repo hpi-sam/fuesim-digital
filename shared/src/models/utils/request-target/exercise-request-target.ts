@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     simulatedRegionRequestTarget,
     simulatedRegionRequestTargetConfigurationSchema,
@@ -30,8 +31,8 @@ type ExerciseRequestTargetDictionary = {
     >['type']]: Target;
 };
 
-export type ExerciseRequestTargetConfiguration = z.infer<
-    typeof exerciseRequestTargetConfigurationSchema
+export type ExerciseRequestTargetConfiguration = Immutable<
+    z.infer<typeof exerciseRequestTargetConfigurationSchema>
 >;
 
 export const requestTargetDictionary = Object.fromEntries(

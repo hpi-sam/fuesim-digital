@@ -1,20 +1,22 @@
-import { isUUID } from 'class-validator';
 import {
     type UUID,
     type ExerciseKey,
     joinExerciseResponseDataSchema,
     isExerciseKey,
+    uuidSchema,
 } from 'fuesim-digital-shared';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
 import { ClientWrapper, ExerciseClientWrapper } from '../client-wrapper.js';
 import type { Services } from '../../database/services/index.js';
+import type { Repositories } from '../../database/repositories/index.js';
 import { secureOn } from './secure-on.js';
 
 export function registerJoinExerciseHandler(
     io: ExerciseServer,
     socket: ExerciseSocket,
-    services: Services
+    services: Services,
+    repositories: Repositories
 ) {
     secureOn(
         socket,
@@ -34,7 +36,8 @@ export function registerJoinExerciseHandler(
             const clientWrapper = ClientWrapper.init(
                 ExerciseClientWrapper,
                 socket,
-                services
+                services,
+                repositories
             );
             if (!clientWrapper) return;
 
@@ -63,7 +66,10 @@ export function registerJoinExerciseHandler(
                 });
                 return;
             }
-            if (clientId !== undefined && !isUUID(clientId, 4)) {
+            if (
+                clientId !== undefined &&
+                !uuidSchema.safeParse(clientId).success
+            ) {
                 callback({
                     success: false,
                     message: 'Invalid clientId format',
@@ -72,14 +78,15 @@ export function registerJoinExerciseHandler(
                 return;
             }
 
-            clientWrapper.getSessionInformation().then(() => {
+            clientWrapper.getSessionInformation().then(async () => {
                 let joinedClientId: UUID | null = null;
                 try {
                     if (clientId !== undefined) {
-                        joinedClientId = clientWrapper.reconnectToExercise(
-                            exerciseKey,
-                            clientId
-                        );
+                        joinedClientId =
+                            await clientWrapper.reconnectToExercise(
+                                exerciseKey,
+                                clientId
+                            );
                         if (joinedClientId === null) {
                             callback({
                                 success: false,
@@ -90,7 +97,7 @@ export function registerJoinExerciseHandler(
                             return;
                         }
                     } else {
-                        joinedClientId = clientWrapper.joinExercise(
+                        joinedClientId = await clientWrapper.joinExercise(
                             exerciseKey,
                             clientName!
                         );

@@ -5,6 +5,10 @@
             <i class="bi bi-person me-1"></i> {{ authData.user.displayName }}
         </button>
         <div ngbDropdownMenu>
+            <a ngbDropdownItem routerLink="/organisations">
+                <i class="bi bi-people me-1"></i>
+                Organisationen
+            </a>
             @if (authData?.userSelfServiceEnabled) {
                 <a ngbDropdownItem [href]="userSelfServiceUrl">
                     <i class="bi bi-person-gear me-1"></i>
@@ -20,6 +24,11 @@
                 <i class="bi bi-box-arrow-right me-1"></i>
                 Abmelden
             </a>
+
+            <button ngbDropdownItem (click)="downloadUserdata()">
+                <i class="bi bi-download me-1"></i>
+                Nutzerdaten
+            </button>
         </div>
     </div>
 } @else if (authData.user === null) {

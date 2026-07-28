@@ -7,11 +7,11 @@
                     as exerciseTemplate
                 ) {
                     <a
-                        [routerLink]="`/exercises/templates/`"
+                        (click)="location.back()"
                         class="btn btn-outline-secondary me-4"
                     >
                         <i class="bi bi-chevron-left me-2"></i>
-                        Zurück zur Liste
+                        Zurück
                     </a>
                     <h2 class="mb-0">
                         Übungsvorlage: {{ exerciseTemplate.name }}
@@ -106,14 +106,24 @@
                             <div ngbDropdownMenu class="position-absolute">
                                 <button
                                     ngbDropdownItem
-                                    (click)="exportExerciseWithHistory()"
+                                    (click)="
+                                        exerciseService.exportExercise(
+                                            exerciseKey()!,
+                                            true
+                                        )
+                                    "
                                 >
                                     <i class="bi-clock-history me-2"> </i>
                                     Kompletten Verlauf
                                 </button>
                                 <button
                                     ngbDropdownItem
-                                    (click)="exportExerciseState()"
+                                    (click)="
+                                        exerciseService.exportExercise(
+                                            exerciseKey()!,
+                                            false
+                                        )
+                                    "
                                 >
                                     <i class="bi-cloud-download me-2"> </i>
                                     Aktuellen Zustand
@@ -222,9 +232,7 @@
                     @if (!ownClient.isInWaitingRoom) {
                         @switch (ownClient.role.specificRole) {
                             @case ('mapOperator') {
-                                <app-exercise-map
-                                    class="h-100 rounded overflow-hidden"
-                                ></app-exercise-map>
+                                <app-map-operator-map />
                             }
                             @case ('trainer') {
                                 <app-trainer-map-editor></app-trainer-map-editor>

@@ -16,6 +16,10 @@ export const trainerKeySchema = z
 export type ParallelExerciseKey = z.infer<typeof parallelExerciseKey>;
 export type ParticipantKey = z.infer<typeof participantKeySchema>;
 export type TrainerKey = z.infer<typeof trainerKeySchema>;
+export const exerciseKeySchema = z.union([
+    participantKeySchema,
+    trainerKeySchema,
+]);
 // z.union doesn't work well with branded types
 export type ExerciseKey = ParticipantKey | TrainerKey;
 export const accessKeySchema = z.union([

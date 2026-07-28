@@ -1,0 +1,58 @@
+<div class="modal-header">
+    <h4 class="modal-title">Alarmgruppe auswählen</h4>
+
+    @if (collectionElements.isLoading()) {
+        <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
+    }
+
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    @if (collectionElements.hasValue()) {
+        @for (entry of collectionElements.value(); track entry) {
+            @if (entry.collection !== null && entry.elements !== null) {
+                <div class="mb-4">
+                    <h5>{{ entry.collection.title }}</h5>
+
+                    <div class="container">
+                        <div
+                            class="row row-cols-2 row-cols-md-4 row-cols-lg-4 g-2"
+                        >
+                            @for (
+                                element of filterAlarmGroups(
+                                    entry.elements.direct
+                                );
+                                track element.versionId
+                            ) {
+                                <app-element-card
+                                    [element]="element"
+                                    [showIndicator]="undefined"
+                                    [small]="true"
+                                    mode="static"
+                                    (click)="close(element.content)"
+                                    [collection]="entry.collection"
+                                    [collectionElements]="entry.elements"
+                                />
+                            }
+                        </div>
+                        @if (
+                            filterAlarmGroups(entry.elements.direct).length ===
+                            0
+                        ) {
+                            <div class="col">
+                                <p
+                                    class="bg-light p-4 rounded-3 lead mb-0 mt-2 d-flex flex-column gap-2"
+                                >
+                                    <span>
+                                        Diese Sammlung enthält keine
+                                        Alarmgruppen.
+                                    </span>
+                                </p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    }
+</div>

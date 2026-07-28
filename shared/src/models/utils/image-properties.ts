@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const imagePropertiesSchema = z.strictObject({
     /**
@@ -24,7 +25,7 @@ export const imagePropertiesSchema = z.strictObject({
     aspectRatio: z.number().positive(),
 });
 
-export type ImageProperties = z.infer<typeof imagePropertiesSchema>;
+export type ImageProperties = Immutable<z.infer<typeof imagePropertiesSchema>>;
 
 export function newImageProperties(
     url: string,

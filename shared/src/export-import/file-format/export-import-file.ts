@@ -1,4 +1,7 @@
-import type { PartialExport } from './partial-export.js';
-import type { StateExport } from './state-export.js';
+import { z } from 'zod';
 
-export type ExportImportFile = PartialExport | StateExport;
+export const exportImportFileSchema = z.object({
+    type: z.literal(['complete', 'partial']),
+    fileVersion: z.int().nonnegative(),
+    dataVersion: z.int().nonnegative(),
+});

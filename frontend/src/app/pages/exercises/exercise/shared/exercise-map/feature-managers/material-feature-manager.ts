@@ -113,7 +113,7 @@ export class MaterialFeatureManager extends MoveableFeatureManager<Material> {
             [(this.getElementFromFeature(feature) as Material).vehicleId]
         );
 
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 MaterialPopupComponent,
                 feature,

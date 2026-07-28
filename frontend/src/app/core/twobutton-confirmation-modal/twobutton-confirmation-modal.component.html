@@ -1,0 +1,37 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ title }}</h4>
+    <button
+        type="button"
+        class="btn-close"
+        (click)="confirmation$.next(null); activeModal.close()"
+    ></button>
+</div>
+<div class="modal-body">
+    <div>{{ description }}</div>
+</div>
+<div class="modal-footer">
+    <button
+        type="button"
+        class="btn btn-outline-secondary"
+        autofocus
+        (click)="confirmation$.next(null); activeModal.close()"
+    >
+        {{ cancelButtonText }}
+    </button>
+    <div class="d-flex flex-row justify-content-between w-100 mt-2">
+        <button
+            type="button"
+            class="btn btn-success"
+            (click)="confirmation$.next('success'); activeModal.close()"
+        >
+            {{ successButtonText }}
+        </button>
+        <button
+            type="button"
+            class="btn btn-danger"
+            (click)="confirmation$.next('danger'); activeModal.close()"
+        >
+            {{ dangerButtonText }}
+        </button>
+    </div>
+</div>

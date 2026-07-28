@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { addActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
 import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
@@ -12,8 +13,8 @@ export const providePersonnelBehaviorStateSchema = z.strictObject({
     vehicleTemplatePriorities: z.array(uuidSchema),
 });
 
-export type ProvidePersonnelBehaviorState = z.infer<
-    typeof providePersonnelBehaviorStateSchema
+export type ProvidePersonnelBehaviorState = Immutable<
+    z.infer<typeof providePersonnelBehaviorStateSchema>
 >;
 
 export function newProvidePersonnelBehaviorState(

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { patientStatusSchema } from '../utils/patient-status.js';
 import type { UUID } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
@@ -12,8 +13,8 @@ export const transferCategoryCompletedRadiogramSchema = z.strictObject({
     scope: transferProgressScopeSchema,
 });
 
-export type TransferCategoryCompletedRadiogram = z.infer<
-    typeof transferCategoryCompletedRadiogramSchema
+export type TransferCategoryCompletedRadiogram = Immutable<
+    z.infer<typeof transferCategoryCompletedRadiogramSchema>
 >;
 export function newTransferCategoryCompletedRadiogram(
     id: UUID,

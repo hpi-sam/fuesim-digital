@@ -14,6 +14,7 @@ import { Fill } from 'ol/style';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
+import type { Immutable } from 'immer';
 import { SimulatedRegionPopupComponent } from '../shared/simulated-region-popup/simulated-region-popup.component';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -149,7 +150,7 @@ export class SimulatedRegionFeatureManager
     }
 
     public override onFeatureDrop(
-        droppedElement: Element | undefined,
+        droppedElement: Immutable<Element> | undefined,
         droppedOnFeature: Feature<any>,
         dropEvent: MouseEvent | TranslateEvent
     ) {
@@ -197,7 +198,7 @@ export class SimulatedRegionFeatureManager
         }
 
         const simulatedRegionId = feature.getId() as UUID;
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 SimulatedRegionPopupComponent,
                 event.coordinate,

@@ -1,10 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { OnInit, inject, Component, computed, signal } from '@angular/core';
 import {
     NgbModal,
     NgbAccordionDirective,
     NgbAccordionItem,
     NgbAccordionHeader,
-    NgbAccordionToggle,
     NgbAccordionButton,
     NgbAccordionCollapse,
     NgbAccordionBody,
@@ -12,29 +11,41 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
-    PartialExport,
     migratePartialExport,
     transferPointImage,
     validateExerciseExport,
     viewportImage,
     bystanderCategories,
     scoutableMapImageTemplate,
+    getEntityFromElement,
 } from 'fuesim-digital-shared';
-import type { PatientCategory, UUID } from 'fuesim-digital-shared';
+import type {
+    PatientCategory,
+    UUID,
+    TechnicalChallengeTemplate,
+    Element as FuesimElement,
+    CollectionEntityId,
+    CollectionVersionId,
+} from 'fuesim-digital-shared';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
-import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
 import { FormsModule } from '@angular/forms';
-import { AsyncPipe, KeyValuePipe } from '@angular/common';
-import { DragElementService } from '../core/drag-element.service';
+import { AsyncPipe, KeyValuePipe, NgTemplateOutlet } from '@angular/common';
+import {
+    CdkDrag,
+    CdkDragPlaceholder,
+    CdkDropList,
+    CdkDropListGroup,
+} from '@angular/cdk/drag-drop';
+import {
+    DragElementService,
+    TransferTemplate,
+} from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
-import { openCreateVehicleTemplateModal } from '../editor-panel/create-vehicle-template-modal/open-create-vehicle-template-modal';
 import { openEditImageTemplateModal } from '../editor-panel/edit-image-template-modal/open-edit-image-template-modal';
 import { openPartialImportOverwriteModal } from '../partial-import/open-partial-import-overwrite-modal';
 import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
-import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal';
 import { restrictedZoneDragTemplates } from '../editor-panel/templates/restricted-zone';
-import { ExerciseService } from '../../../../../core/exercise.service';
 import { MessageService } from '../../../../../core/messages/message.service';
 import type { AppState } from '../../../../../state/app.state';
 import {
@@ -42,16 +53,24 @@ import {
     selectVehicleTemplates,
     selectMapImagesTemplates,
     selectExerciseState,
+    selectAlarmgroupTemplates,
+    selectSelectedCollections,
+    selectTechnicalChallengeTemplates,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { FileInputDirective } from '../../../../../shared/directives/file-input.directive';
-import { MapEditorCardComponent } from '../editor-panel/map-editor-card/map-editor-card.component';
 import { PatientStatusBadgeComponent } from '../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 import { HelpBannerComponent } from '../../../../../help-banner/help-banner.component.js';
+import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
+import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group-overview-page.component';
+import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
+import { openManageExerciseCollectionsModal } from '../manage-exercise-collections/open-manage-exercise-collections-modal';
+import { CollectionService } from '../../../../../core/exercise-element.service';
+import { openEditTechnicalChallengeTemplateModal } from '../editor-panel/edit-technical-challenge-template-modal/open-edit-technical-challenge-template-modal.js';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -73,9 +92,7 @@ type FilterCategory =
         NgbAccordionDirective,
         NgbAccordionItem,
         NgbAccordionHeader,
-        NgbAccordionToggle,
         NgbAccordionButton,
-        NgbCollapse,
         NgbAccordionCollapse,
         NgbAccordionBody,
         MapEditorCardComponent,
@@ -88,6 +105,13 @@ type FilterCategory =
         KeyValuePipe,
         ValuesPipe,
         HelpBannerComponent,
+        CdkDrag,
+        CdkDropList,
+        CdkDropListGroup,
+        NgTemplateOutlet,
+        CdkDragPlaceholder,
+        AlarmGroupOverviewPageComponent,
+        HospitalEditorPageComponent,
     ],
 })
 /**
@@ -95,11 +119,15 @@ type FilterCategory =
  */
 export class TrainerMapEditorComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
-    readonly dragElementService = inject(DragElementService);
+    private readonly dragElementService = inject(DragElementService);
     readonly transferLinesService = inject(TransferLinesService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly messageService = inject(MessageService);
-    private readonly exerciseService = inject(ExerciseService);
+    private readonly collectionService = inject(CollectionService);
+
+    public readonly overwriteTrainerMap = signal<
+        'alarmgroups' | 'hospitals' | null
+    >(null);
 
     public selectedCategories$: BehaviorSubject<{
         [key in FilterCategory]: boolean;
@@ -126,6 +154,23 @@ export class TrainerMapEditorComponent implements OnInit {
     public readonly mapImageTemplates$ = this.store.select(
         selectMapImagesTemplates
     );
+
+    public readonly alarmGroupTemplates$ = this.store.select(
+        selectAlarmgroupTemplates
+    );
+
+    public readonly selectedCollections$ = this.store.selectSignal(
+        selectSelectedCollections
+    );
+
+    public readonly technicalChallengeTemplates = computed<
+        readonly TechnicalChallengeTemplate[]
+    >(() => {
+        const templates = this.store.selectSignal(
+            selectTechnicalChallengeTemplates
+        );
+        return Object.values(templates());
+    });
 
     public patientCategories$?: Observable<{
         [key in FilterCategory]?: PatientCategory[];
@@ -179,16 +224,15 @@ export class TrainerMapEditorComponent implements OnInit {
         openCreateImageTemplateModal(this.ngbModalService);
     }
 
-    public addVehicleTemplate() {
-        openCreateVehicleTemplateModal(this.ngbModalService);
-    }
-
     public editMapImageTemplate(mapImageTemplateId: UUID) {
         openEditImageTemplateModal(this.ngbModalService, mapImageTemplateId);
     }
 
-    public editVehicleTemplate(mapImageTemplateId: UUID) {
-        openEditVehicleTemplateModal(this.ngbModalService, mapImageTemplateId);
+    public editTechnicalChallengeTemplate(technicalChallengeTemplateId: UUID) {
+        openEditTechnicalChallengeTemplateModal(
+            this.ngbModalService,
+            technicalChallengeTemplateId
+        );
     }
 
     public setCurrentCategory(
@@ -201,6 +245,81 @@ export class TrainerMapEditorComponent implements OnInit {
         });
     }
 
+    public startElementDrag(
+        event: PointerEvent,
+        transferTemplate: TransferTemplate
+    ) {
+        this.overwriteTrainerMap.set(null);
+        this.dragElementService.onMouseDown(event, transferTemplate);
+    }
+
+    public openTemplateManagementModal() {
+        openManageExerciseCollectionsModal(this.ngbModalService);
+    }
+
+    public getTitleOfCollectionVersion(collectionVersion: CollectionVersionId) {
+        return this.collectionService.getCollectionVersionStructureFromCache(
+            collectionVersion
+        ).title;
+    }
+
+    public filterElementsToCollection(
+        elements: FuesimElement[],
+        collectionEntityId: CollectionEntityId
+    ) {
+        return elements.filter((element) =>
+            this.getCollectionsOfElement(element).includes(collectionEntityId)
+        );
+    }
+
+    public getCollectionsOfElement(
+        element: FuesimElement
+    ): CollectionEntityId[] {
+        const entity = getEntityFromElement(element);
+
+        if (entity === undefined) {
+            return [];
+        }
+
+        const collectionElements = this.selectedCollections$().map(
+            (collection) => ({
+                collection,
+                elements:
+                    this.collectionService.getCollectionVersionStructureFromCache(
+                        collection.versionId
+                    ),
+            })
+        );
+
+        return collectionElements
+            .filter(
+                (collection) =>
+                    collection.elements.direct.some(
+                        (directElement) =>
+                            directElement.versionId === entity.versionId
+                    ) ||
+                    collection.elements.imported.some((importItem) =>
+                        importItem.elements.some(
+                            (importedElement) =>
+                                importedElement.versionId === entity.versionId
+                        )
+                    )
+            )
+            .map((collection) => collection.collection.entityId);
+    }
+
+    public getElementsWithoutCollection(
+        elements: FuesimElement[]
+    ): FuesimElement[] {
+        return elements.filter(
+            (element) => getEntityFromElement(element) === undefined
+        );
+    }
+
+    public getEntityOfElement(element: FuesimElement) {
+        return getEntityFromElement(element);
+    }
+
     public importingTemplates = false;
     public async importPartialExport(fileList: FileList) {
         try {
@@ -210,19 +329,19 @@ export class TrainerMapEditorComponent implements OnInit {
                 // The file dialog has been aborted.
                 return;
             }
-            const importedPlainObject = JSON.parse(
-                importedText
-            ) as PartialExport;
+            const importedPlainObject = JSON.parse(importedText);
+
+            const partialExport = validateExerciseExport(importedPlainObject);
+            if (partialExport.type !== 'partial') {
+                this.messageService.postError({
+                    title: 'An dieser Stelle können keine vollständigen Übungsexports importiert werden.',
+                });
+                return;
+            }
             const migratedPartialExport = migratePartialExport(
-                importedPlainObject,
+                partialExport,
                 selectStateSnapshot(selectExerciseState, this.store)
             );
-            const validation = validateExerciseExport(migratedPartialExport);
-            if (validation.length > 0) {
-                throw Error(
-                    `PartialExport is invalid:\n${validation.join('\n')}`
-                );
-            }
             openPartialImportOverwriteModal(
                 this.ngbModalService,
                 migratedPartialExport

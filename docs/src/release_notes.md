@@ -3,6 +3,32 @@
 Auf dieser Seite informieren wir über aktuelle Änderungen in der FüSim Digital. Zudem gibt es einen [Mailverteiler](https://lists.myhpi.de/8NGBl7FhFMPbVxPK7Pa0cRMfCezUkjHksbD9HxOM),
 der auch über die Änderungen informiert.
 
+## Version 1.0.0-rc.1 -- 28.07.2026
+
+[Release 1.0.0-rc.1 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v1.0.0-rc.1)
+
+### Neue Features
+
+- Es wurden Organisationen eingeführt, um Inhalte gemeinsam mit anderen Nutzern zu verwalten. Es ist möglich, eigene Organisationen zu erstellen, zu verwalten und andere Nutzer in diese einzuladen. Dort können dann gemeinsam Übungen, Übungsvorlagen, Parallelübungen und Übungselemente verwaltet werden.
+- Es wurden Sammlungen von Übungselementen eingeführt, um Übungselemente (z. B. Fahrzeuge, Alarmgruppen usw.) auch außerhalb von Übungen zu verwalten und gemeinsam zu nutzen.
+- Mithilfe von sogenannten Parallelübungen können nun Teilnehmende basierend auf der gleichen Übungsvorlage in verschiedenen Übungsinstanzen gleichzeitig üben und dabei unabhängig voneinander das Szenario bearbeiten.
+- Mit technischen Herausforderungen ist es nun möglich, sich dynamisch verändernde Situationen wie technische Hilfeleistungen oder Brandbekämpfung einzubinden. Um diese zu bewältigen, können die Teilnehmenden Personal zuweisen und ihnen Aufträge in Form von vordefinierten Aufgaben erteilen. Derzeit gibt es zwei vorgefertigte technische Herausforderungen. Diese Funktion wird in einer späteren Softwareversion um einen Editor erweitert, damit Ausbilder ihre eigenen Herausforderungen erstellen können.
+- Es wurden Maßnahmen hinzugefügt, mit denen Ausbilder verschiedene globale Aktionen konfigurieren können, die Teilnehmende ausführen können (z. B. einen Statusbericht abgeben, eine Gefahrenzone einzeichnen, zusätzliche Einheiten anfordern).
+- Es gibt nun eine Meldung, die angezeigt wird, wenn die Anwendung nicht ordnungsgemäß gestartet werden kann, und das den Benutzer über mögliche Ursachen informiert.
+- Benutzer können nun alle ihre benutzerbezogenen Daten exportieren, wenn sie angemeldet sind.
+- Übungen und Übungsvorlagen können aus dem Übungsmanager exportiert werden.
+- Es ist möglich, alle Übungen/Übungsvorlagen einer Organisation als ZIP-Datei zu exportieren.
+
+### Änderungen
+
+- Übungen, Übungsvorlagen und parallele Übungen sind nicht mehr an einen Benutzer, sondern an eine Organisation gebunden. Jeder Benutzer verfügt daher über eine private Organisation für seine persönlichen Inhalte.
+- Wenn Teilnehmende Erkundungselemente ansehen, wird dies erfasst und Übungsleitenden durch eine grüne Sprechblase/Lupe angezeigt. Außerdem erscheint diese Information im Log.
+
+### Fehlerbehebungen
+
+- Übungselemente werden nun erst dann als erkundbar markiert, wenn der Name oder Inhalt festgelegt wurde, und können auch wieder als nicht erkundbar markiert werden.
+- Fehlermeldungen beim Import von Übungen werden nun in einem lesbaren Format angezeigt.
+
 ## Version 0.17.0 -- 30.06.2026
 
 [Release 0.17.0 auf GitHub](https://github.com/hpi-sam/fuesim-digital/releases/tag/v0.17.0)

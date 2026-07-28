@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     defaultTileMapProperties,
     defaultOperationsMapProperties,
@@ -21,7 +22,9 @@ export const exerciseConfigurationSchema = z.strictObject({
     tileMapProperties: tileMapPropertiesSchema,
     operationsMapProperties: operationsMapPropertiesSchema,
 });
-export type ExerciseConfiguration = z.infer<typeof exerciseConfigurationSchema>;
+export type ExerciseConfiguration = Immutable<
+    z.infer<typeof exerciseConfigurationSchema>
+>;
 export function newExerciseConfiguration(): ExerciseConfiguration {
     return {
         type: 'exerciseConfiguration',

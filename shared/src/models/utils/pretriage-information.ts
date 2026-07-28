@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const pretriageInformationSchema = z.strictObject({
     injuries: z.string(),
@@ -14,4 +15,6 @@ export const pretriageInformationSchema = z.strictObject({
     hearing: z.string(),
 });
 
-export type PretriageInformation = z.infer<typeof pretriageInformationSchema>;
+export type PretriageInformation = Immutable<
+    z.infer<typeof pretriageInformationSchema>
+>;

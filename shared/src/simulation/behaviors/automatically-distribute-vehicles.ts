@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash-es';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { z } from 'zod';
 import { nextUUID } from '../utils/randomness.js';
 import { uuidSetSchema } from '../../utils/uuid-set.js';
@@ -31,8 +31,8 @@ export const automaticallyDistributeVehiclesBehaviorStateSchema =
         recurringActivityId: uuidSchema.optional(),
     });
 
-export type AutomaticallyDistributeVehiclesBehaviorState = z.infer<
-    typeof automaticallyDistributeVehiclesBehaviorStateSchema
+export type AutomaticallyDistributeVehiclesBehaviorState = Immutable<
+    z.infer<typeof automaticallyDistributeVehiclesBehaviorStateSchema>
 >;
 
 export function newAutomaticallyDistributeVehiclesBehaviorState(): AutomaticallyDistributeVehiclesBehaviorState {

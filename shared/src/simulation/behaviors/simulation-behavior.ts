@@ -1,4 +1,4 @@
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { z } from 'zod';
 import type { ExerciseState } from '../../state.js';
 import { uuidSchema } from '../../utils/uuid.js';
@@ -10,8 +10,8 @@ export const simulationBehaviorStateSchema = z.strictObject({
     id: uuidSchema,
 });
 
-export type SimulationBehaviorState = z.infer<
-    typeof simulationBehaviorStateSchema
+export type SimulationBehaviorState = Immutable<
+    z.infer<typeof simulationBehaviorStateSchema>
 >;
 
 export interface SimulationBehavior<S extends SimulationBehaviorState> {

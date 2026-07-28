@@ -1,5 +1,4 @@
-import type { WritableDraft } from 'immer';
-import { produce } from 'immer';
+import { produce, type WritableDraft } from 'immer';
 import type { ExerciseState } from '../state.js';
 import { sleep } from '../utils/sleep.js';
 import { applyAction } from './reduce-exercise-state.js';
@@ -45,21 +44,24 @@ export function jumpToTime(
     let lastAppliedActionIndex = 0;
     // TODO: find a heuristic for whether using produce or deepCloning it
     // Default is produce
-    const stateAtTime = produce(initialState, (draftState) => {
-        for (const action of actions) {
-            applyAction(draftState, action);
-            const nextAction = actions[lastAppliedActionIndex + 1];
-            // Because this action type is the only one that increases the currentTime
-            // and we always want the state after the last action at the currentTime
-            if (
-                nextAction?.type === '[Exercise] Tick' &&
-                draftState.currentTime >= time
-            ) {
-                break;
+    const stateAtTime = produce(
+        initialState,
+        (draftState: WritableDraft<ExerciseState>): void => {
+            for (const action of actions) {
+                applyAction(draftState, action);
+                const nextAction = actions[lastAppliedActionIndex + 1];
+                // Because this action type is the only one that increases the currentTime
+                // and we always want the state after the last action at the currentTime
+                if (
+                    nextAction?.type === '[Exercise] Tick' &&
+                    draftState.currentTime >= time
+                ) {
+                    break;
+                }
+                lastAppliedActionIndex++;
             }
-            lastAppliedActionIndex++;
         }
-    });
+    );
     return {
         lastAppliedActionIndex,
         stateAtTime,

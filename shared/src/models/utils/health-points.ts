@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { PatientStatus } from './patient-status.js';
 
 export const healthPointsDefaults = {
@@ -17,7 +18,7 @@ export const healthPointsSchema = z
     .number()
     .min(healthPointsDefaults.min)
     .max(healthPointsDefaults.max);
-export type HealthPoints = z.infer<typeof healthPointsSchema>;
+export type HealthPoints = Immutable<z.infer<typeof healthPointsSchema>>;
 
 export function getStatus(health: HealthPoints): PatientStatus {
     if (health <= healthPointsDefaults.blackMax) {

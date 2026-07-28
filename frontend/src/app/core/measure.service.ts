@@ -1,0 +1,263 @@
+import { inject, Injectable, signal } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+    MeasureProperty,
+    MeasurePropertyInstance,
+    MeasureTemplate,
+    newDrawing,
+    newMeasure,
+} from 'fuesim-digital-shared';
+import { filter, firstValueFrom, map, Subject, race } from 'rxjs';
+
+import { AppState } from '../state/app.state';
+import { selectLastClientName } from '../state/application/selectors/application.selectors';
+import {
+    openAlarmModal,
+    openEocLogModal,
+} from '../pages/exercises/exercise/shared/measure-modals/open-measure-modals';
+import { selectStateSnapshot } from '../state/get-state-snapshot';
+import {
+    createSelectAlarmGroup,
+    selectCurrentTime,
+} from '../state/application/selectors/exercise.selectors';
+import { getVehicleParameters } from '../shared/functions/vehicle-parameters';
+import { ConfirmationModalService } from './confirmation-modal/confirmation-modal.service';
+import { ExerciseService } from './exercise.service';
+import { DrawingInteractionService } from './drawing-interaction.service';
+import { MessageService } from './messages/message.service';
+
+@Injectable({
+    providedIn: 'root',
+})
+export class MeasureService {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly messageService = inject(MessageService);
+    private readonly ngbModalService = inject(NgbModal);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
+    private readonly drawingInteractionService = inject(
+        DrawingInteractionService
+    );
+
+    private readonly clientName = this.store.selectSignal(selectLastClientName);
+
+    public readonly activeMeasure = signal<MeasureTemplate | null>(null);
+    public readonly activeProperty = signal<MeasureProperty | null>(null);
+    public endEvent?: Subject<boolean | null>;
+
+    /**
+     * Handles the execution of a single property for a measure.
+     * @param template The template this property is being executed for.
+     * @param property The property being executed.
+     * @returns - false if user canceled the measure
+     *          - true if property was executed successfully but returns no instance
+     *          - MeasurePropertyInstance if property executed successfully and returns an instance
+     */
+    private async handle(
+        template: MeasureTemplate,
+        property: MeasureProperty
+    ): Promise<MeasurePropertyInstance | boolean> {
+        this.activeProperty.set(property);
+        const currentTime = selectStateSnapshot(selectCurrentTime, this.store);
+        switch (property.type) {
+            case 'delay':
+                this.endEvent = new Subject<boolean | null>();
+                return firstValueFrom(
+                    race(
+                        this.endEvent.pipe(filter((e) => e !== null)),
+                        this.store
+                            .select(selectCurrentTime)
+                            .pipe(
+                                filter(
+                                    (t) =>
+                                        t >= currentTime + property.delay * 1000
+                                )
+                            )
+                            .pipe(map(() => true))
+                    )
+                );
+            case 'response':
+                await this.confirmationModalService.confirm({
+                    title: template.name,
+                    description: property.response,
+                    confirmationString: '',
+                });
+                return true;
+            case 'manualConfirm': {
+                const res = await this.confirmationModalService.confirm({
+                    title: template.name,
+                    description: property.prompt,
+                    confirmationString: property.confirmationString,
+                });
+                return res ?? false;
+            }
+            case 'alarm': {
+                const modalRef = openAlarmModal(
+                    this.ngbModalService,
+                    property.alarmGroups,
+                    property.targetTransferPointIds,
+                    template.name
+                );
+                try {
+                    const result = await modalRef.result;
+                    return {
+                        type: 'alarmInstance',
+                        alarmGroup: result.alarmGroup,
+                        targetTransferPointId: result.targetTransferPointId,
+                        vehicleParameters: getVehicleParameters(
+                            this.store,
+                            selectStateSnapshot(
+                                createSelectAlarmGroup(result.alarmGroup),
+                                this.store
+                            )
+                        ),
+                    };
+                } catch {
+                    return false;
+                }
+            }
+            case 'eocLog': {
+                let message: string;
+                if (property.confirm) {
+                    const modalRef = openEocLogModal(
+                        this.ngbModalService,
+                        property.message,
+                        property.editable
+                    );
+                    try {
+                        const result = await modalRef.result;
+                        message = result.message;
+                    } catch {
+                        return false;
+                    }
+                } else {
+                    // The zod schema enforces that the message is editable
+                    // when it is empty, and that it has to be confirmed when
+                    // it is editable. Thus, message must be defined here.
+                    message = property.message!;
+                }
+
+                return {
+                    type: 'eocLogInstance',
+                    message,
+                };
+            }
+            case 'drawFreehand': {
+                this.endEvent = new Subject<boolean | null>();
+                const result =
+                    await this.drawingInteractionService.requestDrawing({
+                        drawingType: 'polygon',
+                        strokeColor: property.strokeColor,
+                        fillColor: property.fillColor,
+                        endEvent: this.endEvent,
+                    });
+                if (!result) return false;
+                const drawing = newDrawing(
+                    'polygon',
+                    result.points,
+                    property.strokeColor,
+                    property.fillColor
+                );
+                this.exerciseService.proposeAction({
+                    type: '[Drawing] Add drawing',
+                    drawing,
+                });
+                return {
+                    type: 'drawingInstance',
+                    id: drawing.id,
+                };
+            }
+            case 'drawLine': {
+                this.endEvent = new Subject<boolean | null>();
+                const result =
+                    await this.drawingInteractionService.requestDrawing({
+                        drawingType: 'line',
+                        strokeColor: property.strokeColor,
+                        endEvent: this.endEvent,
+                    });
+                if (!result) return false;
+                const drawing = newDrawing(
+                    'line',
+                    result.points,
+                    property.strokeColor,
+                    undefined
+                );
+                this.exerciseService.proposeAction({
+                    type: '[Drawing] Add drawing',
+                    drawing,
+                });
+                return {
+                    type: 'drawingInstance',
+                    id: drawing.id,
+                };
+            }
+        }
+    }
+
+    private resetActive() {
+        this.activeMeasure.set(null);
+        this.activeProperty.set(null);
+    }
+
+    public async executeMeasure(template: MeasureTemplate) {
+        this.activeMeasure.set(template);
+
+        const instances = [];
+        for (const property of template.properties) {
+            // eslint-disable-next-line no-await-in-loop
+            const result = await this.handle(template, property);
+
+            if (result === false) {
+                this.resetActive();
+                this.abort(instances);
+                return;
+            } else if (result === true) continue;
+
+            instances.push(result);
+        }
+
+        this.resetActive();
+        this.confirm(template, instances);
+    }
+
+    private confirm(
+        template: MeasureTemplate,
+        instances: MeasurePropertyInstance[]
+    ) {
+        this.exerciseService
+            .proposeAction({
+                type: '[Measure] Add Measure',
+                measure: newMeasure(
+                    selectStateSnapshot(selectCurrentTime, this.store),
+                    this.clientName() ?? '',
+                    template.id,
+                    instances
+                ),
+            })
+            .catch((e) => {
+                this.messageService.postError({
+                    title: 'Fehler beim Erstellen der Maßnahme',
+                    error: e.message,
+                });
+            });
+    }
+
+    private abort(instances: MeasurePropertyInstance[]) {
+        for (const instance of instances) {
+            switch (instance.type) {
+                case 'drawingInstance': {
+                    this.exerciseService.proposeAction({
+                        type: '[Drawing] Remove drawing',
+                        drawingId: instance.id,
+                    });
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
+}

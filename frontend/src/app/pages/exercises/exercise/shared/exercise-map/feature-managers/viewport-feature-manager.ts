@@ -150,7 +150,7 @@ export class ViewportFeatureManager
         const zoom = this.olMap.getView().getZoom()!;
         const margin = 10 / zoom;
 
-        this.popupService.openPopup({
+        this.popupService.togglePopup({
             elementUUID: feature.getId()?.toString(),
             component: ViewportPopupComponent,
             closingUUIDs: [feature.getId() as UUID],

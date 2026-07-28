@@ -1,0 +1,80 @@
+<a
+    class="card d-block text-decoration-none"
+    [routerLink]="
+        noLink() ? undefined : '/collections/' + collection().entityId
+    "
+    [queryParams]="{ from: fromLocation() }"
+    data-cy="collectionCard"
+    data-title="{{ collection().title }}"
+    [attr.data-entity]="collection().entityId"
+>
+    <div class="card-body">
+        <h5 class="mb-0 card-title" data-cy="collectionCardTitle">
+            {{ collection().title }}
+        </h5>
+    </div>
+    <ul class="list-group list-group-flush small">
+        <li class="list-group-item py-1">
+            <i class="bi bi-clock me-1"></i> Zuletzt bearbeitet:
+            {{ collection().editedAt | date }}
+        </li>
+        <li class="list-group-item py-1">
+            <i class="bi bi-grid me-1"></i>
+            {{ collection().elementCount }} Übungselemente
+            @if (collection().draftState) {
+                <i
+                    class="bi bi-pencil-fill ms-1 draftstate-indicator"
+                    ngbTooltip="befindet sich im Entwurfsstatus"
+                ></i>
+            }
+        </li>
+        <li class="list-group-item py-1 d-flex flex-wrap align-items-center">
+            <i class="bi bi-people me-1"></i>
+            @for (
+                org of collection().userCollectionRelationships;
+                track org.id
+            ) {
+                <span class="badge text-bg-secondary ms-1">{{ org.name }}</span>
+            } @empty {
+                <span class="text-muted ms-1">Keine Organisationen</span>
+            }
+        </li>
+    </ul>
+    <div class="card-body d-flex flex-row flex-wrap justify-content-between">
+        <a
+            [routerLink]="
+                noLink() ? undefined : '/collections/' + collection().entityId
+            "
+            [queryParams]="{ from: fromLocation() }"
+            class="btn btn-primary me-2"
+        >
+            Öffnen
+        </a>
+        @if (showArchiveButton()) {
+            <button
+                class="btn btn-outline-danger"
+                (click)="
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    archive.emit()
+                "
+            >
+                <i class="bi bi-archive me-1"></i>
+                Archivieren
+            </button>
+        }
+        @if (showLeaveButton()) {
+            <button
+                class="btn btn-outline-danger"
+                (click)="
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    leave.emit()
+                "
+            >
+                <i class="bi bi-box-arrow-right me-1"></i>
+                Verlassen
+            </button>
+        }
+    </div>
+</a>

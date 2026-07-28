@@ -1,3 +1,5 @@
+import { z } from 'zod';
+import type { ActionReducer } from '../action-reducer.js';
 import { AlarmGroupActionReducers } from './alarm-group.js';
 import { ClientActionReducers } from './client.js';
 import { ExerciseActionReducers } from './exercise.js';
@@ -20,7 +22,14 @@ import { VehicleTemplateActionReducers } from './vehicle-templates.js';
 import { RestrictedZoneActionReducers } from './restricted-zone.js';
 import { OperationalSectionActionReducers } from './operational-section.js';
 import { ScoutableActionReducers } from './scoutable.js';
+import { MeasureActionReducers } from './measure.js';
+import { MeasureTemplateActionReducers } from './measure-templates.js';
+import { MeasureTemplateActionReducers as MeasureTemplateCategoryActionReducers } from './measure-template-categories.js';
+import { DrawingActionReducers } from './drawing.js';
+import { TechnicalChallengeActionReducers } from './technical-challenge.js';
+import { CollectionReducers } from './collections.js';
 
+import { TechnicalChallengeTemplateActionReducers } from './technical-challenge-template.js';
 /**
  * All action reducers of the exercise must be registered here
  */
@@ -45,48 +54,58 @@ const actionReducers = {
     ...RadiogramActionReducers,
     ...VehicleTemplateActionReducers,
     ...RestrictedZoneActionReducers,
+    ...CollectionReducers,
     ...OperationalSectionActionReducers,
     ...ScoutableActionReducers,
-};
+    ...TechnicalChallengeActionReducers,
+    ...TechnicalChallengeTemplateActionReducers,
+    ...MeasureActionReducers,
+    ...MeasureTemplateActionReducers,
+    ...MeasureTemplateCategoryActionReducers,
+    ...DrawingActionReducers,
+} as const;
 
 type ExerciseActionReducer =
     (typeof actionReducers)[keyof typeof actionReducers];
 
+type ExtractAction<R> = R extends ActionReducer<infer A> ? A : never;
+
+/**
+ * A map that maps from each `Action.type` to the corresponding `ActionReducer`.
+ */
 type ExerciseActionTypeDictionary = {
-    [_ActionReducer in ExerciseActionReducer as InstanceType<
-        _ActionReducer['action']
-    >['type']]: _ActionReducer;
+    [_ActionReducer in ExerciseActionReducer as ExtractAction<_ActionReducer>['type']]: _ActionReducer;
 };
 
 /**
  * This dictionary maps the action type to the ActionReducer.
  */
-let exerciseActionTypeDictionary: ExerciseActionTypeDictionary | undefined;
-
-export function getExerciseActionTypeDictionary(): ExerciseActionTypeDictionary {
-    if (exerciseActionTypeDictionary) {
-        return exerciseActionTypeDictionary;
-    }
-    const dictionary = {} as any;
-    // fill in the dictionary
-    Object.values(actionReducers)
-        .map(
-            (actionReducer) =>
-                ({
-                    // the generated ts code from class default values adds them only in the constructor: https://github.com/microsoft/TypeScript/issues/15607
-                    // therefore we have to call the constructor (An ActionClass constructor is therefore required to not throw an error when called without arguments)
-                    type: new actionReducer.action().type,
-                    actionClass: actionReducer,
-                }) as const
+export const exerciseActionTypeDictionary: ExerciseActionTypeDictionary =
+    Object.fromEntries(
+        Object.values(actionReducers).map(
+            (actionReducer) => [actionReducer.type, actionReducer] as const
         )
-        .forEach(({ type, actionClass }) => {
-            dictionary[type] = actionClass;
-        });
-    exerciseActionTypeDictionary = dictionary as ExerciseActionTypeDictionary;
-    return exerciseActionTypeDictionary;
+    ) as ExerciseActionTypeDictionary;
+
+export function isActionType(
+    actionType: string
+): actionType is ExerciseAction['type'] {
+    return actionType in exerciseActionTypeDictionary;
+}
+export const actionTypeSchema = z.custom<ExerciseAction['type']>(
+    (val) => typeof val === 'string' && isActionType(val),
+    'Not a valid action type'
+);
+
+export function lookupReducerFor(
+    actionType: ExerciseAction['type']
+): ActionReducer<ExerciseAction> {
+    return exerciseActionTypeDictionary[
+        actionType
+    ] as ActionReducer<ExerciseAction>;
 }
 
 /**
  * A Union of all actions of the exercise.
  */
-export type ExerciseAction = InstanceType<ExerciseActionReducer['action']>;
+export type ExerciseAction = ExtractAction<ExerciseActionReducer>;

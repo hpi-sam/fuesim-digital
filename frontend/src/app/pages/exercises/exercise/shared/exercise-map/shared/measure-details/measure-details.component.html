@@ -1,0 +1,44 @@
+@if (measureService.activeMeasure() !== null) {
+    @let measure = measureService.activeMeasure()!;
+    <div class="card bg-body bg-opacity-75">
+        <div class="card-header text-center">
+            {{ measure.name }}
+        </div>
+        @if (showBody() && activeProperty) {
+            <div class="card-body d-flex flex-column align-items-center">
+                @if (activeProperty.hint.length > 0) {
+                    <h5 class="card-title text-center">
+                        {{ activeProperty.hint }}
+                    </h5>
+                }
+                <div>
+                    @switch (activeProperty.type) {
+                        @case ('drawFreehand')
+                        @case ('delay') {
+                            <button
+                                class="btn btn-danger"
+                                (click)="abortProperty()"
+                            >
+                                Abbrechen
+                            </button>
+                        }
+                        @case ('drawLine') {
+                            <button
+                                class="btn btn-danger me-2"
+                                (click)="abortProperty()"
+                            >
+                                Abbrechen
+                            </button>
+                            <button
+                                class="btn btn-success"
+                                (click)="completeProperty()"
+                            >
+                                Fertig
+                            </button>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

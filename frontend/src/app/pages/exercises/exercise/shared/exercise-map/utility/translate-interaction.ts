@@ -57,6 +57,43 @@ export class TranslateInteraction extends Translate {
         });
     }
 
+    public static setTranslateStartAllowedPredicate(
+        feature: Feature,
+        predicate: (feature: Feature, event: MapBrowserEvent<any>) => boolean
+    ) {
+        feature.set(translateStartAllowedPredicateKey, predicate);
+    }
+
+    protected override handleDownEvent(
+        mapBrowserEvent: MapBrowserEvent<any>
+    ): boolean {
+        if (!this.isTranslateStartAllowed(mapBrowserEvent)) {
+            return false;
+        }
+        return super.handleDownEvent(mapBrowserEvent);
+    }
+
+    private isTranslateStartAllowed(event: MapBrowserEvent<any>): boolean {
+        let isAllowed = true;
+        event.map.forEachFeatureAtPixel(
+            event.pixel,
+            (feature) => {
+                const predicate = feature.get(
+                    translateStartAllowedPredicateKey
+                );
+
+                if (predicate) {
+                    isAllowed = predicate(feature as Feature, event);
+                }
+                return true;
+            },
+            {
+                hitTolerance: 10,
+            }
+        );
+        return isAllowed;
+    }
+
     protected override handleMoveEvent(
         mapBrowserEvent: MapBrowserEvent<any>
     ): void {
@@ -65,3 +102,5 @@ export class TranslateInteraction extends Translate {
         // Therefore we override this handler with an empty one.
     }
 }
+
+const translateStartAllowedPredicateKey = 'translateStartAllowedPredicate';

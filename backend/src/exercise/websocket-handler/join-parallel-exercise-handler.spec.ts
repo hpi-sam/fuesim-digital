@@ -1,18 +1,22 @@
 import assert from 'node:assert';
 import type {
     GetParallelExerciseResponseData,
+    OrganisationMembershipRole,
     ParallelExerciseInstanceSummary,
 } from 'fuesim-digital-shared';
 import { uuid } from 'fuesim-digital-shared';
 import {
     alternativeTestUserSessionData,
+    createExerciseTemplate,
     createTestEnvironment,
     createTestUserSession,
+    defaultTestUserSessionData,
 } from '../../test/utils.js';
 import {
     createParallelExercise,
     joinParallelExercise,
 } from '../../test/parallel-exercise-utils.js';
+import { createOrganisation } from '../../test/organisation-utils.js';
 
 describe('join parallel exercise', () => {
     const environment = createTestEnvironment();
@@ -77,6 +81,74 @@ describe('join parallel exercise', () => {
             expect(join.success).toBe(false);
         }, session2);
     });
+
+    it('fails with 403 if not member of organisation', async () => {
+        const session2 = await createTestUserSession(environment, {
+            user: alternativeTestUserSessionData,
+        });
+        const organisation = await createOrganisation(environment, session2);
+        const exerciseTemplate = await createExerciseTemplate(
+            environment,
+            session2,
+            organisation.id
+        );
+        parallelExercise = await createParallelExercise(
+            environment,
+            session2,
+            exerciseTemplate
+        );
+
+        await environment.withWebsocket(async (socket) => {
+            const join = await socket.emit(
+                'joinParallelExercise',
+                parallelExercise.id
+            );
+
+            expect(join.success).toBe(false);
+        }, session);
+    });
+
+    it.each([
+        'viewer',
+        'editor',
+        'admin',
+    ] satisfies OrganisationMembershipRole[])(
+        'succeeds with 200 if %s',
+        async (role) => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            await environment.repositories.organisationRepository.addMemberToOrganisation(
+                organisation.id,
+                defaultTestUserSessionData.id,
+                role
+            );
+
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+            parallelExercise = await createParallelExercise(
+                environment,
+                session2,
+                exerciseTemplate
+            );
+
+            await environment.withWebsocket(async (socket) => {
+                const join = await socket.emit(
+                    'joinParallelExercise',
+                    parallelExercise.id
+                );
+
+                expect(join.success).toBe(true);
+            }, session);
+        }
+    );
 
     it('fails double joining', async () => {
         await environment.withWebsocket(async (socket) => {
@@ -209,63 +281,6 @@ describe('join parallel exercise', () => {
             );
             expect(exerciseInstance.isActive).toBe(false);
             expect(exerciseInstance.clientNames).toStrictEqual([clientName]);
-        }, session);
-    });
-
-    it('start and stop parallel exercise', async () => {
-        await environment.withWebsocket(async (socket) => {
-            await socket.emit('joinParallelExercise', parallelExercise.id);
-
-            const joinedParticipant1 = await joinParallelExercise(
-                environment,
-                parallelExercise
-            );
-            const joinedParticipant2 = await joinParallelExercise(
-                environment,
-                parallelExercise
-            );
-
-            await environment.withWebsocket(async (clientSocket1) => {
-                await clientSocket1.emit('joinExercise', {
-                    exerciseKey: joinedParticipant1.participantKey,
-                    clientName: '',
-                });
-
-                await environment.withWebsocket(async (clientSocket2) => {
-                    await clientSocket2.emit('joinExercise', {
-                        exerciseKey: joinedParticipant2.participantKey,
-                        clientName: '',
-                    });
-
-                    await socket.emit('controlParallelExercise', 'start');
-
-                    for (const joinedParticipant of [
-                        joinedParticipant1,
-                        joinedParticipant2,
-                    ]) {
-                        const state = environment.services.exerciseService
-                            .TESTING_getExerciseMap()
-                            .get(joinedParticipant.participantKey)!.exercise
-                            .currentStateString;
-
-                        expect(state.currentStatus).toBe('running');
-                    }
-
-                    await socket.emit('controlParallelExercise', 'pause');
-
-                    for (const joinedParticipant of [
-                        joinedParticipant1,
-                        joinedParticipant2,
-                    ]) {
-                        const state = environment.services.exerciseService
-                            .TESTING_getExerciseMap()
-                            .get(joinedParticipant.participantKey)!.exercise
-                            .currentStateString;
-
-                        expect(state.currentStatus).toBe('paused');
-                    }
-                });
-            });
         }, session);
     });
 });

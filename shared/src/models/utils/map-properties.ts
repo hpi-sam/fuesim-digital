@@ -1,5 +1,6 @@
 /* eslint-disable require-unicode-regexp */
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const tileUrlSchema = z.union([
     z.string().regex(/{x}/i),
@@ -16,7 +17,9 @@ export const tileMapPropertiesSchema = z.strictObject({
      */
     maxZoom: z.number().positive(),
 });
-export type TileMapProperties = z.infer<typeof tileMapPropertiesSchema>;
+export type TileMapProperties = Immutable<
+    z.infer<typeof tileMapPropertiesSchema>
+>;
 
 export const operationsMapPropertiesSchema = z.strictObject({
     tileUrl: tileUrlSchema,
@@ -24,6 +27,6 @@ export const operationsMapPropertiesSchema = z.strictObject({
     enable3dBuildings: z.boolean(),
 });
 
-export type OperationsMapProperties = z.infer<
-    typeof operationsMapPropertiesSchema
+export type OperationsMapProperties = Immutable<
+    z.infer<typeof operationsMapPropertiesSchema>
 >;

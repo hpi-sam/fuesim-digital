@@ -1,4 +1,4 @@
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { z } from 'zod';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
@@ -43,6 +43,7 @@ import type { SimulatedRegion } from '../../models/simulated-region.js';
 import { newRecurringEventActivityState } from '../activities/recurring-event.js';
 import { newAskForPatientDataEvent } from '../events/ask-for-patient-data-event.js';
 import { newTryToSendToHospitalEvent } from '../events/try-to-send-to-hospital.js';
+import { getTemplates } from '../../models/template.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
 import type { SimulationBehavior } from './simulation-behavior.js';
 
@@ -60,7 +61,7 @@ const vehiclesForPatientsSchema = z.strictObject({
     greenIndex: z.int().nonnegative(),
 });
 
-type VehiclesForPatients = z.infer<typeof vehiclesForPatientsSchema>;
+type VehiclesForPatients = Immutable<z.infer<typeof vehiclesForPatientsSchema>>;
 
 function newVehiclesForPatients(): VehiclesForPatients {
     return {
@@ -115,8 +116,8 @@ export const managePatientTransportToHospitalBehaviorStateSchema =
         recurringSendToHospitalActivityId: uuidSchema.optional(),
     });
 
-export type ManagePatientTransportToHospitalBehaviorState = z.infer<
-    typeof managePatientTransportToHospitalBehaviorStateSchema
+export type ManagePatientTransportToHospitalBehaviorState = Immutable<
+    z.infer<typeof managePatientTransportToHospitalBehaviorStateSchema>
 >;
 
 export function newManagePatientTransportToHospitalBehaviorState(): ManagePatientTransportToHospitalBehaviorState {
@@ -375,7 +376,7 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                         event.vehiclesSent.vehicleCounts
                     ).reduce((sum, [type, count]) => {
                         const vehicleTemplate = Object.values(
-                            draftState.vehicleTemplates
+                            getTemplates(draftState, 'vehicleTemplate')
                         ).find((template) => template.vehicleType === type);
 
                         return (

@@ -1,6 +1,12 @@
 <app-header />
 <main class="container">
-    <h1 class="mb-3">Meine Parallelübungen</h1>
+    <div
+        class="d-flex flex-wrap align-items-center justify-content-between mb-3"
+    >
+        <h1>Parallelübungen</h1>
+        <app-help-button url="2_exercises/5_parallel.html" />
+        <div class="flex-grow-1"></div>
+    </div>
     @if (parallelExercises.hasValue()) {
         <div class="row row-cols-3">
             @for (

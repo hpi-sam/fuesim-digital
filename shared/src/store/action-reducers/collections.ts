@@ -1,0 +1,135 @@
+import type { Immutable, WritableDraft } from 'immer';
+import { z } from 'zod';
+import type { ActionReducer } from '../action-reducer.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import type { ExerciseState } from '../../state.js';
+import type { ChangeApply } from '../../marketplace/exercise-collection-upgrade/exercise-collection-change-apply.js';
+import { changeApplySchema } from '../../marketplace/exercise-collection-upgrade/exercise-collection-change-apply.js';
+import {
+    hasEntityProperties,
+    marketplaceElementsDefinitions,
+} from '../../marketplace/elements/marketplace-elements.js';
+import { versionedCollectionPartialSchema } from '../../marketplace/models/versioned-id-schema.js';
+import { templateSchema } from '../../models/template.js';
+import type { DefinitelyTemplateVersionContent } from '../../marketplace/models/versioned-element-content.js';
+
+export const addCollectionActionSchema = z.strictObject({
+    type: z.literal('[Collection] Add Collection'),
+    collection: versionedCollectionPartialSchema,
+    overwriteTemplates: z.array(templateSchema),
+});
+export type AddCollectionAction = Immutable<
+    z.infer<typeof addCollectionActionSchema>
+>;
+
+export const upgradeCollectionActionSchema = z.strictObject({
+    type: z.literal('[Collection] Upgrade Collection'),
+    collection: versionedCollectionPartialSchema,
+    overwriteTemplates: z.array(templateSchema),
+    changeApplies: z.array(changeApplySchema),
+});
+
+export type UpgradeCollectionAction = Immutable<
+    z.infer<typeof upgradeCollectionActionSchema>
+>;
+
+export const removeCollectionActionSchema = z.strictObject({
+    type: z.literal('[Collection] Remove Collection'),
+    collectionVersion: versionedCollectionPartialSchema,
+    overwriteTemplates: z.array(templateSchema),
+    changeApplies: z.array(changeApplySchema),
+});
+
+export type RemoveCollectionAction = Immutable<
+    z.infer<typeof removeCollectionActionSchema>
+>;
+
+export namespace CollectionReducers {
+    export const addCollection: ActionReducer<AddCollectionAction> = {
+        type: addCollectionActionSchema.shape.type.value,
+        actionSchema: addCollectionActionSchema,
+        reducer: (draftState, data) => {
+            overwriteStateTemplates(draftState, data.overwriteTemplates);
+
+            draftState.selectedCollections.push({
+                entityId: data.collection.entityId,
+                versionId: data.collection.versionId,
+            });
+
+            return draftState;
+        },
+        rights: 'trainer',
+    };
+    export const upgradeCollection: ActionReducer<UpgradeCollectionAction> = {
+        type: upgradeCollectionActionSchema.shape.type.value,
+        actionSchema: upgradeCollectionActionSchema,
+        reducer: (draftState, data) => {
+            overwriteStateTemplates(draftState, data.overwriteTemplates);
+
+            // THIS VERSION IS THE "LITE"-MARKETPLACE
+            // CHANGE APPLIES ARE NOT YET IMPLEMENTED
+            // IF YOU PASS IN ANYTHING BUT AN EMPTY ARRAY
+            // IT *WILL* THROW AN ERROR
+            applyAllChangeApplies(draftState, data.changeApplies);
+
+            draftState.selectedCollections = cloneDeepMutable(
+                draftState.selectedCollections.map((collection) => {
+                    if (collection.entityId === data.collection.entityId) {
+                        return cloneDeepMutable({
+                            entityId: data.collection.entityId,
+                            versionId: data.collection.versionId,
+                        });
+                    }
+                    return collection;
+                })
+            );
+
+            return draftState;
+        },
+        rights: 'trainer',
+    };
+    export const removeCollection: ActionReducer<RemoveCollectionAction> = {
+        type: removeCollectionActionSchema.shape.type.value,
+        actionSchema: removeCollectionActionSchema,
+        reducer: (draftState, data) => {
+            overwriteStateTemplates(draftState, data.overwriteTemplates);
+            applyAllChangeApplies(draftState, data.changeApplies);
+
+            // Remove the collection from the selected collections in the state
+            draftState.selectedCollections =
+                draftState.selectedCollections.filter(
+                    (collection) =>
+                        collection.entityId !== data.collectionVersion.entityId
+                );
+
+            return draftState;
+        },
+        rights: 'trainer',
+    };
+}
+
+function overwriteStateTemplates(
+    draftState: WritableDraft<ExerciseState>,
+    overwriteTemplates: Immutable<DefinitelyTemplateVersionContent[]>
+) {
+    draftState.templates = Object.fromEntries([
+        ...Object.entries(draftState.templates).filter(
+            ([id, element]) =>
+                // we only want to keep templates that
+                // are not part of the marketplace
+                !hasEntityProperties(element)
+        ),
+        ...overwriteTemplates.map((template) => [template.id, template]),
+    ]);
+}
+
+function applyAllChangeApplies(
+    draftState: WritableDraft<ExerciseState>,
+    changeApplies: Immutable<ChangeApply[]>
+) {
+    for (const changeApply of changeApplies) {
+        for (const entry of Object.values(marketplaceElementsDefinitions)) {
+            entry.changeApply(draftState, changeApply);
+        }
+    }
+}

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { resourceDescriptionSchema } from '../utils/resource-description.js';
 import type { UUID } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
@@ -9,8 +10,8 @@ export const personnelCountRadiogramSchema = z.strictObject({
     type: z.literal('personnelCountRadiogram'),
     personnelCount: resourceDescriptionSchema,
 });
-export type PersonnelCountRadiogram = z.infer<
-    typeof personnelCountRadiogramSchema
+export type PersonnelCountRadiogram = Immutable<
+    z.infer<typeof personnelCountRadiogramSchema>
 >;
 
 export function newPersonnelCountRadiogram(

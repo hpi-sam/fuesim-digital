@@ -42,12 +42,12 @@
         </button>
     </form>
 } @else {
-    <div class="d-flex">
+    <div class="d-flex align-items-center">
         <div class="flex-grow-1" [title]="name()">
             @if (value()) {
                 {{ value() }}
             } @else {
-                –
+                {{ noValueText() }}
             }
         </div>
         <button class="btn btn-sm" (click)="startEdit()" title="Bearbeiten">

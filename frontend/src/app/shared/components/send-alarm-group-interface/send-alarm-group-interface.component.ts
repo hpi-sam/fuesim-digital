@@ -1,12 +1,7 @@
 import { computed, signal, type OnDestroy, type OnInit } from '@angular/core';
 import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import {
-    createVehicleParameters,
-    getTransferPointFullName,
-    newMapCoordinatesAt,
-    uuid,
-} from 'fuesim-digital-shared';
+import { getTransferPointFullName, uuid } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, map, takeUntil } from 'rxjs';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -21,9 +16,6 @@ import {
     selectAlarmGroups,
     selectTransferPoints,
     createSelectAlarmGroup,
-    selectVehicleTemplates,
-    selectMaterialTemplates,
-    selectPersonnelTemplates,
     selectExerciseStatus,
 } from '../../../state/application/selectors/exercise.selectors';
 import {
@@ -37,6 +29,7 @@ import { HotkeyIndicatorComponent } from '../hotkey-indicator/hotkey-indicator.c
 import { SearchableDropdownComponent } from '../searchable-dropdown/searchable-dropdown.component';
 import { IntegerValidatorDirective } from '../../validation/integer-validator.directive';
 import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
+import { getVehicleParameters } from '../../functions/vehicle-parameters';
 
 // We want to remember this
 let selectedAlarmGroup: SearchableDropdownOption | null = null;
@@ -219,93 +212,65 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     public async sendAlarmGroup() {
         this.loading.set(true);
+        try {
+            if (!this.canSubmit) {
+                this.messageService.postError({
+                    title: 'Fehler beim Senden der Alarmgruppe',
+                    body: 'Bitte geben Sie alle notwendigen Informationen an!',
+                });
+                this.loading.set(false);
+                return;
+            }
 
-        if (!this.canSubmit) {
-            this.messageService.postError({
-                title: 'Fehler beim Senden der Alarmgruppe',
-                body: 'Bitte geben Sie alle notwendigen Informationen an!',
+            const alarmGroup = selectStateSnapshot(
+                createSelectAlarmGroup(selectedAlarmGroup!.key),
+                this.store
+            );
+
+            const firstVehiclesCountForAction = this.firstVehiclesCount;
+            const firstVehiclesCountReducedBy = Math.min(
+                Object.keys(alarmGroup.alarmGroupVehicles).length,
+                this.firstVehiclesCount
+            );
+            this.firstVehiclesCount -= firstVehiclesCountReducedBy;
+
+            const vehicleParameters = getVehicleParameters(
+                this.store,
+                alarmGroup
+            );
+
+            const request = await this.exerciseService.proposeAction({
+                type: '[Emergency Operation Center] Send Alarm Group',
+                clientName: selectStateSnapshot(selectOwnClient, this.store)!
+                    .name,
+                alarmGroupId: alarmGroup.id,
+                sortedVehicleParameters: vehicleParameters,
+                targetTransferPointId: this.selectedTarget!.key,
+                firstVehiclesCount: firstVehiclesCountForAction,
+                firstVehiclesTargetTransferPointId:
+                    this.selectedFirstVehiclesTarget?.key,
+                eocLogId: uuid(),
             });
+
             this.loading.set(false);
-            return;
-        }
 
-        const alarmGroup = selectStateSnapshot(
-            createSelectAlarmGroup(selectedAlarmGroup!.key),
-            this.store
-        );
-
-        const firstVehiclesCountForAction = this.firstVehiclesCount;
-        const firstVehiclesCountReducedBy = Math.min(
-            Object.keys(alarmGroup.alarmGroupVehicles).length,
-            this.firstVehiclesCount
-        );
-        this.firstVehiclesCount -= firstVehiclesCountReducedBy;
-
-        const vehicleTemplates = selectStateSnapshot(
-            selectVehicleTemplates,
-            this.store
-        );
-
-        const materialTemplates = selectStateSnapshot(
-            selectMaterialTemplates,
-            this.store
-        );
-        const personnelTemplates = selectStateSnapshot(
-            selectPersonnelTemplates,
-            this.store
-        );
-
-        const sortedAlarmGroupVehicles = Object.values(
-            alarmGroup.alarmGroupVehicles
-        ).sort((a, b) => a.time - b.time);
-
-        // We have to provide a map position when creating a vehicle
-        // It will be overwritten directly after by putting the vehicle into transfer
-        const placeholderPosition = newMapCoordinatesAt(0, 0);
-
-        // Create vehicle parameters for the alarm group
-        // This has to be done in the frontend to ensure the UUIDs of the vehicles, material, and personnel are consistent across all clients
-        const vehicleParameters = sortedAlarmGroupVehicles.map(
-            (alarmGroupVehicle) =>
-                createVehicleParameters(
-                    uuid(),
-                    {
-                        ...vehicleTemplates[
-                            alarmGroupVehicle.vehicleTemplateId
-                        ]!,
-                        name: alarmGroupVehicle.name,
-                    },
-                    materialTemplates,
-                    personnelTemplates,
-                    placeholderPosition
-                )
-        );
-
-        const request = await this.exerciseService.proposeAction({
-            type: '[Emergency Operation Center] Send Alarm Group',
-            clientName: selectStateSnapshot(selectOwnClient, this.store)!.name,
-            alarmGroupId: alarmGroup.id,
-            sortedVehicleParameters: vehicleParameters,
-            targetTransferPointId: this.selectedTarget!.key,
-            firstVehiclesCount: firstVehiclesCountForAction,
-            firstVehiclesTargetTransferPointId:
-                this.selectedFirstVehiclesTarget?.key,
-            eocLogId: uuid(),
-        });
-
-        this.loading.set(false);
-
-        if (request.success) {
-            this.messageService.postMessage({
-                title: `Alarmgruppe ${alarmGroup.name} alarmiert!`,
-                color: 'success',
-            });
-        } else {
-            this.firstVehiclesCount += firstVehiclesCountReducedBy;
+            if (request.success) {
+                this.messageService.postMessage({
+                    title: `Alarmgruppe ${alarmGroup.name} alarmiert!`,
+                    color: 'success',
+                });
+            } else {
+                this.firstVehiclesCount += firstVehiclesCountReducedBy;
+                this.firstVehiclesCount += firstVehiclesCountReducedBy;
+                throw new Error("Couldn't send alarm group");
+            }
+        } catch {
             this.messageService.postError({
                 title: 'Fehler beim Senden der Alarmgruppe',
                 body: 'Die Alarmgruppe konnte nicht gesendet werden',
             });
+        } finally {
+            this.loading.set(false);
         }
     }
 }

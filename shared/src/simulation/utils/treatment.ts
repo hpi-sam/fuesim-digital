@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const treatmentProgressAllowedValues = [
     'counted',
@@ -11,7 +12,9 @@ export const treatmentProgressAllowedValues = [
 export const treatmentProgressSchema = z.literal(
     treatmentProgressAllowedValues
 );
-export type TreatmentProgress = z.infer<typeof treatmentProgressSchema>;
+export type TreatmentProgress = Immutable<
+    z.infer<typeof treatmentProgressSchema>
+>;
 
 export const treatmentProgressToGermanNameDictionary: {
     [Key in TreatmentProgress]: string;

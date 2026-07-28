@@ -1,0 +1,13 @@
+<h5 class="popover-header">
+    {{ technicalChallenge().name }}
+    <button
+        (click)="closePopup()"
+        type="button"
+        class="btn-close float-end"
+    ></button>
+</h5>
+<div class="popover-body p-0">
+    <app-technical-challenge-details
+        [technicalChallenge]="this.technicalChallenge()"
+    />
+</div>

@@ -4,6 +4,7 @@
 @use 'bootstrap/scss/bootstrap';
 
 @use 'maplibre-gl/dist/maplibre-gl.css';
+@use 'app/pages/marketplace/shared/_change-indicator-colors' as ci;
 
 .dropdown-menu {
     overflow: auto;
@@ -63,4 +64,37 @@ main {
 .modal-xxl {
     width: 90%;
     max-width: 90%;
+}
+
+.rounded-none {
+    border-radius: 0 !important;
+}
+
+$primary-muted: color-mix(in srgb, bootstrap.$primary 60%, transparent);
+
+.pulsating {
+    animation: pulsate 1s infinite ease-in-out;
+}
+
+@keyframes pulsate {
+    0% {
+        box-shadow: 0 0 1px 0px var(--pulsating-color, $primary-muted);
+    }
+    50% {
+        box-shadow: 0 0 3px var(--pulsating-strength, 2px)
+            var(--pulsating-color, $primary-muted);
+    }
+    100% {
+        box-shadow: 0 0 1px 0px var(--pulsating-color, $primary-muted);
+    }
+}
+
+.btn-outline-changed {
+    border: map-get(bootstrap.$border-widths, 1) solid;
+    color: ci.$change-primary !important;
+    border-color: ci.$change-primary !important;
+    &:hover {
+        color: var(--bs-white) !important;
+        background-color: ci.$change-primary !important;
+    }
 }

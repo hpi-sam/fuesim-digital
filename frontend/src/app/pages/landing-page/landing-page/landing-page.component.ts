@@ -9,10 +9,10 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
+    GetExerciseResponseData,
     isAccessKey,
     isExerciseKey,
     isParallelExerciseKey,
-    type ExportImportFile,
 } from 'fuesim-digital-shared';
 import { escapeRegExp } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
@@ -22,6 +22,7 @@ import {
     validate,
     validateAsync,
 } from '@angular/forms/signals';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AuthService } from '../../../core/auth.service';
 import { ApiService } from '../../../core/api.service';
@@ -32,6 +33,7 @@ import { FileInputDirective } from '../../../shared/directives/file-input.direct
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { DisplayModelValidationComponent } from '../../../shared/validation/display-model-validation/display-model-validation.component';
 import { HelpButtonComponent } from '../../../help-button/help-button.component.js';
+import { ExerciseService } from '../../../core/exercise.service.js';
 
 @Pipe({
     name: 'sanitizeHtml',
@@ -67,6 +69,8 @@ export class LandingPageComponent {
     private readonly router = inject(Router);
     private readonly messageService = inject(MessageService);
     readonly auth = inject(AuthService);
+    private readonly ngbModalService = inject(NgbModal);
+    private readonly exerciseService = inject(ExerciseService);
 
     protected readonly exerciseConfig = this.apiService.exerciseConfig.value;
     protected readonly banner = this.apiService.getBanner();
@@ -125,67 +129,30 @@ export class LandingPageComponent {
         });
     });
 
-    public async createExercise() {
-        this.apiService.createExercise().then((exerciseKeys) => {
-            this.trainerKey = exerciseKeys.trainerKey;
-            this.model.set({ joinKey: this.trainerKey });
-            this.participantKey = exerciseKeys.participantKey;
-            this.exerciseHasBeenCreated = true;
+    public readonly importingExercise = signal<boolean>(false);
 
-            this.messageService.postMessage({
-                title: 'Übung erstellt',
-                body: 'Sie können nun der Übung beitreten.',
-                color: 'success',
-            });
-        });
-    }
-
-    public importingExercise = false;
-    public async importExerciseState(fileList: FileList) {
-        this.importingExercise = true;
+    public async createExercise(fileList?: FileList) {
+        if (fileList) {
+            this.importingExercise.set(true);
+        }
         try {
-            const importString = await fileList.item(0)?.text();
-            if (importString === undefined) {
-                // The file dialog has been aborted.
-                return;
-            }
-            const importPlain = JSON.parse(importString) as ExportImportFile;
-            const type = importPlain.type;
-            if (!['complete', 'partial'].includes(type)) {
-                throw new Error(`Ungültiger Dateityp: \`type === ${type}\``);
-            }
-            switch (importPlain.type) {
-                case 'complete': {
-                    const exerciseKeys =
-                        await this.apiService.importExercise(importPlain);
+            await this.exerciseService.createExercise(
+                fileList,
+                (exerciseKeys: GetExerciseResponseData) => {
                     this.trainerKey = exerciseKeys.trainerKey;
                     this.model.set({ joinKey: this.trainerKey });
                     this.participantKey = exerciseKeys.participantKey;
                     this.exerciseHasBeenCreated = true;
 
                     this.messageService.postMessage({
+                        title: 'Übung erstellt',
+                        body: 'Sie können nun der Übung beitreten.',
                         color: 'success',
-                        title: 'Übung importiert',
-                        body: 'Sie können nun der Übung beitreten',
                     });
-                    break;
                 }
-                case 'partial': {
-                    this.messageService.postMessage({
-                        color: 'danger',
-                        title: 'Unerlaubter Importtyp',
-                        body: 'Dieser Typ kann nur innerhalb einer Übung importiert werden.',
-                    });
-                    break;
-                }
-            }
-        } catch (error: unknown) {
-            this.messageService.postError({
-                title: 'Fehler beim Importieren der Übung',
-                error,
-            });
+            );
         } finally {
-            this.importingExercise = false;
+            this.importingExercise.set(false);
         }
     }
 

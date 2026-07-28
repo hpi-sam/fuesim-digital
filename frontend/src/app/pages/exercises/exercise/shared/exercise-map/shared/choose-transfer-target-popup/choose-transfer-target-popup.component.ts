@@ -16,7 +16,7 @@ import { HospitalNameComponent } from '../../../../../../../shared/components/ho
 @Component({
     selector: 'app-choose-transfer-target-popup',
     templateUrl: './choose-transfer-target-popup.component.html',
-    styleUrls: ['./choose-transfer-target-popup.component.scss'],
+    styleUrls: ['../chooser-popup.scss'],
     imports: [TransferPointNameComponent, HospitalNameComponent, AsyncPipe],
 })
 export class ChooseTransferTargetPopupComponent implements OnInit {
@@ -47,6 +47,6 @@ export class ChooseTransferTargetPopupComponent implements OnInit {
 
     public transferTo(targetId: UUID, type: 'hospital' | 'transferPoint') {
         this.transferToCallback(targetId, type);
-        this.popupService.closePopup();
+        this.popupService.dismissPopup();
     }
 }

@@ -7,12 +7,16 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseSimulationBehaviorType,
     ExerciseState,
-    ScoutableElementType,
+    MeasureTemplate,
+    TechnicalChallengeId,
+    Template,
     UUID,
     Vehicle,
     WithPosition,
+    StateMachine,
 } from 'fuesim-digital-shared';
 import {
+    currentStateOf,
     elementTypePluralMap,
     isInSpecificSimulatedRegion,
     isInTransfer,
@@ -22,6 +26,7 @@ import {
 } from 'fuesim-digital-shared';
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
+import type { ScoutableIndicator } from '../../../shared/types/scoutable-indicator.js';
 
 // Properties
 
@@ -37,6 +42,24 @@ function selectPropertyFactory<Key extends keyof ExerciseState>(key: Key) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);
 }
 
+export const selectTemplates = selectPropertyFactory('templates');
+
+function selectTemplatesFactory<K extends Template['type']>(
+    key: K
+): MemoizedSelector<
+    AppState,
+    { [key: string]: Extract<Template, { type: K }> },
+    any
+> {
+    return createSelector(selectTemplates, (templates) =>
+        Object.fromEntries(
+            Object.entries(templates).filter(
+                ([_, template]) => template.type === key
+            ) as [string, Extract<Template, { type: K }>][]
+        )
+    );
+}
+
 export const scoutableElementSelectors = scoutableElementTypes.map(
     (elementType) => selectPropertyFactory(elementTypePluralMap[elementType])
 );
@@ -50,6 +73,8 @@ export const selectVehicles = selectPropertyFactory('vehicles');
 export const selectPersonnel = selectPropertyFactory('personnel');
 export const selectAlarmGroups = selectPropertyFactory('alarmGroups');
 export const selectMaterials = selectPropertyFactory('materials');
+export const selectMeasures = selectPropertyFactory('measures');
+export const selectTaskTypes = selectPropertyFactory('taskTypes');
 export const selectTransferPoints = selectPropertyFactory('transferPoints');
 export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
@@ -63,16 +88,31 @@ export const selectActiveClients = createSelector(
 );
 export const selectRadiograms = selectPropertyFactory('radiograms');
 export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
+export const selectDrawings = selectPropertyFactory('drawings');
 export const selectOperationalSections = selectPropertyFactory(
     'operationalSections'
 );
-export const selectVehicleTemplates = selectPropertyFactory('vehicleTemplates');
+export const selectTechnicalChallenges = selectPropertyFactory(
+    'technicalChallenges'
+);
+export const selectTechnicalChallengeTemplates = selectPropertyFactory(
+    'technicalChallengeTemplates'
+);
+export const selectVehicleTemplates = selectTemplatesFactory('vehicleTemplate');
 export const selectPersonnelTemplates =
-    selectPropertyFactory('personnelTemplates');
+    selectTemplatesFactory('personnelTemplate');
 export const selectMaterialTemplates =
-    selectPropertyFactory('materialTemplates');
+    selectTemplatesFactory('materialTemplate');
 export const selectMapImagesTemplates =
-    selectPropertyFactory('mapImageTemplates');
+    selectTemplatesFactory('mapImageTemplate');
+export const selectAlarmgroupTemplates = selectTemplatesFactory('alarmGroup');
+export const selectMeasureTemplateCategories =
+    selectPropertyFactory('measureTemplates');
+export const selectMeasureTemplates = createSelector(
+    selectMeasureTemplateCategories,
+    (categories): { [key: UUID]: MeasureTemplate } =>
+        Object.assign({}, ...Object.values(categories).map((c) => c.templates))
+);
 // Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');
@@ -87,6 +127,9 @@ export const selectCollectedClientNames = selectPropertyFactory(
     'collectedClientNames'
 );
 export const selectScoutables = selectPropertyFactory('scoutables');
+export const selectSelectedCollections = selectPropertyFactory(
+    'selectedCollections'
+);
 
 // Elements
 
@@ -104,6 +147,8 @@ export const createSelectPersonnel =
     createSelectElementFromMapFactory(selectPersonnel);
 export const createSelectMaterial =
     createSelectElementFromMapFactory(selectMaterials);
+export const createSelectTaskType =
+    createSelectElementFromMapFactory(selectTaskTypes);
 export const createSelectPatient =
     createSelectElementFromMapFactory(selectPatients);
 export const createSelectVehicle =
@@ -122,11 +167,16 @@ export const createSelectRestrictedZone = createSelectElementFromMapFactory(
 export const createSelectSimulatedRegion = createSelectElementFromMapFactory(
     selectSimulatedRegions
 );
+export const createSelectTechnicalChallenge = createSelectElementFromMapFactory(
+    selectTechnicalChallenges
+);
 export const createSelectClient =
     createSelectElementFromMapFactory(selectClients);
 export const createSelectVehicleTemplate = createSelectElementFromMapFactory(
     selectVehicleTemplates
 );
+export const createSelectTechnicalChallengeTemplate =
+    createSelectElementFromMapFactory(selectTechnicalChallengeTemplates);
 export const createSelectMaterialTemplate = createSelectElementFromMapFactory(
     selectMaterialTemplates
 );
@@ -138,6 +188,9 @@ export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
 );
 export const createSelectScoutable =
     createSelectElementFromMapFactory(selectScoutables);
+export const createSelectMeasureTemplate = createSelectElementFromMapFactory(
+    selectMeasureTemplates
+);
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,
@@ -146,12 +199,13 @@ export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
 }
 
 export const scoutableElementTypeSelectorMap: {
-    [key in ScoutableElementType]: (
+    [key in ScoutableIndicator['scoutableElementType']]: (
         id: string
     ) => MemoizedSelector<AppState, any, any>;
 } = {
     patient: createSelectPatient,
     mapImage: createSelectMapImage,
+    technicalChallenge: createSelectTechnicalChallenge,
 };
 
 // Misc selectors
@@ -408,3 +462,65 @@ export function createSelectActivityStatesByType<
             )
     );
 }
+
+export function createSelectCurrentStateOf(
+    technicalChallengeId: TechnicalChallengeId,
+    stateMachineId: StateMachine['id']
+) {
+    return createSelector(
+        createSelectTechnicalChallenge(technicalChallengeId),
+        (challenge) => {
+            const stateMachine = challenge.stateMachines[stateMachineId];
+            if (!stateMachine)
+                throw Error(
+                    `StateMachine ${stateMachineId} not found in challenge ${technicalChallengeId}.
+                     (Not one of ${Object.keys(challenge.stateMachines).join(',')}.)`
+                );
+            return currentStateOf(stateMachine);
+        }
+    );
+}
+
+export function createSelectAvailableTasks(
+    technicalChallengeId: TechnicalChallengeId
+) {
+    return createSelector(
+        createSelectTechnicalChallenge(technicalChallengeId),
+        selectTaskTypes,
+        (challenge, taskTypes) =>
+            Object.values(challenge.stateMachines).map((stateMachine) => {
+                const currentState = currentStateOf(stateMachine);
+                return {
+                    stateMachine,
+                    tasks: Object.keys(currentState.possibleTasks).map(
+                        (taskId) => {
+                            const taskType = taskTypes[taskId];
+                            if (!taskType)
+                                throw new Error(
+                                    `Invalid taskTypeId ${taskId} in TechnicalChallenge(${technicalChallengeId}).StateMachine(${stateMachine.id}).`
+                                );
+                            return taskTypes[taskId];
+                        }
+                    ),
+                };
+            })
+    );
+}
+
+export const selectWorkingPersonnel = createSelector(
+    selectTechnicalChallenges,
+    (challenges) => {
+        const workingPersonnel = new Set<UUID>();
+        const stateMachines = Object.values(challenges).flatMap((challenge) =>
+            Object.values(challenge.stateMachines)
+        );
+        for (const stateMachine of stateMachines) {
+            for (const personnelId of Object.keys(
+                stateMachine.assignedPersonnel
+            )) {
+                workingPersonnel.add(personnelId);
+            }
+        }
+        return workingPersonnel;
+    }
+);

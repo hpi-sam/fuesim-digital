@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuidSchema } from '../../../utils/uuid.js';
 
 export const loadOccupationSchema = z.strictObject({
@@ -6,7 +7,7 @@ export const loadOccupationSchema = z.strictObject({
     loadingActivityId: uuidSchema,
 });
 
-export type LoadOccupation = z.infer<typeof loadOccupationSchema>;
+export type LoadOccupation = Immutable<z.infer<typeof loadOccupationSchema>>;
 
 export function newLoadOccupation(loadingActivityId: string): LoadOccupation {
     return {

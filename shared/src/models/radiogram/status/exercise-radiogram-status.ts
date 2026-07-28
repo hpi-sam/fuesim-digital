@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { radiogramAcceptedStatus } from './radiogram-accepted-status.js';
 import { radiogramDoneStatus } from './radiogram-done-status.js';
 import { radiogramUnpublishedStatus } from './radiogram-unpublished-status.js';
@@ -11,8 +12,8 @@ export const exerciseRadiogramStatusSchema = z.discriminatedUnion('type', [
     radiogramUnpublishedStatus,
 ]);
 
-export type ExerciseRadiogramStatus = z.infer<
-    typeof exerciseRadiogramStatusSchema
+export type ExerciseRadiogramStatus = Immutable<
+    z.infer<typeof exerciseRadiogramStatusSchema>
 >;
 
 export const radiogramStatusTypeToGermanDictionary: {

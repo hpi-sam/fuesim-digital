@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     assignLeaderBehavior,
     assignLeaderBehaviorStateSchema,
@@ -52,8 +53,8 @@ export const exerciseSimulationBehaviorStateSchema = z.discriminatedUnion(
     ]
 );
 
-export type ExerciseSimulationBehaviorState = z.infer<
-    typeof exerciseSimulationBehaviorStateSchema
+export type ExerciseSimulationBehaviorState = Immutable<
+    z.infer<typeof exerciseSimulationBehaviorStateSchema>
 >;
 
 export type ExerciseSimulationBehaviorType =

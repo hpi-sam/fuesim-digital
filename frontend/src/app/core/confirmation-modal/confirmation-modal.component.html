@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h4 class="modal-title">{{ title }}</h4>
+    <h4 class="modal-title" data-cy="confirmationModalTitle">{{ title }}</h4>
     <button
         type="button"
         class="btn-close"
@@ -39,7 +39,7 @@
         (click)="confirmation$.next(true); activeModal.close()"
         data-cy="confirmationModalOkButton"
     >
-        OK
+        {{ confirmationButtonText }}
     </button>
     <button
         type="button"

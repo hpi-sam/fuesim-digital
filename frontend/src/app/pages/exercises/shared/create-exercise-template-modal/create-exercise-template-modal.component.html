@@ -3,40 +3,77 @@
     <button type="button" class="btn-close" (click)="close()"></button>
 </div>
 <div class="modal-body">
-    <form #f="ngForm" (ngSubmit)="createExerciseTemplate(f)">
+    <form (ngSubmit)="createExerciseTemplate()">
+        <div class="form-group mb-2">
+            <label class="form-label">Organisation</label>
+            <select
+                [formField]="exerciseTemplateForm.organisationId"
+                class="form-control"
+                [class.placeholder]="organisations.isLoading()"
+            >
+                @for (org of organisations.value(); track org.id) {
+                    <option [value]="org.id">
+                        {{ org.name }}
+                    </option>
+                }
+            </select>
+            <app-display-model-validation
+                [field]="exerciseTemplateForm.organisationId()"
+            />
+        </div>
+
         <div class="form-group mb-2">
             <label class="form-label">Name</label>
             <input
-                [(ngModel)]="model.name"
-                name="name"
-                #nameInput="ngModel"
+                [formField]="exerciseTemplateForm.name"
                 class="form-control"
-                required
                 [appAutofocus]="true"
-                [maxlength]="255"
                 type="text"
             />
-            <app-display-validation
-                [ngModelInput]="nameInput"
-            ></app-display-validation>
+            <app-display-model-validation
+                [field]="exerciseTemplateForm.name()"
+            ></app-display-model-validation>
         </div>
 
-        <div class="form-group mb-4">
+        <div class="form-group mb-2">
             <label class="form-label">Beschreibung</label>
 
             <textarea
-                [(ngModel)]="model.description"
-                name="description"
-                #descriptionInput="ngModel"
+                [formField]="exerciseTemplateForm.description"
                 class="form-control"
                 rows="3"
             ></textarea>
-            <app-display-validation
-                [ngModelInput]="descriptionInput"
-            ></app-display-validation>
+            <app-display-model-validation
+                [field]="exerciseTemplateForm.description()"
+            ></app-display-model-validation>
         </div>
 
-        <button class="btn btn-primary" [disabled]="!f.form.valid">
+        <div class="mb-3">
+            @if (importFileName(); as importFileName) {
+                <label class="form-label">Importierte Datei</label>
+                <input
+                    class="form-control ng-valid"
+                    [value]="importFileName"
+                    disabled
+                />
+            } @else {
+                <label class="btn btn-outline-primary my-2">
+                    <i class="bi-cloud-upload me-2"> </i>
+                    Vorlage importieren
+                    <input
+                        (appFileInput)="importFile($event)"
+                        type="file"
+                        accept="application/json"
+                        class="d-none"
+                    />
+                </label>
+            }
+        </div>
+
+        <button
+            class="btn btn-primary"
+            [disabled]="exerciseTemplateForm().invalid()"
+        >
             Übungsvorlage erstellen
         </button>
     </form>

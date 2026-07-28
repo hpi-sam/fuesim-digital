@@ -1,5 +1,10 @@
+import crypto from 'node:crypto';
 import type {
     ActionId,
+    CollectionEntityId,
+    CollectionVersionId,
+    ElementEntityId,
+    ElementVersionId,
     ExerciseAction,
     ExerciseId,
     ExerciseState,
@@ -8,10 +13,19 @@ import type {
     AccessKey,
     TrainerKey,
     ParallelExerciseId,
+    OrganisationId,
+    OrganisationMembershipId,
+    OrganisationMembershipRole,
     ParallelExerciseKey,
+    OrganisationInviteLinkId,
+    TemplateVersionContent,
 } from 'fuesim-digital-shared';
-import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { relations, sql } from 'drizzle-orm';
+import {
+    collectionVisibilityValues,
+    uuid as fuesimUUID,
+} from 'fuesim-digital-shared';
+import { type InferInsertModel, type InferSelectModel } from 'drizzle-orm';
+import { relations } from 'drizzle-orm';
 import {
     char,
     integer,
@@ -23,19 +37,28 @@ import {
     varchar,
     timestamp,
     text,
+    pgEnum,
     unique,
+    index,
+    boolean,
+    primaryKey,
 } from 'drizzle-orm/pg-core';
 
-function typedUUID<T>() {
+function typedUUID<T = string>() {
     return uuid().$type<T>();
+}
+function defaultUUID<T = string>() {
+    return typedUUID<T>().$defaultFn(() => fuesimUUID() as T);
+}
+function defaultPrefixedUUID<T = string>(prefix: string) {
+    return varchar()
+        .$defaultFn(() => `${prefix}_${fuesimUUID()}`)
+        .$type<T>();
 }
 
 function baseTable<T>() {
     return {
-        id: typedUUID<T>()
-            .default(sql`uuid_generate_v4()`)
-            .primaryKey()
-            .notNull(),
+        id: defaultUUID<T>().primaryKey().notNull(),
     };
 }
 
@@ -70,10 +93,88 @@ export const sessionTable = pgTable('sessions', {
 });
 export type SessionEntry = InferSelectModel<typeof sessionTable>;
 
+export const organisationTable = pgTable(
+    'organisation',
+    {
+        ...baseTable<OrganisationId>(),
+        name: varchar().notNull(),
+        description: text().notNull().default(''),
+        createdAt: timestamp({ withTimezone: true, mode: 'date' })
+            .notNull()
+            .defaultNow(),
+        personalOrganisationOf: varchar().references(() => userTable.id, {
+            onDelete: 'cascade',
+        }),
+    },
+    (t) => [unique().on(t.personalOrganisationOf)]
+);
+export type OrganisationEntry = InferSelectModel<typeof organisationTable>;
+export type OrganisationInsert = InferInsertModel<typeof organisationTable>;
+
+const organisationMembershipRoleEnum = pgEnum('organisation_membership_role', [
+    'viewer',
+    'editor',
+    'admin',
+]);
+export const organisationMembershipTable = pgTable(
+    'organisation_membership',
+    {
+        ...baseTable<OrganisationMembershipId>(),
+        userId: varchar()
+            .references(() => userTable.id, { onDelete: 'cascade' })
+            .notNull(),
+        organisationId: uuid()
+            .$type<OrganisationId>()
+            .references(() => organisationTable.id, { onDelete: 'cascade' })
+            .notNull(),
+        role: organisationMembershipRoleEnum()
+            .$type<OrganisationMembershipRole>()
+            .notNull(),
+        joinedAt: timestamp({ withTimezone: true, mode: 'date' })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        unique().on(t.userId, t.organisationId),
+        index().on(t.organisationId, t.role),
+    ]
+);
+export type OrganisationMembershipEntry = InferSelectModel<
+    typeof organisationMembershipTable
+>;
+export type OrganisationMembershipInsert = InferInsertModel<
+    typeof organisationMembershipTable
+>;
+
+export const organisationInviteLinkTable = pgTable('organisation_invite_link', {
+    ...baseTable<OrganisationInviteLinkId>(),
+    token: varchar()
+        .notNull()
+        .$defaultFn(() => crypto.randomBytes(32).toString('hex')),
+    organisationId: uuid()
+        .$type<OrganisationId>()
+        .references(() => organisationTable.id, { onDelete: 'cascade' })
+        .notNull(),
+    expirationDate: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .$defaultFn(() => {
+            const newDate = new Date();
+            newDate.setDate(newDate.getDate() + 7);
+            return newDate;
+        }),
+});
+export type OrganisationInviteLinkEntry = InferSelectModel<
+    typeof organisationInviteLinkTable
+>;
+export type OrganisationInviteLinkInsert = InferInsertModel<
+    typeof organisationInviteLinkTable
+>;
+
 export const exerciseTemplateTable = pgTable('exercise_template', {
     ...baseTable<ExerciseTemplateId>(),
-    user: varchar()
-        .references(() => userTable.id, { onDelete: 'cascade' })
+    organisationId: uuid()
+        .$type<OrganisationId>()
+        .references(() => organisationTable.id, { onDelete: 'cascade' })
         .notNull(),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
@@ -94,6 +195,14 @@ export type ExerciseTemplateEntry = InferSelectModel<
 export type ExerciseTemplateInsert = InferInsertModel<
     typeof exerciseTemplateTable
 >;
+export interface ExerciseTemplateDetailsEntry extends ExerciseTemplateEntry {
+    trainerKey: TrainerKey;
+    exercise: ExerciseEntry;
+    organisation: OrganisationEntry;
+}
+export interface ExerciseTemplateDetailsEntryWithUserRole extends ExerciseTemplateDetailsEntry {
+    userRole: OrganisationMembershipRole;
+}
 
 export const exerciseTable = pgTable('exercise_entity', {
     ...baseTable<ExerciseId>(),
@@ -106,7 +215,9 @@ export const exerciseTable = pgTable('exercise_entity', {
     trainerKey: char({ length: 8 }).$type<TrainerKey>().notNull().unique(),
     currentStateString: json().$type<ExerciseState>().notNull(),
     stateVersion: integer().notNull(),
-    user: varchar().references(() => userTable.id, { onDelete: 'cascade' }),
+    organisationId: uuid()
+        .$type<OrganisationId>()
+        .references(() => organisationTable.id, { onDelete: 'cascade' }),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
         .defaultNow(),
@@ -133,6 +244,16 @@ export const exerciseTable = pgTable('exercise_entity', {
 export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
 export type ExerciseInsert = InferInsertModel<typeof exerciseTable>;
 
+export interface ExerciseDetailsEntry extends ExerciseEntry {
+    template?: ExerciseTemplateEntry | null;
+    baseTemplate: ExerciseTemplateEntry | null;
+    organisation: OrganisationEntry;
+    actionsCount?: number | undefined;
+}
+export interface ExerciseDetailsEntryWithUserRole extends ExerciseDetailsEntry {
+    userRole: OrganisationMembershipRole;
+}
+
 export const actionTable = pgTable(
     'action_entity',
     {
@@ -156,6 +277,194 @@ export const actionTable = pgTable(
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;
 
+function stateVersionedEntity<EntityBrand, VersionBrand>(
+    prefix: string,
+    usePrefixForVersionId = true
+) {
+    return {
+        // VersionId uniquely indentifies an entry in the entire elements/collections table
+        versionId: usePrefixForVersionId
+            ? defaultPrefixedUUID<VersionBrand>(`${prefix}_version`)
+                  .unique()
+                  .notNull()
+                  .primaryKey()
+            : defaultUUID<VersionBrand>().unique().notNull().primaryKey(),
+        // EntityId references a set of multiple versions of an element/collection
+        // and is therefore not unique.
+        entityId: defaultPrefixedUUID(`${prefix}_entity`)
+            .notNull()
+            .$type<EntityBrand>(),
+        // A natural integer increasing by one with every new version of an element/collection.
+        // This is used to easily determine the latest version of an element/collection.
+        version: integer().notNull(),
+        // Used to determine the data-model version used in the content of an element/collection
+        // (for migrations)
+        stateVersion: integer().notNull(),
+        createdAt: timestamp({ withTimezone: true, mode: 'date' })
+            .defaultNow()
+            .notNull(),
+        editedAt: timestamp({ withTimezone: true, mode: 'date' })
+            .$onUpdateFn(() => new Date())
+            .defaultNow()
+            .notNull(),
+    };
+}
+
+export const collectionVisibilityEnum = pgEnum(
+    'collection_visibility_enum',
+    collectionVisibilityValues
+);
+export const collectionTable = pgTable(
+    'collections',
+    {
+        ...stateVersionedEntity<CollectionEntityId, CollectionVersionId>(
+            'collection'
+        ),
+        title: varchar().notNull(),
+        description: varchar().notNull(),
+        visibility: collectionVisibilityEnum().notNull().default('private'),
+        draftState: boolean().notNull(),
+        archived: boolean().notNull().default(false),
+        // fyi: we cant use computed/generated columns for
+        // elementCount here bc we need to access the
+        // mappings table (external table lookups are not allowed)
+    },
+    (table) => [
+        // Each Entity (set of multiple versions) should
+        // only every have each version number once
+        unique('unique_collection_version').on(table.entityId, table.version),
+    ]
+);
+
+// This table maps each element-version to a collection-version.
+//
+// An element-version can be mapped to multiple collection-versions of the same collection-entity,
+// however there should always be exactly one mapping with isBaseReference=true for a set of
+// element-version (1) to (n) collection-entity entries.
+//
+// isBaseReference in this case means that this mapping points to the collection-version
+// in which the associated element-version was originally created / it belongs to.
+export const elementCollectionMappingTable = pgTable(
+    'element_to_collection_mapping',
+    {
+        collectionEntityId: varchar().notNull().$type<CollectionEntityId>(),
+        collectionVersionId: varchar()
+            .notNull()
+            .$type<CollectionVersionId>()
+            .references(() => collectionTable.versionId, {
+                onDelete: 'cascade',
+            }),
+        elementEntityId: varchar().notNull().$type<ElementEntityId>(),
+        elementVersionId: uuid()
+            .notNull()
+            .$type<ElementVersionId>()
+            .references(() => elementTable.versionId, {
+                onDelete: 'cascade',
+            }),
+        // isBaseReference=true means that the connected element-version was initially created in this collection-version.
+        // If this entry belong to the draftState collection version we are currently working on, we can edit this entry directly.
+        //
+        // isBaseReference=false means that the connected element-version is only referenced in the associated collection-version,
+        // but was created for a different collection-version.
+        // We can therefore not edit this connected element-version directly but must create a new version of the element onWrite
+        // and create a new mapping entry with isBaseReference=true for the new element-version and the current collection-version.
+        isBaseReference: boolean().default(false),
+    },
+    (table) => [
+        // Each element-version should only be mapped once to a collection-version.
+        // (e.g. Collection A (v1) should not have two mappings to RTW (v1))
+        unique('unique_element_collection_mapping').on(
+            table.collectionVersionId,
+            table.elementVersionId
+        ),
+        // each collection version should not have multiple mappings to the same element-entity
+        // (e.g. Collection A (v1) should not have two mappings to RTW (v1) and RTW (v2) at the same time.
+        unique('unique_element_collection_mapping_2').on(
+            table.collectionVersionId,
+            table.elementEntityId
+        ),
+    ]
+);
+
+export const collectionDependencyMappingTable = pgTable(
+    'collection_dependency_mapping',
+    {
+        // The Parent Collection
+        dependentCollectionEntityId: varchar()
+            .notNull()
+            .$type<CollectionEntityId>(),
+        dependentCollectionVersionId: varchar()
+            .notNull()
+            .$type<CollectionVersionId>()
+            .references(() => collectionTable.versionId, {
+                onDelete: 'cascade',
+            }),
+        // Our Dependency
+        collectionEntityId: varchar().notNull().$type<CollectionEntityId>(),
+        collectionVersionId: varchar()
+            .notNull()
+            .$type<CollectionVersionId>()
+            .references(() => collectionTable.versionId, {
+                onDelete: 'cascade',
+            }),
+    },
+    (table) => [
+        // Each collection-version should only have one mapping to a specific dependency collection-version.
+        // (e.g. Collection A (v1) should not have two mappings to Collection B (v1))
+        // +
+        // Each collection-version should only have one mapping to a specific dependency collection-entity.
+        // (e.g. Collection A (v1) should not have two mappings to Collection B (v1) and Collection B (v2) at the same time.
+        //
+        // The latter is also enforced since they share an EntityId
+        unique('unique_collection_dependency').on(
+            table.dependentCollectionVersionId,
+            table.collectionEntityId
+        ),
+    ]
+);
+
+// Make sure this type is up to date with the TemplateVersion type
+export const elementTable = pgTable(
+    'elements',
+    {
+        ...stateVersionedEntity<ElementEntityId, ElementVersionId>(
+            'element',
+            false
+        ),
+        title: varchar().notNull(),
+        description: varchar().notNull(),
+        content: json().$type<TemplateVersionContent>().notNull(),
+    },
+    (table) => [
+        unique('unique_template_version').on(table.entityId, table.version),
+        unique('unique_template_id').on(table.entityId, table.versionId),
+    ]
+);
+
+export const collectionOrganisationMappingTable = pgTable(
+    'collection_organisation_mapping',
+    {
+        collection: varchar().notNull().$type<CollectionEntityId>(),
+        organisationId: uuid()
+            .$type<OrganisationId>()
+            .references(() => organisationTable.id, { onDelete: 'cascade' })
+            .notNull(),
+        owner: boolean().notNull().default(false),
+    },
+    (table) => [
+        primaryKey({ columns: [table.collection, table.organisationId] }),
+    ]
+);
+
+export const collectionJoinCodesTable = pgTable('collection_join_codes', {
+    code: varchar()
+        .primaryKey()
+        .notNull()
+        .$defaultFn(() => crypto.randomBytes(10).toString('hex')),
+    collection: varchar().notNull().$type<CollectionEntityId>(),
+    expiresAt: timestamp({ withTimezone: true, mode: 'date' }).notNull(),
+});
+
 export const actionEntityRelations = relations(actionTable, ({ one }) => ({
     exerciseWrapperEntity: one(exerciseTable, {
         fields: [actionTable.exerciseId],
@@ -169,8 +478,9 @@ export const exerciseEntityRelations = relations(exerciseTable, ({ many }) => ({
 
 export const parallelExerciseTable = pgTable('parallel_exercise', {
     ...baseTable<ParallelExerciseId>(),
-    user: varchar()
-        .references(() => userTable.id, { onDelete: 'cascade' })
+    organisationId: uuid()
+        .$type<OrganisationId>()
+        .references(() => organisationTable.id, { onDelete: 'cascade' })
         .notNull(),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
@@ -178,8 +488,10 @@ export const parallelExerciseTable = pgTable('parallel_exercise', {
     name: varchar().notNull(),
     templateId: uuid()
         // TODO Cascade dangerous?
+        .$type<ExerciseTemplateId>()
         .references(() => exerciseTemplateTable.id, { onDelete: 'cascade' })
         .notNull(),
+    templateStateString: json().$type<ExerciseState>().notNull(),
     participantKey: char({ length: 7 })
         .$type<ParallelExerciseKey>()
         .notNull()
@@ -193,6 +505,10 @@ export type ParallelExerciseEntry = InferSelectModel<
 export type ParallelExerciseInsert = InferInsertModel<
     typeof parallelExerciseTable
 >;
-export interface ParallelExercise extends ParallelExerciseEntry {
+export interface ParallelExerciseDetailsEntry extends ParallelExerciseEntry {
     template: ExerciseTemplateEntry;
+    organisation: OrganisationEntry;
+}
+export interface ParallelExerciseDetailsEntryWithUserRole extends ParallelExerciseDetailsEntry {
+    userRole: OrganisationMembershipRole;
 }

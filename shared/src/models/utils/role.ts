@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const roleAllowedValues = ['participant', 'trainer'] as const;
 export const roleSchema = z.literal(roleAllowedValues);
-export type Role = z.infer<typeof roleSchema>;
+export type Role = Immutable<z.infer<typeof roleSchema>>;
 
 export const specificRoleAllowedValues = [
     'mapOperator',
@@ -11,7 +12,7 @@ export const specificRoleAllowedValues = [
     'operationsTablet',
 ] as const;
 export const specificRoleSchema = z.literal(specificRoleAllowedValues);
-export type SpecificRole = z.infer<typeof specificRoleSchema>;
+export type SpecificRole = Immutable<z.infer<typeof specificRoleSchema>>;
 
 export const specificRoleDisplayNames: { [key in SpecificRole]: string } = {
     eoc: 'Leitstelle',

@@ -1,0 +1,32 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ templateName() }}</h4>
+    <button type="button" class="btn-close" (click)="cancel()"></button>
+</div>
+<div class="modal-body">
+    <div class="mb-3">
+        <label class="form-label">Alarmgruppe</label>
+        <select class="form-select" [formField]="alarmForm.alarmGroup">
+            <option disabled [value]="''">Alarmgruppe auswählen</option>
+            @for (ag of allowedAlarmGroups() | values; track ag.id) {
+                <option [value]="ag.id">{{ ag.name }}</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Ziel</label>
+        <select class="form-select" [formField]="alarmForm.transferPoint">
+            <option disabled [value]="''">Ziel auswählen</option>
+            @for (tp of allowedTransferPoints() | values; track tp.id) {
+                <option [value]="tp.id">{{ tp.internalName }}</option>
+            }
+        </select>
+    </div>
+    <button
+        type="button"
+        class="btn btn-primary w-100"
+        [disabled]="!alarmForm().valid()"
+        (click)="confirm()"
+    >
+        Bestätigen
+    </button>
+</div>

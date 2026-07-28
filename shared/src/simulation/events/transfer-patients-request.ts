@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
 import { type UUIDSet, uuidSetSchema } from '../../utils/uuid-set.js';
@@ -14,8 +15,8 @@ export const transferPatientsRequestEventSchema = z.strictObject({
     transferDestinationType: transferDestinationTypeSchema,
     transferDestinationId: uuidSchema,
 });
-export type TransferPatientsRequestEvent = z.infer<
-    typeof transferPatientsRequestEventSchema
+export type TransferPatientsRequestEvent = Immutable<
+    z.infer<typeof transferPatientsRequestEventSchema>
 >;
 
 export function newTransferPatientsRequestEvent(

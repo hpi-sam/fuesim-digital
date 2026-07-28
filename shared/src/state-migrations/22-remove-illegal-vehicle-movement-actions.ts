@@ -1,6 +1,4 @@
-import type { WritableDraft } from 'immer';
 import { isCompletelyLoaded } from '../store/action-reducers/utils/completely-load-vehicle.js';
-import type { ExerciseState } from '../state.js';
 import type { UUID } from '../utils/uuid.js';
 import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { Migration } from './migration-functions.js';
@@ -20,10 +18,7 @@ export const removeIllegalVehicleMovementActions22: Migration = {
                     'vehicle',
                     vehicleId
                 );
-                return isCompletelyLoaded(
-                    intermediaryState as WritableDraft<ExerciseState>,
-                    vehicle
-                );
+                return isCompletelyLoaded(intermediaryState, vehicle);
             }
             case '[SimulatedRegion] Add Element': {
                 const { elementToBeAddedType, elementToBeAddedId } = action as {
@@ -36,10 +31,7 @@ export const removeIllegalVehicleMovementActions22: Migration = {
                         'vehicle',
                         elementToBeAddedId
                     );
-                    return isCompletelyLoaded(
-                        intermediaryState as WritableDraft<ExerciseState>,
-                        vehicle
-                    );
+                    return isCompletelyLoaded(intermediaryState, vehicle);
                 }
             }
         }

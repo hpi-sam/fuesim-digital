@@ -11,10 +11,12 @@ import {
 export const scoutableSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('scoutable'),
+    name: z.string(),
     userGeneratedContent: userGeneratedContentSchema,
     isVisibleForParticipants: z.boolean(),
+    viewedByParticipants: z.boolean(),
 });
-export type Scoutable = Immutable<z.infer<typeof scoutableSchema>>;
+export type Scoutable = Immutable<Immutable<z.infer<typeof scoutableSchema>>>;
 
 /* When adding a new ElementType (refered to as it) to become a functioning Scoutable element, do the following:
 1) add the scoutableId attribute to its class;
@@ -28,30 +30,41 @@ export const scoutableElementSchema = z.discriminatedUnion('type', [
     mapImageSchema,
     patientSchema,
 ]);
-export type ScoutableElement = z.infer<typeof scoutableElementSchema>;
-export type ScoutableElementType = ScoutableElement['type'];
+export type ScoutableElement = Immutable<
+    z.infer<typeof scoutableElementSchema>
+>;
 
 export const scoutableElementTypes = [
     'patient',
     'mapImage',
-] satisfies ScoutableElementType[];
+] satisfies ScoutableElement['type'][];
 export const scoutableElementTypeSchema = z.literal(scoutableElementTypes);
 
 export function newScoutable(): Scoutable {
     return {
         id: uuid(),
         type: 'scoutable',
+        name: '',
         userGeneratedContent: newUserGeneratedContent(),
         isVisibleForParticipants: true,
+        viewedByParticipants: false,
     };
 }
 
-export const genericScoutableImageUrl = '/assets/scoutable-generic.png';
-export const patientScoutableImageUrl = '/assets/scoutable-patient.png';
+export const scoutableImages = {
+    unviewed: {
+        generic: '/assets/scoutable-generic.png',
+        patient: '/assets/scoutable-patient.png',
+    },
+    viewed: {
+        generic: '/assets/scoutable-generic-viewed.png',
+        patient: '/assets/scoutable-patient-viewed.png',
+    },
+} as const;
 
 export function isPatientBystander(patient: Patient) {
     return patient.patientStatusCode.firstField.colorCode === 'B';
 }
 export function isElementGenericScoutable(element: ScoutableElement) {
-    return element.image.url.endsWith(genericScoutableImageUrl);
+    return element.image.url.endsWith(scoutableImages.unviewed.generic);
 }

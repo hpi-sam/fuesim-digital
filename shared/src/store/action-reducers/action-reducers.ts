@@ -29,6 +29,7 @@ import { DrawingActionReducers } from './drawing.js';
 import { TechnicalChallengeActionReducers } from './technical-challenge.js';
 import { CollectionReducers } from './collections.js';
 
+import { TechnicalChallengeTemplateActionReducers } from './technical-challenge-template.js';
 /**
  * All action reducers of the exercise must be registered here
  */
@@ -57,6 +58,7 @@ const actionReducers = {
     ...OperationalSectionActionReducers,
     ...ScoutableActionReducers,
     ...TechnicalChallengeActionReducers,
+    ...TechnicalChallengeTemplateActionReducers,
     ...MeasureActionReducers,
     ...MeasureTemplateActionReducers,
     ...MeasureTemplateCategoryActionReducers,

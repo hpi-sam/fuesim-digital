@@ -286,11 +286,11 @@ Alarmgruppen ohne Auslösungsbeschränkung oder mit einer hohen Anzahl mögliche
 
 ## Maßnahmen
 
-Über Maßnahmen können [Übungsteilnehmende](2_user_interfaces.md#teilnehmenden-ansicht) verschiedene Interaktionen mit der Übung vornehmen. sollen die Tätigkeiten der (in einer Ansicht) übenden Führungskraft simulieren, die über das bei der FüSim Digital im Vordergrund stehende Disponieren von Kräften auf der Übungskarte hinausgehen. Daher können Maßnahmen beispielsweise auch "echte" Zeit in Anspruch nehmen.
+Über Maßnahmen können [Übungsteilnehmende](2_user_interfaces.md#teilnehmenden-ansicht) verschiedene Interaktionen mit der Übung vornehmen. Maßnahmen sollen all jene Tätigkeiten der (in einer Ansicht) übenden Führungskraft simulieren, die über das (bei der FüSim Digital im Vordergrund stehende) Disponieren von Kräften auf der Übungskarte hinausgehen. Daher können Maßnahmen teilweise auch echte Zeit in Anspruch nehmen.
 
 Maßnahmen sind in der FüSim Digital als generisches Baukastensystem angelegt: Übungsleitende stellen jede Maßnahme aus einzelnen _Schritten_ zusammen und legen so selbst fest, unter welchen Begriffen die Teilnehmenden welches Verhalten auslösen können. So lassen sich sehr unterschiedliche Übungszenarien mit jeweils individuell gestalteten Interaktionsmöglichkeiten umsetzen.
 
-Das erlaubt insbesondere auch, dass Übungsleitende über die für ein Szenario tatsächlich nötigen und sinnvollen Maßnahmen hinaus solche Maßnahmen erstellen können, die für eine korrekte Bearbeitung des Szenarios nicht nötig sind. Dadurch kann verhindert werden, dass die vorhandenen Maßnahmen als "Checkliste" und somit Hilfestellung bei der Übungsbearbeitung dienen können.
+Das erlaubt insbesondere auch, dass Übungsleitende mehr Maßnahmen anlegen, als für ein Szenario tatsächlich nötig oder sinnvoll sind. Durch ein solches Überangebot lässt sich verhindern, dass die vorhandenen Maßnahmen als "Checkliste" dienen und somit als Hilfestellung bei der Übungsbearbeitung fungieren.
 
 ![Fenster „Maßnahmen“ mit der Standardkategorie und den vier vorbereiteten Maßnahmen](./exercise_elements_measures.png)
 
@@ -313,27 +313,27 @@ Mit einem Klick auf eine Maßnahme wird diese gestartet. Die Schritte der Maßna
 ![Hinweisfeld der Maßnahme "Absperrung anordnen"](./exercise_elements_measures_hint.png)
 
 > [!IMPORTANT]
-> Wird eine Maßnahme abgebrochen – etwa über <kbd>Abbrechen</kbd>, die <kbd>Esc</kbd>-Taste oder das Schließen eines Fensters –, wird die _gesamte_ Maßnahme verworfen. Bereits gezeichnete Zeichnungen werden wieder entfernt, es werden keine Einsatztagebucheinträge angelegt und keine Alarmierungen ausgelöst. Eine teilweise ausgeführte Maßnahme gibt es nicht.
+> Wird eine Maßnahme abgebrochen – etwa über <kbd>Abbrechen</kbd>, die <kbd>Esc</kbd>-Taste oder das Schließen eines Fensters –, wird die _gesamte_ Maßnahme verworfen. Bereits gezeichnete Zeichnungen werden wieder entfernt, es werden keine Einsatztagebucheinträge angelegt und keine Alarmierungen ausgelöst. Es gibt keine teilweise ausgeführte Maßnahme.
 
 ### Nutzung in Übungen
 
-Maßnahmen sind kein festes Repertoire, sondern ein Baukasten: Jede Übungsleitung stellt sich aus den sieben Schritt-Typen die Maßnahmen zusammen, die zum jeweiligen Szenario und Lernziel passen. Beispiele für mögliche Maßnahmen sind:
+Maßnahmen sind kein festes Repertoire, sondern ein Baukasten: Jede Übungsleitung stellt sich aus den verfügbaren Schritt-Typen die Maßnahmen zusammen, die zum jeweiligen Szenario und Lernziel passen. Beispiele für mögliche Maßnahmen sind:
 
 - **Stichworterhöhung** – eine [Verzögerung](#verzögerung) von 30 Sekunden, gefolgt von einer [Alarmierung](#alarmierung). Die Teilnehmenden fordern eigenständig Kräfte nach, müssen aber – wie im echten Einsatz – kurz auf die Rückmeldung der Leitstelle warten. Diese Maßnahmenkonfiguration ist das Grundmuster für alle Maßnahmen, bei denen die Teilnehmenden etwas anfordern, das nicht sofort verfügbar ist.
 - **Kurzmeldung abgeben** – ein [Einsatztagebucheintrag](#einsatztagebucheintrag), der bearbeitbar ist und bestätigt werden muss. Die Teilnehmenden formulieren eine Lagemeldung selbst; sie erscheint anschließend im Einsatztagebuch und steht damit auch für die [Auswertung](5_evaluation.md) zur Verfügung. Diese Maßnahmenkonfiguration ist das Grundmuster für alle Maßnahmen, bei denen die Teilnehmenden etwas melden oder dokumentieren sollen.
 - **Gefahrenbereich einzeichnen** – eine [Freihandzeichnung](#freihandzeichnung) mit aktivierter Option _Vorherige Maßnahme ersetzen?_. Die Teilnehmenden markieren den Gefahrenbereich; zeichnen sie ihn später erneut, ersetzt die neue Fläche die alte, statt sich mit ihr zu überlagern. Diese Maßnahmenkonfiguration ist das Grundmuster für alle Maßnahmen, bei denen eine Entscheidung räumlich dargestellt wird und sich im Laufe der Übung ändern kann.
 - **Absperrung anordnen** – eine [Linienzeichnung](#linienzeichnung), gefolgt von einer [Verzögerung](#verzögerung). Die Teilnehmenden legen die Absperrgrenze fest und warten anschließend darauf, dass die Polizei sie „umsetzt“.
 
-Aus diesen Bausteinen lassen sich beliebige weitere Maßnahmen bilden, zum Beispiel die Einrichtung eines Bereitstellungsraums ([Freihandzeichnung](#freihandzeichnung) + [Einsatztagebucheintrag](#einsatztagebucheintrag)), die Anforderung eines Fachberaters ([Manuelle Bestätigung](#manuelle-bestätigung) + [Verzögerung](#verzögerung) + [Rückmeldung](#rückmeldung)) oder eine Rückfrage bei der Einsatzleitung ([Manuelle Bestätigung](#manuelle-bestätigung) + [Verzögerung](#verzögerung) + [Rückmeldung](#rückmeldung) mit vorbereiteter Antwort).
+Aus diesen Bausteinen lassen sich beliebige weitere Maßnahmen bilden, zum Beispiel die Festlegung eines Bereitstellungsraums ([Freihandzeichnung](#freihandzeichnung) + [Einsatztagebucheintrag](#einsatztagebucheintrag)), die Anforderung eines Fachberaters ([Manuelle Bestätigung](#manuelle-bestätigung) + [Verzögerung](#verzögerung) + [Rückmeldung](#rückmeldung)) oder eine Rückfrage bei der Einsatzleitung ([Manuelle Bestätigung](#manuelle-bestätigung) + [Verzögerung](#verzögerung) + [Rückmeldung](#rückmeldung) mit vorbereiteter Antwort).
 
 > [!TIP]
 > Kategorien sollten nach der Art der Handlung benannt werden, nicht nach dem technischen Schritt-Typ – also z. B. „Nachforderungen“, „Meldungen“ und „Raumordnung“. Für die Teilnehmenden sind die Kategorien die oberste Ebene der Maßnahmenleiste und damit ihr wichtigster Orientierungspunkt.
 
 > [!TIP]
-> Da die Maßnahmenleiste erst erscheint, wenn mindestens eine Maßnahme existiert, kann eine Übung auch vollständig ohne Maßnahmen durchgeführt werden.
+Eine Übung auch vollständig ohne Maßnahmen durchgeführt werden. Die Maßnahmenleiste erst erscheint, wenn mindestens eine Maßnahme vorhanden ist.
 
 > [!NOTE]
-> Es gibt keine gesonderte Übersicht der bereits ausgeführten Maßnahmen. Jede Ausführung erzeugt jedoch einen Eintrag im [Log](5_evaluation.md#log) mit der Kennzeichnung „Maßnahme“, sodass sich der Ablauf im Nachhinein nachvollziehen lässt. Mit der für eine der nächsten Versionen geplanten didaktischen Übersicht soll zudem eine automatische Kontrolle der Maßnahmendurchführung ermöglicht werden.
+> Es gibt keine gesonderte Übersicht über die bereits ausgeführten Maßnahmen. Jede Ausführung erzeugt jedoch einen Eintrag im [Log](5_evaluation.md#log) mit der Kennzeichnung „Maßnahme“, sodass sich der Ablauf im Nachhinein nachvollziehen lässt. Mit der für eine der nächsten Versionen geplanten didaktischen Übersicht soll zudem eine automatische Kontrolle von bestimmten Maßnahmendurchführungen ermöglicht werden.
 
 ### Einstellungsmöglichkeiten
 
@@ -346,12 +346,12 @@ Die Maßnahmen sind dort in **Kategorien** gruppiert. Eine neue Kategorie wird �
 > [!IMPORTANT]
 > Kategorienamen müssen eindeutig sein, und die letzte verbleibende Kategorie kann nicht gelöscht werden.
 
-**Maßnahmen** werden über den Button <kbd>Maßnahme hinzufügen</kbd> der jeweiligen Kategorie angelegt. Jede Maßnahme wird als Kachel dargestellt und kann über das gelbe Stift-Symbol bearbeitet und über das rote Mülleimer-Symbol gelöscht werden. Um eine Maßnahme in eine andere Kategorie zu verschieben, wird ihre Kachel per Drag-and-Drop in den Bereich der Zielkategorie gezogen.
+**Maßnahmen** werden über den Button <kbd>Maßnahme hinzufügen</kbd> der jeweiligen Kategorie angelegt. Jede Maßnahme wird als Kachel dargestellt und kann über das gelbe Stift-Symbol bearbeitet sowie über das rote Mülleimer-Symbol gelöscht werden. Um eine Maßnahme in eine andere Kategorie zu verschieben, wird ihre Kachel per Drag-and-Drop in den Bereich der Zielkategorie gezogen.
 
 ![Verschieben einer Maßnahme in eine andere Kategorie per Drag-and-Drop](./exercise_elements_measures_categories_dragndrop.png)
 
 > [!NOTE]
-> Innerhalb einer Kategorie lassen sich Maßnahmen nicht sortieren; sie werden in der Reihenfolge ihrer Erstellung angezeigt. Auch die Reihenfolge der Kategorien selbst ist nicht änderbar.
+> Innerhalb einer Kategorie lassen sich Maßnahmen nicht sortieren; sie werden in der Reihenfolge ihrer Erstellung angezeigt. Auch die Reihenfolge der Kategorien lässt sich nicht ändern.
 
 Im Bearbeitungsfenster einer Maßnahme kann Folgendes angegeben werden:
 
@@ -360,11 +360,11 @@ Im Bearbeitungsfenster einer Maßnahme kann Folgendes angegeben werden:
 - <kbd>**Vorherige Maßnahme ersetzen?**</kbd>: Wenn diese Option aktiviert ist, werden bei einer erneuten Ausführung derselben Maßnahme die Zeichnungen der vorherigen Ausführung gelöscht und durch die neuen ersetzt. Die Option wirkt sich ausschließlich auf Zeichnungen aus, nicht auf Einsatztagebucheinträge oder Alarmierungen.
 - <kbd>**Schritte**</kbd>: Die eigentliche Definition der Maßnahme (siehe [Schritte](#schritte)).
 
-Über <kbd>Schritt hinzufügen</kbd> wird ein neuer Schritt am Ende der Liste angehängt. Das Menü listet dabei alle verfügbaren Schritt-Typen auf.
+Über <kbd>Schritt hinzufügen</kbd> wird ein neuer Schritt am Ende der Liste angehängt. Das Menü listet dabei alle verfügbaren [Schritt-Typen](#schritte) auf.
 
 ![Bearbeitungsfenster einer Maßnahme mit aufgeklapptem Menü „Schritt hinzufügen“](./exercise_elements_measures_editor.png)
 
-Jeder Schritt hat in seiner Kopfzeile drei Symbole: einen roten Mülleimer zum Entfernen sowie zwei Pfeile <kbd>Nach oben</kbd> und <kbd>Nach unten</kbd>, mit denen der Schritt mit seinem Nachbarn getauscht wird. Die Reihenfolge der Schritte ist die Reihenfolge, in der sie später bei den Teilnehmenden ablaufen.
+Jeder Schritt hat in seiner Kopfzeile drei Symbole: einen roten Mülleimer zum Entfernen sowie zwei Pfeile <kbd>Nach oben</kbd> und <kbd>Nach unten</kbd>, mit denen der Schritt mit seinem Nachbarn getauscht wird. Die Reihenfolge der Schritte entspricht der Reihenfolge, in der sie später bei den Teilnehmenden ablaufen.
 
 ![Maßnahme aus mehreren Schritten; der Mauszeiger steht auf „Nach oben“](./exercise_elements_measures_editor_step_order.png)
 
@@ -379,7 +379,7 @@ Es stehen sieben Schritt-Typen zur Verfügung. Sie werden im Folgenden jeweils z
 
 #### Manuelle Bestätigung
 
-Die Teilnehmenden müssen mit diesem Schritt die Ausführung der gesamten Maßnahme aktiv bestätigen. Das ist sinnvoll, um versehentliche Auslösungen folgenreicher Maßnahmen oder Fehleingaben in Maßnahmen zu verhindern.
+Mit diesem Schritt müssen die Teilnehmenden die Ausführung der gesamten Maßnahme aktiv bestätigen. Das ist sinnvoll, um versehentliche Auslösungen folgenreicher Maßnahmen oder Fehleingaben in Maßnahmen zu verhindern.
 
 - <kbd>**Hinweistext**</kbd>
 - <kbd>**Bestätigungstext**</kbd>: Der Text, der den Teilnehmenden im Bestätigungsfenster angezeigt wird.
@@ -387,7 +387,7 @@ Die Teilnehmenden müssen mit diesem Schritt die Ausführung der gesamten Maßna
 
 ![Der Schritt „Manuelle Bestätigung“ im Bearbeitungsfenster](./exercise_elements_measures_step_manual_confirm_editor.png)
 
-Bei der Ausführung erscheint das Bestätigungsfenster. Ist ein Bestätigungs-Code hinterlegt, wird er angezeigt und muss in das darunterliegende Feld eingetippt werden.
+Bei der Ausführung wird das Bestätigungsfenster angezeigt. Ist ein Bestätigungs-Code hinterlegt, wird er angezeigt und muss in das darunterliegende Feld eingetippt werden.
 
 ![Bestätigungsfenster bei den Teilnehmenden mit Bestätigungs-Code](./exercise_elements_measures_step_manual_confirm_participant.png)
 
@@ -406,7 +406,7 @@ Bei der Ausführung wird der Text in einem Fenster angezeigt.
 
 ![Rückmeldungsfenster bei den Teilnehmenden](./exercise_elements_measures_step_response_participant.png)
 
-Anders als bei der Manuellen Bestätigung wird die Maßnahme hier in jedem Fall fortgesetzt – auch dann, wenn die Teilnehmenden das Fenster über <kbd>Abbrechen</kbd> schließen.
+Anders als bei der [Manuellen Bestätigung](#manuelle-bestätigung) wird die Maßnahme hier in jedem Fall fortgesetzt – auch dann, wenn die Teilnehmenden das Fenster über <kbd>Abbrechen</kbd> schließen.
 
 #### Verzögerung
 
@@ -426,7 +426,7 @@ Während der Wartezeit sehen die Teilnehmenden nur das Hinweisfeld am unteren Ra
 
 #### Alarmierung
 
-Die Teilnehmenden lösen selbst eine [Alarmgruppe](#alarmgruppen) aus und wählen einen [Transferpunkt](#transferpunkte) als Eintreffort. Die Fahrzeuge treffen anschließend genauso ein, wie wenn die Alarmgruppe über die [Leitstelle](4_conduction.md#alarmierungen) ausgelöst worden wäre.
+Die Teilnehmenden lösen selbst eine [Alarmgruppe](#alarmgruppen) aus und wählen einen [Transferpunkt](#transferpunkte) als Eintreffort. Die Fahrzeuge treffen anschließend genauso ein wie wenn die Alarmgruppe über die [Leitstelle](4_conduction.md#alarmierungen) ausgelöst worden wäre.
 
 - <kbd>**Hinweistext**</kbd>
 - <kbd>**Alarmgruppen**</kbd>: Auswahl der Alarmgruppen, die den Teilnehmenden zur Verfügung stehen.
@@ -439,7 +439,7 @@ Beide Listen sind zunächst leer; über den jeweiligen Button <kbd>Hinzufügen</
 Für beide Listen gilt dieselbe Logik:
 
 - Bleibt die Liste **leer**, stehen den Teilnehmenden _alle_ Alarmgruppen bzw. Transferpunkte der Übung zur Auswahl.
-- Werden **mehrere** Einträge hinterlegt, können die Teilnehmenden aus genau diesen wählen.
+- Werden **mehrere** Einträge hinterlegt, können die Teilnehmenden zwischen ihnen wählen.
 - Wird **genau ein** Eintrag hinterlegt, ist die Auswahl fest vorgegeben und das Auswahlfeld für die Teilnehmenden gesperrt.
 
 Bei der Ausführung öffnet sich ein Fenster mit den Feldern <kbd>Alarmgruppe</kbd> und <kbd>Ziel</kbd>. Stehen mehrere Möglichkeiten zur Auswahl, wählen die Teilnehmenden sie dort selbst aus.
@@ -458,22 +458,22 @@ Ist jeweils genau ein Eintrag hinterlegt, sind beide Felder bereits ausgefüllt 
 Es wird ein Eintrag im [Einsatztagebuch](4_conduction.md#einsatztagebuch) erstellt, der für [Übungsleitende](2_user_interfaces.md#übungsleitenden-ansicht) und [Übungsteilnehmende in der Leitstellen-Ansicht](2_user_interfaces.md#leitstellenansicht-für-teilnehmende) sichtbar ist und den Namen der Teilnehmenden trägt.
 
 - <kbd>**Hinweistext**</kbd>
-- <kbd>**Einsatztagebuch-Nachricht (optional)**</kbd>: Vorgegebener Text des Eintrags.
+- <kbd>**Einsatztagebuch-Nachricht (optional)**</kbd>: Vordefinierter Text des Eintrags.
 - <kbd>**Editierbar**</kbd>: Wenn aktiviert, können die Teilnehmenden den vorgegebenen Text vor dem Absenden anpassen oder frei formulieren.
-- <kbd>**Bestätigung**</kbd>: Wenn aktiviert, wird den Teilnehmenden der Eintrag vor dem Absenden in einem Fenster mit Möglichkeit zur Bestätigung oder zum Abbrechen angezeigt.
+- <kbd>**Bestätigung**</kbd>: Wenn aktiviert, wird den Teilnehmenden der Eintrag vor dem Absenden in einem Fenster mit der Möglichkeit zur Bestätigung oder zum Abbrechen angezeigt.
 
 ![Der Schritt „Einsatztagebucheintrag“ im Bearbeitungsfenster](./exercise_elements_measures_step_eoc_log_editor.png)
 
 > [!IMPORTANT]
-> Die beiden Schalter und die Einsatztagebuch-Nachricht sind voneinander abhängig. Ein bearbeitbarer Eintrag muss auch bestätigt werden, da die Bearbeitung in demselben Fenster wie die Bestätigung passiert. Ein Eintrag ohne Bearbeitungsmöglichkeit muss eine vorgegebene Nachricht enthalten, da er sonst leer wäre.
+> Die beiden Schalter und die Einsatztagebuch-Nachricht sind voneinander abhängig. Ein bearbeitbarer Eintrag muss auch bestätigt werden, da die Bearbeitung im selben Fenster wie die Bestätigung erfolgt. Ein Eintrag ohne Bearbeitungsmöglichkeit muss eine vorgegebene Nachricht enthalten, da er sonst leer wäre.
 
-Ist <kbd>Bestätigung</kbd> aktiviert, öffnet sich bei der Ausführung ein Fenster mit dem Feld <kbd>Nachricht</kbd>. Ist der Eintrag nicht editierbar, ist der vorgegebene Text dort schreibgeschützt. Ohne Bestätigung wird der vorgegebene Text ohne weitere Rückfrage in das Einsatztagebuch geschrieben.
+Ist <kbd>Bestätigung</kbd> aktiviert, öffnet sich beim Ausführen ein Fenster mit dem Feld <kbd>Nachricht</kbd>. Ist der Eintrag nicht editierbar, ist der vorgegebene Text dort schreibgeschützt. Ohne Bestätigung wird der vorgegebene Text ohne weitere Rückfrage ins Einsatztagebuch eingetragen.
 
 ![Fenster zum Erstellen eines Einsatztagebucheintrags bei den Teilnehmenden](./exercise_elements_measures_step_eoc_log_participant.png)
 
 #### Freihandzeichnung
 
-Die Teilnehmenden zeichnen eine Fläche frei auf der Karte ein. Das kann beispielsweise für Gefahrenbereiche oder das Markieren von Einsatzabschnitten genutzt werden.
+Die Teilnehmenden zeichnen auf der Karte eine Fläche frei ein (siehe [Zeichnungen](#zeichnungen)). Das kann beispielsweise für Gefahrenbereiche oder zum Markieren von Einsatzabschnitten genutzt werden.
 
 - <kbd>**Hinweistext**</kbd>
 - <kbd>**Strichfarbe**</kbd>: Farbe des Randes.
@@ -487,7 +487,7 @@ Bei der Ausführung halten die Teilnehmenden die Maustaste gedrückt (bzw. den F
 
 #### Linienzeichnung
 
-Die Teilnehmenden zeichnen einen Linienzug aus geraden Abschnitten. Das ist beispielsweise gut geeignet um Straßensperrungen zu markieren.
+Die Teilnehmenden zeichnen einen Linienzug aus geraden Abschnitten (siehe [Zeichnungen](#zeichnungen)). Das eignet sich beispielsweise, um Straßensperrungen zu markieren.
 
 - <kbd>**Hinweistext**</kbd>
 - <kbd>**Strichfarbe**</kbd>
@@ -510,12 +510,12 @@ Zeichnungen haben keine direkte Auswirkung auf die Übung. Sie dienen ausschlie�
 
 Sowohl Teilnehmende als auch Übungsleitende können eine bestehende Zeichnung als Ganzes per Drag-and-Drop verschieben. Dazu muss die Zeichnung an ihrem **Rand** bzw. an der Linie selbst angefasst werden – ein Ziehen innerhalb einer Fläche verschiebt die Zeichnung nicht.
 
-Übungsleitende können Zeichnungen löschen, indem sie sie auf das Mülleimer-Symbol am oberen rechten Rand der Karte ziehen. Teilnehmende können Zeichnungen nicht löschen.
+Übungsleitende können Zeichnungen löschen, indem sie sie auf das Mülleimer-Symbol oben rechts auf der Karte ziehen. Teilnehmende können Zeichnungen nicht löschen.
 
 > [!NOTE]
-> Eine Zeichnung lässt sich nach dem Erstellen nicht mehr in ihrer Form verändern. Einzelne Stützpunkte können also nicht nachträglich verschoben, hinzugefügt oder entfernt werden. Eine falsch gesetzte Zeichnung wird stattdessen entweder verschoben oder durch das erneute Ausführen der Maßnahme neu erstellt. Nutzt die Maßnahme die Option _Vorherige Maßnahme ersetzen?_, verschwindet die alte Zeichnung automatisch.
+> Eine Zeichnung lässt sich nach der Erstellung nicht mehr in ihrer Form ändern. Einzelne Stützpunkte können also nicht nachträglich verschoben, hinzugefügt oder entfernt werden. Eine falsch gesetzte Zeichnung wird stattdessen entweder verschoben oder durch erneutes Ausführen der Maßnahme neu erstellt. Nutzt die Maßnahme die Option _Vorherige Maßnahme ersetzen?_, verschwindet die alte Zeichnung automatisch.
 
-Zeichnungen besitzen keine Beschriftung und kein Popup; ein Klick auf eine Zeichnung bewirkt nichts.
+Zeichnungen sind nicht beschriftet und haben kein Popup; ein Klick auf eine Zeichnung bewirkt nichts.
 
 ### Einstellungsmöglichkeiten
 

@@ -1,3 +1,4 @@
+/* eslint-disable import-x/no-named-as-default-member */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, globalIgnores, includeIgnoreFile } from 'eslint/config';
@@ -53,6 +54,7 @@ export default defineConfig([
         rules: {
             // TODO: Temporarily disabled, see #1121
             '@typescript-eslint/explicit-member-accessibility': 'off',
+            '@angular-eslint/prefer-on-push-component-change-detection': 'warn',
         },
     },
     {

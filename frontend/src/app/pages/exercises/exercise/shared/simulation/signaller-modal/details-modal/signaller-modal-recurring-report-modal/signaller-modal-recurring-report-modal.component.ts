@@ -95,7 +95,7 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
             return;
         }
 
-        let actionPromise: Promise<{ success: boolean }> | null = null;
+        let actionPromise: Promise<{ success: boolean }> | null;
 
         if (this.reportsEnabled && !this.recurringActivityId) {
             // Reports are currently not enabled but should be

@@ -96,7 +96,7 @@ export class CreateCollectionModalComponent implements OnInit {
     }
 
     public async createNewCollection() {
-        let createdCollection: CollectionVersion | null = null;
+        let createdCollection: CollectionVersion | null;
         if (this.basedOnCollection === null) {
             createdCollection = await this.collectionService.createColletion(
                 this.collectionCreationForm.title().value(),

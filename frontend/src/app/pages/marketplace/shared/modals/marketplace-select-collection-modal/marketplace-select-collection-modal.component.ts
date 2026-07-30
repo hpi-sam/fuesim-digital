@@ -22,7 +22,7 @@ import {
 import { Subject } from 'rxjs';
 import { RouterLink, RouterLinkWithHref } from '@angular/router';
 // we cannot get around it
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import { CollectionElementsListComponent } from '../../collection-elements-list/collection-elements-list.component';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 

@@ -24,8 +24,8 @@ import { ConfirmationModalService } from '../../../../../core/confirmation-modal
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { EditingVersionedElementModalData } from '../../modals/editor-modals/base-versioned-element-submodal';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
-// its a nessesary evil
-// eslint-disable-next-line import/no-cycle
+// it's a necessary evil
+// eslint-disable-next-line import-x/no-cycle
 import { openSelectCollectionModal } from '../../modals/marketplace-select-collection-modal/select-collection-modal';
 import { openVersionedElementModal } from '../../modals/editor-modals/versioned-element-modal/open-versioned-element-model';
 import { marketplaceComponentDefinitions } from '../../definitions';

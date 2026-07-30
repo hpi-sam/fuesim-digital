@@ -35,6 +35,7 @@ export const hospitalPatientSchema = z.strictObject({
     pretriageStatus: patientStatusSchema,
     realStatus: patientStatusSchema,
     hasTransportPriority: z.boolean(),
+    ticket: z.string(),
     image: imagePropertiesSchema,
     healthStates: z.record(uuidSchema, patientHealthStateSchema),
     /**
@@ -72,6 +73,7 @@ export function newHospitalPatientFromPatient(
         pretriageStatus: patient.pretriageStatus,
         realStatus: patient.realStatus,
         hasTransportPriority: patient.hasTransportPriority,
+        ticket: patient.ticket,
         healthStates: patient.healthStates,
         currentHealthStateId: patient.currentHealthStateId,
         image: patient.image,

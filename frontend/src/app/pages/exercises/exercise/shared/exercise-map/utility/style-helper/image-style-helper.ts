@@ -1,4 +1,4 @@
-import type { ImageProperties } from 'fuesim-digital-shared';
+import type { ImageProperties, MapCoordinates } from 'fuesim-digital-shared';
 import { normalZoom } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import Icon from 'ol/style/Icon';
@@ -17,7 +17,11 @@ export class ImageStyleHelper extends StyleHelper<Style, Feature> {
             feature: Feature
         ) => ImageProperties & {
             rotation?: number;
-        }
+            displacement?: MapCoordinates;
+        },
+        private readonly getDisplacement?: (
+            feature: Feature
+        ) => [number, number]
     ) {
         super();
     }
@@ -33,6 +37,12 @@ export class ImageStyleHelper extends StyleHelper<Style, Feature> {
                 // See https://github.com/openlayers/openlayers/issues/11133#issuecomment-638987210
                 color: rasterizeVectorImage ? 'white' : undefined,
                 rotation: imageProperties.rotation,
+                displacement: imageProperties.displacement
+                    ? [
+                          imageProperties.displacement.x,
+                          imageProperties.displacement.y,
+                      ]
+                    : [0, 0],
             }),
         });
     }
@@ -70,6 +80,13 @@ export class ImageStyleHelper extends StyleHelper<Style, Feature> {
             // Make sure the image is always the same size on the map
             image.setScale(newScale);
         }
+
+        image.setDisplacement(
+            this.getDisplacement?.(feature).map(
+                (a) => a / (zoom * normalZoom)
+            ) ?? [0, 0]
+        );
+
         return imageStyle;
     }
 }

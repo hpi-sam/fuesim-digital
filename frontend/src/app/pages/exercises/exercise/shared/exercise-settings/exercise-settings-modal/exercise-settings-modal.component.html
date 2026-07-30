@@ -169,6 +169,20 @@
                 </div>
             </div>
 
+            <div class="form-group mb-3">
+                <label class="form-label mb-1"> Art genutzter Tickets </label>
+
+                <select
+                    class="form-select"
+                    [ngModel]="configuration().patientTicketMode"
+                    (ngModelChange)="setPatientTicketMode($event)"
+                >
+                    <option value="none">Keine Tickets</option>
+                    <option value="freeText">Freie Texteingabe</option>
+                    <option value="external">Extern zugewiesene Tickets</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label class="form-label mb-1">
                     Präfix der Patienten-IDs:

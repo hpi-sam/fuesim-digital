@@ -169,6 +169,12 @@ Mit der Einstellung <kbd>**Mit Vorsichtung üben?**</kbd> wird das Vorsichten vo
 
 Die Einstellung <kbd>**Mit SK IV Patienten üben?**</kbd> regelt, ob die SK IV (blau) verfügbar ist. Wenn sie deaktiviert ist, wird die Sichtungskategorie SK IV (blau) dort, wo sie gesetzt ist, durch SK I (rot) ersetzt.
 
+Die <kbd>**Art genutzter Tickets**</kbd> konfiguriert, welche Arten von [Tickets](3_exercise_elements.html#nutzung-in-übungen-4) Patienten zugewiesen werden können. Dabei gibt es folgende Möglichkeiten:
+
+- <kbd>Keine Tickets</kbd>: Das Ticketsystem ist deaktiviert. Es können keine Tickets zu Patienten zugewiesen werden und zugewiesene Tickets werden nicht angezeigt. Durch das Deaktivieren gehen keine bereits zugewiesenen Tickets verloren; wird das Ticketsystem wieder aktiviert, sind bereits zugewiesene Tickets wieder sichtbar.
+- <kbd>Freie Texteingabe</kbd>: Als Ticket kann ein beliebiger Text eingegeben werden, zum Beispiel der Name einen Krankenhauses oder eine Ticket-ID
+- <kbd>Extern zugewiesene Tickets</kbd>: Die Zuweisung der Tickets geschieht in einer beliebigen, von der FüSim Digital unabhängigen Liste oder Software gemäß des lokalen Übungs- oder Einsatzkonzepts. In der FüSim Digital kann bei jedem Patienten ein Haken gesetzt werden, um zu markieren, dass dieser bereits ein Ticket erhalten hat. Somit wird auch in der FüSim das Ticket-Symbol für den Patienten angezeigt, ohne dass alle Details des Tickets in beiden Systemen eingetragen werden müssen.
+
 Im Feld <kbd>**Präfix der Patienten-IDs**</kbd> kann ein Präfix eingegeben werden, das allen Patienten-IDs in der Übung vorangestellt wird. Mit dieser Einstellung lassen sich Patienten-IDs an ein ortsübliches Schema anpassen, z.B. indem das Ortskennzeichen (z.B. `B-`) vorangestellt wird. Die eigentlichen IDs (der Teil hinter dem Präfix) sind eine bei `0001` beginnende Zahl, die mit vier Ziffern dargestellt wird.
 
 > [!WARNING]

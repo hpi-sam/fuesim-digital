@@ -85,3 +85,7 @@ License: [MIT](https://github.com/twbs/icons/blob/main/LICENSE)
 [blue_car_burned_out.png](blue_car_burned_out.png)
 Felix Koch, based on <https://illustoon.com/?dl=9476> and <https://illustoon.com/?id=2723> by [DESIGNALIKE](https://illustoon.com)
 License: CC0 1.0
+
+[ticket.svg](ticket.svg):  
+<https://icons.getbootstrap.com/icons/ticket-perforated/> (edited)  
+License: [MIT](https://github.com/twbs/icons/blob/main/LICENSE)

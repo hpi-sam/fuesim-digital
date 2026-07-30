@@ -49,6 +49,14 @@ export type SetPatientIdentifierPrefixAction = Immutable<
     z.infer<typeof setPatientIdentifierPrefixActionSchema>
 >;
 
+export const setPatientTicketModeActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set patientTicketMode'),
+    patientTicketMode: exerciseConfigurationSchema.shape.patientTicketMode,
+});
+export type SetPatientTicketModeAction = Immutable<
+    z.infer<typeof setPatientTicketModeActionSchema>
+>;
+
 export const setVehicleStatusHighlightEnabledActionSchema = z.strictObject({
     type: z.literal('[Configuration] Set vehicleStatusHighlightEnabled'),
     vehicleStatusHighlightEnabled:
@@ -152,6 +160,17 @@ export namespace ConfigurationActionReducers {
             reducer(draftState, { patientIdentifierPrefix }) {
                 draftState.configuration.patientIdentifierPrefix =
                     patientIdentifierPrefix;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setPatientTicketMode: ActionReducer<SetPatientTicketModeAction> =
+        {
+            type: setPatientTicketModeActionSchema.shape.type.value,
+            actionSchema: setPatientTicketModeActionSchema,
+            reducer(draftState, { patientTicketMode }) {
+                draftState.configuration.patientTicketMode = patientTicketMode;
                 return draftState;
             },
             rights: 'trainer',

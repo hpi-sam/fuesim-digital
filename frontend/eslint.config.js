@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import prettier from 'eslint-config-prettier/flat';
 import { includeIgnoreFile } from '@eslint/compat';
-import _import from 'eslint-plugin-import';
+import _import from 'eslint-plugin-import-x';
 import unicorn from 'eslint-plugin-unicorn';
 import ts from 'typescript-eslint';
 import js from '@eslint/js';

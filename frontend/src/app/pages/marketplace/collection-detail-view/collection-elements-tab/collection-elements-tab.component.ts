@@ -1,4 +1,9 @@
-import { Component, computed, input } from '@angular/core';
+import {
+    Component,
+    computed,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     checkCollectionMembershipRole,
     gatherAllVisibleCollectionElements,
@@ -11,6 +16,7 @@ import { CollectionElementsListComponent } from '../../shared/collection-element
     selector: 'app-collection-elements-tab',
     imports: [NgbDropdownModule, CollectionElementsListComponent],
     styleUrl: './collection-elements-tab.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './collection-elements-tab.component.html',
 })
 export class CollectionElementsTabComponent {

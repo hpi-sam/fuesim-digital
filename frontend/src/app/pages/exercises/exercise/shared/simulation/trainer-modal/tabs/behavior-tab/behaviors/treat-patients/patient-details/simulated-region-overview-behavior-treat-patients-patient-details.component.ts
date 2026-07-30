@@ -1,5 +1,10 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import { getPatientVisibleStatus, Patient } from 'fuesim-digital-shared';
@@ -26,6 +31,7 @@ import { PatientStatusDisplayComponent } from '../../../../../../../../../../../
     styleUrls: [
         './simulated-region-overview-behavior-treat-patients-patient-details.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         PatientIdentifierComponent,
         PatientStatusBadgeComponent,

@@ -4,7 +4,12 @@ import type {
     SimpleChanges,
     AfterViewInit,
 } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type { LogEntry, Tag } from 'fuesim-digital-shared';
 import { difference } from 'lodash-es';
 import { Subject, takeUntil } from 'rxjs';
@@ -25,6 +30,7 @@ interface Filter {
     selector: 'app-log-table',
     templateUrl: './log-table.component.html',
     styleUrls: ['./log-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgbPopover, SearchableDropdownComponent, LogEntryComponent],
 })
 export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {

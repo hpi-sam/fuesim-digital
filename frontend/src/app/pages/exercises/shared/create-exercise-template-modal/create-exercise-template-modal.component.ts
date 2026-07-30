@@ -1,4 +1,11 @@
-import { output, signal, Component, inject, effect } from '@angular/core';
+import {
+    output,
+    signal,
+    Component,
+    inject,
+    effect,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import {
@@ -26,6 +33,7 @@ import { ExerciseService } from '../../../../core/exercise.service.js';
     selector: 'app-create-exercise-template-modal',
     templateUrl: './create-exercise-template-modal.component.html',
     styleUrls: ['./create-exercise-template-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AutofocusDirective,

@@ -1,4 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import {
@@ -14,6 +19,7 @@ import { DisplayModelValidationComponent } from '../../../../../../shared/valida
     selector: 'app-eoc-log-entry-modal',
     templateUrl: './eoc-log-modal.component.html',
     styleUrls: ['./eoc-log-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AutofocusDirective,

@@ -1,4 +1,9 @@
-import { Component, inject, output } from '@angular/core';
+import {
+    Component,
+    inject,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AsyncPipe } from '@angular/common';
 import {
@@ -23,6 +28,7 @@ import { AlarmGroupItemComponent } from './alarm-group-item/alarm-group-item.com
     selector: 'app-alarm-group-overview-page',
     templateUrl: './alarm-group-overview-page.component.html',
     styleUrls: ['./alarm-group-overview-page.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         AlarmGroupItemComponent,
         AsyncPipe,

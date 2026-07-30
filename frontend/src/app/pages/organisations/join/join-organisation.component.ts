@@ -1,4 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {
+    Component,
+    inject,
+    OnInit,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
@@ -7,6 +12,7 @@ import { MessageService } from '../../../core/messages/message.service';
     selector: 'app-join-organisation',
     templateUrl: './join-organisation.component.html',
     styleUrls: ['./join-organisation.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [],
 })
 export class JoinOrganisationComponent implements OnInit {

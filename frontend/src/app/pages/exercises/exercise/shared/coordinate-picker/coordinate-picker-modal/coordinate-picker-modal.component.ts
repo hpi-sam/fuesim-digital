@@ -1,4 +1,10 @@
-import { effect, signal, Component, inject } from '@angular/core';
+import {
+    effect,
+    signal,
+    Component,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import {
     form,
@@ -19,6 +25,7 @@ import { DisplayModelValidationComponent } from '../../../../../../shared/valida
     selector: 'app-coordinate-picker-modal',
     templateUrl: './coordinate-picker-modal.component.html',
     styleUrls: ['./coordinate-picker-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, DisplayModelValidationComponent, FormField],
 })
 export class CoordinatePickerModalComponent {

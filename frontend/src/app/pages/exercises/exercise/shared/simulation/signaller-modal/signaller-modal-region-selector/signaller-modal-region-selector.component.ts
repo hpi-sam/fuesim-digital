@@ -1,5 +1,10 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, viewChild, inject } from '@angular/core';
+import {
+    Component,
+    viewChild,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type { Observable } from 'rxjs';
 import { map, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -27,6 +32,7 @@ import { HotkeyIndicatorComponent } from '../../../../../../../shared/components
     selector: 'app-signaller-modal-region-selector',
     templateUrl: './signaller-modal-region-selector.component.html',
     styleUrls: ['./signaller-modal-region-selector.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbPopover,
         HotkeyIndicatorComponent,

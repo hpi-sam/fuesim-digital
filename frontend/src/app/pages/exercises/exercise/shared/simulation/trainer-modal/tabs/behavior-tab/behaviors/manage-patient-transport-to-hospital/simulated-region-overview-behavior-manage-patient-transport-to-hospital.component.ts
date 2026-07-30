@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import type { UUID } from 'fuesim-digital-shared';
 import { ManagePatientTransportToHospitalStatusEditorComponent } from './shared/manage-patient-transport-to-hospital-status-editor/manage-patient-transport-to-hospital-status-editor.component';
 import { ManagePatientTransportToHospitalRequestTargetEditorComponent } from './shared/manage-patient-transport-to-hospital-request-target-editor/manage-patient-transport-to-hospital-request-target-editor.component';
@@ -15,6 +15,7 @@ import { ManagePatientTransportToHospitalSettingsEditorComponent } from './share
     styleUrls: [
         './simulated-region-overview-behavior-manage-patient-transport-to-hospital.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ManagePatientTransportToHospitalStatusEditorComponent,
         ManagePatientTransportToHospitalRequestTargetEditorComponent,

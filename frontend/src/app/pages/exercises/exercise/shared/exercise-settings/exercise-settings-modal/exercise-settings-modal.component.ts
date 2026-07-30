@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
@@ -25,6 +25,7 @@ import { HelpButtonComponent } from '../../../../../../help-button/help-button.c
     selector: 'app-exercise-settings-modal',
     templateUrl: './exercise-settings-modal.component.html',
     styleUrls: ['./exercise-settings-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         UrlValidatorDirective,

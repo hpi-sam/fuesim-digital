@@ -5,6 +5,7 @@ import {
     OnInit,
     inject,
     input,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
@@ -41,6 +42,7 @@ import { HotkeyIndicatorComponent } from '../../../../../../../../shared/compone
         './signaller-modal-transport-request-target-editor.component.html',
     styleUrl:
         './signaller-modal-transport-request-target-editor.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         NgbPopover,

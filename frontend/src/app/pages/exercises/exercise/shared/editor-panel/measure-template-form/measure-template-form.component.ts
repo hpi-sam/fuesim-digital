@@ -1,5 +1,12 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input, output, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    output,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     cloneDeepMutable,
     measurePropertyTypeSchema,
@@ -40,6 +47,7 @@ import { AlarmPropertyEditorComponent } from './alarm-property-editor/alarm-prop
     selector: 'app-measure-template-form',
     templateUrl: './measure-template-form.component.html',
     styleUrl: './measure-template-form.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         NgbDropdown,

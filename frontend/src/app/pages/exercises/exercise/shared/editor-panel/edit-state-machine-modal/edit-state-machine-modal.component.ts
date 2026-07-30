@@ -4,6 +4,7 @@ import {
     inject,
     OnInit,
     type Signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import type {
@@ -21,6 +22,7 @@ import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot.
 @Component({
     selector: 'app-edit-state-machine-modal',
     imports: [EditStateMachineFormComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './edit-state-machine-modal.component.html',
 })
 export class EditStateMachineModalComponent implements OnInit {

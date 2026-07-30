@@ -1,4 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
@@ -21,6 +27,7 @@ import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
     selector: 'app-alarm-modal',
     templateUrl: './alarm-modal.component.html',
     styleUrl: './alarm-modal.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, FormField, ValuesPipe],
 })
 export class AlarmModalComponent {

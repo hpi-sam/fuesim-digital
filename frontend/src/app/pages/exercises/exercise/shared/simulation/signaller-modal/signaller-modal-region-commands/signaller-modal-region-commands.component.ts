@@ -5,6 +5,7 @@ import {
     inject,
     input,
     viewChild,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import type {
     ExerciseSimulationBehaviorType,
@@ -33,6 +34,7 @@ import { SignallerModalTransportRequestTargetEditorComponent } from '../details-
     selector: 'app-signaller-modal-region-commands',
     templateUrl: './signaller-modal-region-commands.component.html',
     styleUrls: ['./signaller-modal-region-commands.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         SignallerModalInteractionsComponent,
         SignallerModalTransferConnectionsEditorComponent,

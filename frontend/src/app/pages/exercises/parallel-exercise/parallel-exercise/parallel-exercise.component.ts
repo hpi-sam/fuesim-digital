@@ -1,4 +1,10 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    effect,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
 import { NgClass } from '@angular/common';
 import {
@@ -29,6 +35,7 @@ import { CopyButtonComponent } from '../../../../shared/components/copy-button/c
     selector: 'app-parallel-exercise',
     templateUrl: './parallel-exercise.component.html',
     styleUrls: ['./parallel-exercise.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         HeaderComponent,
         ExerciseStateBadgeInnerComponent,

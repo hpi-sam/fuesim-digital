@@ -1,4 +1,11 @@
-import { computed, Component, inject, input, type OnInit } from '@angular/core';
+import {
+    computed,
+    Component,
+    inject,
+    input,
+    type OnInit,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TechnicalChallenge, StateMachine } from 'fuesim-digital-shared';
 import {
@@ -24,6 +31,7 @@ import { ExerciseService } from '../../../core/exercise.service.js';
     selector: 'app-technical-challenge-details',
     templateUrl: './technical-challenge-details.component.html',
     styleUrls: ['./technical-challenge-details.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbNav,
         NgbNavItem,

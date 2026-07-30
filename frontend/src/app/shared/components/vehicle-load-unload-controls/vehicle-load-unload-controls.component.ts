@@ -1,4 +1,10 @@
-import { Component, computed, inject, input } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { isInSpecificVehicle } from 'fuesim-digital-shared';
@@ -16,6 +22,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
 @Component({
     selector: 'app-vehicle-load-unload-controls',
     templateUrl: './vehicle-load-unload-controls.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./vehicle-load-unload-controls.component.scss'],
 })
 export class VehicleLoadUnloadControlsComponent {

@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { DragElementService } from '../core/drag-element.service';
@@ -15,6 +20,7 @@ import {
     selector: 'app-map-operator-map',
     templateUrl: './map-operator-map.component.html',
     styleUrls: ['./map-operator-map.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ExerciseMapComponent, FormsModule, MapOperatorToolbarComponent],
 })
 /**

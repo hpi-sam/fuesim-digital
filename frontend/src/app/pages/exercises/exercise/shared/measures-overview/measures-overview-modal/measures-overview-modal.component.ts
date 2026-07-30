@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     NgbActiveModal,
     NgbModal,
@@ -34,6 +39,7 @@ import { HelpButtonComponent } from '../../../../../../help-button/help-button.c
     selector: 'app-measures-overview-modal',
     templateUrl: './measures-overview-modal.component.html',
     styleUrls: ['./measures-overview-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         MeasureCardComponent,
         CdkDropList,

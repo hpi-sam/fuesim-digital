@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { ResourceRequestRadiogram, UUID } from 'fuesim-digital-shared';
 import { isAccepted, isDone } from 'fuesim-digital-shared';
@@ -20,6 +25,7 @@ import { KeysPipe } from '../../../../../../../../../shared/pipes/keys.pipe';
     selector: 'app-radiogram-card-content-resource-request',
     templateUrl: './radiogram-card-content-resource-request.component.html',
     styleUrls: ['./radiogram-card-content-resource-request.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [HotkeyIndicatorComponent, KeysPipe, AsyncPipe],
 })
 export class RadigoramCardContentResourceRequestComponent implements OnInit {

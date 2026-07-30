@@ -1,5 +1,10 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     type UUID,
     type ExerciseOccupation,
@@ -18,6 +23,7 @@ import { OccupationNamePipe } from '../../pipes/occupation-name.pipe';
     selector: 'app-vehicle-occupation-editor',
     templateUrl: './vehicle-occupation-editor.component.html',
     styleUrls: ['./vehicle-occupation-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe, OccupationNamePipe],
 })
 export class VehicleOccupationEditorComponent implements OnChanges {

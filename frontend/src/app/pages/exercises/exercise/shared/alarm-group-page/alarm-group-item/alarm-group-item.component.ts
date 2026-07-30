@@ -1,4 +1,10 @@
-import { Component, inject, OnInit, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    OnInit,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormsModule } from '@angular/forms';
 import {
@@ -30,6 +36,7 @@ import { AlarmGroupVehicleItemComponent } from '../alarm-group-vehicle-item/alar
     selector: 'app-alarm-group-item',
     templateUrl: './alarm-group-item.component.html',
     styleUrls: ['./alarm-group-item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AppSaveOnTypingDirective,

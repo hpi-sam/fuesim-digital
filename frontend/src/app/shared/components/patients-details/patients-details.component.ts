@@ -1,5 +1,12 @@
 import type { OnChanges } from '@angular/core';
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import {
@@ -45,6 +52,7 @@ import { ScoutableElementNavItemComponent } from '../scoutable-element-nav-item/
     selector: 'app-patients-details',
     templateUrl: './patients-details.component.html',
     styleUrls: ['./patients-details.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbNav,
         NgbNavItem,

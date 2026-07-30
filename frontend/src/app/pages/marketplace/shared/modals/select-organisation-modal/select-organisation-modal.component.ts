@@ -1,4 +1,10 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import {
+    Component,
+    effect,
+    inject,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
 import {
     form,
@@ -22,6 +28,7 @@ import { DisplayModelValidationComponent } from '../../../../../shared/validatio
     selector: 'app-select-organisation-modal',
     templateUrl: './select-organisation-modal.component.html',
     styleUrls: ['./select-organisation-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormField, DisplayModelValidationComponent],
 })
 export class SelectOrganisationModalComponent {

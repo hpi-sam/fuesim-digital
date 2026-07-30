@@ -1,4 +1,11 @@
-import { Component, computed, input, output, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    input,
+    output,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type { GetExerciseDetailsResponseData } from 'fuesim-digital-shared';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -20,6 +27,7 @@ import { ExerciseService } from '../../../core/exercise.service.js';
     selector: 'app-exercise-card',
     templateUrl: './exercise-card.component.html',
     styleUrls: ['./exercise-card.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CopyButtonComponent,
         RouterLink,

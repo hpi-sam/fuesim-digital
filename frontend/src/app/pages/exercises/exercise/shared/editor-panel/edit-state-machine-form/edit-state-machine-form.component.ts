@@ -1,4 +1,11 @@
-import { Component, effect, input, linkedSignal, output } from '@angular/core';
+import {
+    Component,
+    effect,
+    input,
+    linkedSignal,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { FormsModule } from '@angular/forms';
 import type {
@@ -13,6 +20,7 @@ import { UserGeneratedContentEditorComponent } from '../../../../../../shared/co
 @Component({
     selector: 'app-edit-state-machine-form',
     imports: [FormsModule, FormField, UserGeneratedContentEditorComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './edit-state-machine-form.component.html',
 })
 export class EditStateMachineFormComponent {

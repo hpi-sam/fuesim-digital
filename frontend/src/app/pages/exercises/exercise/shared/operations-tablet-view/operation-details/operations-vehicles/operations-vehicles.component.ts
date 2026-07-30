@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../../../../state/app.state';
 import {
@@ -11,6 +16,7 @@ import { OperationsVehicleItemComponent } from './operations-vehicle-item/operat
     selector: 'app-operations-vehicles',
     templateUrl: './operations-vehicles.component.html',
     styleUrl: './operations-vehicles.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [OperationsVehicleItemComponent],
 })
 export class OperationsVehiclesComponent {

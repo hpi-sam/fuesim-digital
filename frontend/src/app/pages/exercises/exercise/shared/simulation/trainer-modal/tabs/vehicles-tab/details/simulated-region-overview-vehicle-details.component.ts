@@ -1,4 +1,10 @@
-import { Component, computed, inject, input } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle } from 'fuesim-digital-shared';
 import {
@@ -25,6 +31,7 @@ import { SimulatedRegionOverviewPatientsTableComponent } from '../../../patients
     selector: 'app-simulated-region-overview-vehicle-details',
     templateUrl: './simulated-region-overview-vehicle-details.component.html',
     styleUrls: ['./simulated-region-overview-vehicle-details.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         VehicleNameEditorComponent,
         VehicleOccupationEditorComponent,

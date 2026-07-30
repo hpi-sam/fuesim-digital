@@ -1,4 +1,10 @@
-import { Component, inject, input, output } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { GetOrganisationDetailsResponseData } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,6 +17,7 @@ import { AuthService } from '../../../../core/auth.service.js';
     selector: 'app-organisation-tab-settings',
     imports: [FormsModule],
     templateUrl: './organisation-tab-settings.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './organisation-tab-settings.component.scss',
 })
 export class OrganisationTabSettingsComponent {

@@ -3,6 +3,7 @@ import {
     inject,
     type OnInit,
     type WritableSignal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { UUID } from 'fuesim-digital-shared';
 import type { TechnicalChallengeTemplate } from 'fuesim-digital-shared';
@@ -16,6 +17,7 @@ import { TechnicalChallengeTemplateFormComponent } from '../technical-challenge-
     selector: 'app-edit-technical-challenge-template-modal',
     imports: [TechnicalChallengeTemplateFormComponent],
     templateUrl: './edit-technical-challenge-template-modal.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './edit-technical-challenge-template-modal.component.scss',
 })
 export class EditTechnicalChallengeTemplateModalComponent implements OnInit {

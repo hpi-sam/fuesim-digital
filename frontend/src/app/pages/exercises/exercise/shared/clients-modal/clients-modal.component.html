@@ -36,7 +36,9 @@
                     class="btn btn-light"
                     [value]="shareUrl()"
                     icon="link-45deg"
-                    [ngbTooltip]="shareRoleInfo()?.linkHintText"
+                    [ngbTooltip]="
+                        $safeNavigationMigration(shareRoleInfo()?.linkHintText)
+                    "
                     container="body"
                 ></button>
             </div>

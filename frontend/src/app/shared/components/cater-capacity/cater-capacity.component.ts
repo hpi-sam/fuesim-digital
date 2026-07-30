@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import type { PatientStatus, CanCaterFor } from 'fuesim-digital-shared';
 import { PatientStatusBadgeComponent } from '../patient-status-badge/patient-status-badge.component';
 
@@ -6,6 +6,7 @@ import { PatientStatusBadgeComponent } from '../patient-status-badge/patient-sta
     selector: 'app-cater-capacity',
     templateUrl: './cater-capacity.component.html',
     styleUrls: ['./cater-capacity.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [PatientStatusBadgeComponent],
 })
 export class CaterCapacityComponent {

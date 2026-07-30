@@ -1,5 +1,11 @@
 import type { OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { Component, OnInit, inject, input } from '@angular/core';
+import {
+    Component,
+    OnInit,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ReportBehaviorState,
@@ -80,6 +86,7 @@ interface EventBasedReport {
     selector: 'app-simulation-event-based-report-editor',
     templateUrl: './simulation-event-based-report-editor.component.html',
     styleUrls: ['./simulation-event-based-report-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AppSaveOnTypingDirective,

@@ -1,4 +1,11 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    OnDestroy,
+    OnInit,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -42,6 +49,7 @@ import { CollectionElementsTabComponent } from './collection-elements-tab/collec
         CollectionDetailsTabComponent,
     ],
     templateUrl: './collection-detail-view.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './collection-detail-view.component.scss',
 })
 export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {

@@ -1,4 +1,9 @@
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Vehicle } from 'fuesim-digital-shared';
 import { selectCurrentTime } from '../../../../../../../../state/application/selectors/exercise.selectors';
@@ -7,6 +12,7 @@ import { AppState } from '../../../../../../../../state/app.state';
 @Component({
     selector: 'app-operations-vehicle-item',
     templateUrl: './operations-vehicle-item.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './operations-vehicle-item.component.scss',
 })
 export class OperationsVehicleItemComponent {

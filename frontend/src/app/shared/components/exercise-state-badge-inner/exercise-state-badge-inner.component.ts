@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, isDevMode } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    isDevMode,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { ExerciseStatus } from 'fuesim-digital-shared';
 import { DatePipe } from '@angular/common';
 import { Store } from '@ngrx/store';
@@ -11,6 +18,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     selector: 'app-exercise-state-badge-inner',
     templateUrl: './exercise-state-badge-inner.component.html',
     styleUrls: ['./exercise-state-badge-inner.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [DatePipe, SingleTickButtonComponent],
 })
 export class ExerciseStateBadgeInnerComponent {

@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Hospital, TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -26,6 +31,7 @@ import { OrderByPipe } from '../../../../../../shared/pipes/order-by.pipe';
     selector: 'app-transfer-hospitals-tab',
     templateUrl: './transfer-hospitals-tab.component.html',
     styleUrls: ['./transfer-hospitals-tab.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         HospitalNameComponent,
         NgbDropdown,

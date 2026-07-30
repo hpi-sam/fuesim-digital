@@ -5,6 +5,7 @@ import {
     inject,
     input,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     cloneDeepMutable,
@@ -54,6 +55,7 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
         NgbTooltip,
     ],
     templateUrl: './vehicle-template-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./vehicle-template-form.component.scss'],
 })
 export class VehicleTemplateFormMarketplaceComponent implements BaseVersionedElementSubmodal<VehicleTemplate> {

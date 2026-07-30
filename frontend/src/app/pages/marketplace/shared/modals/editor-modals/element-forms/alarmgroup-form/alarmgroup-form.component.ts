@@ -5,6 +5,7 @@ import {
     inject,
     input,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     AlarmGroup,
@@ -49,6 +50,7 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
         MarketplaceFormSubmitButtonBarComponent,
     ],
     templateUrl: './alarmgroup-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './alarmgroup-form.component.scss',
 })
 export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<AlarmGroup> {

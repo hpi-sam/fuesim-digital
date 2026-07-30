@@ -1,4 +1,9 @@
-import { Component, inject, resource } from '@angular/core';
+import {
+    Component,
+    inject,
+    resource,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import { Store } from '@ngrx/store';
 import {
@@ -17,6 +22,7 @@ import { ElementCardComponent } from '../../../../marketplace/shared/cards/eleme
     selector: 'app-alarm-group-modal',
     templateUrl: './alarm-group-modal.component.html',
     styleUrls: ['./alarm-group-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ElementCardComponent],
 })
 export class AlarmGroupModalComponent {

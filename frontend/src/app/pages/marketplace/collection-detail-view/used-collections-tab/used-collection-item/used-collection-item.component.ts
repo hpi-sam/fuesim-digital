@@ -1,4 +1,10 @@
-import { Component, inject, input, resource } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    resource,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     NgbDropdownModule,
     NgbModal,
@@ -32,6 +38,7 @@ import { CollectionUpgradeImpactModalComponent } from '../../../shared/modals/ma
         RouterLink,
     ],
     templateUrl: './used-collection-item.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './used-collection-item.component.scss',
 })
 export class UsedCollectionItemComponent {

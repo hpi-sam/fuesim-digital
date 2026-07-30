@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { validationMessages } from 'fuesim-digital-shared';
 import type { CustomValidationErrors } from '../custom-validation-errors';
@@ -6,6 +6,7 @@ import type { CustomValidationErrors } from '../custom-validation-errors';
 @Component({
     selector: 'app-display-validation',
     templateUrl: './display-validation.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./display-validation.component.scss'],
 })
 export class DisplayValidationComponent {

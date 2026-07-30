@@ -5,6 +5,7 @@ import {
     input,
     output,
     resource,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     CollectionVersion,
@@ -20,6 +21,7 @@ import { ApiService } from '../../../../../core/api.service';
     selector: 'app-collection-member-item',
     templateUrl: './collection-member-item.component.html',
     styleUrl: './collection-member-item.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [],
 })
 export class CollectionMemberItemComponent {

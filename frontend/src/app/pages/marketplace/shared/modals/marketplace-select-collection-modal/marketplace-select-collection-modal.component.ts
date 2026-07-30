@@ -5,6 +5,7 @@ import {
     inject,
     resource,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     CollectionVersion,
@@ -29,6 +30,7 @@ import { CollectionService } from '../../../../../core/exercise-element.service'
     selector: 'app-select-collection-modal',
     templateUrl: './marketplace-select-collection-modal.component.html',
     styleUrl: './marketplace-select-collection-modal.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CollectionElementsListComponent,
         RouterLink,

@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseOccupationType,
@@ -17,6 +22,7 @@ import { OccupationShortNamePipe } from '../../../../../../../../../shared/pipes
     selector: 'app-radiogram-card-content-vehicle-occupations',
     templateUrl: './radiogram-card-content-vehicle-occupations.component.html',
     styleUrls: ['./radiogram-card-content-vehicle-occupations.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [KeysPipe, OccupationShortNamePipe, AsyncPipe, KeyValuePipe],
 })
 export class RadiogramCardContentVehicleOccupationsComponent implements OnInit {

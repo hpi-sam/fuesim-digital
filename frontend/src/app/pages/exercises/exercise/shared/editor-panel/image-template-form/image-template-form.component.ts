@@ -1,5 +1,11 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input, output } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { cloneDeep } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from '../../../../../../core/messages/message.service';
@@ -14,6 +20,7 @@ import { IntegerValidatorDirective } from '../../../../../../shared/validation/i
     selector: 'app-image-template-form',
     templateUrl: './image-template-form.component.html',
     styleUrls: ['./image-template-form.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         ImageExistsValidatorDirective,

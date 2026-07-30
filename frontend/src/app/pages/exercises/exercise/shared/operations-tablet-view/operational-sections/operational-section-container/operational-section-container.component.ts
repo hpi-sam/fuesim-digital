@@ -1,4 +1,10 @@
-import { Component, computed, inject, input } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { type OperationalSection } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +22,7 @@ import { DisplayValidationComponent } from '../../../../../../../shared/validati
     selector: 'app-operational-section-container',
     templateUrl: './operational-section-container.component.html',
     styleUrl: './operational-section-container.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         DisplayValidationComponent,
         FormsModule,

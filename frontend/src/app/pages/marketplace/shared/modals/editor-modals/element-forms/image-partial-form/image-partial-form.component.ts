@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { ImageProperties } from 'fuesim-digital-shared';
 import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component';
@@ -7,6 +7,7 @@ import { DisplayModelValidationComponent } from '../../../../../../../shared/val
     selector: 'app-image-partial-form',
     templateUrl: './image-partial-form.component.html',
     styleUrl: './image-partial-form.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormField, DisplayModelValidationComponent],
 })
 export class ImagePartialFormComponent {

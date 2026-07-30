@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { ViewEncapsulation, Component, inject } from '@angular/core';
+import {
+    ViewEncapsulation,
+    Component,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, TransferPoint } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -34,6 +39,7 @@ let activeNavId: NavIds = 'names';
     templateUrl: './transfer-point-popup.component.html',
     styleUrls: ['./transfer-point-popup.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbNav,
         NgbNavItem,

@@ -1,5 +1,11 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, inject, input, viewChild } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    viewChild,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbPopover, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
@@ -38,6 +44,7 @@ import { HotkeyIndicatorComponent } from '../../../../../../../../shared/compone
     selector: 'app-signaller-modal-transport-trays-editor',
     templateUrl: './signaller-modal-transport-trays-editor.component.html',
     styleUrls: ['./signaller-modal-transport-trays-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbTooltip,
         NgbPopover,

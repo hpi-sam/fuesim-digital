@@ -1,4 +1,10 @@
-import { Component, computed, inject, input } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ParallelExerciseInstanceSummary } from 'fuesim-digital-shared';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -13,6 +19,7 @@ import { LogEntryComponent } from '../../exercise/shared/exercise-statistics/log
     selector: 'tr[app-parallel-exercise-instance-row]',
     templateUrl: './parallel-exercise-instance-row.component.html',
     styleUrls: ['./parallel-exercise-instance-row.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [CopyButtonComponent, LogEntryComponent, RouterLink],
 })
 export class ParallelExerciseInstanceRowComponent {

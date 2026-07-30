@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -23,6 +28,7 @@ import { HelpButtonComponent } from '../../../../../../help-button/help-button.c
     selector: 'app-eoc-log-interface',
     templateUrl: './eoc-log-interface.component.html',
     styleUrls: ['./eoc-log-interface.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AutofocusDirective,

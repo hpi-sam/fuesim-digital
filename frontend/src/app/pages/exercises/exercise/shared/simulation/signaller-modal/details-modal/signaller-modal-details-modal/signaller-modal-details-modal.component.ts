@@ -5,6 +5,7 @@ import {
     TemplateRef,
     inject,
     effect,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgTemplateOutlet } from '@angular/common';
@@ -20,6 +21,7 @@ import { HotkeyIndicatorComponent } from '../../../../../../../../shared/compone
     selector: 'app-signaller-modal-details-modal',
     templateUrl: './signaller-modal-details-modal.component.html',
     styleUrls: ['./signaller-modal-details-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AutofocusDirective, NgTemplateOutlet, HotkeyIndicatorComponent],
 })
 export class SignallerModalDetailsModalComponent implements OnDestroy {

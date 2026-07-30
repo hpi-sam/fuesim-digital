@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { MaterialCountRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -14,6 +19,7 @@ import { KeysPipe } from '../../../../../../../../../shared/pipes/keys.pipe';
     selector: 'app-radiogram-card-content-material-count',
     templateUrl: './radiogram-card-content-material-count.component.html',
     styleUrls: ['./radiogram-card-content-material-count.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [PatientStatusBadgeComponent, KeysPipe, AsyncPipe],
 })
 export class RadiogramCardContentMaterialCountComponent implements OnInit {

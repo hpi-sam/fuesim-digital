@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { NgClass, NgStyle } from '@angular/common';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { type PatientStatusDataField } from 'fuesim-digital-shared';
@@ -11,6 +11,7 @@ import { PatientBehaviorDescriptionPipe } from '../../../pipes/patient-behavior-
     selector: 'app-patient-status-data-field',
     templateUrl: './patient-status-data-field.component.html',
     styleUrls: ['./patient-status-data-field.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgClass,
         NgStyle,

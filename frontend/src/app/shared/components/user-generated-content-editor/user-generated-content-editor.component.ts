@@ -6,6 +6,7 @@ import {
     model,
     OnDestroy,
     OnInit,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
@@ -19,6 +20,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     selector: 'app-user-generated-content-editor',
     templateUrl: './user-generated-content-editor.component.html',
     styleUrls: ['./user-generated-content-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgxEditorModule, FormsModule],
 })
 export class UserGeneratedContentEditorComponent implements OnInit, OnDestroy {

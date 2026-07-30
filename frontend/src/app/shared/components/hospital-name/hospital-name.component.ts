@@ -1,5 +1,10 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Hospital, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -11,6 +16,7 @@ import { createSelectHospital } from '../../../state/application/selectors/exerc
     selector: 'app-hospital-name',
     templateUrl: './hospital-name.component.html',
     styleUrls: ['./hospital-name.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe],
 })
 export class HospitalNameComponent implements OnChanges {

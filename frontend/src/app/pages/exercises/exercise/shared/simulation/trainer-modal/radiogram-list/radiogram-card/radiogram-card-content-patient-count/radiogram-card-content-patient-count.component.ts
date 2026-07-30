@@ -1,4 +1,10 @@
-import { Component, computed, inject, input } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientCountRadiogram, UUID } from 'fuesim-digital-shared';
 import type { AppState } from '../../../../../../../../../state/app.state';
@@ -12,6 +18,7 @@ import { PatientStatusBadgeComponent } from '../../../../../../../../../shared/c
     selector: 'app-radiogram-card-content-patient-count',
     templateUrl: './radiogram-card-content-patient-count.component.html',
     styleUrls: ['./radiogram-card-content-patient-count.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [PatientStatusBadgeComponent],
 })
 export class RadiogramCardContentPatientCountComponent {

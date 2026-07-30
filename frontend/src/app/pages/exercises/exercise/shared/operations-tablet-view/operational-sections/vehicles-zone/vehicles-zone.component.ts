@@ -1,4 +1,10 @@
-import { Component, computed, input, output } from '@angular/core';
+import {
+    Component,
+    computed,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { Vehicle } from 'fuesim-digital-shared';
 import { VehicleTagComponent } from '../vehicle-tag/vehicle-tag.component';
@@ -8,6 +14,7 @@ import { ScrollButtonsComponent } from '../../../../../../../shared/components/s
     selector: 'app-vehicles-zone',
     templateUrl: './vehicles-zone.component.html',
     styleUrl: './vehicles-zone.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         VehicleTagComponent,
         CdkDropList,

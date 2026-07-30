@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { UUID } from 'fuesim-digital-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
@@ -14,6 +14,7 @@ import {
     selector: 'app-signaller-modal-regions-overview',
     templateUrl: './signaller-modal-regions-overview.component.html',
     styleUrls: ['./signaller-modal-regions-overview.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe],
 })
 export class SignallerModalRegionsOverviewComponent implements OnInit {

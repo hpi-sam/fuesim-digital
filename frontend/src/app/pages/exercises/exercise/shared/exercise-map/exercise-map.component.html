@@ -38,7 +38,9 @@
             <i class="bi-zoom-out"></i>
         </button>
         @let lockZoom =
-            (olMapManagerService.olMapManager?.lockZoom$ | async) ?? false;
+            ($safeNavigationMigration(
+                olMapManagerService.olMapManager?.lockZoom$
+            ) | async) ?? false;
         <button
             (click)="
                 olMapManagerService.olMapManager?.toggleZoomLock();

@@ -1,4 +1,11 @@
-import { Component, computed, input, output, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    input,
+    output,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type {
     GetParallelExerciseResponseData,
     PatchParallelExerciseRequestData,
@@ -16,6 +23,7 @@ import { OrganisationBadgeComponent } from '../../../pages/organisations/shared/
     selector: 'app-parallel-exercise-card',
     templateUrl: './parallel-exercise-card.component.html',
     styleUrls: ['./parallel-exercise-card.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CopyButtonComponent,
         RouterLink,

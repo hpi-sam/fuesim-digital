@@ -1,5 +1,10 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, output, inject } from '@angular/core';
+import {
+    Component,
+    output,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type { HotkeyLayer } from '../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
@@ -11,6 +16,7 @@ import { HotkeyIndicatorComponent } from '../../../../../../../shared/components
     selector: 'app-signaller-modal-no-leader-overlay',
     templateUrl: './signaller-modal-no-leader-overlay.component.html',
     styleUrls: ['./signaller-modal-no-leader-overlay.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [HotkeyIndicatorComponent],
 })
 export class SignallerModalNoLeaderOverlayComponent

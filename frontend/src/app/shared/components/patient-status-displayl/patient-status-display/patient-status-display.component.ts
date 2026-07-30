@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { type PatientStatusCode } from 'fuesim-digital-shared';
 import { PatientStatusDataFieldComponent } from '../patient-status-data-field/patient-status-data-field.component';
 import { PatientStatusTagsFieldComponent } from '../patient-status-tags-field/patient-status-tags-field.component';
@@ -7,6 +7,7 @@ import { PatientStatusTagsFieldComponent } from '../patient-status-tags-field/pa
     selector: 'app-patient-status-display',
     templateUrl: './patient-status-display.component.html',
     styleUrls: ['./patient-status-display.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [PatientStatusDataFieldComponent, PatientStatusTagsFieldComponent],
 })
 export class PatientStatusDisplayComponent {

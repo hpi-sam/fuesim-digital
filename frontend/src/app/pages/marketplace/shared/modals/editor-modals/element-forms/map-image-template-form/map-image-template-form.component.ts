@@ -1,4 +1,11 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    effect,
+    inject,
+    input,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     cloneDeepMutable,
     MapImageTemplate,
@@ -27,6 +34,7 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
     selector: 'app-map-image-template-form',
     templateUrl: './map-image-template-form.component.html',
     styleUrl: './map-image-template-form.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ImagePartialFormComponent,
         FormField,

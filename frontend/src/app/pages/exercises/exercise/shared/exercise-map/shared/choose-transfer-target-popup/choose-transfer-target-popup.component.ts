@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Hospital, TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -17,6 +17,7 @@ import { HospitalNameComponent } from '../../../../../../../shared/components/ho
     selector: 'app-choose-transfer-target-popup',
     templateUrl: './choose-transfer-target-popup.component.html',
     styleUrls: ['../chooser-popup.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [TransferPointNameComponent, HospitalNameComponent, AsyncPipe],
 })
 export class ChooseTransferTargetPopupComponent implements OnInit {

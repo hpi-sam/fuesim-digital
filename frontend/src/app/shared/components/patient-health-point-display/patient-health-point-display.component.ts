@@ -1,4 +1,10 @@
-import { computed, Component, inject, input } from '@angular/core';
+import {
+    computed,
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import {
@@ -19,6 +25,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     selector: 'app-patient-health-point-display',
     templateUrl: './patient-health-point-display.component.html',
     styleUrls: ['./patient-health-point-display.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgStyle, PercentPipe],
 })
 export class PatientHealthPointDisplayComponent {

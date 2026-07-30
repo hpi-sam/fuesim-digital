@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { selectVehiclesOnLocation } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
@@ -9,6 +14,7 @@ import { VehiclesZoneComponent } from '../vehicles-zone/vehicles-zone.component'
     selector: 'app-vehicles-on-location',
     templateUrl: './vehicles-on-location.component.html',
     styleUrl: './vehicles-on-location.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [VehiclesZoneComponent],
 })
 export class VehiclesOnLocationComponent {

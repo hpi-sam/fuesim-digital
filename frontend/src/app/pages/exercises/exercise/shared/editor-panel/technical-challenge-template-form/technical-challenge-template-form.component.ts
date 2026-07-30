@@ -1,4 +1,10 @@
-import { Component, inject, input, linkedSignal } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    linkedSignal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     TechnicalChallengeTemplate,
     cloneDeepMutable,
@@ -13,6 +19,7 @@ import { EditStateMachineModalComponent } from '../edit-state-machine-modal/edit
 @Component({
     selector: 'app-technical-challenge-template-form',
     imports: [FormsModule, FormField],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './technical-challenge-template-form.component.html',
 })
 export class TechnicalChallengeTemplateFormComponent {

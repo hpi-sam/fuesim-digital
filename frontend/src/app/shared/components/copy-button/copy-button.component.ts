@@ -1,4 +1,9 @@
-import { Component, input, inject } from '@angular/core';
+import {
+    Component,
+    input,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { MessageService } from '../../../core/messages/message.service';
 
 @Component({
@@ -6,6 +11,7 @@ import { MessageService } from '../../../core/messages/message.service';
     selector: '[app-copy-button]',
     templateUrl: './copy-button.component.html',
     styleUrls: ['./copy-button.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     host: {
         '(click)': 'copy()',
         type: 'button',

@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     ChangeElementType,
     TemplateVersion,
@@ -28,6 +35,7 @@ import { ConfirmationModalService } from '../../../../core/confirmation-modal/co
     selector: 'app-collection-elements-list',
     templateUrl: './collection-elements-list.component.html',
     styleUrl: './collection-elements-list.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ElementCardComponent,
         VersionedElementDisplayNamePipe,

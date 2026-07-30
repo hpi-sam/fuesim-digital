@@ -1,4 +1,10 @@
-import { Component, inject, resource, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    resource,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     NgbAccordionModule,
     NgbActiveModal,
@@ -25,6 +31,7 @@ import { ExerciseColletionItemComponent } from './exercise-collection-item/exerc
     selector: 'app-manage-exercise-collections-modal',
     templateUrl: './manage-exercise-collections-modal.component.html',
     styleUrl: './manage-exercise-collections-modal.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ExerciseColletionItemComponent,
         NgbAccordionModule,

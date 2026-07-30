@@ -1,4 +1,11 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    effect,
+    inject,
+    input,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     cloneDeepMutable,
     PersonnelTemplate,
@@ -28,6 +35,7 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
     selector: 'app-personnel-template-form',
     templateUrl: './personnel-template-form.component.html',
     styleUrl: './personnel-template-form.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CaterForFormComponent,
         FormField,

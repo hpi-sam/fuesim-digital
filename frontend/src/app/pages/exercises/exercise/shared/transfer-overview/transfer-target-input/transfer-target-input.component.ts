@@ -1,4 +1,9 @@
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Transfer } from 'fuesim-digital-shared';
 import {
@@ -19,6 +24,7 @@ import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
     selector: 'app-transfer-target-input',
     templateUrl: './transfer-target-input.component.html',
     styleUrls: ['./transfer-target-input.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbDropdown,
         NgbDropdownToggle,

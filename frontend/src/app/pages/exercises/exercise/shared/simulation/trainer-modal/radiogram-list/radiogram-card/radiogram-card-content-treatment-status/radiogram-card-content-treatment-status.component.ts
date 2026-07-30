@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TreatmentStatusRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -12,6 +17,7 @@ import { TreatmentStatusBadgeComponent } from '../../../treatment-status-badge/t
     selector: 'app-radiogram-card-content-treatment-status',
     templateUrl: './radiogram-card-content-treatment-status.component.html',
     styleUrls: ['./radiogram-card-content-treatment-status.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [TreatmentStatusBadgeComponent, AsyncPipe],
 })
 export class RadiogramCardContentTreatmentStatusComponent implements OnInit {

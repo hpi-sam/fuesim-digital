@@ -1,7 +1,7 @@
 <div class="form-group">
     <input
         #nameInput="ngModel"
-        [ngModel]="(vehicle$ | async)?.name"
+        [ngModel]="$safeNavigationMigration((vehicle$ | async)?.name)"
         (appSaveOnTyping)="renameVehicle($event)"
         [maxlength]="16"
         required

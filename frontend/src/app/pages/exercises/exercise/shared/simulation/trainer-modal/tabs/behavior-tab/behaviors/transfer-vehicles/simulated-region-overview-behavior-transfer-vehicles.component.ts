@@ -1,5 +1,10 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type { MemoizedSelector } from '@ngrx/store';
 import { Store, createSelector } from '@ngrx/store';
 import type {
@@ -62,6 +67,7 @@ let globalLastTransferCollapsed = true;
     styleUrls: [
         './simulated-region-overview-behavior-transfer-vehicles.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbCollapse,
         FormsModule,

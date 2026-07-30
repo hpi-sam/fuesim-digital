@@ -1,5 +1,10 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseAction,
@@ -27,6 +32,7 @@ import { HotkeyIndicatorComponent } from '../../../../../../../../shared/compone
     styleUrls: [
         './signaller-modal-start-transfer-of-category-modal.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AutofocusDirective,

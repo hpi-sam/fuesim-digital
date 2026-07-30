@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Viewport } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -18,6 +18,7 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
     selector: 'app-viewport-popup',
     templateUrl: './viewport-popup.component.html',
     styleUrls: ['./viewport-popup.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AppSaveOnTypingDirective,

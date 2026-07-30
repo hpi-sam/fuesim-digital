@@ -4,9 +4,11 @@
             <input
                 [id]="'eventBasedReportEditor_' + eventBasedReport.eventId"
                 [ngModel]="
-                    (reportBehaviorState$ | async)?.[
-                        eventBasedReport.propertyName
-                    ]
+                    $safeNavigationMigration(
+                        (reportBehaviorState$ | async)?.[
+                            eventBasedReport.propertyName
+                        ]
+                    )
                 "
                 [disabled]="
                     (canReport$ | async)?.[eventBasedReport.eventId] !== true

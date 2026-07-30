@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { SendAlarmGroupsCardComponent } from '../send-alarm-groups-card/send-alarm-groups-card.component';
 import { EocLogInterfaceComponent } from '../eoc-log-interface/eoc-log-interface.component';
 
@@ -6,6 +6,7 @@ import { EocLogInterfaceComponent } from '../eoc-log-interface/eoc-log-interface
     selector: 'app-emergency-operations-center-full',
     templateUrl: './emergency-operations-center-full.component.html',
     styleUrls: ['./emergency-operations-center-full.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [SendAlarmGroupsCardComponent, EocLogInterfaceComponent],
 })
 export class EmergencyOperationsCenterFullComponent {}

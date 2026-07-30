@@ -1,4 +1,9 @@
-import { Component, inject, output } from '@angular/core';
+import {
+    Component,
+    inject,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { catchAllHospitalId, newHospital } from 'fuesim-digital-shared';
@@ -15,6 +20,7 @@ import { HelpButtonComponent } from '../../../../../help-button/help-button.comp
     selector: 'app-hospital-editor-page',
     templateUrl: './hospital-editor-page.component.html',
     styleUrls: ['./hospital-editor-page.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AppSaveOnTypingDirective,

@@ -1,4 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+    Component,
+    OnInit,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map, Observable, combineLatest } from 'rxjs';
 import {
@@ -43,6 +48,7 @@ let activeNavId: NavIds = 'settings';
     selector: 'app-restricted-zone-popup',
     templateUrl: './restricted-zone-popup.component.html',
     styleUrls: ['./restricted-zone-popup.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbNav,
         NgbNavItem,

@@ -1,4 +1,10 @@
-import { Component, input, model, output } from '@angular/core';
+import {
+    Component,
+    input,
+    model,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
 import { AutofocusDirective } from '../../directives/autofocus.directive';
@@ -7,6 +13,7 @@ import { AutofocusDirective } from '../../directives/autofocus.directive';
     selector: 'app-inline-text-editor',
     templateUrl: './inline-text-editor.component.html',
     styleUrls: ['./inline-text-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, DisplayValidationComponent, AutofocusDirective],
 })
 export class InlineTextEditorComponent {

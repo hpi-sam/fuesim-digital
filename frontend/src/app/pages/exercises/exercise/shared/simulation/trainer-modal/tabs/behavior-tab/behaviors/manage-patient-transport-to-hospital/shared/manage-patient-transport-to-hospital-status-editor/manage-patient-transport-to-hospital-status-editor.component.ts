@@ -1,5 +1,10 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
@@ -18,6 +23,7 @@ import { ExerciseService } from '../../../../../../../../../../../../core/exerci
     styleUrls: [
         './manage-patient-transport-to-hospital-status-editor.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe],
 })
 export class ManagePatientTransportToHospitalStatusEditorComponent implements OnChanges {

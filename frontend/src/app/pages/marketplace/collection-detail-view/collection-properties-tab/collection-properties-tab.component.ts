@@ -5,6 +5,7 @@ import {
     input,
     resource,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     collectionOrganisationRelationshipTypeAllowedValues,
@@ -31,6 +32,7 @@ import { CollectionMemberItemComponent } from './collection-member-item/collecti
         CollectionMemberItemComponent,
     ],
     templateUrl: './collection-properties-tab.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './collection-properties-tab.component.scss',
 })
 export class CollectionDetailsTabComponent {

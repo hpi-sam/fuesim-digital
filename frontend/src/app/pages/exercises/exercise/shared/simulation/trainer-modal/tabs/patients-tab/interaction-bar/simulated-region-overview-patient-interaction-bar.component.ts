@@ -1,4 +1,9 @@
-import { Component, input, inject } from '@angular/core';
+import {
+    Component,
+    input,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type { UUIDSet, UUID } from 'fuesim-digital-shared';
 import { WritableDraft } from 'immer';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
@@ -13,6 +18,7 @@ import { ExerciseService } from '../../../../../../../../../core/exercise.servic
     styleUrls: [
         './simulated-region-overview-patient-interaction-bar.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgbTooltip],
 })
 export class SimulatedRegionOverviewPatientInteractionBarComponent {

@@ -1,5 +1,11 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, inject, input, viewChild } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    viewChild,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ResourceDescription, UUID } from 'fuesim-digital-shared';
 import {
@@ -41,6 +47,7 @@ import { ValuesPipe } from '../../../../../../../../shared/pipes/values.pipe';
     selector: 'app-signaller-modal-provide-vehicles-editor',
     templateUrl: './signaller-modal-provide-vehicles-editor.component.html',
     styleUrls: ['./signaller-modal-provide-vehicles-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         IntegerValidatorDirective,

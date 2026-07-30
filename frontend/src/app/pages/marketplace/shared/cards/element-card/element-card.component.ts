@@ -1,4 +1,11 @@
-import { Component, computed, inject, Injector, input } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    Injector,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     TemplateVersion,
     gatherAllCollectionElements,
@@ -27,6 +34,7 @@ import { marketplaceComponentDefinitions } from '../../definitions';
     selector: 'app-element-card',
     imports: [GenericElementCardComponent, ValuesPipe, NgComponentOutlet],
     templateUrl: './element-card.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './element-card.component.scss',
 })
 export class ElementCardComponent {

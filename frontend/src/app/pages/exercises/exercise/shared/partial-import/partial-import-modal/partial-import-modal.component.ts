@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import type { MigratedPartialExport } from 'fuesim-digital-shared';
 import { preparePartialExportForImport } from 'fuesim-digital-shared';
@@ -11,6 +11,7 @@ import { HelpButtonComponent } from '../../../../../../help-button/help-button.c
     selector: 'app-partial-import-modal',
     templateUrl: './partial-import-modal.component.html',
     styleUrls: ['./partial-import-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AutofocusDirective, HelpButtonComponent],
 })
 export class PartialImportModalComponent {

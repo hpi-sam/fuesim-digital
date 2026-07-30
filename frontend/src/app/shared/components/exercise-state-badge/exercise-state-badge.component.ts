@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { AppState } from '../../../state/app.state';
 import {
@@ -11,6 +11,7 @@ import { ExerciseStateBadgeInnerComponent } from '../exercise-state-badge-inner/
     selector: 'app-exercise-state-badge',
     templateUrl: './exercise-state-badge.component.html',
     styleUrls: ['./exercise-state-badge.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ExerciseStateBadgeInnerComponent],
 })
 export class ExerciseStateBadgeComponent {

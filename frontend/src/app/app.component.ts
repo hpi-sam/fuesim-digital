@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { RouterOutlet } from '@angular/router';
 import { httpOrigin, websocketOrigin } from './core/api-origins';
@@ -10,6 +10,7 @@ import { DisplayMessagesComponent } from './feature/messages/display-messages/di
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [RouterOutlet, DisplayMessagesComponent],
 })
 export class AppComponent {

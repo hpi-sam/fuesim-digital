@@ -1,4 +1,10 @@
-import { OnInit, Component, inject, Signal } from '@angular/core';
+import {
+    OnInit,
+    Component,
+    inject,
+    Signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,
@@ -13,6 +19,7 @@ import { createSelectTechnicalChallenge } from '../../../../../../../state/appli
     selector: 'app-technical-challenge-popup',
     templateUrl: './technical-challenge-popup.component.html',
     styleUrls: ['./technical-challenge-popup.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [TechnicalChallengeDetailsComponent],
 })
 export class TechnicalChallengePopupComponent implements OnInit {

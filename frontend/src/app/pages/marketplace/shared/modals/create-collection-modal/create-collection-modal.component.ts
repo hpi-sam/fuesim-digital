@@ -6,6 +6,7 @@ import {
     OnInit,
     output,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     disabled,
@@ -32,6 +33,7 @@ import { DisplayModelValidationComponent } from '../../../../../shared/validatio
     selector: 'app-create-collection-modal',
     templateUrl: './create-collection-modal.component.html',
     styleUrl: './create-collection-modal.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormField,
         DisplayModelValidationComponent,

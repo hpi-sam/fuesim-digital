@@ -4,6 +4,7 @@ import {
     Component,
     ViewEncapsulation,
     inject,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     NgbActiveModal,
@@ -31,6 +32,7 @@ import { SimulatedRegionOverviewGeneralComponent } from '../overview/simulated-r
     templateUrl: './simulated-regions-modal.component.html',
     styleUrls: ['./simulated-regions-modal.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         StartPauseButtonComponent,
         RadiogramListComponent,

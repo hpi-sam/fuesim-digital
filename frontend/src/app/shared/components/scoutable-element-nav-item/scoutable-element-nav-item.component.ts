@@ -7,6 +7,7 @@ import {
     linkedSignal,
     OnInit,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
@@ -33,6 +34,7 @@ import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.di
     selector: 'app-scoutable-element-nav-item',
     templateUrl: './scoutable-element-nav-item.component.html',
     styleUrls: ['./scoutable-element-nav-item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         UserGeneratedContentEditorComponent,
         FormsModule,

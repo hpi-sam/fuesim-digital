@@ -2,7 +2,6 @@ import { ZodError } from 'zod';
 import type { MapCoordinates } from '../models/utils/position/map-coordinates.js';
 import { newViewport } from '../models/viewport.js';
 import { validateExerciseAction } from './validate-exercise-action.js';
-import type { ExerciseAction } from './action-reducers/action-reducers.js';
 
 describe('validateExerciseAction', () => {
     it('should accept a valid action object', () => {
@@ -52,7 +51,7 @@ describe('validateExerciseAction', () => {
             validateExerciseAction({
                 type: '[Viewport] Remove viewport',
                 // missing viewportId
-            } as ExerciseAction)
+            })
         ).toThrow();
 
         expect(() =>
@@ -97,7 +96,7 @@ describe('validateExerciseAction', () => {
                     },
                 },
                 someKey: 'someValue',
-            } as unknown as ExerciseAction)
+            })
         ).toThrow();
         // down in the structure
         expect(() =>

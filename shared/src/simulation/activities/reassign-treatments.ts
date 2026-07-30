@@ -21,7 +21,6 @@ import { logTreatmentStatusChangedInSimulatedRegion } from '../../store/action-r
 import type { UUID } from '../../utils/uuid.js';
 import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
 import { stringCompare } from '../../utils/string-compare.js';
-import type { AssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
 import { newTreatmentProgressChangedEvent } from '../events/treatment-progress-changed.js';
 import {
     addResourceDescription,
@@ -90,7 +89,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
             const leaderId = (
                 simulatedRegion.behaviors.find(
                     (behavior) => behavior.type === 'assignLeaderBehavior'
-                ) as AssignLeaderBehaviorState | undefined
+                )
             )?.leaderId;
 
             let leaderIndex: number;
@@ -309,7 +308,7 @@ const capacities = Object.fromEntries(
             },
         ]
     )
-) as { [key in string]: ResourceDescription<TreatablePatientStatus> };
+);
 capacities['notarzt'] = {
     green: defaultPersonnelTemplates.notarzt.canCaterFor.green,
     red: defaultPersonnelTemplates.notarzt.canCaterFor.red,
@@ -986,7 +985,7 @@ function calculateSubstitutedMissingPersonnel(
 
                     return [personnelType, requiredPersonnelCount];
                 })
-            ) as ResourceDescription;
+            );
             return { from, to: realPersonnelType };
         });
 

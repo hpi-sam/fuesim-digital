@@ -162,7 +162,7 @@ export function getTaskProgress(
     stateMachine: StateMachine
 ): TaskProgress {
     console.assert(
-        stateMachine.tasks[taskId],
+        !!stateMachine.tasks[taskId],
         `Task ${taskId} does not exist on stateMachine.`,
         stateMachine
     );

@@ -28,17 +28,18 @@
         "lodash-es": "^4.17.23"
     },
     "devDependencies": {
-        "@eslint/compat": "^1.4.0",
-        "@eslint/js": "^9.36.0",
+        "@eslint/compat": "^2.1.0",
+        "@eslint/js": "~10.0.1",
         "@types/lodash-es": "^4.17.12",
         "@types/node": "^22.14.0",
-        "eslint": "^9.36.0",
+        "eslint": "~10.8.0",
         "eslint-config-prettier": "^10.1.1",
-        "eslint-plugin-import": "~2.31.0",
-        "eslint-plugin-unicorn": "^56.0.1",
+        "eslint-import-resolver-typescript": "^4.4.5",
+        "eslint-plugin-import-x": "~4.17.1",
+        "eslint-plugin-unicorn": "^72.0.0",
         "tsx": "^4.19.3",
-        "typescript": "~5.9.3",
-        "typescript-eslint": "^8.55.0"
+        "typescript": "~6.0.3",
+        "typescript-eslint": "^8.65.0"
     },
     "overrides": {
         "@istanbuljs/load-nyc-config": {

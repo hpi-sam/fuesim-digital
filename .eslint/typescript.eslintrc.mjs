@@ -264,10 +264,11 @@ export default {
         /**
          * eslint-plugin-import
          */
-        'import/no-deprecated': 'warn',
-        'import/order': 'warn',
-        'import/no-cycle': 'warn',
-        'import/no-unresolved': 'off', // Causes false positives with import resolution of Angular/Vite and TypeScript
+        'import-x/no-deprecated': 'warn',
+        'import-x/order': 'warn',
+        'import-x/no-cycle': 'warn',
+        'import-x/no-unresolved': 'off', // Causes false positives with import resolution of Angular/Vite and TypeScript
+        'import-x/export': 'off', // Causes false positives in our index.ts files
 
         /**
          * @typescript-eslint

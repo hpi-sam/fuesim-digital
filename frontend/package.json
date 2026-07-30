@@ -99,5 +99,13 @@
             "@angular/common": "$@angular/common",
             "@angular/core": "$@angular/core"
         }
+    },
+    "allowScripts": {
+        "cypress@15.19.0": true,
+        "esbuild@0.28.1": true,
+        "lmdb@3.5.6": true,
+        "msgpackr-extract@3.0.4": true,
+        "@parcel/watcher@2.6.0": true,
+        "unrs-resolver@1.12.2": true
     }
 }

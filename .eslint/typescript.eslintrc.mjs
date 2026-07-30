@@ -262,7 +262,7 @@ export default {
         ],
 
         /**
-         * eslint-plugin-import
+         * eslint-plugin-import-x
          */
         'import-x/no-deprecated': 'warn',
         'import-x/order': 'warn',

@@ -201,7 +201,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     });
 
     publicRouter.get('/usable', async (req, res) => {
-        let collections: ExtendedCollectionVersion[] = [];
+        let collections: ExtendedCollectionVersion[];
         if (req.session) {
             collections = await collectionService.getLatestUsableCollections(
                 req.session

@@ -266,7 +266,7 @@ export class CollectionService {
         );
 
         // if we dont have direct rights, the highest role we can get is other
-        return rolesInParents.some((r) => r) ? 'other' : null;
+        return rolesInParents.includes(true) ? 'other' : null;
     }
 
     public async addCollectionOrganisation(

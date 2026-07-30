@@ -48,9 +48,11 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
                 )
             )
             .pipe(
-                startWith({
+                startWith<{
+                    ticketsEnabled: boolean;
+                    patients: { readonly [key: UUID]: Patient };
+                }>({
                     ticketsEnabled: true,
-                     
                     patients: {},
                 }),
                 pairwise(),

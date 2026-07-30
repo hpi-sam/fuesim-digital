@@ -1,10 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
-    NgbDropdown,
-    NgbDropdownItem,
-    NgbDropdownMenu,
-    NgbDropdownToggle,
     NgbNav,
     NgbNavItem,
     NgbNavItemRole,
@@ -30,10 +26,6 @@ import { ApiService } from '../../../core/api.service';
         NgbNavLinkBase,
         UserAccountNavbarItemComponent,
         AsyncPipe,
-        NgbDropdown,
-        NgbDropdownToggle,
-        NgbDropdownMenu,
-        NgbDropdownItem,
     ],
 })
 export class HeaderComponent {

@@ -90,7 +90,7 @@ $primary-muted: color-mix(in srgb, bootstrap.$primary 60%, transparent);
 }
 
 .btn-outline-changed {
-    border: map-get(bootstrap.$border-widths, 1) solid;
+    border: map.get(bootstrap.$border-widths, 1) solid;
     color: ci.$change-primary !important;
     border-color: ci.$change-primary !important;
     &:hover {

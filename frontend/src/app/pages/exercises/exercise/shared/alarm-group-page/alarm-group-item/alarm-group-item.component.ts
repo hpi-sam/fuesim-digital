@@ -29,7 +29,6 @@ import {
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
-import { VehicleTemplateDisplayComponent } from '../vehicle-template-display/vehicle-template-display.component';
 import { AlarmGroupVehicleItemComponent } from '../alarm-group-vehicle-item/alarm-group-vehicle-item.component';
 
 @Component({
@@ -44,7 +43,6 @@ import { AlarmGroupVehicleItemComponent } from '../alarm-group-vehicle-item/alar
         NgbDropdownModule,
         NgbDropdownToggle,
         NgbDropdownMenu,
-        VehicleTemplateDisplayComponent,
         AsyncPipe,
         ValuesPipe,
         AlarmGroupVehicleItemComponent,

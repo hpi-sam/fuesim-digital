@@ -31,7 +31,6 @@ import {
     FormOutputInjectionToken,
     VersionedElementModalData,
 } from '../../base-versioned-element-submodal';
-import { MapEditorCardComponent } from '../../../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { ValuesPipe } from '../../../../../../../shared/pipes/values.pipe';
 import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 import { AlarmGroupVehicleItemComponent } from '../../../../../../exercises/exercise/shared/alarm-group-page/alarm-group-vehicle-item/alarm-group-vehicle-item.component';
@@ -40,7 +39,6 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
 @Component({
     selector: 'app-alarmgroup-form',
     imports: [
-        MapEditorCardComponent,
         DisplayModelValidationComponent,
         FormsModule,
         NgbDropdownModule,

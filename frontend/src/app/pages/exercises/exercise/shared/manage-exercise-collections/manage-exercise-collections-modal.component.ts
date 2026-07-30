@@ -22,7 +22,6 @@ import { ExerciseService } from '../../../../../core/exercise.service';
 import { AppState } from '../../../../../state/app.state';
 import { openSelectCollectionModal } from '../../../../marketplace/shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { DragElementService } from '../core/drag-element.service';
-import { CollectionElementsListComponent } from '../../../../marketplace/shared/collection-elements-list/collection-elements-list.component';
 import { selectSelectedCollections } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectExerciseKey } from '../../../../../state/application/selectors/application.selectors';
 import { ExerciseColletionItemComponent } from './exercise-collection-item/exercise-collection-item.component';
@@ -32,12 +31,7 @@ import { ExerciseColletionItemComponent } from './exercise-collection-item/exerc
     templateUrl: './manage-exercise-collections-modal.component.html',
     styleUrl: './manage-exercise-collections-modal.component.scss',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [
-        ExerciseColletionItemComponent,
-        NgbAccordionModule,
-        CollectionElementsListComponent,
-        RouterLink,
-    ],
+    imports: [ExerciseColletionItemComponent, NgbAccordionModule, RouterLink],
 })
 export class ManageExerciseCollectionsModalComponent {
     private readonly activeModal = inject(NgbActiveModal);

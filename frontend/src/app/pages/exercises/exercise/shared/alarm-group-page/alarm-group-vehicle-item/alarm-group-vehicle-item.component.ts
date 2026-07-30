@@ -7,18 +7,13 @@ import {
 import { FormsModule } from '@angular/forms';
 import { AlarmGroupVehicle, VehicleTemplate } from 'fuesim-digital-shared';
 import { VehicleTemplateDisplayComponent } from '../vehicle-template-display/vehicle-template-display.component';
-import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 
 @Component({
     selector: 'app-alarm-group-vehicle-item',
     templateUrl: './alarm-group-vehicle-item.component.html',
     styleUrl: './alarm-group-vehicle-item.component.scss',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [
-        VehicleTemplateDisplayComponent,
-        FormsModule,
-        AppSaveOnTypingDirective,
-    ],
+    imports: [VehicleTemplateDisplayComponent, FormsModule],
 })
 export class AlarmGroupVehicleItemComponent {
     public readonly disabled = input(false);

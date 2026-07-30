@@ -54,7 +54,8 @@ export default defineConfig([
         rules: {
             // TODO: Temporarily disabled, see #1121
             '@typescript-eslint/explicit-member-accessibility': 'off',
-            '@angular-eslint/prefer-on-push-component-change-detection': 'warn',
+            // TODO: Temporarily disable, until all are checked and migrated
+            '@angular-eslint/prefer-on-push-component-change-detection': 'off',
         },
     },
     {

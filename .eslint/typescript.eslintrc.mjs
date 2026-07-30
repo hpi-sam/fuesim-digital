@@ -264,7 +264,7 @@ export default {
         /**
          * eslint-plugin-import-x
          */
-        'import-x/no-deprecated': 'warn',
+        'import-x/no-deprecated': 'off', // does not work with multiple function signatures: https://github.com/TrevorBurnham/eslint-plugin-import-x/blob/master/docs/rules/no-deprecated.md#when-not-to-use-it
         'import-x/order': 'warn',
         'import-x/no-cycle': 'warn',
         'import-x/no-unresolved': 'off', // Causes false positives with import resolution of Angular/Vite and TypeScript
@@ -273,6 +273,7 @@ export default {
         /**
          * @typescript-eslint
          */
+        '@typescript-eslint/no-deprecated': 'warn',
         '@typescript-eslint/prefer-as-const': 'off',
         '@typescript-eslint/ban-tslint-comment': 'warn',
         '@typescript-eslint/class-literal-property-style': ['warn', 'fields'],

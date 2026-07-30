@@ -299,10 +299,7 @@ export namespace PatientActionReducers {
             actionSchema: setPatientTransportPriorityActionSchema,
             reducer: (draftState, { patientId, hasTransportPriority }) => {
                 const patient = getElement(draftState, 'patient', patientId);
-                if (patient.hasTransportPriority !== hasTransportPriority) {
-                    patient.hasTransportPriority = hasTransportPriority;
-                }
-
+                patient.hasTransportPriority = hasTransportPriority;
                 return draftState;
             },
             rights: 'participant',
@@ -313,10 +310,7 @@ export namespace PatientActionReducers {
         actionSchema: setPatientTicketActionSchema,
         reducer: (draftState, { patientId, ticket }) => {
             const patient = getElement(draftState, 'patient', patientId);
-            if (patient.ticket !== ticket) {
-                patient.ticket = ticket;
-            }
-
+            patient.ticket = ticket;
             return draftState;
         },
         rights: 'participant',

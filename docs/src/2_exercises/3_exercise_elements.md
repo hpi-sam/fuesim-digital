@@ -181,12 +181,14 @@ Ebenso kann im Tab <kbd>Vorsichtung</kbd> jedem Patienten ein Ticket zugewiesen 
 
 > [!WARNING]
 > Das Erstellen von eigenen technischen Herausforderungen ist derzeit noch in Entwicklung.
-> Es gibt im Moment nur eine geringe Menge an Vorlagen und die Bearbeitung ist nur sehr eingeschränkt möglich.
+> Es gibt im Moment nur eine geringe Menge an Vorlagen und die Bearbeitung ist nur eingeschränkt möglich.
 
 Neben Patienten kann es viele weitere Herausforderungen in einem Einsatz geben.
 Technische Herausforderungen sind in der FüSim Digital der Überbegriff für Kartenelemente, wo von Personal konkrete Aufgaben erfüllt werden müssen.
 
-![Übungsleitendenansicht einer technischen Herausforderung](exercise_elements_technical_challenge_overview.png)
+Technische Herausforderungen bestehen aus einer oder mehreren _Teilherausforderungen_.
+Einzelne Teilherausforderungen können verschiedene Zustände mit eigenen Erkundungsinformationen haben.
+Die erste Teilherausforderung legt zusätzlich fest, welche Grafik auf der Karte angezeigt werden soll.
 
 ### Interaktion auf der Übungskarte
 
@@ -194,16 +196,35 @@ Analog zu den Ansichten kann mit einem anhaltenden Klick (oder einer Berührung 
 den Rand eine technische Herausforderung verschoben werden.
 Wird die Ecke angeklickt oder berührt, kann die Größe geändert werden.
 
+Mit einem Klick auf die technische Herausforderung öffnet sich für Übungsleitende eine Übersichtsansicht.
+Hierbei gibt es einen Tab für jede Teilherausforderung, wo jeweils
+
+- der aktuelle Zustand,
+- der Fortschritt aller Timer und Aufgaben,
+- der Fortschritt aktuell möglicher Übergänge,
+- und aktuell zugewiesenes Personal mit deren Aufgaben
+
+sichtbar sind.
+
+![Übungsleitendenansicht einer technischen Herausforderung](exercise_elements_technical_challenge_overview.png)
+
 Teilnehmende können Personal per Drag-and-Drop auf die technischen Herausforderungen ziehen und bekommen dann mögliche Aufgaben angezeigt.
 
 ![Zuweisen einer Aufgabe](exercise_elements_technical_challenge_assignment.png)
 
 Teilnehmende sehen, wenn sie eine technische Herausforderung anklicken, ein Pop-up mit den dynamischen Erkundungstexten aller Teilherausforderungen.
+Für jede Teilherausforderung wird ein einzelner Tab mit dem jeweiligen aktuellen Erkundungstext angezeigt.
 Siehe [Erkundungselemente](#erkundungselemente) für Details.
 
 ### Einstellungsmöglichkeiten
 
-Bei Vorlagen von technischen Herausforderungen kann man eigene Erkundungstexte für die verschiedenen Zustände aller Teilherausforderungen einstellen.
+Übungsleitende können bei bestehende Vorlagen im Editor und bei bereits platzierten Herausforderungen auf der Karte
+die einzelnen Teilherausforderungen bearbeiten.
+Für eine Teilherausforderung ist Folgendes einstellbar:
+
+- der Erkundungstext eines jeden Zustands
+- die Zeitdauer jedes Timers
+- die benötigte Zeit jeder Aufgabe
 
 ## Bilder
 

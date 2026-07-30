@@ -1,11 +1,5 @@
-import {
-    Component,
-    effect,
-    input,
-    linkedSignal,
-    output,
-    ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, effect, input, linkedSignal, output } from '@angular/core';
+import { computed, inject, type Signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { FormsModule } from '@angular/forms';
 import type {
@@ -13,22 +7,57 @@ import type {
     StateMachineState,
     ImageProperties,
     UserGeneratedContent,
+    Task,
+    Timer,
+    UUID,
 } from 'fuesim-digital-shared';
-import { uuid } from 'fuesim-digital-shared';
+import { uuid, cloneDeepMutable } from 'fuesim-digital-shared';
+import { Store } from '@ngrx/store';
+import {
+    NgbAccordionBody,
+    NgbAccordionButton,
+    NgbAccordionCollapse,
+    NgbAccordionDirective,
+    NgbAccordionHeader,
+    NgbAccordionItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { NgOptimizedImage } from '@angular/common';
 import { UserGeneratedContentEditorComponent } from '../../../../../../shared/components/user-generated-content-editor/user-generated-content-editor.component.js';
+import type { AppState } from '../../../../../../state/app.state.js';
+import { createSelectTaskType } from '../../../../../../state/application/selectors/exercise.selectors.js';
+import {
+    TimeInputComponent,
+    TimeUnit,
+} from '../../../../../../shared/components/time-input/time-input.component.js';
 
 @Component({
     selector: 'app-edit-state-machine-form',
-    imports: [FormsModule, FormField, UserGeneratedContentEditorComponent],
-    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [
+        FormsModule,
+        FormField,
+        UserGeneratedContentEditorComponent,
+        TimeInputComponent,
+        NgbAccordionDirective,
+        NgbAccordionItem,
+        NgbAccordionHeader,
+        NgbAccordionButton,
+        NgbAccordionCollapse,
+        NgbAccordionBody,
+        NgOptimizedImage,
+    ],
     templateUrl: './edit-state-machine-form.component.html',
 })
 export class EditStateMachineFormComponent {
+    private readonly store = inject<Store<AppState>>(Store);
+
     readonly initialStateMachine = input.required<StateMachine>();
     readonly stateMachineModel = linkedSignal({
         source: this.initialStateMachine,
         computation: domainToFormModel,
     });
+    readonly isPrimaryStateMachine = input<boolean>(false);
+
+    readonly showStateImage = this.isPrimaryStateMachine;
 
     stateMachineForm = form(this.stateMachineModel);
 
@@ -46,6 +75,16 @@ export class EditStateMachineFormComponent {
             }
         });
     }
+
+    nameOfTask(taskTypeId: UUID): Signal<string> {
+        return computed(
+            () =>
+                this.store.selectSignal(createSelectTaskType(taskTypeId))()
+                    .taskName
+        );
+    }
+
+    protected readonly timeUnit = TimeUnit.s;
 }
 
 interface StateFormModel {
@@ -83,6 +122,8 @@ interface StateMachineFormModel {
     id: string;
     name: string;
     states: StateFormModel[];
+    tasks: Task[];
+    timers: Timer[];
 }
 function domainToFormModel(
     stateMachine: StateMachine | undefined
@@ -93,12 +134,16 @@ function domainToFormModel(
             id: uuid(),
             name: '',
             states: [],
+            tasks: [],
+            timers: [],
         };
     }
     return {
         id: stateMachine.id,
         name: stateMachine.name,
         states: Object.values(stateMachine.states).map(stateToFormModel),
+        tasks: Object.values(stateMachine.tasks).map(cloneDeepMutable),
+        timers: Object.values(stateMachine.timers).map(cloneDeepMutable),
     };
 }
 
@@ -114,6 +159,14 @@ function formModelToDomain(
                 fM.id,
                 stateFromFormModel(fM, initialValue),
             ])
+        ),
+        tasks: Object.fromEntries(
+            formModel.tasks.map((task) => [task.taskTypeId, task])
+        ),
+        timers: Object.fromEntries(
+            formModel.timers
+                .map((timer) => [timer.id, timer])
+                .map(cloneDeepMutable)
         ),
     };
 }

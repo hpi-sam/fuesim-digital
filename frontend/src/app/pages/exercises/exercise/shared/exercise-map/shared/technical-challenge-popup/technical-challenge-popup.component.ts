@@ -14,13 +14,14 @@ import { PopupService } from '../../utility/popup.service';
 import { TechnicalChallengeDetailsComponent } from '../../../../../../../shared/components/technical-challenge-details/technical-challenge-details.component';
 import { AppState } from '../../../../../../../state/app.state';
 import { createSelectTechnicalChallenge } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { HelpButtonComponent } from '../../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-technical-challenge-popup',
     templateUrl: './technical-challenge-popup.component.html',
     styleUrls: ['./technical-challenge-popup.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [TechnicalChallengeDetailsComponent],
+    imports: [TechnicalChallengeDetailsComponent, HelpButtonComponent],
 })
 export class TechnicalChallengePopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

@@ -12,13 +12,13 @@ import { Store } from '@ngrx/store';
 import { AppState } from '../../../../../../state/app.state.js';
 import { createSelectTechnicalChallengeTemplate } from '../../../../../../state/application/selectors/exercise.selectors.js';
 import { TechnicalChallengeTemplateFormComponent } from '../technical-challenge-template-form/technical-challenge-template-form.component.js';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-edit-technical-challenge-template-modal',
-    imports: [TechnicalChallengeTemplateFormComponent],
+    imports: [TechnicalChallengeTemplateFormComponent, HelpButtonComponent],
     templateUrl: './edit-technical-challenge-template-modal.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrl: './edit-technical-challenge-template-modal.component.scss',
 })
 export class EditTechnicalChallengeTemplateModalComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

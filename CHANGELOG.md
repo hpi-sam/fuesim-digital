@@ -10,6 +10,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Added
 
 - A simple ticket system allows tickets to be assigned to patients. A patient who has a ticket assigned shows a ticket icon above them on the map. Tickets do not affect the exercise logic (i.e., patients can be loaded into vehicles and sent to hospitals regardless of their ticket status).
+- Trainers can edit the timers and tasks of technical challenges and their templates. Trainers can edit user generated content of technical challenges.
 
 ## [1.0.0-rc.1] - 2026-07-28
 

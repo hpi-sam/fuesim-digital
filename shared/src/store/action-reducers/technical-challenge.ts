@@ -19,7 +19,6 @@ import {
 } from '../../models/technical-challenge/state-machine.js';
 import { taskTypeSchema } from '../../models/task-type.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { createScoutableTag } from '../../models/utils/tag-helpers.js';
 import { getElement } from './utils/get-element.js';
 import {
@@ -60,12 +59,9 @@ const resizeTechnicalChallengeActionSchema = z.strictObject({
     newSize: sizeSchema,
 });
 
-const updateTechnicalChallengeStateContentActionSchema = z.strictObject({
-    type: z.literal('[TechnicalChallenge] Update state content'),
-    technicalChallengeId: technicalChallengeIdSchema,
-    stateMachineId: stateMachineSchema.shape.id,
-    stateId: stateMachineStateSchema.shape.id,
-    userGeneratedContent: userGeneratedContentSchema,
+const updateTechnicalChallengeActionSchema = z.strictObject({
+    type: z.literal('[TechnicalChallenge] Update technical challenge'),
+    updatedTechnicalChallenge: technicalChallengeSchema,
 });
 
 const markTechnicalChallengeStateAsViewedActionSchema = z.strictObject({
@@ -183,29 +179,19 @@ export namespace TechnicalChallengeActionReducers {
         rights: 'trainer',
     };
     export const updateTechnicalChallengeStateContent: ActionReducer<
-        z.infer<typeof updateTechnicalChallengeStateContentActionSchema>
+        Immutable<z.infer<typeof updateTechnicalChallengeActionSchema>>
     > = {
-        type: updateTechnicalChallengeStateContentActionSchema.shape.type.value,
-        actionSchema: updateTechnicalChallengeStateContentActionSchema,
-        reducer: (draftState, action) => {
-            const technicalChallenge = getElement(
+        type: updateTechnicalChallengeActionSchema.shape.type.value,
+        actionSchema: updateTechnicalChallengeActionSchema,
+        reducer: (draftState, { updatedTechnicalChallenge }) => {
+            getElement(
                 draftState,
                 'technicalChallenge',
-                action.technicalChallengeId
+                updatedTechnicalChallenge.id
             );
-            const stateMachine =
-                technicalChallenge.stateMachines[action.stateMachineId];
-            if (!stateMachine) {
-                throw new ReducerError(
-                    `StateMachine ${action.stateMachineId} not found in technical challenge ${technicalChallenge.id}.`
-                );
-            }
+            draftState.technicalChallenges[updatedTechnicalChallenge.id] =
+                cloneDeepMutable(updatedTechnicalChallenge);
 
-            const state = currentStateOf(stateMachine);
-
-            state.userGeneratedContent = cloneDeepMutable(
-                action.userGeneratedContent
-            );
             return draftState;
         },
         rights: 'trainer',

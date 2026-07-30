@@ -14,7 +14,7 @@ import { disabled, form, FormField } from '@angular/forms/signals';
 import type { StateMachine } from 'fuesim-digital-shared';
 import type { WritableDraft } from 'immer';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EditStateMachineModalComponent } from '../edit-state-machine-modal/edit-state-machine-modal.component.js';
+import { EditStateMachineTemplateModalComponent } from '../edit-state-machine-template-modal/edit-state-machine-template-modal.component.js';
 
 @Component({
     selector: 'app-technical-challenge-template-form',
@@ -38,13 +38,13 @@ export class TechnicalChallengeTemplateFormComponent {
 
     public async editStateMachine(stateMachine: StateMachineFormModel) {
         const modalRef = this.ngbModalService.open(
-            EditStateMachineModalComponent,
+            EditStateMachineTemplateModalComponent,
             {
-                size: 'lg',
+                size: 'xl',
             }
         );
         const componentInstance =
-            modalRef.componentInstance as EditStateMachineModalComponent;
+            modalRef.componentInstance as EditStateMachineTemplateModalComponent;
         componentInstance.initialStateMachineId = stateMachine.id;
         componentInstance.containingTechnicalChallengeTemplateId =
             this.technicalChallengeTemplate().id;

@@ -17,6 +17,6 @@ export class DisplayValidationComponent {
     }
 
     get errors(): CustomValidationErrors | null {
-        return this.ngModelInput().errors as CustomValidationErrors | null;
+        return this.ngModelInput().errors;
     }
 }

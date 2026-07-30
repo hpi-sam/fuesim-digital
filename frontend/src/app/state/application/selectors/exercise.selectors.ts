@@ -84,7 +84,7 @@ export const selectActiveClients = createSelector(
     (clients) =>
         Object.fromEntries(
             Object.entries(clients).filter(([, client]) => client.isActive)
-        ) as typeof clients
+        )
 );
 export const selectRadiograms = selectPropertyFactory('radiograms');
 export const selectRestrictedZones = selectPropertyFactory('restrictedZones');

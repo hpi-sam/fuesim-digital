@@ -220,7 +220,7 @@ export class ExerciseService {
                     (resolve) => {
                         this.socket.emit(
                             'proposeAction',
-                            action as WritableDraft<ExerciseAction>,
+                            action,
                             resolve
                         );
                     }

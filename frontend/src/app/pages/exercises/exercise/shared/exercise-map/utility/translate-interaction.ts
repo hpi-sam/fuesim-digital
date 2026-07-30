@@ -83,7 +83,7 @@ export class TranslateInteraction extends Translate {
                 );
 
                 if (predicate) {
-                    isAllowed = predicate(feature as Feature, event);
+                    isAllowed = predicate(feature, event);
                 }
                 return true;
             },

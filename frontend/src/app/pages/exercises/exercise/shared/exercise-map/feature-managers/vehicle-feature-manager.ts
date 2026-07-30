@@ -117,8 +117,8 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             .pipe(
                 startWith({
                     configuration: newExerciseConfiguration(),
-                    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-                    vehicles: {} as { [key: UUID]: Vehicle },
+                     
+                    vehicles: {},
                     currentTime: -1,
                 }),
                 pairwise(),

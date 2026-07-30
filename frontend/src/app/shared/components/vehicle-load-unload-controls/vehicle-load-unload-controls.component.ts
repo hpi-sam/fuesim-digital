@@ -73,7 +73,7 @@ export class VehicleLoadUnloadControlsComponent {
 
         return {
             loadable: elementsInVehicle.some((isInVehicle) => !isInVehicle),
-            unloadable: elementsInVehicle.some((isInVehicle) => isInVehicle),
+            unloadable: elementsInVehicle.includes(true),
         };
     });
 

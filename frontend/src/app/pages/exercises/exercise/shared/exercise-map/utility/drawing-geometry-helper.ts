@@ -47,7 +47,7 @@ export class DrawingGeometryHelper implements GeometryHelper<
         const coords = element.points.map(toCoordinate);
         return (
             element.drawingType === 'polygon' ? [closeRing(coords)] : coords
-        ) as Coordinates<LineString | Polygon>;
+        );
     }
 
     getFeatureCoordinates(

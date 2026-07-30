@@ -1,25 +1,25 @@
-<div class="form-group">
+<div class="form-group mb-4">
     <label class="form-label">Name der Technischen Herausforderung:</label>
     <input class="form-control" type="text" [formField]="templateForm.name" />
 </div>
 
 <div class="form-group mt-2">
-    <label class="form-label">Beinhaltete Teilherausforderungen: </label>
-    <div class="d-flex flex-row gap-2">
+    <h5>Beinhaltete Teilherausforderungen</h5>
+    <div class="list-group w-100">
         @for (
             stateMachine of templateForm.stateMachines().value();
             track stateMachine.id
         ) {
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ stateMachine.name }}</h5>
-                    <a
-                        (click)="editStateMachine(stateMachine)"
-                        class="btn btn-primary stretched-link"
-                    >
-                        Bearbeiten
-                    </a>
-                </div>
+            <div class="list-group-item d-flex align-items-center">
+                <div>{{ stateMachine.name }}</div>
+                <div class="flex-grow-1"></div>
+                <a
+                    (click)="editStateMachine(stateMachine)"
+                    class="btn btn-outline-primary stretched-link"
+                >
+                    <i class="bi bi-pencil me-2"></i>
+                    Bearbeiten
+                </a>
             </div>
         }
     </div>

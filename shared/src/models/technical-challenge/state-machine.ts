@@ -29,13 +29,14 @@ const taskSchema = z.object({
     taskTypeId: taskTypeSchema.shape.id,
     totalDuration: z.number().nonnegative(),
 });
+export type Task = Immutable<z.infer<typeof taskSchema>>;
 
 const timerSchema = z.object({
     id: uuidSchema.brand<'TimerId'>(),
     name: z.string(),
     totalDuration: z.number().nonnegative(),
 });
-type Timer = z.infer<typeof timerSchema>;
+export type Timer = Immutable<z.infer<typeof timerSchema>>;
 
 const taskGuardSchema = z.object({
     type: z.literal('taskGuard'),

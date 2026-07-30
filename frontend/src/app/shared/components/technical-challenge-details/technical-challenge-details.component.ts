@@ -9,6 +9,7 @@ import {
 import { Store } from '@ngrx/store';
 import type { TechnicalChallenge, StateMachine } from 'fuesim-digital-shared';
 import {
+    NgbModal,
     NgbNav,
     NgbNavContent,
     NgbNavItem,
@@ -26,6 +27,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
 import { UserGeneratedContentEditorComponent } from '../user-generated-content-editor/user-generated-content-editor.component.js';
 import { StateMachineDetailsComponent } from '../state-machine-details/state-machine-details.component.js';
 import { ExerciseService } from '../../../core/exercise.service.js';
+import { openEditStateMachineModalComponent } from '../../../pages/exercises/exercise/shared/exercise-map/shared/edit-state-machine-modal/edit-state-machine-modal.component.js';
 
 @Component({
     selector: 'app-technical-challenge-details',
@@ -46,6 +48,7 @@ import { ExerciseService } from '../../../core/exercise.service.js';
 export class TechnicalChallengeDetailsComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
+    private readonly ngbModalService = inject(NgbModal);
 
     readonly technicalChallenge = input.required<TechnicalChallenge>();
     readonly stateMachines = computed(() =>
@@ -56,6 +59,7 @@ export class TechnicalChallengeDetailsComponent implements OnInit {
     readonly exerciseStatus = this.store.selectSignal(selectExerciseStatus);
 
     public readonly currentTime = this.store.selectSignal(selectCurrentTime);
+    readonly isTrainer = computed(() => this.currentRole() === 'trainer');
 
     scoutStateMachine(stateMachine: StateMachine) {
         if (this.currentRole() === 'participant') {
@@ -67,6 +71,14 @@ export class TechnicalChallengeDetailsComponent implements OnInit {
                 stateId: state.id,
             });
         }
+    }
+
+    editStateMachine(stateMachine: StateMachine) {
+        openEditStateMachineModalComponent(
+            this.ngbModalService,
+            this.technicalChallenge().id,
+            stateMachine.id
+        );
     }
 
     ngOnInit(): void {

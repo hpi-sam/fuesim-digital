@@ -1,6 +1,6 @@
 <div class="modal-header">
     <h4 class="modal-title">
-        Vorlage der Technischen Herausforderung bearbeiten
+        {{ modalTitle() }}
         <app-help-button
             url="2_exercises/3_exercise_elements.html#technische-herausforderungen"
             [trainerOnly]="true"
@@ -8,9 +8,11 @@
     </h4>
     <button type="button" class="btn-close" (click)="close()"></button>
 </div>
+
 <div class="modal-body">
-    <app-technical-challenge-template-form
-        [technicalChallengeTemplate]="technicalChallengeTemplate()"
-    >
-    </app-technical-challenge-template-form>
+    <app-edit-state-machine-form
+        [initialStateMachine]="stateMachine()"
+        (updatedStateMachine)="updateStateMachine($event)"
+        [isPrimaryStateMachine]="isPrimaryStateMachine()"
+    ></app-edit-state-machine-form>
 </div>

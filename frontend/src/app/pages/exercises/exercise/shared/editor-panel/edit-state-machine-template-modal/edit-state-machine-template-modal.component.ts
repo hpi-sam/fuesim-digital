@@ -18,14 +18,15 @@ import type { AppState } from '../../../../../../state/app.state.js';
 import { createSelectTechnicalChallengeTemplate } from '../../../../../../state/application/selectors/exercise.selectors.js';
 import { ExerciseService } from '../../../../../../core/exercise.service.js';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot.js';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
-    selector: 'app-edit-state-machine-modal',
-    imports: [EditStateMachineFormComponent],
+    selector: 'app-edit-state-machine-template-modal',
+    imports: [EditStateMachineFormComponent, HelpButtonComponent],
     changeDetection: ChangeDetectionStrategy.Eager,
-    templateUrl: './edit-state-machine-modal.component.html',
+    templateUrl: './edit-state-machine-template-modal.component.html',
 })
-export class EditStateMachineModalComponent implements OnInit {
+export class EditStateMachineTemplateModalComponent implements OnInit {
     private readonly activeModal = inject(NgbActiveModal);
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
@@ -35,7 +36,9 @@ export class EditStateMachineModalComponent implements OnInit {
     // set, when instantiating component
     initialStateMachineId: UUID | undefined;
 
+    private readonly technicalChallengeTemplate!: Signal<TechnicalChallengeTemplate>;
     readonly stateMachine!: Signal<StateMachine>;
+    readonly isPrimaryStateMachine!: Signal<boolean>;
 
     readonly modalTitle = computed(
         () => `Teilherausforderung: ${this.stateMachine().name}`
@@ -47,12 +50,14 @@ export class EditStateMachineModalComponent implements OnInit {
 
     ngOnInit(): void {
         // @ts-expect-error initialization
+        this.technicalChallengeTemplate = this.store.selectSignal(
+            createSelectTechnicalChallengeTemplate(
+                this.containingTechnicalChallengeTemplateId
+            )
+        );
+        // @ts-expect-error initialization
         this.stateMachine = computed(() => {
-            const template = this.store.selectSignal(
-                createSelectTechnicalChallengeTemplate(
-                    this.containingTechnicalChallengeTemplateId
-                )
-            )();
+            const template = this.technicalChallengeTemplate();
             console.assert(
                 !!this.initialStateMachineId,
                 'Creating new state machines is not implemented.'
@@ -63,6 +68,13 @@ export class EditStateMachineModalComponent implements OnInit {
                 ];
             return stateMachine;
         });
+        // @ts-expect-error initialization
+        this.isPrimaryStateMachine = computed(
+            () =>
+                Object.values(
+                    this.technicalChallengeTemplate().stateMachines
+                ).at(0)?.id === this.initialStateMachineId
+        );
     }
 
     public async updateStateMachine(updatedStateMachine: StateMachine) {

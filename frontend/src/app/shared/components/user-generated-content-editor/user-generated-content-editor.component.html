@@ -1,5 +1,5 @@
 @if (this.currentRole() === 'trainer') {
-    <div class="m-2">
+    <div>
         <div class="NgxEditor__Wrapper mb-2">
             <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
             </ngx-editor-menu>
@@ -22,5 +22,5 @@
         }
     </div>
 } @else {
-    <div class="m-2" [innerHTML]="editorContent()"></div>
+    <div [innerHTML]="editorContent()"></div>
 }

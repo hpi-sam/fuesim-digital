@@ -26,6 +26,7 @@ import { DisplayModelValidationComponent } from '../../../../shared/validation/d
 import { AuthService } from '../../../../core/auth.service.js';
 import { MessageService } from '../../../../core/messages/message.service.js';
 import { FileInputDirective } from '../../../../shared/directives/file-input.directive.js';
+// eslint-disable-next-line import-x/no-cycle
 import { ExerciseService } from '../../../../core/exercise.service.js';
 
 @Component({
@@ -60,10 +61,10 @@ export class CreateExerciseModalComponent {
     readonly organisationLocked = signal<boolean>(false);
 
     readonly exerciseForm = form(this.model, (schemaPath) => {
-        disabled(
-            schemaPath.organisationId,
-            () => this.organisations.isLoading() || this.organisationLocked()
-        );
+        disabled(schemaPath.organisationId, {
+            when: () =>
+                this.organisations.isLoading() || this.organisationLocked(),
+        });
         validateStandardSchema(schemaPath, postExerciseRequestDataSchema);
     });
 

@@ -48,10 +48,10 @@ export class SelectOrganisationModalComponent {
     readonly organisationLocked = signal<boolean>(false);
 
     readonly selectOrgaForm = form(this.model, (schemaPath) => {
-        disabled(
-            schemaPath.organisationId,
-            () => this.organisations.isLoading() || this.organisationLocked()
-        );
+        disabled(schemaPath.organisationId, {
+            when: () =>
+                this.organisations.isLoading() || this.organisationLocked(),
+        });
         validateStandardSchema(
             schemaPath,
             z.object({

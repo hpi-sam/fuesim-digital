@@ -23,7 +23,6 @@ import {
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { EditingVersionedElementModalData } from '../../modals/editor-modals/base-versioned-element-submodal';
-import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 // it's a necessary evil
 // eslint-disable-next-line import-x/no-cycle
 import { openSelectCollectionModal } from '../../modals/marketplace-select-collection-modal/select-collection-modal';
@@ -32,7 +31,7 @@ import { marketplaceComponentDefinitions } from '../../definitions';
 
 @Component({
     selector: 'app-element-card',
-    imports: [GenericElementCardComponent, ValuesPipe, NgComponentOutlet],
+    imports: [NgComponentOutlet],
     templateUrl: './element-card.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './element-card.component.scss',
@@ -72,18 +71,21 @@ export class ElementCardComponent {
         };
     });
 
-    public readonly genericElementCardOutputInjector = Injector.create([
-        {
-            provide: GenericElementCardOutputInjectionToken,
-            useValue: {
-                click: () => this.openEditor(),
-                delete: async () => this.deleteElement(),
-                duplicate: async () => this.duplicateElement(),
-                duplicateExternal: async () => this.duplicateElementExternal(),
-                restore: async () => this.restoreElement(),
+    public readonly genericElementCardOutputInjector = Injector.create({
+        providers: [
+            {
+                provide: GenericElementCardOutputInjectionToken,
+                useValue: {
+                    click: () => this.openEditor(),
+                    delete: async () => this.deleteElement(),
+                    duplicate: async () => this.duplicateElement(),
+                    duplicateExternal: async () =>
+                        this.duplicateElementExternal(),
+                    restore: async () => this.restoreElement(),
+                },
             },
-        },
-    ]);
+        ],
+    });
 
     private getCollection(): VersionedCollectionPartial {
         const collection = this.collection();

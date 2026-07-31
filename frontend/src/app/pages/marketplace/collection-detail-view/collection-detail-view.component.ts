@@ -97,6 +97,7 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
 
     constructor() {
         // TODO: @Quixelation remove this before prod
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         this.router.routeReuseStrategy.shouldReuseRoute = () => false;
         this.activatedRoute.queryParamMap
             .pipe(takeUntil(this.destroy$))

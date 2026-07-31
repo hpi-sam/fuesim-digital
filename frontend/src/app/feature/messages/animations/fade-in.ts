@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-deprecated */
+
 import type {
     AnimationTransitionMetadata,
     AnimationTriggerMetadata,

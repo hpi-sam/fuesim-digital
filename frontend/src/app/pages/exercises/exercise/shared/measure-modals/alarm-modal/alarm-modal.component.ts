@@ -73,14 +73,12 @@ export class AlarmModalComponent {
         transferPoint: '',
     });
     public readonly alarmForm = form(this.values, (schemaPath) => {
-        disabled(
-            schemaPath.alarmGroup,
-            () => this.allowedAlarmGroupIds().length === 1
-        );
-        disabled(
-            schemaPath.transferPoint,
-            () => this.allowedTransferPointIds().length === 1
-        );
+        disabled(schemaPath.alarmGroup, {
+            when: () => this.allowedAlarmGroupIds().length === 1,
+        });
+        disabled(schemaPath.transferPoint, {
+            when: () => this.allowedTransferPointIds().length === 1,
+        });
         validateStandardSchema(schemaPath.alarmGroup, uuidSchema);
         validateStandardSchema(schemaPath.transferPoint, uuidSchema);
     });

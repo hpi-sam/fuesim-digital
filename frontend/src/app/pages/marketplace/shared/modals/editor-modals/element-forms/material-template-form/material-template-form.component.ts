@@ -74,7 +74,7 @@ export class MaterialTemplateFormComponent implements BaseVersionedElementSubmod
     });
 
     public readonly materialForm = form(this.values, (schema) => {
-        disabled(schema, this.disabled);
+        disabled(schema, { when: () => this.disabled() });
         validateStandardSchema(
             schema,
             stripEntityFromElementSchema(materialTemplateSchema)

@@ -76,7 +76,7 @@ export class PersonnelTemplateFormComponent implements BaseVersionedElementSubmo
     });
 
     public readonly personnelForm = form(this.values, (schema) => {
-        disabled(schema, this.disabled);
+        disabled(schema, { when: () => this.disabled() });
         validateStandardSchema(
             schema,
             stripEntityFromElementSchema(personnelTemplateSchema)

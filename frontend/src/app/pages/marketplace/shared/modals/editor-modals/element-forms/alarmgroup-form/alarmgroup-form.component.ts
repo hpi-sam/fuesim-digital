@@ -72,7 +72,7 @@ export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<Ala
     });
 
     public readonly agForm = form(this.values, (schema) => {
-        disabled(schema, this.disabled);
+        disabled(schema, { when: () => this.disabled() });
         validateStandardSchema(
             schema,
             stripEntityFromElementSchema(alarmGroupSchema)

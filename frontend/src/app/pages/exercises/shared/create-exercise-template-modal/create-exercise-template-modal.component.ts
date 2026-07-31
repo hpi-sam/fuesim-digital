@@ -27,6 +27,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
 import { DisplayModelValidationComponent } from '../../../../shared/validation/display-model-validation/display-model-validation.component.js';
 import { AuthService } from '../../../../core/auth.service.js';
 import { FileInputDirective } from '../../../../shared/directives/file-input.directive.js';
+// eslint-disable-next-line import-x/no-cycle
 import { ExerciseService } from '../../../../core/exercise.service.js';
 
 @Component({
@@ -60,10 +61,10 @@ export class CreateExerciseTemplateModalComponent {
     readonly organisationLocked = signal<boolean>(false);
 
     readonly exerciseTemplateForm = form(this.model, (schemaPath) => {
-        disabled(
-            schemaPath.organisationId,
-            () => this.organisations.isLoading() || this.organisationLocked()
-        );
+        disabled(schemaPath.organisationId, {
+            when: () =>
+                this.organisations.isLoading() || this.organisationLocked(),
+        });
         validateStandardSchema(
             schemaPath,
             postExerciseTemplateRequestDataSchema

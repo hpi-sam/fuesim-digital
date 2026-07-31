@@ -47,10 +47,9 @@ export class CreateParallelExerciseModalComponent {
         templateId: '' as ExerciseTemplateId,
     });
     parallelExerciseForm = form(this.model, (schemaPath) => {
-        disabled(
-            schemaPath.joinViewportId,
-            () => !this.viewportsLoading() && !this.viewports()?.length
-        );
+        disabled(schemaPath.joinViewportId, {
+            when: () => !this.viewportsLoading() && !this.viewports()?.length,
+        });
         validateStandardSchema(
             schemaPath,
             postParallelExerciseRequestDataSchema

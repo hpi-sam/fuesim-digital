@@ -60,9 +60,9 @@ export class CreateCollectionModalComponent implements OnInit {
     });
 
     public readonly collectionCreationForm = form(this.model, (schemaPath) => {
-        disabled(schemaPath.organisationId, () =>
-            this.organisations.isLoading()
-        );
+        disabled(schemaPath.organisationId, {
+            when: () => this.organisations.isLoading(),
+        });
         validateStandardSchema(
             schemaPath,
             Marketplace.Collection.Create.requestSchema

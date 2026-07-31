@@ -25,7 +25,7 @@ import {
 import { patientSchema } from './models/patient.js';
 import { hospitalPatientSchema } from './models/hospital-patient.js';
 import { patientCategorySchema } from './models/patient-category.js';
-import { uuid, uuidSchema } from './utils/uuid.js';
+import { getIdMapSchema, uuid, uuidSchema } from './utils/uuid.js';
 import { SpatialTree } from './models/utils/spatial-tree.js';
 import { logEntrySchema } from './models/log-entry.js';
 import {
@@ -78,48 +78,48 @@ export const exerciseStateSchema = z.strictObject({
 
     selectedCollections: z.array(versionedCollectionPartialSchema),
 
-    viewports: z.record(uuidSchema, viewportSchema),
+    viewports: getIdMapSchema(viewportSchema),
     autojoinViewportId: uuidSchema.nullable(),
 
-    simulatedRegions: z.record(uuidSchema, simulatedRegionSchema),
+    simulatedRegions: getIdMapSchema(simulatedRegionSchema),
 
-    vehicles: z.record(uuidSchema, vehicleSchema),
-    personnel: z.record(uuidSchema, personnelSchema),
-    patients: z.record(uuidSchema, patientSchema),
-    materials: z.record(uuidSchema, materialSchema),
+    vehicles: getIdMapSchema(vehicleSchema),
+    personnel: getIdMapSchema(personnelSchema),
+    patients: getIdMapSchema(patientSchema),
+    materials: getIdMapSchema(materialSchema),
 
-    restrictedZones: z.record(uuidSchema, restrictedZoneSchema),
-    measures: z.record(measureSchema.shape.id, measureSchema),
-    drawings: z.record(drawingSchema.shape.id, drawingSchema),
+    restrictedZones: getIdMapSchema(restrictedZoneSchema),
+    measures: getIdMapSchema(measureSchema),
+    drawings: getIdMapSchema(drawingSchema),
 
-    mapImages: z.record(uuidSchema, mapImageSchema),
+    mapImages: getIdMapSchema(mapImageSchema),
 
-    taskTypes: z.record(uuidSchema, taskTypeSchema),
+    taskTypes: getIdMapSchema(taskTypeSchema),
 
-    technicalChallenges: z.record(uuidSchema, technicalChallengeSchema),
+    technicalChallenges: getIdMapSchema(technicalChallengeSchema),
     technicalChallengeTemplates: z.record(
         uuidSchema,
         technicalChallengeTemplateSchema
     ),
 
-    transferPoints: z.record(uuidSchema, transferPointSchema),
+    transferPoints: getIdMapSchema(transferPointSchema),
 
-    hospitals: z.record(uuidSchema, hospitalSchema),
+    hospitals: getIdMapSchema(hospitalSchema),
     hospitalPatients: z.record(uuidSchema, hospitalPatientSchema),
-    alarmGroups: z.record(uuidSchema, alarmGroupSchema),
+    alarmGroups: getIdMapSchema(alarmGroupSchema),
 
-    clients: z.record(uuidSchema, clientSchema),
+    clients: getIdMapSchema(clientSchema),
     /** All client names that are currently in the exercise or joined the exercise in the past */
     collectedClientNames: z.array(z.string()),
 
-    radiograms: z.record(uuidSchema, exerciseRadiogramSchema),
+    radiograms: getIdMapSchema(exerciseRadiogramSchema),
 
-    operationalSections: z.record(uuidSchema, operationalSectionSchema),
+    operationalSections: getIdMapSchema(operationalSectionSchema),
 
     patientCategories: z.array(patientCategorySchema),
     measureTemplates: z.record(z.string(), measureTemplateCategorySchema),
 
-    scoutables: z.record(scoutableSchema.shape.id, scoutableSchema),
+    scoutables: getIdMapSchema(scoutableSchema),
 
     templates: z.record(uuidSchema, templateSchema),
 

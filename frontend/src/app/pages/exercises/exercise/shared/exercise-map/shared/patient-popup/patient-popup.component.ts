@@ -1,6 +1,11 @@
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { Component, OnInit, inject } from '@angular/core';
+import {
+    Component,
+    OnInit,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type { Patient, UUID } from 'fuesim-digital-shared';
 import { NgClass, AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
@@ -15,6 +20,7 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
     selector: 'app-patient-popup',
     templateUrl: './patient-popup.component.html',
     styleUrls: ['./patient-popup.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgClass,
         PatientHeaderComponent,

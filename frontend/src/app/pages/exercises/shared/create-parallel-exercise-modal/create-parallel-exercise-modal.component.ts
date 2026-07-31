@@ -1,4 +1,11 @@
-import { output, Component, inject, signal, effect } from '@angular/core';
+import {
+    output,
+    Component,
+    inject,
+    signal,
+    effect,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import {
     ExerciseTemplateId,
@@ -22,6 +29,7 @@ import { DisplayModelValidationComponent } from '../../../../shared/validation/d
     selector: 'app-create-parallel-exercise-modal',
     templateUrl: './create-parallel-exercise-modal.component.html',
     styleUrls: ['./create-parallel-exercise-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [DisplayModelValidationComponent, FormsModule, FormField],
 })
 export class CreateParallelExerciseModalComponent {
@@ -39,10 +47,9 @@ export class CreateParallelExerciseModalComponent {
         templateId: '' as ExerciseTemplateId,
     });
     parallelExerciseForm = form(this.model, (schemaPath) => {
-        disabled(
-            schemaPath.joinViewportId,
-            () => !this.viewportsLoading() && !this.viewports()?.length
-        );
+        disabled(schemaPath.joinViewportId, {
+            when: () => !this.viewportsLoading() && !this.viewports()?.length,
+        });
         validateStandardSchema(
             schemaPath,
             postParallelExerciseRequestDataSchema

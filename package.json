@@ -41,12 +41,12 @@
     "devEngines": {
         "runtime": {
             "name": "node",
-            "version": "~24.13.0",
+            "version": "~26.5.0",
             "onFail": "error"
         },
         "packageManager": {
             "name": "npm",
-            "version": "~11.6.2",
+            "version": "~11.17.0",
             "onFail": "error"
         }
     },
@@ -57,11 +57,16 @@
         "node-json2html": "^3.3.3",
         "npm-run-all": "^4.1.5",
         "nyc": "^18.0.0",
-        "prettier": "^3.8.3"
+        "prettier": "^3.8.3",
+        "typescript": "~6.0.3",
+        "typescript-eslint": "^8.65.0"
     },
     "overrides": {
         "@istanbuljs/load-nyc-config": {
             "js-yaml": "^4.1.1"
         }
+    },
+    "allowScripts": {
+        "es5-ext": false
     }
 }

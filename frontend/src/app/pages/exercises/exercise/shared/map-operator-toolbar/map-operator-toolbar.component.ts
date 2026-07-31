@@ -4,6 +4,7 @@ import {
     HostListener,
     inject,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { MeasureTemplate } from 'fuesim-digital-shared';
@@ -17,6 +18,7 @@ import { MeasureDetailsComponent } from '../exercise-map/shared/measure-details/
     selector: 'app-map-operator-toolbar',
     templateUrl: './map-operator-toolbar.component.html',
     styleUrls: ['./map-operator-toolbar.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ScrollButtonsComponent, MeasureDetailsComponent],
 })
 export class MapOperatorToolbarComponent {

@@ -1,4 +1,10 @@
-import { Component, inject, OnInit, Signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    OnInit,
+    Signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { TaskType, TechnicalChallengeId, UUID } from 'fuesim-digital-shared';
 import type { StateMachine } from 'fuesim-digital-shared';
@@ -10,6 +16,7 @@ import { createSelectAvailableTasks } from '../../../../../../../state/applicati
     selector: 'app-choose-task-popup',
     imports: [],
     templateUrl: './choose-task-popup.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: '../chooser-popup.scss',
 })
 export class ChooseTaskPopupComponent implements OnInit {

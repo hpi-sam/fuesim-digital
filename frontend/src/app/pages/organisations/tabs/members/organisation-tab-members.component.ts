@@ -1,4 +1,10 @@
-import { Component, inject, input, output } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     GetOrganisationDetailsResponseData,
     OrganisationMembershipId,
@@ -19,6 +25,7 @@ import { openCreateInviteModal } from '../../../../shared/components/create-invi
     selector: 'app-organisation-tab-members',
     imports: [FormsModule, NgbTooltip],
     templateUrl: './organisation-tab-members.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './organisation-tab-members.component.scss',
 })
 export class OrganisationTabMembersComponent {

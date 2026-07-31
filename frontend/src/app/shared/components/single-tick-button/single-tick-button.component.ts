@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ExerciseService } from '../../../core/exercise.service';
 import type { AppState } from '../../../state/app.state';
@@ -6,6 +6,7 @@ import type { AppState } from '../../../state/app.state';
 @Component({
     selector: 'app-single-tick-button',
     templateUrl: './single-tick-button.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './single-tick-button.component.scss',
 })
 export class SingleTickButtonComponent {

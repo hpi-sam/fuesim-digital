@@ -1,5 +1,11 @@
 import type { OnChanges, OnDestroy } from '@angular/core';
-import { Component, inject, input, output } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Personnel, UUID } from 'fuesim-digital-shared';
 import {
@@ -21,6 +27,7 @@ import {
     selector: 'app-signaller-modal-region-leader',
     templateUrl: './signaller-modal-region-leader.component.html',
     styleUrls: ['./signaller-modal-region-leader.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe],
 })
 export class SignallerModalRegionLeaderComponent

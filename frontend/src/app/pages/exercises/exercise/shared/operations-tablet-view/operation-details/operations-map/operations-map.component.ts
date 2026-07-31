@@ -7,6 +7,7 @@ import {
     OnDestroy,
     viewChild,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import maplibregl from 'maplibre-gl';
@@ -23,6 +24,7 @@ import { selectStateSnapshot } from '../../../../../../../state/get-state-snapsh
 @Component({
     selector: 'app-operations-map',
     templateUrl: './operations-map.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './operations-map.component.scss',
 })
 export class OperationsMapComponent implements OnDestroy {

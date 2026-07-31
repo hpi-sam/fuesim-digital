@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { currentTransferOf, UUID } from 'fuesim-digital-shared';
 import { groupBy } from 'lodash-es';
@@ -20,6 +20,7 @@ interface ArrivingVehicle {
     selector: 'app-signaller-modal-eoc-information-arriving-vehicles',
     templateUrl:
         './signaller-modal-eoc-information-arriving-vehicles.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: [
         './signaller-modal-eoc-information-arriving-vehicles.component.scss',
     ],

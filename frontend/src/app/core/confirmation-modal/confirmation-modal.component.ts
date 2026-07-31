@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +17,7 @@ import { DisplayValidationComponent } from '../../shared/validation/display-vali
         ExactMatchValidatorDirective,
         DisplayValidationComponent,
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     host: {
         'data-cy': 'confirmationModal',
     },

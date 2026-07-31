@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TransferCountsRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -12,6 +17,7 @@ import { PatientStatusBadgeComponent } from '../../../../../../../../../shared/c
     selector: 'app-radiogram-card-content-transfer-counts',
     templateUrl: './radiogram-card-content-transfer-counts.component.html',
     styleUrls: ['./radiogram-card-content-transfer-counts.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [PatientStatusBadgeComponent, AsyncPipe],
 })
 export class RadiogramCardContentTransferCountsComponent implements OnInit {

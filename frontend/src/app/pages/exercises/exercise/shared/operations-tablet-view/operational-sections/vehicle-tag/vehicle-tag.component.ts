@@ -1,4 +1,10 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    OnInit,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { CdkDrag } from '@angular/cdk/drag-drop';
 import type { Vehicle } from 'fuesim-digital-shared';
 
@@ -7,6 +13,7 @@ import type { Vehicle } from 'fuesim-digital-shared';
     selector: 'app-vehicle-tag',
     templateUrl: './vehicle-tag.component.html',
     styleUrl: './vehicle-tag.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     hostDirectives: [CdkDrag],
 })
 export class VehicleTagComponent implements OnInit {

@@ -21,7 +21,6 @@ import { nextUUID } from '../utils/randomness.js';
 import { newLeaderChangedEvent } from '../events/leader-changed.js';
 import type { MaterialCountRadiogram } from '../../models/radiogram/material-count-radiogram.js';
 import type { PersonnelCountRadiogram } from '../../models/radiogram/personnel-count-radiogram.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import type { TransferConnectionsRadiogram } from '../../models/radiogram/transfer-connections-radiogram.js';
 import type { VehicleCountRadiogram } from '../../models/radiogram/vehicle-count-radiogram.js';
 import {
@@ -201,7 +200,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                                 key,
                                                 value.length,
                                             ])
-                                        ) as ResourceDescription;
+                                        );
 
                                     radiogram.informationAvailable = true;
                                 }

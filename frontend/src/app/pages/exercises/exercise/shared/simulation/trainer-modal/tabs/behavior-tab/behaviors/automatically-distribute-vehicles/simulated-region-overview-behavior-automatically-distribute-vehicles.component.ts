@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     UUID,
@@ -40,6 +45,7 @@ import { OrderByPipe } from '../../../../../../../../../../shared/pipes/order-by
     styleUrls: [
         './simulated-region-overview-behavior-automatically-distribute-vehicles.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbDropdown,
         NgbDropdownToggle,

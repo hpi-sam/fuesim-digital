@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import type { Sort } from '@angular/material/sort';
 import { Store } from '@ngrx/store';
 import { statusNames } from 'fuesim-digital-shared';
@@ -17,6 +17,7 @@ import { FormatDurationPipe } from '../../../../../../shared/pipes/format-durati
     selector: 'app-hospital-patients-table',
     templateUrl: './hospital-patients-table.component.html',
     styleUrls: ['./hospital-patients-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatSort, MatSortHeader, AsyncPipe, FormatDurationPipe],
 })
 export class HospitalPatientsTableComponent {

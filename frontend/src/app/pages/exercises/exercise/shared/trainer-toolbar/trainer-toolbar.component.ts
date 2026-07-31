@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import {
     NgbModal,
@@ -35,6 +40,7 @@ import { openMeasuresOverviewModal } from '../measures-overview/open-measures-ov
     selector: 'app-trainer-toolbar',
     templateUrl: './trainer-toolbar.component.html',
     styleUrls: ['./trainer-toolbar.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbDropdown,
         NgbDropdownToggle,

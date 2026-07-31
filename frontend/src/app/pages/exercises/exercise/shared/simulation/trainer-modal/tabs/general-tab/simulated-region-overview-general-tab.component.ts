@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     Material,
@@ -39,6 +44,7 @@ export type PatientCategory = (typeof patientCategories)[number];
     selector: 'app-simulated-region-overview-general-tab',
     templateUrl: './simulated-region-overview-general-tab.component.html',
     styleUrls: ['./simulated-region-overview-general-tab.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AppSaveOnTypingDirective,

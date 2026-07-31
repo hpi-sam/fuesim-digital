@@ -6,6 +6,7 @@ import {
     inject,
     input,
     viewChild,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
@@ -16,6 +17,7 @@ import { StackedBarChart } from './time-line-area-chart';
 @Component({
     selector: 'app-stacked-bar-chart',
     templateUrl: './stacked-bar-chart.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./stacked-bar-chart.component.scss'],
 })
 export class StackedBarChartComponent

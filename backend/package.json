@@ -29,12 +29,12 @@
     "devEngines": {
         "runtime": {
             "name": "node",
-            "version": "~24.13.0",
+            "version": "~26.5.0",
             "onFail": "error"
         },
         "packageManager": {
             "name": "npm",
-            "version": "~11.6.2",
+            "version": "~11.17.0",
             "onFail": "error"
         }
     },
@@ -60,8 +60,8 @@
         "zod": "^4.1.13"
     },
     "devDependencies": {
-        "@eslint/compat": "^1.4.0",
-        "@eslint/js": "^9.36.0",
+        "@eslint/compat": "^2.1.0",
+        "@eslint/js": "~10.0.1",
         "@types/archiver": "^8.0.0",
         "@types/cookie": "^0.6.0",
         "@types/cors": "^2.8.17",
@@ -71,16 +71,17 @@
         "@types/node": "^22.19.1",
         "@types/pg": "^8.15.6",
         "@types/supertest": "^6.0.3",
-        "eslint": "^9.36.0",
+        "eslint": "~10.8.0",
         "eslint-config-prettier": "^10.1.1",
-        "eslint-plugin-import": "~2.31.0",
-        "eslint-plugin-unicorn": "^56.0.1",
+        "eslint-import-resolver-typescript": "^4.4.5",
+        "eslint-plugin-import-x": "~4.17.1",
+        "eslint-plugin-unicorn": "^72.0.0",
         "jest": "^30.2.0",
         "socket.io-client": "^4.5.4",
         "ts-jest": "^29.4.5",
         "tsx": "^4.19.3",
-        "typescript": "~5.9.3",
-        "typescript-eslint": "^8.55.0"
+        "typescript": "~6.0.3",
+        "typescript-eslint": "^8.65.0"
     },
     "overrides": {
         "@istanbuljs/load-nyc-config": {
@@ -89,5 +90,11 @@
         "@esbuild-kit/core-utils": {
             "esbuild": "0.27.0"
         }
+    },
+    "allowScripts": {
+        "esbuild@0.25.12": true,
+        "esbuild@0.28.1": true,
+        "esbuild@0.27.0": true,
+        "unrs-resolver@1.12.2": true
     }
 }

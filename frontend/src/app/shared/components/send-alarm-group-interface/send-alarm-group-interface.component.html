@@ -200,12 +200,16 @@
                     }
                     @if (!useAlarmGroupButtons()) {
                         @let selectedAlarmGroup =
-                            selectedAlarmGroupOption?.key === null
+                            $safeNavigationMigration(
+                                selectedAlarmGroupOption?.key
+                            ) === null
                                 ? null
                                 : (alarmGroups[selectedAlarmGroupOption!.key] ??
                                   null);
                         @let triggerLimitReached =
-                            selectedAlarmGroup?.triggerLimit === null
+                            $safeNavigationMigration(
+                                selectedAlarmGroup?.triggerLimit
+                            ) === null
                                 ? false
                                 : (selectedAlarmGroup?.triggerCount ?? 0) >=
                                   (selectedAlarmGroup?.triggerLimit ?? 0);

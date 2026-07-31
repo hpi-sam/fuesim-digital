@@ -1,10 +1,11 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { environment } from '../../environments/environment.js';
 
 @Component({
     selector: 'app-help-button',
     imports: [],
     templateUrl: './help-button.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './help-button.component.scss',
 })
 export class HelpButtonComponent {

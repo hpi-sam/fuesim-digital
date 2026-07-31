@@ -5,6 +5,7 @@ import {
     inject,
     input,
     viewChild,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ReportableInformation, UUID } from 'fuesim-digital-shared';
@@ -29,6 +30,7 @@ import { SimulationEventBasedReportEditorComponent } from '../../shared/simulati
     selector: 'app-signaller-modal-region-information',
     templateUrl: './signaller-modal-region-information.component.html',
     styleUrls: ['./signaller-modal-region-information.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         SignallerModalInteractionsComponent,
         SignallerModalRecurringReportModalComponent,

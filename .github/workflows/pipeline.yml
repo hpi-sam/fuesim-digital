@@ -13,7 +13,7 @@ on:
         types: [opened, synchronize, reopened, ready_for_review]
 
 env:
-    NODE_VERSION: '24.13.0'
+    NODE_VERSION: '26.5.1'
     POSTGRES_USER: dfm
     POSTGRES_PASSWORD: notASecurePassword_forPipelineOnly
     POSTGRES_DB: dfm_db

@@ -1,4 +1,8 @@
-import { type AfterViewInit, type OnDestroy } from '@angular/core';
+import {
+    type AfterViewInit,
+    type OnDestroy,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     Component,
     ElementRef,
@@ -34,6 +38,7 @@ import { OlMapManagerService } from './utility/ol-map-manager.service';
     selector: 'app-exercise-map',
     templateUrl: './exercise-map.component.html',
     styleUrls: ['./exercise-map.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [DisplayMessagesComponent, AsyncPipe, NgClass, NgbTooltip],
 })
 export class ExerciseMapComponent implements AfterViewInit, OnDestroy {

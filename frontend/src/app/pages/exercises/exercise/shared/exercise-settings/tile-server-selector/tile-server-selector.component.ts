@@ -1,4 +1,9 @@
-import { Component, input, model } from '@angular/core';
+import {
+    Component,
+    input,
+    model,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbCollapse, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
@@ -14,6 +19,7 @@ import { DisplayValidationComponent } from '../../../../../../shared/validation/
         NgbTooltip,
     ],
     templateUrl: './tile-server-selector.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './tile-server-selector.component.scss',
 })
 export class TileServerSelectorComponent {

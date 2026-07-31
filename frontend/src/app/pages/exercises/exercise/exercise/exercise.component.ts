@@ -1,5 +1,10 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, computed, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     NgbModal,
     NgbTooltip,
@@ -59,6 +64,7 @@ import { CollectionService } from '../../../../core/exercise-element.service';
     selector: 'app-exercise',
     templateUrl: './exercise.component.html',
     styleUrls: ['./exercise.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ExerciseStateBadgeComponent,
         NgbTooltip,

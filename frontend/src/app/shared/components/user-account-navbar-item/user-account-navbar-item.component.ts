@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
     NgbDropdown,
     NgbDropdownToggle,
@@ -15,6 +15,7 @@ import { saveBlob } from '../../functions/save-blob';
     selector: 'app-user-account-navbar-item',
     templateUrl: './user-account-navbar-item.component.html',
     styleUrls: ['./user-account-navbar-item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbDropdown,
         NgbDropdownToggle,

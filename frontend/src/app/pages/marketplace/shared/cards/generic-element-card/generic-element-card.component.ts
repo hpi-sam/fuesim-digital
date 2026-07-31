@@ -1,4 +1,10 @@
-import { Component, inject, InjectionToken, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    InjectionToken,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbDropdownModule, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
 export type GenericElementCardIndicator =
@@ -14,6 +20,7 @@ export type GenericElementCardIndicator =
     host: {
         '(click)': 'output.click()',
     },
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgbDropdownModule, NgbTooltip],
 })
 export class GenericElementCardComponent {

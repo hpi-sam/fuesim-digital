@@ -8,7 +8,8 @@
         "esModuleInterop": true,
         "outDir": "./dist/out-tsc",
         "lib": ["ES2022", "dom"],
-        "useDefineForClassFields": false // TODO: Enabling this requires multiple changes in the code
+        "useDefineForClassFields": false, // TODO: Enabling this requires multiple changes in the code
+        "rootDir": "src"
     },
     // this fixes jest globals in .spec.ts being overwritten by cypress globals
     "include": ["src"],

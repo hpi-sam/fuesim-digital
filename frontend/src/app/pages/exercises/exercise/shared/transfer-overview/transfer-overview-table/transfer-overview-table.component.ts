@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { currentTransferOf } from 'fuesim-digital-shared';
 import { AsyncPipe } from '@angular/common';
@@ -16,6 +16,7 @@ import { TransferTimeInputComponent } from '../transfer-time-input/transfer-time
     selector: 'app-transfer-overview-table',
     templateUrl: './transfer-overview-table.component.html',
     styleUrls: ['./transfer-overview-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         StartPointNameComponent,
         TransferTargetInputComponent,

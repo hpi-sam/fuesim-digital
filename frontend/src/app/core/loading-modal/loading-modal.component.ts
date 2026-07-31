@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
     selector: 'app-loading-modal',
     templateUrl: './loading-modal.component.html',
     styleUrls: ['./loading-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule],
 })
 export class LoadingModalComponent implements OnDestroy {

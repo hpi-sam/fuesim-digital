@@ -1,4 +1,10 @@
-import { Component, input, output, inject } from '@angular/core';
+import {
+    Component,
+    input,
+    output,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type {
     GetExerciseTemplateDetailsResponseData,
     PatchExerciseTemplateRequestData,
@@ -25,6 +31,7 @@ import { ExerciseService } from '../../../core/exercise.service.js';
     selector: 'app-exercise-template-card',
     templateUrl: './exercise-template-card.component.html',
     styleUrls: ['./exercise-template-card.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         InlineTextEditorComponent,
         RouterLink,

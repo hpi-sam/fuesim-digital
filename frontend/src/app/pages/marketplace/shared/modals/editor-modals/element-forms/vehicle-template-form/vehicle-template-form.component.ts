@@ -5,6 +5,7 @@ import {
     inject,
     input,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     cloneDeepMutable,
@@ -31,9 +32,7 @@ import {
     VersionedElementModalData,
 } from '../../base-versioned-element-submodal';
 import { MessageService } from '../../../../../../../core/messages/message.service';
-import { AutofocusDirective } from '../../../../../../../shared/directives/autofocus.directive';
 import { getImageAspectRatio } from '../../../../../../../shared/functions/get-image-aspect-ratio';
-import { ValuesPipe } from '../../../../../../../shared/pipes/values.pipe';
 import { MapEditorCardComponent } from '../../../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 import { ImagePartialFormComponent } from '../image-partial-form/image-partial-form.component';
@@ -45,15 +44,14 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
         DisplayModelValidationComponent,
         FormsModule,
         NgbDropdownModule,
-        AutofocusDirective,
         MapEditorCardComponent,
-        ValuesPipe,
         FormField,
         ImagePartialFormComponent,
         MarketplaceFormSubmitButtonBarComponent,
         NgbTooltip,
     ],
     templateUrl: './vehicle-template-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./vehicle-template-form.component.scss'],
 })
 export class VehicleTemplateFormMarketplaceComponent implements BaseVersionedElementSubmodal<VehicleTemplate> {
@@ -82,7 +80,7 @@ export class VehicleTemplateFormMarketplaceComponent implements BaseVersionedEle
     public readonly formOutput = inject(FormOutputInjectionToken);
 
     public readonly vehicleForm = form(this.values, (schema) => {
-        disabled(schema, this.disabled);
+        disabled(schema, { when: () => this.disabled() });
         validateStandardSchema(
             schema,
             stripEntityFromElementSchema(vehicleTemplateSchema)

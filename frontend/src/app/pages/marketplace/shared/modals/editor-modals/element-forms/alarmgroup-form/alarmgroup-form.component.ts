@@ -5,6 +5,7 @@ import {
     inject,
     input,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     AlarmGroup,
@@ -49,6 +50,7 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
         MarketplaceFormSubmitButtonBarComponent,
     ],
     templateUrl: './alarmgroup-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './alarmgroup-form.component.scss',
 })
 export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<AlarmGroup> {
@@ -70,7 +72,7 @@ export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<Ala
     });
 
     public readonly agForm = form(this.values, (schema) => {
-        disabled(schema, this.disabled);
+        disabled(schema, { when: () => this.disabled() });
         validateStandardSchema(
             schema,
             stripEntityFromElementSchema(alarmGroupSchema)

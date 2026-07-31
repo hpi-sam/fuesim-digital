@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     UUID,
@@ -38,6 +43,7 @@ let globalLastInformationCollapsed = true;
     styleUrls: [
         './simulated-region-overview-behavior-treat-patients.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         TreatmentStatusBadgeComponent,
         NgbCollapse,

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
 import { AppState } from '../../../../../../../state/app.state';
@@ -13,6 +13,7 @@ import { OperationsVehicleItemComponent } from '../../operation-details/operatio
     selector: 'app-local-operational-leader',
     templateUrl: './local-operational-leader.component.html',
     styleUrl: './local-operational-leader.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [SectionLeaderSlotComponent, OperationsVehicleItemComponent],
 })
 export class LocalOperationalLeaderComponent {

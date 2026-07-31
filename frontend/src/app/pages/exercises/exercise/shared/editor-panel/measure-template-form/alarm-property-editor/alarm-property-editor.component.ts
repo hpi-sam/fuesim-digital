@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     NgbDropdown,
@@ -20,6 +27,7 @@ import { TransferPointNameComponent } from '../../../../../../../shared/componen
     selector: 'app-alarm-property-editor',
     templateUrl: './alarm-property-editor.component.html',
     styleUrls: ['./alarm-property-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbDropdown,
         NgbDropdownToggle,

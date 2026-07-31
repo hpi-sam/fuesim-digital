@@ -1,4 +1,10 @@
-import { Component, computed, inject, input } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import type { AppState } from '../../../state/app.state';
@@ -7,6 +13,7 @@ import { selectAlarmGroups } from '../../../state/application/selectors/exercise
 @Component({
     selector: 'app-alarm-group-name',
     templateUrl: './alarm-group-name.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./alarm-group-name.component.scss'],
 })
 export class AlarmGroupNameComponent {

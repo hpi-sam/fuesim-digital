@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AsyncPipe } from '@angular/common';
 import {
@@ -17,6 +17,7 @@ import { SignallerModalRegionOverviewComponent } from '../signaller-modal-region
     selector: 'app-signaller-modal',
     templateUrl: './signaller-modal.component.html',
     styleUrls: ['./signaller-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         RadiogramListComponent,
         SignallerModalRegionSelectorComponent,

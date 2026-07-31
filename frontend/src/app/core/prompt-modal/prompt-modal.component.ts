@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +10,7 @@ import { DisplayValidationComponent } from '../../shared/validation/display-vali
     selector: 'app-confirmation-modal',
     templateUrl: './prompt-modal.component.html',
     styleUrls: ['./prompt-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, AutofocusDirective, DisplayValidationComponent],
 })
 export class PromptModalComponent implements OnDestroy {

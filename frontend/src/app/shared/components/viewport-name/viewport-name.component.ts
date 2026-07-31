@@ -1,5 +1,10 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Viewport, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -11,6 +16,7 @@ import { createSelectViewport } from '../../../state/application/selectors/exerc
     selector: 'app-viewport-name',
     templateUrl: './viewport-name.component.html',
     styleUrls: ['./viewport-name.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe],
 })
 export class ViewportNameComponent implements OnChanges {

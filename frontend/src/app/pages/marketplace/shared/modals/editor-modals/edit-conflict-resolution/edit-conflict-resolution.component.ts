@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { TemplateVersion, Marketplace } from 'fuesim-digital-shared';
@@ -8,6 +8,7 @@ import { VersionedElementModalData } from '../base-versioned-element-submodal';
     selector: 'app-edit-conflict-resolution',
     imports: [FormsModule],
     templateUrl: './edit-conflict-resolution.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./edit-conflict-resolution.component.html'],
 })
 export class EditConflictResolutionComponent {

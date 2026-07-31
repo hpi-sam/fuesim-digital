@@ -48,10 +48,12 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
                 )
             )
             .pipe(
-                startWith({
+                startWith<{
+                    ticketsEnabled: boolean;
+                    patients: { readonly [key: UUID]: Patient };
+                }>({
                     ticketsEnabled: true,
-                    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-                    patients: {} as { [key: UUID]: Patient },
+                    patients: {},
                 }),
                 pairwise(),
                 takeUntil(destroy$)

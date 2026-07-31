@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID, SimulatedRegion } from 'fuesim-digital-shared';
@@ -17,6 +17,7 @@ import { SimulatedRegionOverviewGeneralComponent } from '../../../simulation/tra
     selector: 'app-simulated-region-popup',
     templateUrl: './simulated-region-popup.component.html',
     styleUrls: ['./simulated-region-popup.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgbTooltip, SimulatedRegionOverviewGeneralComponent, AsyncPipe],
 })
 export class SimulatedRegionPopupComponent implements OnInit {

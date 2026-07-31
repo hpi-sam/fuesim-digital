@@ -1,5 +1,11 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, ViewEncapsulation, inject, input } from '@angular/core';
+import {
+    Component,
+    ViewEncapsulation,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { SimulatedRegion, UUID } from 'fuesim-digital-shared';
 import { isInSpecificSimulatedRegion } from 'fuesim-digital-shared';
@@ -46,6 +52,7 @@ let activeNavId: NavIds = 'general';
     templateUrl: './simulated-region-overview.component.html',
     styleUrls: ['./simulated-region-overview.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbNav,
         NgbNavItem,

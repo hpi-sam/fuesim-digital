@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { AppState } from '../../../../../../../../../state/app.state';
 import { selectAlarmGroups } from '../../../../../../../../../state/application/selectors/exercise.selectors';
@@ -8,6 +8,7 @@ import { selectStateSnapshot } from '../../../../../../../../../state/get-state-
     selector: 'app-signaller-modal-eoc-information-alarm-groups-sent',
     templateUrl:
         './signaller-modal-eoc-information-alarm-groups-sent.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: [
         './signaller-modal-eoc-information-alarm-groups-sent.component.scss',
     ],

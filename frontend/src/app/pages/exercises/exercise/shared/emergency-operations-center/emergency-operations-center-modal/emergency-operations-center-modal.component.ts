@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SendAlarmGroupsCardComponent } from '../send-alarm-groups-card/send-alarm-groups-card.component';
 import { EocLogInterfaceComponent } from '../eoc-log-interface/eoc-log-interface.component';
@@ -7,6 +7,7 @@ import { EocLogInterfaceComponent } from '../eoc-log-interface/eoc-log-interface
     selector: 'app-emergency-operations-center-modal',
     templateUrl: './emergency-operations-center-modal.component.html',
     styleUrls: ['./emergency-operations-center-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [SendAlarmGroupsCardComponent, EocLogInterfaceComponent],
 })
 export class EmergencyOperationsCenterModalComponent {

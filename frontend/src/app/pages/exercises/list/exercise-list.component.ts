@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import type { GetExercisesResponseData } from 'fuesim-digital-shared';
 import { HttpResourceRef } from '@angular/common/http';
 import { ApiService } from '../../../core/api.service';
@@ -13,6 +13,7 @@ import { FileInputDirective } from '../../../shared/directives/file-input.direct
     selector: 'app-exercise-list',
     templateUrl: './exercise-list.component.html',
     styleUrls: ['./exercise-list.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         HeaderComponent,
         ExerciseCardComponent,

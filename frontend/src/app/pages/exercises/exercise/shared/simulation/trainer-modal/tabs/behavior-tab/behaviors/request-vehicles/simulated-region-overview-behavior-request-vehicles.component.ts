@@ -1,5 +1,10 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     newSimulatedRegionRequestTargetConfiguration,
@@ -33,6 +38,7 @@ type RequestTargetOption = UUID | 'trainees';
     styleUrls: [
         './simulated-region-overview-behavior-request-vehicles.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AppSaveOnTypingDirective,

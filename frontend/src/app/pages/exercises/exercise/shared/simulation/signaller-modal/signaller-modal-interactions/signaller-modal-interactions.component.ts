@@ -1,5 +1,12 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, ElementRef, inject, input, viewChild } from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    inject,
+    input,
+    viewChild,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseRadiogram,
@@ -84,6 +91,7 @@ export function setLoadingState(
     selector: 'app-signaller-modal-interactions',
     templateUrl: './signaller-modal-interactions.component.html',
     styleUrls: ['./signaller-modal-interactions.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         HotkeyIndicatorComponent,
         FormsModule,

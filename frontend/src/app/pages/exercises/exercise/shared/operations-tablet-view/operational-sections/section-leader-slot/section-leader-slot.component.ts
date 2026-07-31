@@ -1,5 +1,11 @@
 import { CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
-import { Component, inject, input, output } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { type Vehicle } from 'fuesim-digital-shared';
 import { VehicleTagComponent } from '../vehicle-tag/vehicle-tag.component';
 import { MessageService } from '../../../../../../../core/messages/message.service';
@@ -8,6 +14,7 @@ import { MessageService } from '../../../../../../../core/messages/message.servi
     selector: 'app-section-leader-slot',
     templateUrl: './section-leader-slot.component.html',
     styleUrl: './section-leader-slot.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [VehicleTagComponent, CdkDropList],
 })
 export class SectionLeaderSlotComponent {

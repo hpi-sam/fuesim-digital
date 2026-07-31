@@ -1,4 +1,9 @@
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type { UUID, Patient, PatientStatus } from 'fuesim-digital-shared';
 import { SelectPatientService } from '../select-patient.service';
 import { PatientIdentifierComponent } from '../../../../../../../shared/components/patient-identifier/patient-identifier.component';
@@ -15,6 +20,7 @@ export type Scope = 'simulatedRegion' | 'vehicle';
     selector: 'app-simulated-region-overview-patients-table',
     templateUrl: './simulated-region-overview-patients-table.component.html',
     styleUrls: ['./simulated-region-overview-patients-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         PatientIdentifierComponent,
         PatientStatusBadgeComponent,

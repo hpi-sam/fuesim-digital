@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, ReportableInformation } from 'fuesim-digital-shared';
 import { reportableInformationTypeToGermanNameDictionary } from 'fuesim-digital-shared';
@@ -22,6 +27,7 @@ const defaultInterval = 15 * 60 * 1000; // 15 minutes
     selector: 'app-signaller-modal-recurring-report-modal',
     templateUrl: './signaller-modal-recurring-report-modal.component.html',
     styleUrls: ['./signaller-modal-recurring-report-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, AutofocusDirective, HotkeyIndicatorComponent],
 })
 export class SignallerModalRecurringReportModalComponent implements OnInit {
@@ -89,7 +95,7 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
             return;
         }
 
-        let actionPromise: Promise<{ success: boolean }> | null = null;
+        let actionPromise: Promise<{ success: boolean }> | null;
 
         if (this.reportsEnabled && !this.recurringActivityId) {
             // Reports are currently not enabled but should be

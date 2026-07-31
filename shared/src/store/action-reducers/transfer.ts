@@ -29,7 +29,6 @@ import {
 } from '../../models/utils/position/position-helpers.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import type { MapPosition } from '../../models/utils/position/map-position.js';
 import { imageSizeToPosition } from '../../state-helpers/image-size-to-position.js';
 import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
 import {
@@ -69,7 +68,7 @@ export function letElementArrive(
     );
     const newPosition = cloneDeepMutable(targetTransferPoint.position);
     if (isPositionOnMap(newPosition)) {
-        offsetMapPositionBy(newPosition as WritableDraft<MapPosition>, {
+        offsetMapPositionBy(newPosition, {
             x: 0,
             y: imageSizeToPosition(transferPointImage.height / 3),
         });

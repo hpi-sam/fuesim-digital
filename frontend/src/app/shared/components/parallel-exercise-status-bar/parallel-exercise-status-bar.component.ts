@@ -1,4 +1,11 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    effect,
+    inject,
+    input,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     GetParallelExerciseResponseData,
@@ -28,6 +35,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     selector: 'app-parallel-exercise-status-bar',
     templateUrl: './parallel-exercise-status-bar.component.html',
     styleUrls: ['./parallel-exercise-status-bar.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         RouterLink,
         ExerciseStateBadgeComponent,

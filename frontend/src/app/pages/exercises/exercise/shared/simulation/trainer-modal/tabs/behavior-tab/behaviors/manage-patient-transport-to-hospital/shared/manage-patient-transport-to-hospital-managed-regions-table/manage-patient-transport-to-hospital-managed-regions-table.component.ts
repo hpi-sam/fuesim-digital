@@ -1,5 +1,10 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
@@ -35,6 +40,7 @@ import { AppSaveOnTypingDirective } from '../../../../../../../../../../../../sh
     styleUrls: [
         './manage-patient-transport-to-hospital-managed-regions-table.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         PatientStatusBadgeComponent,
         FormsModule,

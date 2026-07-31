@@ -1,4 +1,10 @@
-import { Component, inject, input, resource } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    resource,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     TemplateVersion,
     CollectionVersion,
@@ -35,6 +41,7 @@ import { openMarketplaceCollectionUpdateImpactModal } from '../../../../../marke
     selector: 'app-exercise-collection-item-component',
     templateUrl: './exercise-collection-item.component.html',
     styleUrl: './exercise-collection-item.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [RouterLink, DatePipe],
 })
 export class ExerciseColletionItemComponent {

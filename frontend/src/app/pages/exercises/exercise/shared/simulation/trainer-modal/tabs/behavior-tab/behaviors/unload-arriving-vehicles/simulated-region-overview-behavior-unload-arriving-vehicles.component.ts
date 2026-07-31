@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     UnloadArrivingVehiclesBehaviorState,
@@ -29,6 +34,7 @@ import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/f
     styleUrls: [
         './simulated-region-overview-behavior-unload-arriving-vehicles.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AppSaveOnTypingDirective,

@@ -5,6 +5,7 @@ import {
     resource,
     signal,
     OnInit,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
@@ -27,6 +28,7 @@ import { HelpButtonComponent } from '../../../../../../help-button/help-button.c
     imports: [DatePipe, VersionedElementFormComponent, HelpButtonComponent],
     templateUrl: './versioned-element-modal.component.html',
     styleUrl: './versioned-element-modal.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     host: {
         'data-cy': 'versionedElementModal',
     },

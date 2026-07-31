@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { uuid } from 'fuesim-digital-shared';
 import type {
@@ -13,6 +13,7 @@ import { HelpButtonComponent } from '../../../../../../help-button/help-button.c
     selector: 'app-create-image-template-modal',
     templateUrl: './create-image-template-modal.component.html',
     styleUrls: ['./create-image-template-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ImageTemplateFormComponent, HelpButtonComponent],
 })
 export class CreateImageTemplateModalComponent {

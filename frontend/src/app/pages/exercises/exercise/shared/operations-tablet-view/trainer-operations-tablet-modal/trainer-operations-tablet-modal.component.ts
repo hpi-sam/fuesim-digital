@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OperationsTabletViewComponent } from '../operations-tablet-view.component';
 
@@ -6,6 +6,7 @@ import { OperationsTabletViewComponent } from '../operations-tablet-view.compone
     selector: 'app-trainer-operations-tablet-modal',
     imports: [OperationsTabletViewComponent],
     templateUrl: './trainer-operations-tablet-modal.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './trainer-operations-tablet-modal.component.scss',
 })
 export class TrainerOperationsTabletModalComponent {

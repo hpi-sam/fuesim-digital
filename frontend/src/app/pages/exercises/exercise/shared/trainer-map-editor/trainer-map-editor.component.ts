@@ -1,4 +1,11 @@
-import { OnInit, inject, Component, computed, signal } from '@angular/core';
+import {
+    OnInit,
+    inject,
+    Component,
+    computed,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     NgbModal,
     NgbAccordionDirective,
@@ -86,6 +93,7 @@ type FilterCategory =
     selector: 'app-trainer-map-editor',
     templateUrl: './trainer-map-editor.component.html',
     styleUrls: ['./trainer-map-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ExerciseMapComponent,
         FileInputDirective,

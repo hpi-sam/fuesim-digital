@@ -79,7 +79,7 @@ export function registerJoinExerciseHandler(
             }
 
             clientWrapper.getSessionInformation().then(async () => {
-                let joinedClientId: UUID | null = null;
+                let joinedClientId: UUID | null;
                 try {
                     if (clientId !== undefined) {
                         joinedClientId =

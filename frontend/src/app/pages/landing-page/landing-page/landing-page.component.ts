@@ -6,6 +6,7 @@ import {
     signal,
     PipeTransform,
     SecurityContext,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
@@ -51,6 +52,7 @@ export class SanitizeHtmlPipe implements PipeTransform {
     selector: 'app-landing-page',
     templateUrl: './landing-page.component.html',
     styleUrls: ['./landing-page.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         HeaderComponent,
         FormsModule,

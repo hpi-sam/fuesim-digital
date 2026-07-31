@@ -1,4 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import {
+    Component,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlarmGroupVehicle, VehicleTemplate } from 'fuesim-digital-shared';
 import { VehicleTemplateDisplayComponent } from '../vehicle-template-display/vehicle-template-display.component';
@@ -8,6 +13,7 @@ import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/ap
     selector: 'app-alarm-group-vehicle-item',
     templateUrl: './alarm-group-vehicle-item.component.html',
     styleUrl: './alarm-group-vehicle-item.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         VehicleTemplateDisplayComponent,
         FormsModule,

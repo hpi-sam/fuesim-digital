@@ -1,5 +1,10 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -11,6 +16,7 @@ import { createSelectTransferPoint } from '../../../state/application/selectors/
     selector: 'app-transfer-point-name',
     templateUrl: './transfer-point-name.component.html',
     styleUrls: ['./transfer-point-name.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe],
 })
 export class TransferPointNameComponent implements OnChanges {

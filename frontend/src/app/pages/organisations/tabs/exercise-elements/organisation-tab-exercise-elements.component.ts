@@ -5,6 +5,7 @@ import {
     type OnInit,
     output,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     CollectionVersion,
@@ -33,6 +34,7 @@ import { PromptModalService } from '../../../../core/prompt-modal/prompt-modal.s
         CollectionCardComponent,
     ],
     templateUrl: './organisation-tab-exercise-elements.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './organisation-tab-exercise-elements.component.scss',
 })
 export class OrganisationTabExerciseElementsComponent implements OnInit {

@@ -1,4 +1,9 @@
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { LogEntry } from 'fuesim-digital-shared';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
 import { TagComponent } from '../tag/tag.component';
@@ -8,6 +13,7 @@ import { FormatDurationPipe } from '../../../../../../shared/pipes/format-durati
     selector: 'app-log-entry',
     templateUrl: './log-entry.component.html',
     styleUrls: ['./log-entry.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [TagComponent, FormatDurationPipe],
 })
 export class LogEntryComponent {

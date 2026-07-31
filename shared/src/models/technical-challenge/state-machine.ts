@@ -14,6 +14,7 @@ import {
 } from '../user-generated-content.js';
 import { type Personnel, personnelSchema } from '../personnel.js';
 import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
+// eslint-disable-next-line import-x/no-cycle
 import {
     logTechnicalChallengePersonnelUnassigned,
     logTechnicalChallengeStateTransition,
@@ -162,7 +163,7 @@ export function getTaskProgress(
     stateMachine: StateMachine
 ): TaskProgress {
     console.assert(
-        stateMachine.tasks[taskId],
+        !!stateMachine.tasks[taskId],
         `Task ${taskId} does not exist on stateMachine.`,
         stateMachine
     );

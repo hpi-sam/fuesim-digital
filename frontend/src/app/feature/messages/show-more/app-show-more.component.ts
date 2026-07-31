@@ -8,6 +8,7 @@ import {
     inject,
     input,
     viewChild,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import type { HeightChangeObservationStrategies } from './height-change-observation-strategies';
 
@@ -39,6 +40,7 @@ import type { HeightChangeObservationStrategies } from './height-change-observat
 @Component({
     selector: 'app-show-more',
     templateUrl: './app-show-more.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./app-show-more.component.scss'],
 })
 export class AppShowMoreComponent

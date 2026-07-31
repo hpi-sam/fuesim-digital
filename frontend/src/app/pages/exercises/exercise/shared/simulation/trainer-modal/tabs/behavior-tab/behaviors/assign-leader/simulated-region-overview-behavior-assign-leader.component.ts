@@ -1,5 +1,10 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Personnel } from 'fuesim-digital-shared';
 import { AssignLeaderBehaviorState } from 'fuesim-digital-shared';
@@ -15,6 +20,7 @@ import { createSelectPersonnel } from '../../../../../../../../../../state/appli
     styleUrls: [
         './simulated-region-overview-behavior-assign-leader.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe],
 })
 export class SimulatedRegionOverviewBehaviorAssignLeaderComponent implements OnChanges {

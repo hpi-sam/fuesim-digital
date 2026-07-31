@@ -368,7 +368,7 @@ function calculateTreatmentAssignment(
                 ).map((template) => [template.id, 0])
             ),
         ])
-    ) as TreatmentAssignment;
+    );
 
     Object.values(draftState.personnel).forEach((personnel) => {
         const assignedPatientCount = Object.keys(

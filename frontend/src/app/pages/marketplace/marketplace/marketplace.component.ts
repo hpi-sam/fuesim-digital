@@ -1,4 +1,10 @@
-import { Component, computed, inject, resource } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    resource,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionVersion } from 'fuesim-digital-shared';
@@ -14,6 +20,7 @@ import { showJoinCollectionWorkflow } from '../shared/modals/show-join-collectio
     selector: 'app-marketplace',
     templateUrl: './marketplace.component.html',
     styleUrl: './marketplace.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [RouterLink, NgbTooltip, CollectionCardComponent],
 })
 export class MarketplaceComponent {

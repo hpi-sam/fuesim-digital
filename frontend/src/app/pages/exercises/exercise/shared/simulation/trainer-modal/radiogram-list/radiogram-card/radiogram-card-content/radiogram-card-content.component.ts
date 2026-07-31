@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import type { ExerciseRadiogram } from 'fuesim-digital-shared';
 import { RadiogramCardContentVehicleCountComponent } from '../radiogram-card-content-vehicle-count/radiogram-card-content-vehicle-count.component';
 import { RadiogramCardContentVehicleOccupationsComponent } from '../radiogram-card-content-vehicle-occupations/radiogram-card-content-vehicle-occupations.component';
@@ -19,6 +19,7 @@ import { RadiogramCardContentInformationUnavailableComponent } from '../radiogra
     selector: 'app-radiogram-card-content',
     templateUrl: './radiogram-card-content.component.html',
     styleUrls: ['./radiogram-card-content.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         RadiogramCardContentVehicleCountComponent,
         RadiogramCardContentVehicleOccupationsComponent,

@@ -88,21 +88,6 @@
                     />
                 </ng-template>
             </ng-container>
-            <ng-container ngbNavItem="exercise-elements">
-                <a ngbNavLink>
-                    <i class="bi bi-box-seam me-1"></i>
-                    Übungselemente
-                    <span class="badge text-bg-secondary ms-1">{{
-                        org.collectionsCount
-                    }}</span>
-                </a>
-                <ng-template ngbNavContent>
-                    <app-organisation-tab-exercise-elements
-                        [organisation]="org"
-                        (update)="reload()"
-                    />
-                </ng-template>
-            </ng-container>
             <ng-container ngbNavItem="exercise-templates">
                 <a ngbNavLink>
                     <i class="bi bi-box-seam me-1"></i>
@@ -113,6 +98,21 @@
                 </a>
                 <ng-template ngbNavContent>
                     <app-organisation-tab-exercise-templates
+                        [organisation]="org"
+                        (update)="reload()"
+                    />
+                </ng-template>
+            </ng-container>
+            <ng-container ngbNavItem="exercise-elements">
+                <a ngbNavLink>
+                    <i class="bi bi-box-seam me-1"></i>
+                    Übungselemente
+                    <span class="badge text-bg-secondary ms-1">{{
+                        org.collectionsCount
+                    }}</span>
+                </a>
+                <ng-template ngbNavContent>
+                    <app-organisation-tab-exercise-elements
                         [organisation]="org"
                         (update)="reload()"
                     />

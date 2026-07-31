@@ -1961,7 +1961,9 @@ export class CollectionService {
             await Promise.all(
                 Object.entries(allElementVersions).map(
                     async ([oldStateVersion]) =>
-                        migrateStateVersion(Number.parseInt(oldStateVersion))
+                        migrateStateVersion(
+                            Number.parseInt(oldStateVersion, 10)
+                        )
                 )
             );
 

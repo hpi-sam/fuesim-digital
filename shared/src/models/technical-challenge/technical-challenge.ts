@@ -4,6 +4,7 @@ import { uuidSchema } from '../../utils/uuid.js';
 import { imagePropertiesSchema } from '../utils/image-properties.js';
 import { positionSchema } from '../utils/position/position.js';
 import { sizeSchema } from '../utils/size.js';
+// eslint-disable-next-line import-x/no-cycle
 import { stateMachineSchema, type StateMachineState } from './state-machine.js';
 
 export const technicalChallengeIdSchema =

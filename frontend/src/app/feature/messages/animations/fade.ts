@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-deprecated */
 import type { AnimationTriggerMetadata } from '@angular/animations';
 import { trigger } from '@angular/animations';
 import { fadeInTransition } from './fade-in';

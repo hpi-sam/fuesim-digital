@@ -18,8 +18,7 @@ export const removeStateHistory6: Migration = {
         }
         const oldState = state as { statusHistory?: StatusHistoryEntry[] };
         const currentStatus =
-            oldState.statusHistory?.at(-1)
-                ?.status ?? 'notStarted';
+            oldState.statusHistory?.at(-1)?.status ?? 'notStarted';
         delete oldState.statusHistory;
         (
             state as { currentStatus: 'notStarted' | 'paused' | 'running' }

@@ -55,8 +55,6 @@ export default defineConfig([
             '@typescript-eslint/explicit-member-accessibility': 'off',
             // TODO: Temporarily disable, until all are checked and migrated
             '@angular-eslint/prefer-on-push-component-change-detection': 'off',
-            // TODO: Too many false (?) positives
-            'import-x/no-named-as-default-member': 'off',
         },
     },
     {

@@ -269,11 +269,12 @@ export default {
         'import-x/no-cycle': 'warn',
         'import-x/no-unresolved': 'off', // Causes false positives with import resolution of Angular/Vite and TypeScript
         'import-x/export': 'off', // Causes false positives in our index.ts files
+        'import-x/no-named-as-default-member': 'off', // TODO: Too many false (?) positives
 
         /**
          * @typescript-eslint
          */
-        '@typescript-eslint/no-deprecated': 'warn',
+        '@typescript-eslint/no-deprecated': 'off', // we use deprecation markers internally
         '@typescript-eslint/prefer-as-const': 'off',
         '@typescript-eslint/ban-tslint-comment': 'warn',
         '@typescript-eslint/class-literal-property-style': ['warn', 'fields'],

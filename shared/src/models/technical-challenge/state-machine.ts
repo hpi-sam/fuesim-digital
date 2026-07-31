@@ -14,6 +14,7 @@ import {
 } from '../user-generated-content.js';
 import { type Personnel, personnelSchema } from '../personnel.js';
 import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
+// eslint-disable-next-line import-x/no-cycle
 import {
     logTechnicalChallengePersonnelUnassigned,
     logTechnicalChallengeStateTransition,

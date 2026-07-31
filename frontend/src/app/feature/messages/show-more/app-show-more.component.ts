@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-deprecated */
 import type { AnimationPlayer, AnimationMetadata } from '@angular/animations';
 import { AnimationBuilder, style, animate } from '@angular/animations';
 import type { AfterViewInit, OnChanges, OnDestroy } from '@angular/core';

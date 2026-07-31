@@ -17,7 +17,7 @@ describe('access key service', () => {
 
         // should be in bounds
         participantKeys.forEach((id) => {
-            const intKey = Number.parseInt(id);
+            const intKey = Number.parseInt(id, 10);
             expect(intKey).toBeGreaterThanOrEqual(0);
             expect(intKey).toBeLessThan(1_000_000);
         });

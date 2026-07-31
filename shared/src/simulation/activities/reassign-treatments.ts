@@ -86,10 +86,8 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                 removeTreatmentsOfElement(draftState, patient)
             );
 
-            const leaderId = (
-                simulatedRegion.behaviors.find(
-                    (behavior) => behavior.type === 'assignLeaderBehavior'
-                )
+            const leaderId = simulatedRegion.behaviors.find(
+                (behavior) => behavior.type === 'assignLeaderBehavior'
             )?.leaderId;
 
             let leaderIndex: number;

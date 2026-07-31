@@ -45,7 +45,6 @@ bootstrapApplication(AppComponent, {
         importProvidersFrom(
             CommonModule,
             BrowserModule,
-
             BrowserAnimationsModule,
             StoreModule.forRoot<AppState>(appReducers)
         ),

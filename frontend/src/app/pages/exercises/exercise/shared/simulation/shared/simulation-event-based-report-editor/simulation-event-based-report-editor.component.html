@@ -3,13 +3,7 @@
         <div class="col-auto">
             <input
                 [id]="'eventBasedReportEditor_' + eventBasedReport.eventId"
-                [ngModel]="
-                    $safeNavigationMigration(
-                        (reportBehaviorState$ | async)?.[
-                            eventBasedReport.propertyName
-                        ]
-                    )
-                "
+                [ngModel]="(reportBehaviorState$ | async)?.[eventBasedReport.propertyName]"
                 [disabled]="
                     (canReport$ | async)?.[eventBasedReport.eventId] !== true
                 "

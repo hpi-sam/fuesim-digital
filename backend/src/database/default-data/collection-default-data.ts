@@ -12,6 +12,9 @@ import {
     defaultVehicleTemplatesById,
     elementEntityIdSchema,
     elementVersionIdSchema,
+    firefightingDefaultPersonnelTemplates,
+    firefightingDefaultMaterialTemplates,
+    firefightingDefaultVehicleTemplatesById,
     replaceDependencies,
 } from 'fuesim-digital-shared';
 import type { Immutable } from 'immer';
@@ -106,6 +109,73 @@ const fuesimDigital20250629DefaultCollectionData: DefaultCollection = {
     ],
 };
 
+const fuesimDigitalFirefighting2026DefaultCollectionData: DefaultCollection = {
+    entityId: collectionEntityIdSchema.parse(
+        'collection_entity_616b6f84-1799-477c-8ca7-a54fe82e735b'
+    ),
+    versionId: collectionVersionIdSchema.parse(
+        'collection_version_52deede7-ed1e-4a8a-a4d5-7060b929b03b'
+    ),
+    title: 'FüSim Digital Feuerwehr 2026',
+    description: '',
+    archived: false,
+    createdAt: new Date(2026, 7, 31), // 31.07.2026
+    editedAt: new Date(2026, 7, 31), // 31.07.2026
+    draftState: false,
+    version: 1,
+    visibility: 'embedded',
+    elements: [
+        ...Object.values(firefightingDefaultVehicleTemplatesById).map(
+            (template) => ({
+                title: template.vehicleType,
+                description: '',
+                content: replaceDependencies(template, [
+                    ...Object.values(defaultMaterialTemplates).map((t) => ({
+                        old: t.id as ElementVersionId,
+                        new: newElementVersionId(t.id),
+                    })),
+                    ...Object.values(defaultPersonnelTemplates).map((t) => ({
+                        old: t.id as ElementVersionId,
+                        new: newElementVersionId(t.id),
+                    })),
+                ]),
+                entityId: newElementEntityId(template.id),
+                versionId: newElementVersionId(template.id),
+                createdAt: new Date(2026, 7, 31), // 31.07.2026
+                editedAt: new Date(2026, 7, 31), // 31.07.2026
+                version: 1,
+            })
+        ),
+
+        ...Object.values(firefightingDefaultPersonnelTemplates).map(
+            (template) => ({
+                title: template.name,
+                description: '',
+                content: template,
+                entityId: newElementEntityId(template.id),
+                versionId: newElementVersionId(template.id),
+                createdAt: new Date(2026, 7, 31), // 31.07.2026
+                editedAt: new Date(2026, 7, 31), // 31.07.2026
+                version: 1,
+            })
+        ),
+
+        ...Object.values(firefightingDefaultMaterialTemplates).map(
+            (template) => ({
+                title: template.name,
+                description: '',
+                content: template,
+                entityId: newElementEntityId(template.id),
+                versionId: newElementVersionId(template.id),
+                createdAt: new Date(2026, 7, 31), // 31.07.2026
+                editedAt: new Date(2026, 7, 31), // 31.07.2026
+                version: 1,
+            })
+        ),
+    ],
+};
+
 export const defaultCollectionData: DefaultCollection[] = [
     fuesimDigital20250629DefaultCollectionData,
+    fuesimDigitalFirefighting2026DefaultCollectionData,
 ];

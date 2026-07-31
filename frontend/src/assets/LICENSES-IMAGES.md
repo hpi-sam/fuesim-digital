@@ -67,12 +67,30 @@ and Fry1989
 [notarzt-personnel.svg](notarzt-personnel.svg):  
 <https://commons.wikimedia.org/wiki/File:Person_(63361)_-_The_Noun_Project.svg> (edited) + <https://commons.wikimedia.org/wiki/File:Encircled_Rod_of_Asclepius.svg> (edited)
 
+[fire-squad-personnel.svg](fire-squad-personnel.svg)
+<https://commons.wikimedia.org/wiki/File:Person_(63361)_-_The_Noun_Project.svg> (edited)
+
+[fire-single-personnel.svg](fire-single-personnel.svg)
+<https://commons.wikimedia.org/wiki/File:Person_(63361)_-_The_Noun_Project.svg> (edited)
+
+[fire-leader-red-personnel.svg](fire-leader-red-personnel.svg) and
+[fire-leader-blue-personnel.svg](fire-leader-blue-personnel.svg) and
+[fire-leader-yellow-personnel.svg](fire-leader-white-personnel.svg) and
+[fire-leader-yellow-personnel.svg](fire-leader-yellow-personnel.svg)
+<https://commons.wikimedia.org/wiki/File:Person_(63361)_-_The_Noun_Project.svg> (edited)
+and Fry1989  
+<https://commons.wikimedia.org/wiki/File:MUTCD_RS-094.svg> (edited)
+
 [trash-can.svg](trash-can.svg):  
 Bootstrap-Icon `bi-trash-fill` (edited)
 
 [naw-vehicle.png](naw-vehicle.png):  
 Lukas Radermacher, based on <https://commons.wikimedia.org/wiki/File:RTW_Altenburg.png> by Florian Greiz 23  
 License: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+[hlf-vehicle.png](hlf-vehicle.png):  
+Florian Greiz 23  
+<https://commons.wikimedia.org/wiki/File:HLF_Gera_PNG.png> (edited)
 
 [favicon.png](favicon.png): created by Freepik - Flaticon <https://www.flaticon.com/de/kostenlose-icons/alarm>
 

@@ -46,7 +46,7 @@ export const postExerciseTemplateRequestDataSchema = z.object({
     organisationId: organisationIdSchema,
     name: z.string().trim().nonempty(),
     description: z.string().trim(),
-    importObject: z.any(),
+    importObject: z.any().optional(),
 });
 export type PostExerciseTemplateRequestData = z.infer<
     typeof postExerciseTemplateRequestDataSchema

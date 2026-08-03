@@ -22,12 +22,14 @@ import type { AppState } from '../../../state/app.state';
 import {
     selectCurrentTime,
     selectExerciseStatus,
+    selectTaskTypes,
 } from '../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 import { UserGeneratedContentEditorComponent } from '../user-generated-content-editor/user-generated-content-editor.component.js';
 import { StateMachineDetailsComponent } from '../state-machine-details/state-machine-details.component.js';
 import { ExerciseService } from '../../../core/exercise.service.js';
 import { openEditStateMachineModalComponent } from '../../../pages/exercises/exercise/shared/exercise-map/shared/edit-state-machine-modal/edit-state-machine-modal.component.js';
+import type { TaskNameMap } from '../../../pages/exercises/exercise/shared/editor-panel/edit-state-machine-form/edit-state-machine-form.component.js';
 
 @Component({
     selector: 'app-technical-challenge-details',
@@ -60,6 +62,10 @@ export class TechnicalChallengeDetailsComponent implements OnInit {
 
     public readonly currentTime = this.store.selectSignal(selectCurrentTime);
     readonly isTrainer = computed(() => this.currentRole() === 'trainer');
+    readonly taskNameMap = computed<TaskNameMap>(() => {
+        const taskTypes = this.store.selectSignal(selectTaskTypes)();
+        return new Map(Object.entries(taskTypes));
+    });
 
     scoutStateMachine(stateMachine: StateMachine) {
         if (this.currentRole() === 'participant') {
@@ -77,7 +83,8 @@ export class TechnicalChallengeDetailsComponent implements OnInit {
         openEditStateMachineModalComponent(
             this.ngbModalService,
             this.technicalChallenge().id,
-            stateMachine.id
+            stateMachine.id,
+            this.taskNameMap
         );
     }
 

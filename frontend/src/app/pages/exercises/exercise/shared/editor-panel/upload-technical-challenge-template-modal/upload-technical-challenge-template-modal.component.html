@@ -1,0 +1,63 @@
+<div class="modal-header">
+    <h4 class="modal-title">
+        Technischen Herausforderung importieren
+        <app-help-button
+            url="2_exercises/3_exercise_elements.html#technische-herausforderungen"
+            [trainerOnly]="true"
+        />
+    </h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+
+<div class="modal-body d-flex flex-column gap-2">
+    @let template = uploadedTechnicalChallenge();
+    @if (template) {
+        <app-technical-challenge-template-form
+            [technicalChallengeTemplate]="template"
+            (technicalChallengeTemplateChange)="
+                uploadedTechnicalChallenge.set($event)
+            "
+            [taskNameMap]="taskNameMap()"
+        >
+        </app-technical-challenge-template-form>
+
+        <div>
+            <label class="form-label">Zusätzliche Aufgabentypen:</label>
+            <p class="text-muted">
+                Diese Aufgabentypen werden von der technischen Herausforderung
+                benötigt und dafür automatisch importiert.
+            </p>
+            <ul>
+                @for (
+                    taskType of uploadedAdditionalTasks();
+                    track taskType.id
+                ) {
+                    <li>{{ taskType.taskName }}</li>
+                }
+            </ul>
+        </div>
+
+        <button class="btn btn-primary mt-3" (click)="importTemplate()">
+            Teilherausforderung importieren
+        </button>
+    } @else {
+        <p class="text-center text-muted">
+            Hier können Sie Vorlagen für technische Herausforderung hochladen
+            und importieren, welche mit dem
+            <a href="javascript:alert('Bald verfügbar!')"
+                >Herausforderungseditor</a
+            >
+            erstellt wurden.
+        </p>
+        <label class="btn btn-outline-primary my-2">
+            <i class="bi-cloud-upload me-2"> </i>
+            Vorlage importieren
+            <input
+                (appFileInput)="uploadTechnicalChallengeTemplate($event)"
+                type="file"
+                accept="application/json"
+                class="d-none"
+            />
+        </label>
+    }
+</div>

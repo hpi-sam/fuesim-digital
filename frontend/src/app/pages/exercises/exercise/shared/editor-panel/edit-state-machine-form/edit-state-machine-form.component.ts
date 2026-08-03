@@ -1,18 +1,17 @@
 import { Component, effect, input, linkedSignal, output } from '@angular/core';
-import { computed, inject, type Signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { FormsModule } from '@angular/forms';
 import type {
-    StateMachine,
     StateMachineState,
     ImageProperties,
     UserGeneratedContent,
     Task,
     Timer,
+    StateMachineDefinition,
+    TaskType,
     UUID,
 } from 'fuesim-digital-shared';
 import { uuid, cloneDeepMutable } from 'fuesim-digital-shared';
-import { Store } from '@ngrx/store';
 import {
     NgbAccordionBody,
     NgbAccordionButton,
@@ -23,12 +22,12 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgOptimizedImage } from '@angular/common';
 import { UserGeneratedContentEditorComponent } from '../../../../../../shared/components/user-generated-content-editor/user-generated-content-editor.component.js';
-import type { AppState } from '../../../../../../state/app.state.js';
-import { createSelectTaskType } from '../../../../../../state/application/selectors/exercise.selectors.js';
 import {
     TimeInputComponent,
     TimeUnit,
 } from '../../../../../../shared/components/time-input/time-input.component.js';
+
+export type TaskNameMap = Map<UUID, TaskType>;
 
 @Component({
     selector: 'app-edit-state-machine-form',
@@ -48,20 +47,19 @@ import {
     templateUrl: './edit-state-machine-form.component.html',
 })
 export class EditStateMachineFormComponent {
-    private readonly store = inject<Store<AppState>>(Store);
-
-    readonly initialStateMachine = input.required<StateMachine>();
+    readonly initialStateMachine = input.required<StateMachineDefinition>();
     readonly stateMachineModel = linkedSignal({
         source: this.initialStateMachine,
         computation: domainToFormModel,
     });
     readonly isPrimaryStateMachine = input<boolean>(false);
+    readonly taskNameMap = input.required<TaskNameMap>();
 
     readonly showStateImage = this.isPrimaryStateMachine;
 
     stateMachineForm = form(this.stateMachineModel);
 
-    readonly updatedStateMachine = output<StateMachine>();
+    readonly updatedStateMachine = output<StateMachineDefinition>();
 
     constructor() {
         effect(() => {
@@ -76,11 +74,9 @@ export class EditStateMachineFormComponent {
         });
     }
 
-    nameOfTask(taskTypeId: UUID): Signal<string> {
-        return computed(
-            () =>
-                this.store.selectSignal(createSelectTaskType(taskTypeId))()
-                    .taskName
+    nameOfTask(taskTypeId: TaskType['id']): string {
+        return (
+            this.taskNameMap().get(taskTypeId)?.taskName ?? 'Unbenannte Aufgabe'
         );
     }
 
@@ -90,7 +86,7 @@ export class EditStateMachineFormComponent {
 interface StateFormModel {
     id: string;
     title: string;
-    image: ImageProperties;
+    image: ImageProperties | undefined;
     userGeneratedContent: UserGeneratedContent;
 }
 function stateToFormModel(state: StateMachineState): StateFormModel {
@@ -103,7 +99,7 @@ function stateToFormModel(state: StateMachineState): StateFormModel {
 }
 function stateFromFormModel(
     stateForm: StateFormModel,
-    stateMachine: StateMachine
+    stateMachine: StateMachineDefinition
 ): StateMachineState {
     const previous =
         stateMachine.states[stateForm.id as StateMachineState['id']];
@@ -126,7 +122,7 @@ interface StateMachineFormModel {
     timers: Timer[];
 }
 function domainToFormModel(
-    stateMachine: StateMachine | undefined
+    stateMachine: StateMachineDefinition | undefined
 ): StateMachineFormModel {
     if (!stateMachine) {
         console.log('state machine was undefined');
@@ -149,8 +145,8 @@ function domainToFormModel(
 
 function formModelToDomain(
     formModel: StateMachineFormModel,
-    initialValue: StateMachine
-): StateMachine {
+    initialValue: StateMachineDefinition
+): StateMachineDefinition {
     return {
         ...initialValue,
         name: formModel.name,

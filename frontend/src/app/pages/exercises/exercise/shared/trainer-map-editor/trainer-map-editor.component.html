@@ -503,20 +503,39 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
+                                <div class="mb-2">
+                                    <button
+                                        class="btn btn-sm btn-outline-primary"
+                                        (click)="
+                                            addTechnicalChallengeTemplate()
+                                        "
+                                    >
+                                        <i class="bi bi-plus"></i>
+                                        Hinzufügen
+                                    </button>
+                                </div>
+
                                 <div class="cards">
                                     @for (
                                         template of technicalChallengeTemplates();
                                         track template.id
                                     ) {
+                                        @let image =
+                                            getTechnicalChallengeTemplateImage(
+                                                template
+                                            );
                                         <app-map-editor-card
                                             (elementPointerdown)="
                                                 startElementDrag($event, {
                                                     type: 'technicalChallenge',
-                                                    template: template,
+                                                    template: {
+                                                        ...template,
+                                                        image,
+                                                    },
                                                 })
                                             "
                                             dataCy="draggableMapImageDiv"
-                                            [imageUrl]="template.image.url"
+                                            [imageUrl]="image.url"
                                             [title]="template.name"
                                             [enableEditButton]="true"
                                             (elementEdit)="

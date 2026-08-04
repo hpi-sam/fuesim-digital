@@ -96,6 +96,61 @@ export const numberCriterionTypeEvaluatorMap: {
     timestampEvalCriterion: getEvalResultOfTimestampCriterion,
 };
 /**
+ * Handles sub-criteria-ids with specified callback function
+ * @param rootCriterion the combined root-criterion. Non combined criteria do no operations.
+ * @param handleChild the callback function to handle a childId.
+ */
+export function handleSubCriteriaIds(
+    rootCriterion: EvalCriterion,
+    handleChild: (id: UUID, ...args: any[]) => void,
+    ...args: any[]
+): void {
+    const type = rootCriterion.criterionType;
+    if (
+        type === 'andEvalCriterion' ||
+        type === 'orEvalCriterion' ||
+        type === 'countCompletedEvalCriterion'
+    ) {
+        rootCriterion.children.forEach((id) => {
+            handleChild(id, ...args);
+        });
+    }
+    if (type === 'firstTrueAtEvalCriterion' || type === 'notEvalCriterion') {
+        handleChild(rootCriterion.child, ...args);
+    }
+    if (type === 'compareEvalCriterion') {
+        handleChild(rootCriterion.leftChild, ...args);
+        handleChild(rootCriterion.rightChild, ...args);
+    }
+}
+/**
+ * Handles sub-criteria with specified callback function
+ * @param rootCriterion the combined root-criterion. Non combined criteria do no operations.
+ * @param critaria A Map of criteria. At a minimum containes all criteria in the tree of the rootCriterion.
+ * @param handleChild the callback function to handle a sub-criterion
+ * @param errorContext This is displayed in the error message, when a child is not contained in the criteria map.
+ */
+export function handleSubCriteriaByMap(
+    rootCriterion: EvalCriterion,
+    critaria: { [id: UUID]: EvalCriterion },
+    handleChild: (subCriterion: EvalCriterion, ...args: any[]) => void,
+    errorContext?: string,
+    ...args: any[]
+): void {
+    function handleChildById(id: UUID) {
+        if (!critaria[id]) {
+            console.log(
+                'LOGIC-ERROR: Handling subCriterion failed. Context: ' +
+                    errorContext +
+                    ' CriterionId: ' +
+                    id
+            );
+        }
+        handleChild(critaria[id]!, ...args);
+    }
+    handleSubCriteriaIds(rootCriterion, handleChildById);
+}
+/**
  * recursively removes the childCriteria of an initial eval criterion from the input map
  * @param criteriaMap
  * @param currentCriterion
@@ -117,39 +172,14 @@ export function removeChildrenOfCriterion(
     const criteriaMap = criteriaMapIn as {
         [key: UUID]: EvalCriterion | null;
     };
-    const type = currentCriterion.criterionType;
-    if (
-        type === 'andEvalCriterion' ||
-        type === 'orEvalCriterion' ||
-        type === 'countCompletedEvalCriterion'
-    ) {
-        for (let i = 0; i < currentCriterion.children.length; i += 1) {
-            let criterion = criteriaMap[currentCriterion.children.at(i)!];
-            if (criterion) {
-                removeChildrenOfCriterion(criteriaMap, criterion);
-                criterion = null;
-            }
-        }
-    }
-    if (type === 'firstTrueAtEvalCriterion' || type === 'notEvalCriterion') {
-        let criterion = criteriaMap[currentCriterion.child];
+    function removeChildren(id: UUID) {
+        let criterion = criteriaMap[id];
         if (criterion) {
             removeChildrenOfCriterion(criteriaMap, criterion);
-            criterion = null;
         }
+        criterion = null;
     }
-    if (type === 'compareEvalCriterion') {
-        let leftCriterion = criteriaMap[currentCriterion.leftChild];
-        let rightCriterion = criteriaMap[currentCriterion.rightChild];
-        if (leftCriterion) {
-            removeChildrenOfCriterion(criteriaMap, leftCriterion);
-            leftCriterion = null;
-        }
-        if (rightCriterion) {
-            removeChildrenOfCriterion(criteriaMap, rightCriterion);
-            rightCriterion = null;
-        }
-    }
+    handleSubCriteriaIds(currentCriterion, removeChildren);
     return criteriaMap;
 }
 /**
@@ -237,4 +267,32 @@ export function getEvalCriterionTreeDepth(
         getEvalCriterionTreeDepth(child, criteriaMap)
     );
     return Math.max(...childDepths) + 1;
+}
+/**
+ *Recursively calculates the row count of a table with one row for each criterion
+ * including the specified criterion and its tree of sub-criteria.
+ * @param criterion The root criterion
+ * @param criteria A map of criteria. At a minimum includes all criteria of the tree with the specified criterion as the root
+ * @returns The row count of a table with one row for each criterion
+ * including the specified criterion and its tree of sub-criteria.
+ */
+export function getEvalCriterionTableLength(
+    criterion: EvalCriterion,
+    criteria: { [id: UUID]: EvalCriterion }
+): number {
+    let rootLength = 1;
+
+    if (isCombinedEvalCriterion(criterion)) {
+        function recursiveIncrement(child: EvalCriterion) {
+            rootLength += 1;
+            handleSubCriteriaByMap(
+                child,
+                criteria,
+                getEvalCriterionTableLength
+            );
+        }
+        handleSubCriteriaByMap(criterion, criteria, recursiveIncrement);
+    }
+    /* console.log('determinining table length. current: ' + rootLength); */
+    return rootLength;
 }

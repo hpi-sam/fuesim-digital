@@ -35,13 +35,9 @@
             "
         />
     }
+    <!-- TODO @JohannesPotzi : correct input -->
     @case ('countMeasuresEvalCriterion') {
-        <form class="ms-2">
-            <label>
-                Art:
-                {{ evalCriterionTypesNames.countMeasuresEvalCriterion }}
-            </label>
-        </form>
+        <app-count-measures-criterion-form [measureCategories]="{}" />
     }
     @case ('reachTechnicalChallengeStateEvalCriterion') {
         <app-reach-technical-challenge-state-criterion-form

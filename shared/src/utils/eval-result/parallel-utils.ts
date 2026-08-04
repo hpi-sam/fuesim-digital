@@ -18,7 +18,6 @@ export function getEvalResultsByExerciseState(state: ExerciseState) {
         state.patients,
         state.scoutables,
         state.measures,
-        state.measureTemplates,
         state.currentTime
     );
 }

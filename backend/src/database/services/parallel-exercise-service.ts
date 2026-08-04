@@ -73,7 +73,6 @@ export class ParallelExerciseService {
                             state.patients,
                             state.scoutables,
                             state.measures,
-                            state.measureTemplates,
                             state.currentTime
                         );
                         this.evalResultsMap[id] = updateEvalResultsMap(

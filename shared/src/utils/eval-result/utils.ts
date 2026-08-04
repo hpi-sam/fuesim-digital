@@ -31,7 +31,6 @@ export function newEvalResultContext(
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
     measures: { [key: string]: Measure },
-    measureTemplates: { [key: string]: MeasureTemplateCategory },
     currentTime: number
 ): EvalResultContext {
     return {
@@ -40,7 +39,6 @@ export function newEvalResultContext(
         patients,
         scoutables,
         measures,
-        measureTemplates,
         currentTime,
     };
 }
@@ -139,7 +137,6 @@ export function getEvalResultsFromCriteria(
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
     measures: { [key: string]: Measure },
-    measureTemplates: { [key: string]: MeasureTemplateCategory },
     currentTime: number
 ): { [evalCriterionId: UUID]: EvalResult } {
     const criteria = Object.values(wantedEvalCriteria);
@@ -150,7 +147,6 @@ export function getEvalResultsFromCriteria(
         patients,
         scoutables,
         measures,
-        measureTemplates,
         currentTime
     );
     return criteria

@@ -516,7 +516,6 @@ function getEvalResultsSelectorBySubset(
         selectPatients,
         selectScoutables,
         selectMeasures,
-        selectMeasureTemplateCategories,
         selectCurrentTime,
         (
             evalCriteria,
@@ -524,7 +523,6 @@ function getEvalResultsSelectorBySubset(
             patients,
             scoutables,
             measures,
-            measureTemplates,
             currentTime
         ) =>
             getEvalResultsFromCriteria(
@@ -534,7 +532,6 @@ function getEvalResultsSelectorBySubset(
                 patients,
                 scoutables,
                 measures,
-                measureTemplates,
                 currentTime
             )
     );

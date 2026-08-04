@@ -49,17 +49,9 @@ export function getEvalResultOfCountMeasuresCriterion(
 ): NumberEvalResult {
     const criterion = evalCriterion;
     let num = null;
-    /* TODO @JohannesPotzi @Jogius : implementation*/
-    console.log('TODO: implement evaluation of countMeasuresEvalCriterion');
-    num = -1;
-    if (!num) {
-        console.log(
-            `[logic Error]: trying to return result of numberCriterion${
-                criterion.id
-            } without calculating the number value. The critrerionType is : ${criterion.criterionType}`
-        );
-        num = -1;
-    }
+    num = Object.values(context.measures).filter(
+        (measure) => measure.templateId === criterion.targetMeasureTemplateId
+    ).length;
     return newNumberEvalResult(
         criterion.id,
         context.currentTime,

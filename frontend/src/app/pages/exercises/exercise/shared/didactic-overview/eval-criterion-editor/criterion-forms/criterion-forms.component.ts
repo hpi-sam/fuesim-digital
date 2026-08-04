@@ -19,6 +19,7 @@ import { PatientAtStatusCriterionFormComponent } from './patient-at-status-crite
 import { CountPatientsAtStatusCriterionFormComponent } from './count-patients-at-status-criterion/count-patients-at-status-criterion-form.component';
 import { ReachTechnicalChallengeStateEvalCriterionFormComponent } from './reach-technical-challenge-state-criterion/reach-technical-challenge-state-criterion-form.component';
 import { ViewScoutableEvalCriterionFormComponent } from './view-scoutable-criterion/view-scoutable-criterion-form.component';
+import { CountMeasuresCriterionFormComponent } from './do-measure-x-times-criterion/count-measures-criterion-form.component';
 
 @Component({
     selector: 'app-eval-criterion-forms',
@@ -32,6 +33,7 @@ import { ViewScoutableEvalCriterionFormComponent } from './view-scoutable-criter
         CountPatientsAtStatusCriterionFormComponent,
         ReachTechnicalChallengeStateEvalCriterionFormComponent,
         ViewScoutableEvalCriterionFormComponent,
+        CountMeasuresCriterionFormComponent,
     ],
 })
 export class EvalCriterionFormsComponent {

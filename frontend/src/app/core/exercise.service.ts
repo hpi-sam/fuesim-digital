@@ -129,7 +129,6 @@ export class ExerciseService {
                     this.store.selectSignal(selectPatients)(),
                     this.store.selectSignal(selectScoutables)(),
                     this.store.selectSignal(selectMeasures)(),
-                    this.store.selectSignal(selectMeasureTemplateCategories)(),
                     this.store.selectSignal(selectCurrentTime)()
                 );
                 this.evalResultsCache.set(

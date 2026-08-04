@@ -64,8 +64,8 @@ import { DidacticOverViewResultsTableComponent } from '../result-table/didactic-
 import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-eval-criterion-creation-card',
-    templateUrl: './eval-criterion-creation-card.component.html',
-    styleUrls: ['./eval-criterion-creation-card.component.scss'],
+    templateUrl: './eval-criterion-editor.component.html',
+    styleUrls: ['./eval-criterion-editor.component.scss'],
     imports: [
         FormField,
         FormsModule,

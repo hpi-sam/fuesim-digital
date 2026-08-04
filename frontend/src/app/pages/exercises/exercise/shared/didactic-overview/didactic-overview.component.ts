@@ -19,7 +19,7 @@ import {
     selectTechnicalChallenges,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { AppState } from '../../../../../state/app.state';
-import { EvalCriterionCreationCardComponent } from './eval-criterion-creation-card/eval-criterion-creation-card.component';
+import { EvalCriterionCreationCardComponent } from './eval-criterion-editor/eval-criterion-editor.component';
 import { ExerciseService } from '../../../../../core/exercise.service';
 import { DidacticOverViewResultsTableComponent } from './result-table/didactic-overview-results-table.component';
 

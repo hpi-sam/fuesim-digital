@@ -39,7 +39,7 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
     public readonly store = inject<Store<AppState>>(Store);
     public readonly isInSelectionModeInput = input<boolean>(true);
     public readonly rootResults = input.required<EvalResult[]>();
-    /** the default of 590 fits nicely into a card with width 600 */
+    // the default of 590 fits nicely into a card with width 600
     public readonly tableMinWidth = input<number>(590);
 
     public readonly selectedResultsOut = output<EvalResult[]>();
@@ -66,9 +66,8 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
         [criterionId: UUID]: boolean;
     }>({});
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit(): void {
         this.isInSelectionMode.set(this.isInSelectionModeInput());
-        /* await this.updateSubTables(); */
         /* initializing selected results */
         const results = Object.values(this.results());
         this.selectedResults.update((obj) => {
@@ -92,7 +91,7 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
             }
         });
     }
-
+    /* TODO  @JohannesPotzi : drop this post editor isolation. */
     public emitSelectedSubResults() {
         if (this.isInSelectionMode()) {
             this.selectedResultsOut.emit(

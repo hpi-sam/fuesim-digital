@@ -13,13 +13,13 @@ export interface InputData {
     countInput: number;
     timestampInput: number;
     patientStatusInput: PatientStatus;
-    patientTargetStatusMap: { [id: UUID]: PatientStatus };
     technicalChallengeId: TechnicalChallengeId | '';
     targetStateMachineIds: StateMachineId[];
     targetStateMachineStateIds: {
         [targetStateMachineId: StateMachineId]: StateMachineStateId;
     };
     targetPatients: Patient[];
+    targetPatientsStatusMap: { [id: UUID]: PatientStatus };
     targetScoutableId: UUID | '';
     subCriteria: EvalCriterion[];
     singleSubCriterion: UUID | '';

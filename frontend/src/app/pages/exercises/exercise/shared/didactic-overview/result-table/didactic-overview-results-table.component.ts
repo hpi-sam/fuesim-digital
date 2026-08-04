@@ -42,8 +42,6 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
     // the default of 590 fits nicely into a card with width 600
     public readonly tableMinWidth = input<number>(590);
 
-    public readonly selectedResultsOut = output<EvalResult[]>();
-
     public readonly isInSelectionMode = signal<boolean>(false);
     public getChildResultsOfResult = getChildResultsOfResult;
     public readonly results = this.store.selectSignal(selectEvalResults);
@@ -86,21 +84,7 @@ export class DidacticOverViewResultsTableComponent implements OnInit {
                 this.subTables
             );
             this.isInSelectionMode.set(this.isInSelectionModeInput());
-            if (this.isInSelectionMode()) {
-                this.emitSelectedSubResults();
-            }
         });
-    }
-    /* TODO  @JohannesPotzi : drop this post editor isolation. */
-    public emitSelectedSubResults() {
-        if (this.isInSelectionMode()) {
-            this.selectedResultsOut.emit(
-                this.rootResults().filter(
-                    (res) => this.selectedResults()[res.criterionId]
-                )
-            );
-            console.log('emitting selected subResults.');
-        }
     }
 
     public toggleSelectResult(result: EvalResult) {

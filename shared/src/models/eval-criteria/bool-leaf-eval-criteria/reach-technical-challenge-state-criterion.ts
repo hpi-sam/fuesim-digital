@@ -42,16 +42,12 @@ export function newReachTechnicalChallengeStateEvalCriterion(
     targetStateMachineIds: StateMachineId[],
     targetStateMachineStateIds: {
         [targetStateMachineId: StateMachineId]: StateMachineStateId;
-    },
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    }
 ): ReachTechnicalChallengeStateEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
         criterionType: 'reachTechnicalChallengeStateEvalCriterion',
         targetTechnicalChallengeId,
         targetStateMachineIds,

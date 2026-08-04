@@ -1,0 +1,123 @@
+<form class="ms-2">
+    <!-- TODO @JohannesPotzi : add computed value for crit type name -->
+    <label>Typ: {{ this.criterionCreationTypeName() }}</label>
+</form>
+<form class="ms-2">
+    <label
+        >name:
+        <input
+            [ngModel]="criterionForm.name"
+            [formField]="criterionForm.name"
+            (appSaveOnTyping)="criterionForm.name().value.set($event)"
+        />
+    </label>
+</form>
+@if (
+    criterionCreationCategory() === 'combinedEvalCriterion' &&
+    this.criterionForm.subCriteria().value().length === 0
+) {
+    <span class="text-muted"
+        >Wählen sie die gewünschten Unterkriterien unten aus den Listen.</span
+    >
+}
+
+@switch (criterionCreationType()) {
+    @case (null) {
+        <span class="text-muted"
+            >Bitte wählen sie eine Art von Kriterium im Drop-Down oben
+            aus.</span
+        >
+    }
+    @case ('countPatientsAtStatusEvalCriterion') {
+        <app-count-patients-at-status-criterion-form
+            (targetStatusOut)="
+                this.criterionForm.patientStatusInput().value.set($event)
+            "
+        />
+    }
+    @case ('countMeasuresEvalCriterion') {
+        <form class="ms-2">
+            <label>
+                Art:
+                {{ evalCriterionTypesNames.countMeasuresEvalCriterion }}
+            </label>
+        </form>
+    }
+    @case ('reachTechnicalChallengeStateEvalCriterion') {
+        <app-reach-technical-challenge-state-criterion-form
+            (targetStateMachineIdsOut)="
+                this.criterionForm.targetStateMachineIds().value.set($event)
+            "
+            (targetStateMachineStateIdsOut)="
+                this.criterionForm
+                    .targetStateMachineStateIds()
+                    .value.set($event)
+            "
+            (technicalChallengeIdOut)="
+                this.criterionForm.technicalChallengeId().value.set($event)
+            "
+        />
+    }
+    @case ('patientAtStatusEvalCriterion') {
+        <app-patient-at-status-criterion-form
+            [criterionForm]="this.criterionForm"
+            (selectedPatientsOut)="
+                this.criterionForm.targetPatients().value.set($event)
+            "
+            (selectedPatientStatusMapOut)="
+                this.criterionForm.targetPatientsStatusMap().value.set($event)
+            "
+        />
+    }
+    @case ('viewScoutableEvalCriterion') {
+        <app-view-scoutable-criterion-form
+            (targetScoutableIdOut)="
+                this.criterionForm.targetScoutableId().value.set($event)
+            "
+        />
+    }
+    @case ('andEvalCriterion') {
+        <!-- TODO @JohannesPotzi @Jogius : combine this form with the orEvalCriterion form -->
+    }
+    @case ('orEvalCriterion') {
+        <!-- TODO @JohannesPotzi @Jogius : combine this form with the andEvalCriterion form -->
+    }
+    @case ('constNumEvalCriterion') {
+        <form class="ms-2">
+            <label>
+                Art:
+                {{ evalCriterionTypesNames.constNumEvalCriterion }}
+            </label>
+            <!-- TODO @JohannesPotzi @Jogius -->
+        </form>
+    }
+    @case ('countCompletedEvalCriterion') {
+        <form class="ms-2">
+            <label>
+                Art:
+                {{ evalCriterionTypesNames.countCompletedEvalCriterion }}
+            </label>
+            <!-- TODO @JohannesPotzi @Jogius -->
+        </form>
+    }
+    @case ('firstTrueAtEvalCriterion') {
+        <form class="ms-2">
+            <label>
+                Art:
+                {{ evalCriterionTypesNames.firstTrueAtEvalCriterion }}
+            </label>
+            <!-- TODO @JohannesPotzi @Jogius -->
+        </form>
+    }
+    @case ('compareEvalCriterion') {}
+    @case ('notEvalCriterion') {}
+    @case ('timestampEvalCriterion') {
+        <form class="ms-2">
+            <label>
+                Art:
+                {{ evalCriterionTypesNames.timestampEvalCriterion }}
+            </label>
+            <!-- TODO @JohannesPotzi @Jogius -->
+        </form>
+    }
+}

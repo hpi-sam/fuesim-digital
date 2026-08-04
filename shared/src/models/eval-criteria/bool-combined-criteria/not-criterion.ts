@@ -28,16 +28,13 @@ export type NotEvalCriterion = Immutable<
 
 export function newNotEvalCriterion(
     name: string,
-    child: UUID,
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    child: UUID
 ): NotEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
+
         criterionType: 'notEvalCriterion',
         child,
     };

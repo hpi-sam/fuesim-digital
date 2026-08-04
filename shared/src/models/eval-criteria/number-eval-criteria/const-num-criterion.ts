@@ -24,16 +24,12 @@ export type ConstNumEvalCriterion = Immutable<
 
 export function newConstNumEvalCriterion(
     name: string,
-    num: number,
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    num: number
 ): ConstNumEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
         criterionType: 'constNumEvalCriterion',
         num,
     };

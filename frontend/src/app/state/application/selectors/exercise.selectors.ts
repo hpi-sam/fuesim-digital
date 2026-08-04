@@ -540,39 +540,5 @@ function getEvalResultsSelectorBySubset(
     );
 }
 
-export const selectNonDraftEvalCriteria = createSelector(
-    selectEvalCriteria,
-    (criteria) =>
-        Object.values(criteria)
-            .filter((crit) => !crit.isDraft)
-            .reduce<{ [criterionId: UUID]: EvalCriterion }>(
-                (obj, criterion) => {
-                    obj[criterion.id] = criterion;
-                    return obj;
-                },
-                {}
-            )
-);
-
-export const selectDraftEvalCriteria = createSelector(
-    selectEvalCriteria,
-    (criteria) =>
-        Object.values(criteria)
-            .filter((crit) => crit.isDraft)
-            .reduce<{ [criterionId: UUID]: EvalCriterion }>(
-                (obj, criterion) => {
-                    obj[criterion.id] = criterion;
-                    return obj;
-                },
-                {}
-            )
-);
-
 export const selectEvalResults =
     getEvalResultsSelectorBySubset(selectEvalCriteria);
-export const selectNonDraftEvalResults = getEvalResultsSelectorBySubset(
-    selectNonDraftEvalCriteria
-);
-export const selectDraftEvalResults = getEvalResultsSelectorBySubset(
-    selectDraftEvalCriteria
-);

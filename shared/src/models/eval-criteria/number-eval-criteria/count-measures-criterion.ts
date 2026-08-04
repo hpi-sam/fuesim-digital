@@ -25,16 +25,12 @@ export type CountMeasuresEvalCriterion = Immutable<
 >;
 export function newcountMeasuresEvalCriterion(
     name: string,
-    targetMeasureTemplateId: UUID,
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    targetMeasureTemplateId: UUID
 ): CountMeasuresEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
         criterionType: 'countMeasuresEvalCriterion',
         targetMeasureTemplateId,
     };

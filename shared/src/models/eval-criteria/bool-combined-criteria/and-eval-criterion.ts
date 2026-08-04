@@ -30,16 +30,12 @@ export type AndEvalCriterion = Immutable<
 
 export function newAndEvalCriterion(
     name: string,
-    children?: UUID[],
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    children?: UUID[]
 ): AndEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
         criterionType: 'andEvalCriterion',
         children: children ?? [],
     };

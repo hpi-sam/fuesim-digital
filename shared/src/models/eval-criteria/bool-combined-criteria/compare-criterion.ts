@@ -43,16 +43,13 @@ export function newCompareEvalCriterion(
     leftChild: UUID,
     rightChild: UUID,
     operator: ComparativeOperator,
-    redThreshold: number,
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    redThreshold: number
 ): CompareEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
+
         criterionType: 'compareEvalCriterion',
         operator,
         leftChild,

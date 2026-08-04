@@ -101,15 +101,17 @@ export class ReachTechnicalChallengeStateEvalCriterionFormComponent {
     public selectTargetState(
         machineId: StateMachineId,
         stateId: StateMachineStateId
-    ) {
+    ): void {
         this.criterionForm.targetStateMachineIds().value.update((obj) => {
             if (!obj.includes(machineId)) {
                 obj = [...obj, machineId];
             }
+            //inner return
             return obj;
         });
         this.criterionForm.targetStateMachineStateIds().value.update((obj) => {
             obj[machineId] = stateId;
+            //inner return
             return obj;
         });
     }

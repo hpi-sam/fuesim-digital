@@ -31,16 +31,12 @@ export type CountCompletedEvalCriterion = Immutable<
 >;
 export function newCountCompletedEvalCriterion(
     name: string,
-    children: UUID[],
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    children: UUID[]
 ): CountCompletedEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
         criterionType: 'countCompletedEvalCriterion',
         children,
     };

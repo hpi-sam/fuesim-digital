@@ -15,7 +15,7 @@ import {
 } from 'fuesim-digital-shared';
 import {
     selectEvalCriteria,
-    selectNonDraftEvalResults,
+    selectEvalResults,
     selectTechnicalChallenges,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { AppState } from '../../../../../state/app.state';
@@ -48,7 +48,7 @@ export class DidacticOverviewComponent {
         this.getRootCriteriaMap(this.store.selectSignal(selectEvalCriteria)())
     );
     public readonly results = computed(() =>
-        Object.values(this.store.selectSignal(selectNonDraftEvalResults)()).map(
+        Object.values(this.store.selectSignal(selectEvalResults)()).map(
             (res) => {
                 if (isTemporalEvalCriterionType(res.criterion.criterionType)) {
                     const cacheHit = this.resultsCache()[res.criterionId];

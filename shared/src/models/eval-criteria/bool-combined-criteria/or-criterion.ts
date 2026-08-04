@@ -28,16 +28,12 @@ export type OrEvalCriterion = Immutable<z.infer<typeof orEvalCriterionSchema>>;
 
 export function newOrEvalCriterion(
     name: string,
-    children?: UUID[],
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    children?: UUID[]
 ): OrEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
         criterionType: 'orEvalCriterion',
         children: children ?? [],
     };

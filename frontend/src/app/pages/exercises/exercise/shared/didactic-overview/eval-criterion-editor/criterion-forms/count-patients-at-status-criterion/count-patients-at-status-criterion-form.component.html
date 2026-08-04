@@ -1,0 +1,16 @@
+<form class="ms-2">
+    <label>
+        Art:
+        {{ evalCriterionTypesNames.countPatientsAtStatusEvalCriterion }}
+    </label>
+    <label class="mt-1">
+        Sichtungskategorie:
+        <select [formField]="criterionForm.targetStatus">
+            @for (status of patientStatusAllowedValues; track status) {
+                <option value="{{ status }}">
+                    {{ statusNames[status] }}
+                </option>
+            }
+        </select></label
+    >
+</form>

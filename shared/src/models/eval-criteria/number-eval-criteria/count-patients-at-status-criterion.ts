@@ -26,9 +26,7 @@ export type CountPatientsAtStatusEvalCriterion = Immutable<
 >;
 export function newCountPatientsAtStatusEvalCriterion(
     name: string,
-    targetStatus: PatientStatus,
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    targetStatus: PatientStatus
 ): CountPatientsAtStatusEvalCriterion {
     return {
         id: uuid(),
@@ -36,8 +34,6 @@ export function newCountPatientsAtStatusEvalCriterion(
         type: 'evalCriterion',
         criterionType: 'countPatientsAtStatusEvalCriterion',
         targetStatus,
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
     };
 }
 /** TODO @JohannesPotzi

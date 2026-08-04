@@ -3,52 +3,9 @@
         <button class="btn btn-primary" (click)="this.creatingcriterion = true">
             Auswertungskriterium Erstellen
         </button>
-        <!-- <div ngbDropdown class="d-inline-block">
-            <button
-                type="button"
-                ngbDropdownToggle
-                class="btn btn-outline-primary ms-3"
-                data-cy="didacticOverviewAddEvalCriterionButton"
-            >
-                <i class="bi bi-plus"></i> Auswertungskriterium Hinzufügen
-            </button>
-            <div ngbDropdownMenu class="position-absolute">
-                <button
-                    ngbDropdownItem
-                    (click)="
-                        creatingcriterion = true;
-                        this.setCriterionCreationCategory('boolEvalCriterion')
-                    "
-                >
-                    Erfüllbares Kriterium
-                </button>
-                <button
-                    ngbDropdownItem
-                    (click)="
-                        creatingcriterion = true;
-                        this.setCriterionCreationCategory('numberEvalCriterion')
-                    "
-                >
-                    Zahl Kriterium
-                </button>
-                <button
-                    ngbDropdownItem
-                    (click)="
-                        creatingcriterion = true;
-                        this.setCriterionCreationCategory(
-                            'combinedEvalCriterion'
-                        )
-                    "
-                >
-                    Kombiniertes Kriterium
-                </button>
-            </div>
-        </div> -->
     </div>
     @if (creatingcriterion) {
-        <app-eval-criterion-creation-card
-            [selectedSubResultsIn]="this.selectedSubResults()"
-        />
+        <app-eval-criterion-editor />
     }
 }
 <div
@@ -75,9 +32,6 @@
         <!-- TODO @JohannesPotzi @Jogius : integrate the creation form into the list. -->
         <app-didactic-overview-results-table
             [rootResults]="this.rootResults()"
-            (selectedResultsOut)="
-                this.selectedSubResults.set($event); logSubResults($event)
-            "
         />
     }
 </div>

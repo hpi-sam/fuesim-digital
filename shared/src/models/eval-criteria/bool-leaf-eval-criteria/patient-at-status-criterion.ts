@@ -27,16 +27,12 @@ export type PatientAtStatusEvalCriterion = Immutable<
 export function newPatientAtStatusEvalCriterion(
     name: string,
     targetPatientId: UUID,
-    targetStatus: PatientStatus,
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    targetStatus: PatientStatus
 ): PatientAtStatusEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
         criterionType: 'patientAtStatusEvalCriterion',
         targetPatientId,
         targetStatus,

@@ -1,19 +1,6 @@
+import { Component, computed, inject, signal } from '@angular/core';
+import { form } from '@angular/forms/signals';
 import {
-    Component,
-    computed,
-    effect,
-    inject,
-    input,
-    output,
-    signal,
-} from '@angular/core';
-import { form, FormField } from '@angular/forms/signals';
-import {
-    type EvalResult,
-    getEvalResultFromCriterion,
-    type Patient,
-    type PatientStatus,
-    patientStatusAllowedValues,
     statusNames,
     combinedEvalCriterionTypes,
     type EvalCriterionCategory,
@@ -31,7 +18,7 @@ import {
     boolEvalCriterionLeafTypes,
     newCountCompletedEvalCriterion,
     newOrEvalCriterion,
-    newEvalResultContext,
+    newCountPatientsAtStatusEvalCriterion,
 } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -43,150 +30,46 @@ import {
     NgbDropdownToggle,
 } from '@ng-bootstrap/ng-bootstrap';
 import { ExerciseService } from '../../../../../../core/exercise.service';
-import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { AppState } from '../../../../../../state/app.state';
-import {
-    selectCurrentTime,
-    selectDraftEvalResults,
-    selectEvalCriteria,
-    selectMeasures,
-    selectMeasureTemplateCategories,
-    selectMeasureTemplates,
-    selectPatients,
-    selectScoutables,
-    selectTechnicalChallenges,
-} from '../../../../../../state/application/selectors/exercise.selectors';
-import { PatientAtStatusCriterionComponent } from './criterion-forms/patient-at-status-criterion/patient-at-status-criterion.component';
+import { selectEvalCriteria } from '../../../../../../state/application/selectors/exercise.selectors';
 import { type InputData } from './input-data';
-import { ReachTechnicalChallengeStateEvalCriterionFormComponent } from './criterion-forms/reach-technical-challenge-state-criterion/reach-technical-challenge-state-criterion-form.component';
-import { ViewScoutableEvalCriterionFormComponent } from './criterion-forms/view-scoutable-criterion/view-scoutable-criterion-form.component';
-import { DidacticOverViewResultsTableComponent } from '../result-table/didactic-overview-results-table.component';
-import { Subscription } from 'rxjs';
+import { EvalCriterionFormsComponent } from './criterion-forms/criterion-forms.component';
 @Component({
-    selector: 'app-eval-criterion-creation-card',
+    selector: 'app-eval-criterion-editor',
     templateUrl: './eval-criterion-editor.component.html',
     styleUrls: ['./eval-criterion-editor.component.scss'],
     imports: [
-        FormField,
         FormsModule,
-        AppSaveOnTypingDirective,
         NgbDropdown,
         NgbDropdownToggle,
         NgbDropdownMenu,
         NgbDropdownButtonItem,
         NgbDropdownItem,
-        PatientAtStatusCriterionComponent,
-        ReachTechnicalChallengeStateEvalCriterionFormComponent,
-        ViewScoutableEvalCriterionFormComponent,
-        DidacticOverViewResultsTableComponent,
+        EvalCriterionFormsComponent,
     ],
 })
 /* TODO @JohannesPotzi : Make this indepentent of the didactic overview component. */
 export class EvalCriterionCreationCardComponent {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
-    private readonly tickSubscribtion: Subscription | null = null;
+    //for the dropdowns to select the critrerion creation type
     public readonly evalCriterionCategoryNames = evalCriterionCategoryNames;
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
-    public readonly patientStatusAllowedValues = patientStatusAllowedValues;
-    public readonly statusNames = statusNames;
     public readonly boolEvalCriterionLeafTypes = boolEvalCriterionLeafTypes;
     public readonly numberEvalCriterionTypes = numberEvalCriterionTypes;
     public readonly combinedEvalCriterionTypes = combinedEvalCriterionTypes;
 
-    public readonly selectedSubResultsIn = input.required<EvalResult[]>();
-
-    public readonly draftEvalResults = computed(() =>
-        Object.values(this.store.selectSignal(selectDraftEvalResults)())
-    );
-
-    constructor() {
-        /* TODO @JohannesPotzi : instead do this: add a draft marker to eval criteria in the state.
-        Also add an input option to the results table to only show draft results. Default is no drafts are shown.
-        Also create criatia as draft when added to the shopping cart.
-            Also edit as non draft on submit.
-            Also delete draft criteria Action when criteria creation mode is ended in the overview.  */
-        const sub = this.exerciseService.mostRecentAtion.subscribe((action) => {
-            if (action.type === '[Exercise] Tick') {
-                const shoppingCart = Object.values(this.criteriaShoppingCart());
-                const cache: { [key: string]: EvalResult } = {};
-                console.log('Hello! ' + shoppingCart);
-                this.shoppingCartResults.set(
-                    shoppingCart.map((crit) =>
-                        this.shortCriterionToResult(crit, cache)
-                    )
-                );
-            }
-        });
-        this.tickSubscribtion?.add(sub);
-        effect(() => {
-            this.criterionForm
-                .subCriteria()
-                .value.set([
-                    ...this.selectedSubResultsIn().map((res) => res.criterion),
-                    ...this.selectedTempSubResults().map(
-                        (res) => res.criterion
-                    ),
-                ]);
-            this.areResultsTablesInSelectionModeOut.emit(
-                this.areResultsTablesInSelectionMode()
-            );
-        });
-    }
-
-    public readonly areResultsTablesInSelectionMode = computed(() => {
-        return this.criterionCreationCategory() === 'combinedEvalCriterion';
-    });
-    public readonly areResultsTablesInSelectionModeOut = output<boolean>();
     public readonly criterionCreationCategory =
         signal<EvalCriterionCategory | null>(null);
 
     public readonly criterionCreationType = signal<EvalCriterionType | null>(
         null
     );
-    public readonly criterionCreationTypeName = computed(() => {
-        const selectedType = this.criterionCreationType();
-        return selectedType ? this.evalCriterionTypesNames[selectedType] : '';
-    });
 
     /* TODO @JohannesPotzi : prune this for sub criteria selection to prevent circular input. */
     public readonly evalCriteria = computed(() =>
         Object.values(this.store.selectSignal(selectEvalCriteria)())
     );
-    private readonly criteriaShoppingCart = signal<{
-        [key: UUID]: EvalCriterion;
-    }>({});
-
-    public readonly shoppingCartResults = signal<EvalResult[]>([]);
-    /* public readonly shoppingCartResults = computed(() => {
-        const shoppingCart = Object.values(this.criteriaShoppingCart());
-        const criteria = this.store.selectSignal(selectEvalCriteria)();
-        const tcs = this.store.selectSignal(selectTechnicalChallenges)();
-        const patients = this.store.selectSignal(selectPatients)();
-        const scoutables = this.store.selectSignal(selectScoutables)();
-        const currentTime = this.store.selectSignal(selectCurrentTime)();
-        const cache: { [key: string]: EvalResult } = {};
-        console.log(shoppingCart);
-        return shoppingCart.map((crit) =>
-            getEvalResultFromCriterion(
-                crit,
-                criteria,
-                tcs,
-                patients,
-                scoutables,
-                currentTime,
-                cache
-            )
-        );
-    }); */
-    public readonly createFurtherCriteraOption = signal<boolean>(false);
-    public toggleCreateFurtherCriteraOption() {
-        this.createFurtherCriteraOption.set(!this.createFurtherCriteraOption());
-    }
-
-    readonly selectedPatientStatusMap = signal<{
-        [id: UUID]: PatientStatus;
-    }>({});
 
     public countInput: number | null = null;
     public nameInput: string | null = null;
@@ -195,65 +78,16 @@ export class EvalCriterionCreationCardComponent {
         countInput: 0,
         timestampInput: 0,
         patientStatusInput: 'black',
-        patientTargetStatusMap: {},
         technicalChallengeId: '',
         targetStateMachineIds: [],
         targetStateMachineStateIds: {},
         targetPatients: [],
+        targetPatientsStatusMap: {},
         targetScoutableId: '',
         subCriteria: [],
         singleSubCriterion: '',
     });
     criterionForm = form(this.inputModel);
-    public addPatients(patients: Patient[]) {
-        const tmpPatients = patients.filter(
-            (pat) => !this.criterionForm.targetPatients().value().includes(pat)
-        );
-        this.criterionForm
-            .targetPatients()
-            .value.update((vals) => [...vals, ...tmpPatients]);
-    }
-    public updateSelectedPatientStatusMapEntry(
-        id: UUID,
-        status: PatientStatus | null
-    ) {
-        if (
-            !this.criterionForm
-                .targetPatients()
-                .value()
-                .some((pat) => pat.id === id)
-        ) {
-            console.log(
-                'trying to assign a PatientStatus to a Patient not in selection.'
-            );
-            return;
-        }
-        if (this.selectedPatientStatusMap()[id] === status) {
-            return;
-        }
-        this.selectedPatientStatusMap.update((val) => {
-            if (!status) {
-                delete val[id];
-            } else {
-                val[id] = status;
-            }
-            return val;
-        });
-    }
-    public updateSelectedPatientStatusMap(mapIn: {
-        [id: UUID]: PatientStatus;
-    }) {
-        const patients = this.criterionForm.targetPatients().value();
-        const patientCount = patients.length;
-        for (let i = 0; i < patientCount; i += 1) {
-            const id = patients[i]!.id;
-            const status = mapIn[id];
-            if (status) {
-                this.updateSelectedPatientStatusMapEntry(id, status);
-            }
-        }
-    }
-    public readonly selectedTempSubResults = signal<EvalResult[]>([]);
 
     private async createCriteria(criteria: EvalCriterion[]) {
         if (criteria.length < 1) {
@@ -265,30 +99,13 @@ export class EvalCriterionCreationCardComponent {
             criteria: criteria,
         });
     }
-    public addCriteriaToCart(criteria: EvalCriterion[]) {
-        this.criteriaShoppingCart.update((cart) => {
-            criteria.forEach((crit) => {
-                cart[crit.id] = crit;
-            });
-            return cart;
-        });
-    }
-    public checkoutShoppingCart() {
-        this.createCriteria(Object.values(this.criteriaShoppingCart()));
-        this.criteriaShoppingCart.set({});
-    }
-    public submit() {
-        this.submitCriterion();
-        this.checkoutShoppingCart();
-    }
-    public submitCriterion(isVisisbleForParticipants?: boolean) {
-        const asDraft = this.createFurtherCriteraOption();
-        const criterionType = this.criterionCreationType();
-        const criterionCategory = this.criterionCreationCategory();
-        if (criterionCategory === 'combinedEvalCriterion') {
-            /* TODO @JohannesPotzi @Jogius : implements for all combined criteria types*/
-        }
-        switch (criterionType) {
+    public submitCriterion() {
+        const name =
+            this.criterionForm.name().value() !== ''
+                ? this.criterionForm.name().value()
+                : null;
+        let criteria: EvalCriterion[] = [];
+        switch (this.criterionCreationType()) {
             case 'reachTechnicalChallengeStateEvalCriterion': {
                 const machineIds = this.criterionForm
                     .targetStateMachineIds()
@@ -307,22 +124,22 @@ export class EvalCriterionCreationCardComponent {
                               this.criterionForm.name().value(),
                               technicalChallengeId,
                               machineIds,
-                              stateIds,
-                              isVisisbleForParticipants,
-                              asDraft
+                              stateIds
                           )
                         : null;
-                    if (criterion) this.addCriteriaToCart([criterion]);
+                    if (criterion) criteria = [criterion];
                 }
                 break;
             }
             case 'patientAtStatusEvalCriterion': {
-                const criteria = this.criterionForm
+                criteria = this.criterionForm
                     .targetPatients()
                     .value()
                     .map((pat) => {
                         const status =
-                            this.selectedPatientStatusMap()[pat.id] ?? 'black';
+                            this.criterionForm
+                                .targetPatientsStatusMap()
+                                .value()[pat.id] ?? 'black';
                         const name = this.criterionForm.name().value();
                         return newPatientAtStatusEvalCriterion(
                             name === ''
@@ -331,12 +148,9 @@ export class EvalCriterionCreationCardComponent {
                                   }`
                                 : name,
                             pat.id,
-                            status,
-                            isVisisbleForParticipants,
-                            asDraft
+                            status
                         );
                     });
-                this.addCriteriaToCart(criteria);
                 break;
             }
             case 'viewScoutableEvalCriterion': {
@@ -344,23 +158,22 @@ export class EvalCriterionCreationCardComponent {
                 const targetScoutableId = this.criterionForm
                     .targetScoutableId()
                     .value();
-                let name = this.criterionForm.name().value();
-                if (name === '') {
-                    name = 'Erkunde';
-                }
+
                 const criterion = targetScoutableId
                     ? newViewScoutableEvalCriterion(
-                          name,
-                          targetScoutableId,
-                          isVisisbleForParticipants,
-                          asDraft
+                          name ?? 'Erkunde',
+                          targetScoutableId
                       )
                     : null;
-                if (criterion) this.addCriteriaToCart([criterion]);
+                if (criterion) criteria = [criterion];
                 break;
             }
             case 'countPatientsAtStatusEvalCriterion': {
-                /* TODO @JohannesPotzi @Jogius */
+                const criterion = newCountPatientsAtStatusEvalCriterion(
+                    name ?? '',
+                    this.criterionForm.patientStatusInput().value()
+                );
+                criteria = [criterion];
                 break;
             }
             case 'countMeasuresEvalCriterion': {
@@ -394,11 +207,9 @@ export class EvalCriterionCreationCardComponent {
                         .subCriteria()
                         .value()
                         .filter((crit) => isBoolEvalCriterion(crit))
-                        .map((crit) => crit.id as UUID),
-                    isVisisbleForParticipants,
-                    asDraft
+                        .map((crit) => crit.id as UUID)
                 );
-                this.addCriteriaToCart([criterion]);
+                if (criterion) criteria = [criterion];
                 break;
             }
             case 'countCompletedEvalCriterion': {
@@ -408,11 +219,9 @@ export class EvalCriterionCreationCardComponent {
                         .subCriteria()
                         .value()
                         .filter((crit) => isBoolEvalCriterion(crit))
-                        .map((crit) => crit.id as UUID),
-                    isVisisbleForParticipants,
-                    asDraft
+                        .map((crit) => crit.id as UUID)
                 );
-                this.addCriteriaToCart([criterion]);
+                if (criterion) criteria = [criterion];
                 break;
             }
             case 'orEvalCriterion': {
@@ -422,42 +231,14 @@ export class EvalCriterionCreationCardComponent {
                         .subCriteria()
                         .value()
                         .filter((crit) => isBoolEvalCriterion(crit))
-                        .map((crit) => crit.id as UUID),
-                    isVisisbleForParticipants,
-                    asDraft
+                        .map((crit) => crit.id as UUID)
                 );
-                this.addCriteriaToCart([criterion]);
+                if (criterion) criteria = [criterion];
                 break;
             }
             default:
                 break;
         }
-    }
-
-    public shortCriterionToResult(
-        criterion: EvalCriterion,
-        cache?: { [key: string]: EvalResult }
-    ): EvalResult {
-        const criteria = this.store.selectSignal(selectEvalCriteria)();
-        const tcs = this.store.selectSignal(selectTechnicalChallenges)();
-        const patients = this.store.selectSignal(selectPatients)();
-        const scoutables = this.store.selectSignal(selectScoutables)();
-        const currentTime = this.store.selectSignal(selectCurrentTime)();
-        const measures = this.store.selectSignal(selectMeasures)();
-        const measureTemplates = this.store.selectSignal(
-            selectMeasureTemplateCategories
-        )();
-
-        const context = newEvalResultContext(
-            criteria,
-            tcs,
-            patients,
-            scoutables,
-            measures,
-            measureTemplates,
-            currentTime
-        );
-
-        return getEvalResultFromCriterion(criterion, context, cache ?? {});
+        this.createCriteria(criteria);
     }
 }

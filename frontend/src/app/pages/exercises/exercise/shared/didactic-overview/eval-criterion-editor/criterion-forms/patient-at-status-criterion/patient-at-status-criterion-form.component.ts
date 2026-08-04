@@ -38,9 +38,9 @@ import { InputData } from '../../input-data';
 import { DidacticOverviewPatientInteractionBarComponent } from './interaction-bar/didactic-overview-patient-interaction-bar.component';
 
 @Component({
-    selector: 'app-patient-at-status-criterion',
-    templateUrl: './patient-at-status-criterion.component.html',
-    styleUrls: ['./patient-at-status-criterion.component.scss'],
+    selector: 'app-patient-at-status-criterion-form',
+    templateUrl: './patient-at-status-criterion-form.component.html',
+    styleUrls: ['./patient-at-status-criterion-form.component.scss'],
     imports: [
         SimulatedRegionPreviewCardComponent,
         PatientHeaderComponent,
@@ -54,7 +54,7 @@ import { DidacticOverviewPatientInteractionBarComponent } from './interaction-ba
         NgbDropdownItem,
     ],
 })
-export class PatientAtStatusCriterionComponent {
+export class PatientAtStatusCriterionFormComponent {
     private readonly store = inject<Store<AppState>>(Store);
 
     public readonly criterionForm = input.required<FieldTree<InputData>>();

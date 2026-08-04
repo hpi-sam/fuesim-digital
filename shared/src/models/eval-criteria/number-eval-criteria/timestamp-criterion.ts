@@ -23,16 +23,12 @@ export type TimestampEvalCriterion = Immutable<
 >;
 export function newTimestampEvalCriterion(
     name: string,
-    timestamp: number,
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    timestamp: number
 ): TimestampEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
         criterionType: 'timestampEvalCriterion',
         timestamp,
     };

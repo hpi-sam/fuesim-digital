@@ -24,16 +24,12 @@ export type ViewScoutableEvalCriterion = Immutable<
 >;
 export function newViewScoutableEvalCriterion(
     name: string,
-    targetScoutableId: UUID,
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    targetScoutableId: UUID
 ): ViewScoutableEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
         criterionType: 'viewScoutableEvalCriterion',
         targetScoutableId,
     };

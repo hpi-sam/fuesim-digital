@@ -31,16 +31,12 @@ export type FirstTrueAtEvalCriterion = Immutable<
 >;
 export function newFirstTrueAtEvalCriterion(
     name: string,
-    child: UUID,
-    isVisibleForParticipants?: boolean,
-    isDraft?: boolean
+    child: UUID
 ): FirstTrueAtEvalCriterion {
     return {
         id: uuid(),
         name,
         type: 'evalCriterion',
-        isVisibleForParticipants: isVisibleForParticipants ?? false,
-        isDraft: isDraft ?? false,
         criterionType: 'firstTrueAtEvalCriterion',
         child,
     };

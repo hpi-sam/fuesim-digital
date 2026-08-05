@@ -111,7 +111,7 @@ jobs:
               with:
                   install-command: (cd shared && npm ci --no-audit) && (cd frontend && npm ci --no-audit)
             - name: Build frontend
-              run: cd frontend && npm run build
+              run: cd frontend && npm run build:deployment
 
     build-backend:
         timeout-minutes: 5

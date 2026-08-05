@@ -12,9 +12,7 @@
                                 [ngbPopover]="selectAlarmGroupTemplate"
                                 #selectAlarmGroupPopover="ngbPopover"
                                 placement="bottom"
-                                [disabled]="
-                                    (alarmGroupOptions?.length ?? 0) === 0
-                                "
+                                [disabled]="alarmGroupOptions.length === 0"
                                 [appAutofocus]="true"
                                 tabindex="1"
                                 class="btn btn-outline-primary flex-grow-1 flex-shrink-1 ms-2 d-flex flex-row"
@@ -41,7 +39,7 @@
                                 ></i>
                             </button>
                             <ng-template #selectAlarmGroupTemplate>
-                                @if ((alarmGroupOptions?.length ?? 0) !== 0) {
+                                @if (alarmGroupOptions.length !== 0) {
                                     <app-searchable-dropdown
                                         [options]="alarmGroupOptions!"
                                         (selected)="
@@ -59,7 +57,7 @@
                             [ngbPopover]="selectTargetTemplate"
                             #selectTargetPopover="ngbPopover"
                             placement="bottom"
-                            [disabled]="(transferPoints?.length ?? 0) === 0"
+                            [disabled]="transferPoints.length === 0"
                             tabindex="2"
                             class="btn btn-outline-primary flex-grow-1 flex-shrink-1 ms-2 d-flex flex-row"
                             style="width: 1px"
@@ -85,7 +83,7 @@
                             ></i>
                         </button>
                         <ng-template #selectTargetTemplate>
-                            @if ((transferPoints?.length ?? 0) !== 0) {
+                            @if (transferPoints.length !== 0) {
                                 <app-searchable-dropdown
                                     [options]="transferPoints!"
                                     (selected)="
@@ -142,7 +140,7 @@
                                     #selectFirstVehiclesTargetPopover="ngbPopover"
                                     placement="bottom"
                                     [disabled]="
-                                        (transferPoints?.length ?? 0) === 0 ||
+                                        transferPoints.length === 0 ||
                                         firstVehiclesCount < 1
                                     "
                                     tabindex="4"
@@ -174,7 +172,7 @@
                                     ></i>
                                 </button>
                                 <ng-template #selectFirstVehiclesTargetTemplate>
-                                    @if ((transferPoints?.length ?? 0) !== 0) {
+                                    @if (transferPoints.length !== 0) {
                                         <app-searchable-dropdown
                                             [options]="transferPoints!"
                                             (selected)="

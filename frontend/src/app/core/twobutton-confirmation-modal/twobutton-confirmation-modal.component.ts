@@ -3,21 +3,13 @@ import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { AutofocusDirective } from '../../shared/directives/autofocus.directive';
-import { ExactMatchValidatorDirective } from '../../shared/validation/exact-match-validator.directive';
-import { DisplayValidationComponent } from '../../shared/validation/display-validation/display-validation.component';
 
 @Component({
     selector: 'app-twobutton-confirmation-modal',
     templateUrl: './twobutton-confirmation-modal.component.html',
     styleUrls: ['./twobutton-confirmation-modal.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [
-        FormsModule,
-        AutofocusDirective,
-        ExactMatchValidatorDirective,
-        DisplayValidationComponent,
-    ],
+    imports: [FormsModule],
 })
 export class TwoButtonConfirmationModalComponent implements OnDestroy {
     readonly activeModal = inject(NgbActiveModal);

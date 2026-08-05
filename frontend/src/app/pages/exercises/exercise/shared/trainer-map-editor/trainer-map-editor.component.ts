@@ -37,12 +37,7 @@ import type {
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, KeyValuePipe, NgTemplateOutlet } from '@angular/common';
-import {
-    CdkDrag,
-    CdkDragPlaceholder,
-    CdkDropList,
-    CdkDropListGroup,
-} from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import {
     DragElementService,
     TransferTemplate,
@@ -66,7 +61,6 @@ import {
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
-import { FileInputDirective } from '../../../../../shared/directives/file-input.directive';
 import { PatientStatusBadgeComponent } from '../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
@@ -96,7 +90,6 @@ type FilterCategory =
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ExerciseMapComponent,
-        FileInputDirective,
         NgbAccordionDirective,
         NgbAccordionItem,
         NgbAccordionHeader,
@@ -117,7 +110,6 @@ type FilterCategory =
         CdkDropList,
         CdkDropListGroup,
         NgTemplateOutlet,
-        CdkDragPlaceholder,
         AlarmGroupOverviewPageComponent,
         HospitalEditorPageComponent,
     ],

@@ -27,7 +27,6 @@ import { ElementCardComponent } from '../cards/element-card/element-card.compone
 import { CreatingVersionedElementModalData } from '../modals/editor-modals/base-versioned-element-submodal';
 import { CollectionService } from '../../../../core/exercise-element.service';
 import { GenericElementCardIndicator } from '../cards/generic-element-card/generic-element-card.component';
-import { FileInputDirective } from '../../../../shared/directives/file-input.directive';
 import { openVersionedElementModal } from '../modals/editor-modals/versioned-element-modal/open-versioned-element-model';
 import { ConfirmationModalService } from '../../../../core/confirmation-modal/confirmation-modal.service';
 
@@ -36,11 +35,7 @@ import { ConfirmationModalService } from '../../../../core/confirmation-modal/co
     templateUrl: './collection-elements-list.component.html',
     styleUrl: './collection-elements-list.component.scss',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [
-        ElementCardComponent,
-        VersionedElementDisplayNamePipe,
-        FileInputDirective,
-    ],
+    imports: [ElementCardComponent, VersionedElementDisplayNamePipe],
 })
 export class CollectionElementsListComponent {
     private readonly confirmationService = inject(ConfirmationModalService);

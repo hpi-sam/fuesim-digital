@@ -13,7 +13,7 @@
         "ng": "ng",
         "start": "ng serve --host 127.0.0.1",
         "build": "ng build",
-        "build:deployment": "ng build --configuration deployment",
+        "build:deployment": "ng build  --ts-config tsconfig.ci.json --configuration deployment",
         "watch": "ng build --watch --configuration development",
         "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,css,sccs,html,angular}\"",
         "lint:fix": "eslint --fix \"./**/*.{ts,js,yml,css,sccs,html,angular}\"",

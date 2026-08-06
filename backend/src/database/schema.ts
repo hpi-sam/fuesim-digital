@@ -323,6 +323,7 @@ export const collectionTable = pgTable(
         title: varchar().notNull(),
         description: varchar().notNull(),
         visibility: collectionVisibilityEnum().notNull().default('private'),
+        defaultForNewExercises: boolean().notNull().default(false),
         draftState: boolean().notNull(),
         archived: boolean().notNull().default(false),
         // fyi: we cant use computed/generated columns for

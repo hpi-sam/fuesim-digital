@@ -92,6 +92,13 @@
             "when": 1784832456580,
             "tag": "0012_marketplace",
             "breakpoints": true
+        },
+        {
+            "idx": 13,
+            "version": "7",
+            "when": 1785763914284,
+            "tag": "0013_marketplace_defaultcollection",
+            "breakpoints": true
         }
     ]
 }

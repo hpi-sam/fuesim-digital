@@ -169,7 +169,7 @@ export const firefightingDefaultMaterialTemplatesById = Object.fromEntries(
 const hlfVehicleTemplate: VehicleTemplate = {
     id: '213fb6dc-4746-413f-8bac-3383a2b771a4',
     type: 'vehicleTemplate',
-    vehicleType: 'feuerwehrHLF',
+    vehicleType: 'HLF',
     name: `HLF #`,
     image: {
         url: '/assets/hlf-vehicle.png',

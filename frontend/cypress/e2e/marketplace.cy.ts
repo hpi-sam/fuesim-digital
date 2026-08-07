@@ -141,7 +141,9 @@ describe('A trainer in the marketplace', () => {
         cy.get(
             '[data-cy="availableCollectionItem"][data-visibility="embedded"]'
         )
-            .find('[data-cy="selectCollectionButton"]')
+            .find(
+                '[data-cy="selectCollectionButton"][data-collection="FüSim Digital 2025 Übungselemente"]'
+            )
             .should('exist')
             .click();
 

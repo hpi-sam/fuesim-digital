@@ -110,6 +110,7 @@ const fuesimDigital20250629DefaultCollectionData: DefaultCollection = {
 };
 
 const fuesimDigitalFirefighting2026DefaultCollectionData: DefaultCollection = {
+    defaultForNewExercises: false,
     entityId: collectionEntityIdSchema.parse(
         'collection_entity_616b6f84-1799-477c-8ca7-a54fe82e735b'
     ),

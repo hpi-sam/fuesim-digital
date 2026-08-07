@@ -29,7 +29,6 @@ import {
 import { CollectionUpgradeImpactModalComponent } from '../shared/modals/marketplace-collection-update-impact-modal/marketplace-collection-update-impact-modal.component';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { CollectionDataResolverResult } from '../collection-data.resolver';
-import { openSelectCollectionModal } from '../shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { openCreateCollectionModal } from '../shared/modals/create-collection-modal/open-create-collection-modal';
 import { MessageService } from '../../../core/messages/message.service';
 import { UsedCollectionsTabComponent } from './used-collections-tab/used-collections-tab.component';
@@ -131,15 +130,6 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
                     };
                 }
             });
-    }
-
-    public async useCollection() {
-        openSelectCollectionModal(this.ngbModalService, {
-            allowCreate: true,
-            restrictToEditable: true,
-            selectionInfoText:
-                'Wollen Sie die Sammlung in der ausgewählten Sammlung verwenden?',
-        });
     }
 
     public async duplicateCollection() {

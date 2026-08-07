@@ -66,13 +66,19 @@ export class MarketplaceSelectCollectionModalComponent {
 
             const userAvailableCollections =
                 this.userAvailableCollections.value();
-            if (this.skipOnNoChoice && userAvailableCollections.length === 1) {
-                const firstCollection = userAvailableCollections[0];
-                if (firstCollection === undefined) {
-                    console.warn('only collection is undefined');
+            const userCreatedCollections = userAvailableCollections.filter(
+                (collection) => collection.visibility !== 'embedded'
+            );
+
+            if (this.skipOnNoChoice && userCreatedCollections.length === 0) {
+                const defaultCollection = userAvailableCollections.find(
+                    (collection) => collection.defaultForNewExercises
+                );
+                if (defaultCollection === undefined) {
+                    console.warn('default collection is undefined');
                     return;
                 }
-                this.close(firstCollection);
+                this.close(defaultCollection);
             }
         });
     }

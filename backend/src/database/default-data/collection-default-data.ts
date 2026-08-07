@@ -35,6 +35,7 @@ function newElementEntityId(uuid: string) {
 // IF YOU WANT TO CHANGE THESE ELEMENTS,
 // PLEASE CREATE A NEW SET OF DEFAULT ELEMENTS (e.g.  FüSim Digital {YEAR} Übungselemente)
 const fuesimDigital20250629DefaultCollectionData: DefaultCollection = {
+    defaultForNewExercises: true,
     entityId: collectionEntityIdSchema.parse(
         'collection_entity_76dcdff5-9dd5-4430-b7a7-f680479977ae'
     ),

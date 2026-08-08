@@ -2,8 +2,6 @@
 
 ## Führung zuweisen
 
-### Auf einen Blick
-
 Durch diese Verhaltensweise wird eine Person aus dem im Bereich verfügbaren Personal ausgewählt, die die lokale Führung übernimmt. Dieses Personal ist mit der Führungsrolle gebunden und kann keine anderen Aufgaben wie die Behandlung von Patienten wahrnehmen.
 
 Die Führungskraft wird als das am höchsten qualifizierte Personal nach der folgenden Rangfolge (1 = höchste Qualifikation) gewählt:
@@ -31,8 +29,6 @@ Damit eine Führungskraft zugewiesen werden kann, muss sich Personal im simulier
 
 ## Fahrzeuge entladen
 
-### Auf einen Blick
-
 Lässt Personal aus allen Fahrzeugen aussteigen, die diesen Bereich erreichen.
 
 Personal, das sich in Fahrzeugen befindet, kann keine Aufgaben übernehmen. Umgekehrt können unbesetzte Fahrzeuge nicht sofort losfahren. Daher ist diese Verhaltensweise zum Beispiel für Patientenablagen essentiell, für Bereitstellungsräume allerdings störend.
@@ -58,8 +54,6 @@ Zeigt eine Tabelle aller Fahrzeuge an, aus denen gerade ausgestiegen wird, sowie
 > Im [Reiter Fahrzuge](1_general.md#fahrzeuge) kann das Ausladen abgebrochen werden.
 
 ## Berichte erstellen
-
-### Auf einen Blick
 
 Dient dem Austausch von Informationen (zum Beispiel die Anzahl verfügbarer Fahrzeuge) des simulierten Bereichs mit den Übungsteilnehmenden per Funk. Eine vollständige Liste der Informationen ist in den Details aufgeführt.
 
@@ -120,8 +114,6 @@ Zudem können automatisch Funksprüche bei folgenden Ereignissen erzeugt werden 
 
 ## Patienten behandeln
 
-### Auf einen Blick
-
 Verwaltet die Behandlung aller Patienten im jeweiligen simulierten Bereich. Alle Patienten werden vorgesichtet und anschließend Personal zur Behandlung zugeteilt. Reicht das vor Ort verfügbare Personal nicht aus, wird zusätzliches Personal angefordert.
 
 ### Informationen und Einstellungen
@@ -181,8 +173,6 @@ Werden dem simulierten Bereich neue Patienten hinzugefügt, fällt der Fortschri
 
 ## Personal nachfordern
 
-### Auf einen Blick
-
 Diese Verhaltensweise "übersetzt" fehlendes Personal in Fahrzeuganfragen, die dann von der Simulation weiterverarbeitet werden können. Personalbedarf kann von anderen Verhaltensweisen des gleichen simulierten Bereichs angemeldet werden und wird dann von dieser Verhaltensweise weiter verarbeitet.
 
 So benötigt beispielsweise die Verhaltensweise [Patienten behandeln](#patienten-behandeln) Personal, während der Bereitstellungsraum nur Fahrzeuge zur Verfügung stellen kann. [Personal nachfordern](#personal-nachfordern) ermittelt, wie viele Fahrzeuge welchen Typs benötigt werden, um das gewünschte Personal zu erhalten.
@@ -212,8 +202,6 @@ Da Anfragen nur von Personal zu Fahrzeugen übersetzt werden, ist zusätzlich di
 
 ## Fahrzeuge anfordern
 
-### Auf einen Blick
-
 Sammelt Fahrzeuganfragen von allen Verhaltensweisen im simulierten Bereich an und gibt diese gesammelt weiter, um die gewünschten Fahrzeuge zu erhalten.
 
 ### Informationen und Einstellungen
@@ -237,8 +225,6 @@ _Dauer, nachdem eine nicht eingelöste Zusage von Fahrzeugen invalidiert werden 
 Diese Verhaltensweise benötigt keine anderen Verhaltensweisen.
 
 ## Fahrzeuge versenden
-
-### Auf einen Blick
 
 Lässt Fahrzeuge zu anderen Orten (verbundene Transferpunkte, simulierte Bereiche oder Krankenhäuser) anfahren und verwaltet alle Fahrzeug-Ausfahrten. Dies umfasst die Simulation von Einstiegszeiten sowie, dass immer nur ein Fahrzeug fahren kann.
 
@@ -299,8 +285,6 @@ Auf der Seite der Verhaltensweise ist unter _Informationen_ eine Liste aller Fah
 
 ## Fahrzeuge verteilen
 
-### Auf einen Blick
-
 Verteilt Fahrzeuge aus dem eigenen simulierten Bereich gleichmäßig auf mehrere simulierte Bereiche.
 
 Diese Verhaltensweise kann beispielsweise genutzt werden, damit alle Patientenablagen zu Beginn eine Grundversorgung an RTWs aus dem Bereitstellungsraum erhalten.
@@ -329,8 +313,6 @@ Damit die Fahrzeuge die Zielbereiche anfahren können, muss im Startbereich die 
 
 ## Fahrzeuganfragen beantworten
 
-### Auf einen Blick
-
 Stellt Fahrzeuge für andere Bereiche zur Verfügung, wenn diese nach Fahrzeugen fragen.
 
 Durch diese Verhaltensweise kann ein simulierter Bereich als Bereitstellungsraum genutzt werden. Anfragen können zum Beispiel von der Verhaltensweise [Fahrzeuge anfordern](#fahrzeuge-anfordern) einer Patientenablage kommen.
@@ -344,8 +326,6 @@ Diese Verhaltensweise bietet keine Einstellungen. Es werden die angefragten Fahr
 Diese Verhaltensweise benötigt die Verhaltensweise [Fahrzeuge versenden](#fahrzeuge-versenden), um die Abfahrt der Fahrzeuge zu koordinieren.
 
 ## Transportorganisation
-
-### Auf einen Blick
 
 Die Transportorganisation verwaltet den Abtransport von Patienten über mehrere simulierte Patientenablagen hinweg. Dazu werden die Patientenzahlen abgefragt und Fahrzeuge zum Transport der Patienten bei einem anderen simulierten Bereich angefragt.
 
@@ -402,8 +382,6 @@ Damit die Transportorganisation arbeiten kann, benötigt sie mindestens zu Begin
 Es ist aktuell nicht möglich, einzustellen, in welches Krankenhaus die Patienten transportiert werden. Alle Patienten werden automatisch in das Standardkrankenhaus gebracht.
 
 ## Patienten abtransportieren
-
-### Auf einen Blick
 
 Transportiert Patienten im eigenen Bereich ab, wenn die Transportorganisation dies vorgibt.
 

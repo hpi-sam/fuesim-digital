@@ -114,7 +114,7 @@ Die folgenden Informationen können abgerufen werden:
 
 Zudem können automatisch Funksprüche bei folgenden Ereignissen erzeugt werden (pro Ereignis aktivierbar):
 
-- Wenn sich der Behandlungsstatus ändert
+- Wenn sich der Behandlungsstatus (siehe oben) ändert
 - Wenn in dieser Patientenablage alle Patienten einer Sichtungskategorie abtransportiert wurden
 - Wenn in allen Patientenablagen, die von dieser Transportorganisation verwaltet werden, alle Patienten einer Sichtungskategorie abtransportiert wurden
 
@@ -144,7 +144,7 @@ Für jede Phase kann ein eigenes Intervall festgelegt werden, sodass in instabil
 
 #### Zähldauer pro Patient
 
-Gibt an, wie lange die Erkundung dauert. Ein höherer Wert kann zum Beispiel genutzt werden, um ein unübersichtliches Gelände oder geschlossenes Gebäude abzubilden.
+Gibt an, wie lange die initiale Erkundung dauert. Ein höherer Wert kann zum Beispiel genutzt werden, um ein unübersichtliches Gelände oder geschlossenes Gebäude abzubilden.
 
 ### Abhängigkeiten
 
@@ -161,7 +161,7 @@ Die Behandlung durchläuft vier Phasen:
 3. Behandeln, Personal fehlt
 4. Erstversorgung sichergestellt
 
-Damit die Behandlung starten kann, muss eine Führungskraft und mindestens eine weitere Person vor Ort sein. Ist diese Bedingung nicht erfüllt, wird die Behandlung unterbrochen.
+Damit die Behandlung starten kann, muss eine Führungskraft und mindestens eine weitere Einsatzkraft vor Ort sein. Ist diese Bedingung nicht erfüllt, wird die Behandlung unterbrochen.
 
 Bei der Erkundung wird der Bereich nach Patienten abgesucht und diese gezählt. Die Dauer der Erkundung richtet sich nach der Anzahl der Patienten und der Dauer pro Patient aus den Einstellungen, die Anzahl des verfügbaren Personals ist unerheblich. Erst nachdem die Erkundung abgeschlossen ist, können Anfragen nach der Anzahl Patienten beantwortet werden und die Vorsichtung beginnt.
 
@@ -183,7 +183,7 @@ Werden dem simulierten Bereich neue Patienten hinzugefügt, fällt der Fortschri
 
 ### Auf einen Blick
 
-Diese Verhaltensweise "übersetzt" fehlendes Personal in Fahrzeuganfragen, die dann von der Simulation weiterverarbeitet werden können. Personalbedarf kann von anderen Verhaltensweisen des gleichen simulierten Bereichs angemeldet werden und wir dann von dieser Verhaltensweise weiter verarbeitet.
+Diese Verhaltensweise "übersetzt" fehlendes Personal in Fahrzeuganfragen, die dann von der Simulation weiterverarbeitet werden können. Personalbedarf kann von anderen Verhaltensweisen des gleichen simulierten Bereichs angemeldet werden und wird dann von dieser Verhaltensweise weiter verarbeitet.
 
 So benötigt beispielsweise die Verhaltensweise [Patienten behandeln](#patienten-behandeln) Personal, während der Bereitstellungsraum nur Fahrzeuge zur Verfügung stellen kann. [Personal nachfordern](#personal-nachfordern) ermittelt, wie viele Fahrzeuge welchen Typs benötigt werden, um das gewünschte Personal zu erhalten.
 
@@ -399,7 +399,7 @@ Die Transportorganisation ist eine Verhaltensweise, die _keine Ressourcen im eig
 
 Damit die Transportorganisation arbeiten kann, benötigt sie mindestens zu Beginn des Transports die Patientenzahlen aus den verwalteten Bereichen. Für jeden Transport passt die Transportorganisation automatisch ihre Zahlen an, die wiederkehrenden Abfragen dienen dem Abgleich und stellen sicher, dass auf die Verbesserung oder Verschlechterung von Patienten reagiert werden kann.
 
-Es ist aktuell nicht möglich, einzustellen, in welches Krankenhaus die Patienten transportiert werden. Alle Patienten werden automatisch in das Standardkrankenhaus "Beliebiges Krankenhaus" gebracht.
+Es ist aktuell nicht möglich, einzustellen, in welches Krankenhaus die Patienten transportiert werden. Alle Patienten werden automatisch in das Standardkrankenhaus gebracht.
 
 ## Patienten abtransportieren
 

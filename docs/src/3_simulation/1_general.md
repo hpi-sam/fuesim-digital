@@ -9,9 +9,9 @@
 
 Diese Funktion ermöglicht es, auch in kleinen Gruppen Einsatzleitungen auszubilden, die in einer sich dynamisch entwickelnden Lage agieren müssen, ohne dass weitere Teilnehmende oder Übungsleitende für die Rollen der untergeordneten Führungskräfte benötigt werden.
 
-Der Parallelbetrieb von simulierten Bereichen und von Teilnehmenden besetzten Ansichten innerhalb einer Übung ist möglich. Allerdings können einzelne Elemente (Fahrzeuge, Personal, Patienten, …) zu einem bestimmten Zeitpunkt nur entweder von der Simulation oder von Teilnehmenden genutzt werden. Zur Verdeutlichung sind die simulierten Bereiche auf der Karte als ausgefüllte Flächen dargestellt, deren Inhalte nicht sichtbar sind. Eine explizite Übergabe von Fahrzeugen, Personal und Patienten zwischen Simulation und Teilnehmenden ist möglich.
+Der Parallelbetrieb von simulierten Bereichen und von durch Teilnehmende besetzten Ansichten innerhalb einer Übung ist möglich. Allerdings können einzelne Elemente (Fahrzeuge, Personal, Patienten, …) zu einem bestimmten Zeitpunkt nur entweder von der Simulation oder von Teilnehmenden genutzt werden. Zur Verdeutlichung sind die simulierten Bereiche auf der Karte als ausgefüllte Flächen dargestellt, deren Inhalte nicht sichtbar sind. Eine explizite Übergabe von Fahrzeugen, Personal und Patienten zwischen Simulation und Teilnehmenden ist möglich.
 
-Für eine möglichst natürliche Interaktion der Teilnehmenden mit einem simulierten Bereich können Informationen per Funkspruch ausgetauscht werden. Abhängig von seinen Verhaltensweisen erstellt ein simulierter Bereich selbst Funksprüche, außerdem können per Funk Befehle erteilt und Informationen abgefragt werden. FüSim Digital hat keine Anbindung an Funktechnik, stattdessen werden Funksprüche in Textform bereitgestellt. Für die Übungsdurchführung wird ein Teilnehmer oder Übungsleiter benötigt, der die Rolle des "Schnittstellenfunkers" übernimmt und die Funksprüche durchsagt oder Befehle entgegennimmt.
+Für eine möglichst natürliche Interaktion der Teilnehmenden mit einem simulierten Bereich können Informationen per Funkspruch ausgetauscht werden. Abhängig von seinen Verhaltensweisen erstellt ein simulierter Bereich selbst Funksprüche, außerdem können per Funk Befehle erteilt und Informationen abgefragt werden. FüSim Digital hat keine Anbindung an Funktechnik, stattdessen werden Funksprüche in Textform bereitgestellt. Für die Übungsdurchführung wird eine Person benötigt, die die Rolle des "Schnittstellenfunkers" übernimmt und die Funksprüche durchsagt oder Befehle entgegennimmt.
 
 ## Begriffe
 
@@ -41,7 +41,7 @@ Der Schnittstellenfunker muss sich selbst keine Informationen zum Übungsablauf 
 
 ## Aufbau des Simulierte-Bereich-Fensters
 
-Bei Klick auf einen simulierten Bereich öffnet sich ein Popup, über welches dieser Bereich konfiguriert werden kann, analog zu anderen Übungselemente auf der Karte. Da die Einstellungsmöglichkeiten von simulierten Bereichen sehr komplex sind, empfiehlt es sich aber, in die großen Simulationseinstellungen zu wechseln. Diese ist über <kbd>**Durchführung > Simulationseinstellungen (Übungsleitung)**</kbd> erreichbar.
+Bei Klick auf einen simulierten Bereich öffnet sich ein Popup, über welches dieser Bereich konfiguriert werden kann, analog zu anderen Übungselementen auf der Karte. Da die Einstellungsmöglichkeiten von simulierten Bereichen sehr komplex sind, empfiehlt es sich aber, in die großen Simulationseinstellungen zu wechseln. Diese ist über <kbd>**Durchführung > Simulationseinstellungen (Übungsleitung)**</kbd> erreichbar.
 
 ![Screenshot der Simulationseinstellungen](./simulation-settings-overview.png)
 

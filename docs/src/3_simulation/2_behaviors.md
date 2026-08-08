@@ -31,7 +31,7 @@ Damit eine Führungskraft zugewiesen werden kann, muss sich Personal im simulier
 
 Lässt Personal aus allen Fahrzeugen aussteigen, die diesen Bereich erreichen.
 
-Personal, das sich in Fahrzeugen befindet, kann keine Aufgaben übernehmen. Umgekehrt können unbesetzte Fahrzeuge nicht sofort losfahren. Daher ist diese Verhaltensweise zum Beispiel für Patientenablagen essentiell, für Bereitstellungsräume allerdings störend.
+Personal, das sich in Fahrzeugen befindet, kann keine Aufgaben übernehmen. Umgekehrt können unbesetzte Fahrzeuge nicht sofort losfahren. Daher ist diese Verhaltensweise zum Beispiel für Patientenablagen essentiell, für Bereitstellungsräume allerdings störend. In Bereichen, wo nicht alles Personal automatisch aussteigen soll, können einzelne Fahrzeuge weiterhin über den [Reiter Fahrzeuge](./1_general.md#fahrzeuge) ausgeladen werden, damit eine Führungskraft vor Ort ist.
 
 ### Informationen und Einstellungen
 
@@ -132,7 +132,7 @@ In der oberen Hälfte wird der aktuelle Zustand der Behandlung angezeigt. Dies u
 
 Über diese Optionen kann eingestellt werden, wie oft die Zuteilung von Personal zu Patienten neu ausgewertet werden soll. Dadurch kann auf Veränderungen von Patienten reagiert werden, wenn diese mehr oder weniger Personal benötigen. Unabhängig davon erfolgt sofort eine neue Zuteilung, wenn neues Personal im simulierten Bereich ankommt oder sich die Phase der Behandlung ändert.
 
-Für jede Phase kann ein eigenes Intervall festgelegt werden, sodass in instabilen Zuständen (zum Beispiel während der Vorsichtung) häufiger neu zugeteilt wird, als wenn die Erstversorgung sichergestellt ist. Die einzelnen Phasen sind in den Details beschrieben.
+Für jede Phase kann ein eigenes Intervall festgelegt werden, sodass in instabilen Zuständen (zum Beispiel während der Vorsichtung) häufiger neu zugeteilt wird, als wenn die Erstversorgung sichergestellt ist. Die einzelnen Phasen sind in den Details beschrieben. Zu geringe Intervalle können die Performance der Simulation beeinflussen. Stockt die Übungszeit, sollte geprüft werden, ob größere Intervalle das Problem beheben. Da die Neuzuteilung nach Ablauf des Intervalls sofort vorgenommen wird und keine zusätzliche "Entscheidungszeit" benötigt, sind zu geringe Intervalle außerdem möglicherweise nicht realistisch.
 
 #### Zähldauer pro Patient
 

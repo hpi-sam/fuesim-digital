@@ -30,6 +30,7 @@ import {
 } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
 import { SimulationEventBasedReportEditorComponent } from '../../../../../shared/simulation-event-based-report-editor/simulation-event-based-report-editor.component';
 import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { HelpButtonComponent } from '../../../../../../../../../../help-button/help-button.component';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-report',
@@ -43,6 +44,7 @@ import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/d
         AppSaveOnTypingDirective,
         AsyncPipe,
         DatePipe,
+        HelpButtonComponent,
     ],
 })
 export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {

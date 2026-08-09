@@ -12,13 +12,19 @@ import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectSimulatedRegion } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
 import { SimulatedRegionOverviewGeneralComponent } from '../../../simulation/trainer-modal/overview/simulated-region-overview.component';
+import { HelpButtonComponent } from '../../../../../../../help-button/help-button.component';
 
 @Component({
     selector: 'app-simulated-region-popup',
     templateUrl: './simulated-region-popup.component.html',
     styleUrls: ['./simulated-region-popup.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [NgbTooltip, SimulatedRegionOverviewGeneralComponent, AsyncPipe],
+    imports: [
+        NgbTooltip,
+        SimulatedRegionOverviewGeneralComponent,
+        AsyncPipe,
+        HelpButtonComponent,
+    ],
 })
 export class SimulatedRegionPopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

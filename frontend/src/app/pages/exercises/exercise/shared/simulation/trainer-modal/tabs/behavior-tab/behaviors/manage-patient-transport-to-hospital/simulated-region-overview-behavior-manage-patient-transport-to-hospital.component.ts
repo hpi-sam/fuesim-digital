@@ -6,6 +6,7 @@ import { ManagePatientTransportToHospitalMaximumCategoryEditorComponent } from '
 import { ManagePatientTransportToHospitalManagedRegionsTableComponent } from './shared/manage-patient-transport-to-hospital-managed-regions-table/manage-patient-transport-to-hospital-managed-regions-table.component';
 import { ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponent } from './shared/manage-patient-transport-to-hospital-vehicles-for-categories-editor/manage-patient-transport-to-hospital-vehicles-for-categories-editor.component';
 import { ManagePatientTransportToHospitalSettingsEditorComponent } from './shared/manage-patient-transport-to-hospital-settings-editor/manage-patient-transport-to-hospital-settings-editor.component';
+import { HelpButtonComponent } from '../../../../../../../../../../help-button/help-button.component';
 
 @Component({
     selector:
@@ -23,6 +24,7 @@ import { ManagePatientTransportToHospitalSettingsEditorComponent } from './share
         ManagePatientTransportToHospitalManagedRegionsTableComponent,
         ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponent,
         ManagePatientTransportToHospitalSettingsEditorComponent,
+        HelpButtonComponent,
     ],
 })
 export class SimulatedRegionOverviewBehaviorManagePatientTransportToHospitalComponent {

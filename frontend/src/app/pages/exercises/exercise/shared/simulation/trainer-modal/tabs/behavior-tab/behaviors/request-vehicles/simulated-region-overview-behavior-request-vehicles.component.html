@@ -1,4 +1,10 @@
 @if (requestBehaviorState$ | async; as requestBehaviorState) {
+    <h4>
+        Fahrzeuge anfordern
+        <app-help-button
+            url="3_simulation/2_behaviors.html#fahrzeuge-anfordern"
+        />
+    </h4>
     <h5>Anfragenziel</h5>
 
     @if ({ time: nextTimeoutIn$ | async }; as nextTimeoutIn) {

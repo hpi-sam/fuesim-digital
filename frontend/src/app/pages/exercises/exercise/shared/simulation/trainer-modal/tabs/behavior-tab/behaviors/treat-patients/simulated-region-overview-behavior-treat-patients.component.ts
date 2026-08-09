@@ -32,8 +32,8 @@ import {
 import { TreatmentStatusBadgeComponent } from '../../../../treatment-status-badge/treatment-status-badge.component';
 import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
 import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
-import { SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent } from './patient-details/simulated-region-overview-behavior-treat-patients-patient-details.component';
 import { HelpButtonComponent } from '../../../../../../../../../../help-button/help-button.component';
+import { SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent } from './patient-details/simulated-region-overview-behavior-treat-patients-patient-details.component';
 
 let globalLastSettingsCollapsed = true;
 let globalLastInformationCollapsed = true;

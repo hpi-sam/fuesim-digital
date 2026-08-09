@@ -96,7 +96,7 @@ Die folgenden Informationen können abgerufen werden:
 - **Anzahl aus diesem Bereich in Krankenhäuser abtransportierter Patienten**: Der aktuelle Bereich muss von einer [Transportorganisation](#transportorganisation) im gleichen oder einem anderen Bereich verwaltet werden.
 - **Transferverbindungen**: Welche anderen Bereiche von diesem aus angefahren werden können
 - **Anzahl unter dieser Transportorganisation in Krankenhäuser abtransportierter Patienten**: Umfasst Patienten aus allen Bereichen, deren Transport von der [Transportorganisation](#transportorganisation) im aktuellen Bereich organisiert wurde.
-- **Behandlungsstatus**: Der Fortschritt der Verhaltensweise [Patienten behandeln](#patienten-behandeln) in diesem Bereich. Die möglichen Phasen sind in den [Details](#details-1) der Verhaltensweise beschrieben
+- **Behandlungsstatus**: Der Fortschritt der Verhaltensweise [Patienten behandeln](#patienten-behandeln) in diesem Bereich. Die möglichen Phasen sind in den [Details der Verhaltensweise](#details-1) beschrieben
 - **Nutzung der Fahrzeuge**: Gibt an, wie viele Fahrzeuge in diesem Bereich für welche Aufgabe genutzt werden. Aufgaben umfassen zum Beispiel
     - Aussteigen (Fahrzeug ist gerade angekommen und wird noch nicht genutzt)
     - Behandlung von Patienten

@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import Package from '../../../../../package.json';
+import { environment } from '../../../../environments/environment.js';
 
 @Component({
     selector: 'app-footer',
@@ -10,5 +11,6 @@ import Package from '../../../../../package.json';
     imports: [RouterLink],
 })
 export class FooterComponent {
-    version = Package.version;
+    readonly version = Package.version;
+    readonly docsUrl = environment.docsUrl;
 }

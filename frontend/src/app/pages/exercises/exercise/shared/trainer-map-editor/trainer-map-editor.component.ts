@@ -25,8 +25,6 @@ import {
     bystanderCategories,
     scoutableMapImageTemplate,
     getEntityFromElement,
-} from 'fuesim-digital-shared';
-import type {
     PatientCategory,
     UUID,
     TechnicalChallengeTemplate,
@@ -71,7 +69,8 @@ import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group
 import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
 import { openManageExerciseCollectionsModal } from '../manage-exercise-collections/open-manage-exercise-collections-modal';
 import { CollectionService } from '../../../../../core/exercise-element.service';
-import { openEditTechnicalChallengeTemplateModal } from '../editor-panel/edit-technical-challenge-template-modal/open-edit-technical-challenge-template-modal.js';
+import { openUploadTechnicalChallengeModal } from '../editor-panel/upload-technical-challenge-template-modal/upload-technical-challenge-template-modal.component.js';
+import { openEditTechnicalChallengeTemplateModal } from '../editor-panel/edit-technical-challenge-template-modal/edit-technical-challenge-template-modal.component.js';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -228,6 +227,10 @@ export class TrainerMapEditorComponent implements OnInit {
         openEditImageTemplateModal(this.ngbModalService, mapImageTemplateId);
     }
 
+    public addTechnicalChallengeTemplate() {
+        openUploadTechnicalChallengeModal(this.ngbModalService);
+    }
+
     public editTechnicalChallengeTemplate(technicalChallengeTemplateId: UUID) {
         openEditTechnicalChallengeTemplateModal(
             this.ngbModalService,
@@ -354,4 +357,7 @@ export class TrainerMapEditorComponent implements OnInit {
             this.importingTemplates = false;
         }
     }
+
+    protected readonly getTechnicalChallengeTemplateImage =
+        TechnicalChallengeTemplate.getImage;
 }

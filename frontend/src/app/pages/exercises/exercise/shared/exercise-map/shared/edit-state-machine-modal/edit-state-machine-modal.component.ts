@@ -11,9 +11,13 @@ import type {
     UUID,
     StateMachine,
     TechnicalChallenge,
+    StateMachineDefinition,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
-import { EditStateMachineFormComponent } from '../../../editor-panel/edit-state-machine-form/edit-state-machine-form.component.js';
+import {
+    EditStateMachineFormComponent,
+    type TaskNameMap,
+} from '../../../editor-panel/edit-state-machine-form/edit-state-machine-form.component.js';
 import type { AppState } from '../../../../../../../state/app.state.js';
 import { ExerciseService } from '../../../../../../../core/exercise.service.js';
 import { createSelectTechnicalChallenge } from '../../../../../../../state/application/selectors/exercise.selectors.js';
@@ -23,7 +27,8 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
 export function openEditStateMachineModalComponent(
     ngbModalService: NgbModal,
     containingTechnicalChallengeId: UUID,
-    stateMachineId: UUID
+    stateMachineId: UUID,
+    taskNameMap: Signal<TaskNameMap>
 ) {
     const modalRef = ngbModalService.open(EditStateMachineModalComponent, {
         size: 'xl',
@@ -33,6 +38,8 @@ export function openEditStateMachineModalComponent(
     componentInstance.initialStateMachineId = stateMachineId;
     componentInstance.containingTechnicalChallengeId =
         containingTechnicalChallengeId;
+    // @ts-expect-error assigning to readonly
+    componentInstance.taskNameMap = taskNameMap;
 }
 
 @Component({
@@ -46,10 +53,10 @@ class EditStateMachineModalComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    // set, when instantiating component
+    // all set, when instantiating component
     containingTechnicalChallengeId!: UUID;
-    // set, when instantiating component
     initialStateMachineId: UUID | undefined;
+    readonly taskNameMap!: Signal<TaskNameMap>;
 
     private readonly technicalChallenge!: Signal<TechnicalChallenge>;
     readonly stateMachine!: Signal<StateMachine>;
@@ -89,7 +96,9 @@ class EditStateMachineModalComponent implements OnInit {
         );
     }
 
-    public async updateStateMachine(updatedStateMachine: StateMachine) {
+    public async updateStateMachine(
+        updatedStateMachine: StateMachineDefinition
+    ) {
         const currentChallenge = selectStateSnapshot(
             createSelectTechnicalChallenge(this.containingTechnicalChallengeId),
             this.store
@@ -97,7 +106,10 @@ class EditStateMachineModalComponent implements OnInit {
 
         const updatedMachines: TechnicalChallenge['stateMachines'] = {
             ...currentChallenge.stateMachines,
-            [updatedStateMachine.id]: updatedStateMachine,
+            [updatedStateMachine.id]: {
+                ...currentChallenge.stateMachines[updatedStateMachine.id],
+                ...updatedStateMachine,
+            },
         };
 
         const updatedChallenge: TechnicalChallenge = {

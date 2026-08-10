@@ -9,11 +9,10 @@
                     </p>
                 </div>
                 <div class="col-4">
-                    <img
-                        alt=""
-                        [src]="currentState().image.url"
-                        class="w-100"
-                    />
+                    @let image = currentState().image;
+                    @if (image) {
+                        <img alt="" [src]="image.url" class="w-100" />
+                    }
                 </div>
             </div>
         </div>

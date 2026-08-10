@@ -106,7 +106,7 @@ export const transitionSchema = z.object({
 export const stateMachineStateSchema = z.object({
     id: stateMachineStateIdSchema,
     title: z.string(),
-    image: imagePropertiesSchema,
+    image: imagePropertiesSchema.optional(),
     userGeneratedContent: userGeneratedContentSchema,
     viewedByParticipants: z.boolean().optional().default(false),
     /**
@@ -293,6 +293,9 @@ export const stateMachineSchema = z
             });
         }
     });
+export type StateMachineDefinition = Immutable<
+    z.infer<typeof stateMachineDefinitionSchema>
+>;
 export type StateMachine = Immutable<z.infer<typeof stateMachineSchema>>;
 
 export function currentStateOf(

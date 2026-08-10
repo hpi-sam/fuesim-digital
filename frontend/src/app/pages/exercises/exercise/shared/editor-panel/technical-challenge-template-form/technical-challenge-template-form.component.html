@@ -1,26 +1,50 @@
-<div class="form-group mb-4">
-    <label class="form-label">Name der Technischen Herausforderung:</label>
-    <input class="form-control" type="text" [formField]="templateForm.name" />
-</div>
+<div class="d-flex flex-column gap-2">
+    <div class="mb-2">
+        <label class="form-label">Name der technischen Herausforderung:</label>
+        <input
+            class="form-control"
+            type="text"
+            [formField]="templateForm.name"
+        />
+    </div>
 
-<div class="form-group mt-2">
-    <h5>Beinhaltete Teilherausforderungen</h5>
-    <div class="list-group w-100">
-        @for (
-            stateMachine of templateForm.stateMachines().value();
-            track stateMachine.id
-        ) {
-            <div class="list-group-item d-flex align-items-center">
-                <div>{{ stateMachine.name }}</div>
-                <div class="flex-grow-1"></div>
-                <a
-                    (click)="editStateMachine(stateMachine)"
-                    class="btn btn-outline-primary stretched-link"
+    <div>
+        <h5>Beinhaltete Teilherausforderungen</h5>
+        @let stateMachineList = templateForm.stateMachines().value();
+        <div
+            class="list-group w-100"
+            cdkDropList
+            [cdkDropListData]="stateMachineList"
+            (cdkDropListDropped)="stateMachineDropped($event)"
+        >
+            @for (stateMachine of stateMachineList; track stateMachine.id) {
+                <div
+                    class="list-group-item d-flex align-items-center"
+                    cdkDrag
+                    [cdkDragData]="stateMachine"
                 >
-                    <i class="bi bi-pencil me-2"></i>
-                    Bearbeiten
-                </a>
-            </div>
-        }
+                    <div>
+                        {{ stateMachine.name }}
+                        @if (
+                            stateMachine.id ===
+                            technicalChallengeTemplate().primaryStateMachineId
+                        ) {
+                            <span
+                                class="ms-2 badge text-bg-primary rounded-pill"
+                                >Primär</span
+                            >
+                        }
+                    </div>
+                    <div class="flex-grow-1"></div>
+                    <a
+                        (click)="editStateMachine(stateMachine)"
+                        class="btn btn-outline-primary stretched-link"
+                    >
+                        <i class="bi bi-pencil me-2"></i>
+                        Bearbeiten
+                    </a>
+                </div>
+            }
+        </div>
     </div>
 </div>

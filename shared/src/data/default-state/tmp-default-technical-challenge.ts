@@ -546,18 +546,15 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
 
     return {
         type: 'technicalChallengeTemplate',
+        primaryStateMachineId: stateMachineId,
         stateMachines: {
             [stateMachineId]: {
                 id: stateMachineId,
                 name: 'Brand',
                 initialStateId: initialState.id,
-                currentStateId: initialState.id,
                 states,
                 tasks,
                 timers,
-                simulationStartTime: 0,
-                taskTimeSpent: {},
-                assignedPersonnel: {},
             },
         },
         id: '9d629cfb-440e-4fe1-9155-ffdb6f97248f',

@@ -1,11 +1,4 @@
-import {
-    Component,
-    computed,
-    inject,
-    input,
-    Signal,
-    ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, inject, input, Signal } from '@angular/core';
 import type {
     StateMachine,
     Personnel,
@@ -34,7 +27,6 @@ import { selectStateSnapshot } from '../../../state/get-state-snapshot.js';
     selector: 'app-state-machine-details',
     imports: [ProgressBarComponent],
     templateUrl: './state-machine-details.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './state-machine-details.component.scss',
 })
 export class StateMachineDetailsComponent {

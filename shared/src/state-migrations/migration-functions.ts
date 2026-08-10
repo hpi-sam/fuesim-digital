@@ -59,6 +59,7 @@ import { addAlarmGroupVehicleType58 } from './58-add-alarm-group-vehicle-type.js
 import { addCollections59 } from './59-add-collections.js';
 import { tickets60 } from './60-tickets.js';
 import { updateTechnicalChallenges61 } from './61-generalize-update-technical-challenge-action.js';
+import { importTechnicalChallenges } from './62-import-technical-challenges.js';
 
 /**
  * Migrate a single action
@@ -147,4 +148,5 @@ export const migrations: {
     59: addCollections59,
     60: tickets60,
     61: updateTechnicalChallenges61,
+    62: importTechnicalChallenges,
 };

@@ -222,6 +222,7 @@ Siehe [Erkundungselemente](#erkundungselemente) für Details.
 die einzelnen Teilherausforderungen bearbeiten.
 Für eine Teilherausforderung ist Folgendes einstellbar:
 
+- der Name der Teilherausforderung
 - der Erkundungstext eines jeden Zustands
 - die Zeitdauer jedes Timers
 - die benötigte Zeit jeder Aufgabe

@@ -12,7 +12,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - A simple ticket system allows tickets to be assigned to patients. A patient who has a ticket assigned shows a ticket icon above them on the map. Tickets do not affect the exercise logic (i.e., patients can be loaded into vehicles and sent to hospitals regardless of their ticket status).
 - Trainers can edit the timers and tasks of technical challenges and their templates. Trainers can edit user generated content of technical challenges.
 - A default element collection with fire department related content for users to start building fire department scenarios.
-- Trainers can upload technical challenge templates which were created using an external editor. 
+- Trainers can upload technical challenge templates which were created using an external editor.
 
 ### Fixed
 

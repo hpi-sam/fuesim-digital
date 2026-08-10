@@ -1,6 +1,6 @@
 <div class="modal-header">
     <h4 class="modal-title">
-        Technischen Herausforderung importieren
+        Technische Herausforderung importieren
         <app-help-button
             url="2_exercises/3_exercise_elements.html#technische-herausforderungen"
             [trainerOnly]="true"
@@ -13,6 +13,7 @@
     @let template = uploadedTechnicalChallenge();
     @if (template) {
         <app-technical-challenge-template-form
+            class="mb-2"
             [technicalChallengeTemplate]="template"
             (technicalChallengeTemplateChange)="
                 uploadedTechnicalChallenge.set($event)
@@ -22,32 +23,32 @@
         </app-technical-challenge-template-form>
 
         <div>
-            <label class="form-label">Zusätzliche Aufgabentypen:</label>
-            <p class="text-muted">
+            <h5>Zusätzliche Aufgabentypen</h5>
+            <div
+                class="alert alert-info small px-2 py-1 d-flex align-items-center"
+            >
+                <i class="bi bi-info-circle me-2"></i>
                 Diese Aufgabentypen werden von der technischen Herausforderung
                 benötigt und dafür automatisch importiert.
-            </p>
-            <ul>
+            </div>
+            <ul class="list-group">
                 @for (
                     taskType of uploadedAdditionalTasks();
                     track taskType.id
                 ) {
-                    <li>{{ taskType.taskName }}</li>
+                    <li class="list-group-item">{{ taskType.taskName }}</li>
                 }
             </ul>
         </div>
 
         <button class="btn btn-primary mt-3" (click)="importTemplate()">
-            Teilherausforderung importieren
+            Technische Herausforderung importieren
         </button>
     } @else {
         <p class="text-center text-muted">
             Hier können Sie Vorlagen für technische Herausforderung hochladen
-            und importieren, welche mit dem
-            <a href="javascript:alert('Bald verfügbar!')"
-                >Herausforderungseditor</a
-            >
-            erstellt wurden.
+            und importieren, welche mit dem bald verfügbaren
+            Herausforderungseditor erstellt wurden.
         </p>
         <label class="btn btn-outline-primary my-2">
             <i class="bi-cloud-upload me-2"> </i>

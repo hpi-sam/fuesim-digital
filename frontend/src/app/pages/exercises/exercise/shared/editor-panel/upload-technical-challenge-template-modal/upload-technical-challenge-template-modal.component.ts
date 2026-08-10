@@ -19,6 +19,7 @@ import { FileInputDirective } from '../../../../../../shared/directives/file-inp
 import { TechnicalChallengeTemplateFormComponent } from '../technical-challenge-template-form/technical-challenge-template-form.component.js';
 import type { TaskNameMap } from '../edit-state-machine-form/edit-state-machine-form.component.js';
 import { ExerciseService } from '../../../../../../core/exercise.service.js';
+import { MessageService } from '../../../../../../core/messages/message.service.js';
 
 export function openUploadTechnicalChallengeModal(ngbModal: NgbModal) {
     ngbModal.open(UploadTechnicalChallengeTemplateModalComponent, {
@@ -45,6 +46,7 @@ const uploadTechnicalChallengeTemplateSchema = z.strictObject({
 class UploadTechnicalChallengeTemplateModalComponent {
     private readonly activeModal = inject(NgbActiveModal);
     private readonly exerciseService = inject(ExerciseService);
+    private readonly messageService = inject(MessageService);
 
     readonly uploadObject = signal<
         z.infer<typeof uploadTechnicalChallengeTemplateSchema> | undefined
@@ -73,6 +75,11 @@ class UploadTechnicalChallengeTemplateModalComponent {
             uploadTechnicalChallengeTemplateSchema.safeParse(jsonValue);
         if (parsedResult.error) {
             console.error(parsedResult.error.message);
+            this.messageService.postMessage({
+                title: 'Die Datei hat das falsche Format.',
+                body: z.prettifyError(parsedResult.error),
+                color: 'danger',
+            });
             return;
         }
 
@@ -90,11 +97,16 @@ class UploadTechnicalChallengeTemplateModalComponent {
             technicalChallengeTemplate,
             additionalTasks,
         });
+
+        this.messageService.postMessage({
+            title: 'Die technische Herausforderung wurde erfolgreich importiert.',
+            color: 'success',
+        });
+
+        this.close();
     }
 
     public close(): void {
         this.activeModal.close();
     }
-
-    protected readonly alert = alert;
 }

@@ -106,7 +106,6 @@ export const transitionSchema = z.object({
 export const stateMachineStateSchema = z.object({
     id: stateMachineStateIdSchema,
     title: z.string(),
-    // TODO: state migration
     image: imagePropertiesSchema.optional(),
     userGeneratedContent: userGeneratedContentSchema,
     viewedByParticipants: z.boolean().optional().default(false),

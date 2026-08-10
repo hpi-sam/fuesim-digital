@@ -1,6 +1,6 @@
 <div class="d-flex flex-column gap-2">
-    <div>
-        <label class="form-label">Name der Technischen Herausforderung:</label>
+    <div class="mb-2">
+        <label class="form-label">Name der technischen Herausforderung:</label>
         <input
             class="form-control"
             type="text"
@@ -9,7 +9,7 @@
     </div>
 
     <div>
-        <label class="form-label">Beinhaltete Teilherausforderungen:</label>
+        <h5>Beinhaltete Teilherausforderungen</h5>
         @let stateMachineList = templateForm.stateMachines().value();
         <div
             class="list-group w-100"
@@ -29,7 +29,8 @@
                             stateMachine.id ===
                             technicalChallengeTemplate().primaryStateMachineId
                         ) {
-                            <span class="badge text-bg-primary rounded-pill"
+                            <span
+                                class="ms-2 badge text-bg-primary rounded-pill"
                                 >Primär</span
                             >
                         }

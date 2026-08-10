@@ -54,7 +54,7 @@ export const technicalChallengeSchema = z
             ctx.addIssue({
                 code: 'custom',
                 message:
-                    'Alle Zustände der primären Teilherausforderung müssen ein Bild für die Kartendarstellung besitzen',
+                    'Alle Zustände der primären Teilherausforderung müssen ein Bild für die Kartendarstellung besitzen.',
                 path: [
                     'stateMachines',
                     primaryStateMachine.id,

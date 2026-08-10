@@ -96,7 +96,6 @@ export class TechnicalChallengeTemplateFormComponent {
                 event.previousIndex,
                 event.currentIndex
             );
-            console.log(oldStateMachines);
             return oldStateMachines;
         });
     }

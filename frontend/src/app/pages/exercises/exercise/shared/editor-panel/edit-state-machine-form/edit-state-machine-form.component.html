@@ -82,7 +82,7 @@
                 <div class="card-header bg-success-subtle">
                     <h6 class="card-title mb-0">Aufgaben</h6>
                 </div>
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush h-100">
                     @for (task of stateMachineForm.tasks; track $index) {
                         <li class="list-group-item d-flex align-items-baseline">
                             <span class="flex-grow-1">{{
@@ -96,7 +96,9 @@
                             ></app-time-input>
                         </li>
                     } @empty {
-                        <li class="list-group-item text-muted">
+                        <li
+                            class="list-group-item text-muted h-100 d-flex align-items-center"
+                        >
                             Keine Aufgaben
                         </li>
                     }
@@ -106,7 +108,7 @@
                 <div class="card-header bg-danger-subtle">
                     <h6 class="card-title mb-0">Timer</h6>
                 </div>
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush h-100">
                     @for (timer of stateMachineForm.timers; track $index) {
                         <li class="list-group-item d-flex align-items-baseline">
                             <span class="flex-grow-1">{{
@@ -120,7 +122,11 @@
                             ></app-time-input>
                         </li>
                     } @empty {
-                        <li class="list-group-item text-muted">Keine Timer</li>
+                        <li
+                            class="list-group-item text-muted h-100 d-flex align-items-center"
+                        >
+                            Keine Timer
+                        </li>
                     }
                 </ul>
             </div>

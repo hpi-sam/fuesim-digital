@@ -19,8 +19,9 @@ import {
     CollectionVersionStructureWithMetadata,
     collectionEntityIdSchema,
     collectionVersionIdSchema,
+    UploadedImageUploadInput,
 } from 'fuesim-digital-shared';
-import { BehaviorSubject, lastValueFrom } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, map } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
@@ -426,6 +427,28 @@ export class CollectionService {
                     data: [content],
                 })
             )
+        );
+
+        return data.result;
+    }
+
+    public async uploadImage(
+        setEntityId: CollectionEntityId,
+        content: UploadedImageUploadInput
+    ) {
+        const data = await lastValueFrom(
+            this.httpClient
+                .post(
+                    `${this.ENDPOINT}/${setEntityId}/upload`,
+                    Marketplace.Element.UploadImage.requestSchema.encode({
+                        data: content,
+                    })
+                )
+                .pipe(
+                    map((v) =>
+                        Marketplace.Element.UploadImage.responseSchema.parse(v)
+                    )
+                )
         );
 
         return data.result;

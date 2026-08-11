@@ -16,6 +16,9 @@ import type {
     CollectionOrganisationRelationshipType,
     CollectionMembershipRole,
     CollectionVisibility,
+    AlarmGroup,
+    UploadedImageUpload,
+    UploadedImage,
 } from 'fuesim-digital-shared';
 import {
     applyMigrations,
@@ -35,6 +38,7 @@ import { Subject } from 'rxjs';
 import { castDraft, type WritableDraft } from 'immer';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
+import { validateImage } from '../../utils/image.js';
 import type { ExerciseService } from './exercise-service.js';
 import type { OrganisationService } from './organisation-service.js';
 
@@ -771,6 +775,51 @@ export class CollectionService {
                 return {
                     newSetVersionId: draftState.versionId,
                     results,
+                };
+            }
+        );
+    }
+
+    public async createUploadedImage(
+        collectionEntityId: CollectionEntityId,
+        content: UploadedImageUpload
+    ) {
+        return this.reduce(
+            collectionEntityId,
+            async (tx, draftState, eventBuffer) => {
+                const { metadata, image } = await validateImage(content.file);
+
+                // TODO Store in S3 here
+
+                const actualContent = {
+                    id: content.id,
+                    type: 'uploadedImage',
+                    name: content.name,
+                    aspectRatio: metadata.width / metadata.height,
+                    path: 'https://example.org', // TODO
+                } satisfies UploadedImage;
+
+                const result = this.exists(
+                    await tx.collectionRepository.createElementVersion({
+                        version: 1,
+                        content: actualContent,
+                    })
+                );
+
+                await tx.collectionRepository.attachElementToCollectionVersion(
+                    result.versionId,
+                    draftState.versionId
+                );
+
+                eventBuffer.next({
+                    event: 'element:create',
+                    data: result,
+                    collectionEntityId,
+                });
+
+                return {
+                    newSetVersionId: draftState.versionId,
+                    result,
                 };
             }
         );

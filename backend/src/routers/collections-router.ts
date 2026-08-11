@@ -374,6 +374,32 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
+    /*
+     * Upload a new image as uploaded image in the collection
+     */
+    publicRouter.post(
+        '/:collectionEntityId/upload',
+        editorAccess,
+        async (req, res) => {
+            const collectionEntityId = getCollectionEntityId(req);
+
+            const parsedBody =
+                Marketplace.Element.UploadImage.requestSchema.parse(req.body);
+
+            const data = await collectionService.createUploadedImage(
+                collectionEntityId,
+                parsedBody.data
+            );
+
+            res.send(
+                Marketplace.Element.UploadImage.responseSchema.encode({
+                    newSetVersionId: data.newSetVersionId,
+                    result: cloneDeepMutable([data.result]),
+                })
+            );
+        }
+    );
+
     publicRouter.get(
         '/:collectionEntityId/invitecode',
         adminAccess,

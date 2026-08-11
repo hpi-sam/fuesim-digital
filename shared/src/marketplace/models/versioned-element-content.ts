@@ -5,6 +5,7 @@ import { vehicleTemplateSchema } from '../../models/vehicle-template.js';
 import { personnelTemplateSchema } from '../../models/personnel-template.js';
 import { materialTemplateSchema } from '../../models/material-template.js';
 import { mapImageTemplateSchema } from '../../models/map-image-template.js';
+import { uploadedImageSchema } from '../../models/uploaded-image.js';
 import { versionedElementModelSchema } from './versioned-element-model.js';
 export {
     type VersionedElementModel,
@@ -17,6 +18,7 @@ export const templateVersionContentSchema = z.discriminatedUnion('type', [
     personnelTemplateSchema,
     materialTemplateSchema,
     mapImageTemplateSchema,
+    uploadedImageSchema,
 ]);
 
 export const templateVersionContentAllowedTypes =

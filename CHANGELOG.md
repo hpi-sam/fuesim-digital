@@ -38,6 +38,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Exercise element collections were introduced to manage and share exercise elements (e.g., vehicles, alarm groups, etc.) outside of exercises.
 - With technical challenges, it is now possible to include dynamically changing situations like technical rescue or fire extinguishing. To solve them, participants can assign personnel and give them pre-defined tasks. Currently, there are two premade technical challenges. This feature will be extended with an editor in a later software version to enable trainers to create their own challenges.
 - Measures were added to allow trainers to configure several global actions that participants can take (e.g., giving a status report, drawing a danger zone, requesting additional units).
+- Organisations were introduced for managing content together with other users. It's possible to manage several organisations and invite other users to them.
+- A marketplace feature has been introduced to manage and share exercise elements (e.g., vehicles, alarm groups, etc.) outside of exercises in so-called collections.
+- With technical challenges, it is now possible to include dynamically changing situations like technical rescue or fire extinguishing. To solve them, participants can assign personnel and give them pre-defined tasks. Currently, there are two premade technical challenges. This feature will be extended with an editor in a later software version to enable trainers to create their own challenges.
+- Measures were added to allow trainers to configure several global actions that participants can take (e.g., giving a status report, drawing a danger zone, requesting additional units).
 - There is now a banner that is displayed when the application is unable to start properly, informing the user about potential causes.
 - New participants joining a parallel exercise after it started now get fast-forwarded to be in sync with all other participants.
 - Users can now export all their user-related data when logged in.

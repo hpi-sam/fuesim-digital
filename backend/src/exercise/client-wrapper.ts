@@ -310,13 +310,15 @@ export class CollectionClientWrapper extends ClientWrapper {
 
     private readonly stopListen$ = new Subject<void>();
 
-    public async startCollectionListener(collectionId: CollectionEntityId) {
+    public async startCollectionListener(
+        collectionEntityId: CollectionEntityId
+    ) {
         this.stopListen$.next();
-        this.chosenCollection = collectionId;
+        this.chosenCollection = collectionEntityId;
 
-        const initialData = await this.getInitialData(collectionId);
-        await this.loadDependencies(collectionId);
-        this.startListen(collectionId);
+        const initialData = await this.getInitialData(collectionEntityId);
+        await this.loadDependencies(collectionEntityId);
+        this.startListen(collectionEntityId);
         return initialData;
     }
 

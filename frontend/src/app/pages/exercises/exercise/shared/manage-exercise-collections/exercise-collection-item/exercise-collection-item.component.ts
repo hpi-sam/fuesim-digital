@@ -24,7 +24,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { CollectionService } from '../../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../../core/collection.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import {
     selectSelectedCollections,

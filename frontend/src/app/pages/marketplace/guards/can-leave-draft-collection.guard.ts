@@ -4,7 +4,7 @@ import type {
     GuardResult,
     RouterStateSnapshot,
 } from '@angular/router';
-import { CollectionService } from '../../../core/exercise-element.service';
+import { CollectionService } from '../../../core/collection.service';
 import { MarketplaceSetDetailComponent } from '../collection-detail-view/collection-detail-view.component';
 import { TwoButtonConfirmationModalService } from '../../../core/twobutton-confirmation-modal/twobutton-confirmation-modal.service';
 

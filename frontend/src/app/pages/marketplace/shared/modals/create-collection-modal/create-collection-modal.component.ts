@@ -25,7 +25,7 @@ import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ApiService } from '../../../../../core/api.service';
 import { AuthService } from '../../../../../core/auth.service';
-import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../core/collection.service';
 import { AutofocusDirective } from '../../../../../shared/directives/autofocus.directive';
 import { DisplayModelValidationComponent } from '../../../../../shared/validation/display-model-validation/display-model-validation.component';
 

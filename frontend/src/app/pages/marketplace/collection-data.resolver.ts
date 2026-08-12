@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import type { CollectionEntityId } from 'fuesim-digital-shared';
 import { isCollectionEntityId } from 'fuesim-digital-shared';
 import type { BehaviorSubject } from 'rxjs';
-import type { CollectionSubscriptionData } from '../../core/exercise-element.service';
-import { CollectionService } from '../../core/exercise-element.service';
+import type { CollectionSubscriptionData } from '../../core/collection.service';
+import { CollectionService } from '../../core/collection.service';
 
 export interface CollectionDataResolverResult {
     subject: BehaviorSubject<CollectionSubscriptionData | null>;

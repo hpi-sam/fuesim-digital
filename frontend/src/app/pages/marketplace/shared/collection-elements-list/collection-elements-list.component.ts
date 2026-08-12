@@ -25,7 +25,7 @@ import { VersionedElementDisplayNamePipe } from '../../../../shared/pipes/versio
 // eslint-disable-next-line import-x/no-cycle
 import { ElementCardComponent } from '../cards/element-card/element-card.component';
 import { CreatingVersionedElementModalData } from '../modals/editor-modals/base-versioned-element-submodal';
-import { CollectionService } from '../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../core/collection.service';
 import { GenericElementCardIndicator } from '../cards/generic-element-card/generic-element-card.component';
 import { openVersionedElementModal } from '../modals/editor-modals/versioned-element-modal/open-versioned-element-model';
 import { ConfirmationModalService } from '../../../../core/confirmation-modal/confirmation-modal.service';

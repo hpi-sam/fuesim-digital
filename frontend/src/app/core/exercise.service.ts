@@ -75,7 +75,7 @@ import { OptimisticActionHandler } from './optimistic-action-handler';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
 import { AuthService } from './auth.service.js';
 import { ApiService } from './api.service.js';
-import { CollectionService } from './exercise-element.service';
+import { CollectionService } from './collection.service';
 
 /**
  * This Service deals with the state synchronization of a live exercise.

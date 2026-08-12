@@ -9,7 +9,7 @@ import {
     gatherAllVisibleCollectionElements,
 } from 'fuesim-digital-shared';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { CollectionSubscriptionData } from '../../../../core/exercise-element.service';
+import { CollectionSubscriptionData } from '../../../../core/collection.service';
 import { CollectionElementsListComponent } from '../../shared/collection-elements-list/collection-elements-list.component';
 
 @Component({

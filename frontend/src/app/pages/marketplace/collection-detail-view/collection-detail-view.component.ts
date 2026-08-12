@@ -25,7 +25,7 @@ import { DatePipe } from '@angular/common';
 import {
     CollectionService,
     CollectionSubscriptionData,
-} from '../../../core/exercise-element.service';
+} from '../../../core/collection.service';
 import { CollectionUpgradeImpactModalComponent } from '../shared/modals/marketplace-collection-update-impact-modal/marketplace-collection-update-impact-modal.component';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { CollectionDataResolverResult } from '../collection-data.resolver';

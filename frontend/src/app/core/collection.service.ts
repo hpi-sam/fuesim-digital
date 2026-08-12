@@ -233,12 +233,12 @@ export class CollectionService {
     }
 
     public async subscribeToCollection(
-        setEntityId: CollectionEntityId
+        collectionEntityId: CollectionEntityId
     ): Promise<BehaviorSubject<CollectionSubscriptionData | null>> {
         const subject = new BehaviorSubject<CollectionSubscriptionData | null>(
             null
         );
-        this._collectionSubscriptions.set(setEntityId, subject);
+        this._collectionSubscriptions.set(collectionEntityId, subject);
 
         while (!this.socket.connected) {
             this.loadingModalService.showLoading({
@@ -252,29 +252,37 @@ export class CollectionService {
         }
         this.loadingModalService.closeLoading();
 
-        this.socket.emit('joinCollectionRoom', setEntityId, (response) => {
-            this.socketFailHard = true;
-            if (!response.success) return;
-            const initialData =
-                Marketplace.Collection.Events.InitialData.schema.decode(
-                    cloneDeepMutable(response.payload)
-                );
+        this.socket.emit(
+            'joinCollectionRoom',
+            collectionEntityId,
+            (response) => {
+                this.socketFailHard = true;
+                if (!response.success) return;
+                const initialData =
+                    Marketplace.Collection.Events.InitialData.schema.decode(
+                        cloneDeepMutable(response.payload)
+                    );
 
-            subject.next({
-                collection: initialData.data.collection,
-                objects: initialData.data.elements,
-                publishedCollection: initialData.data.publishedCollection,
-                publishedElements: initialData.data.publishedElements,
-                ownRole: initialData.data.userRelationship,
-            });
-        });
-
-        this._collectionSubscriptions.get(setEntityId)?.subscribe({
-            complete: () => {
-                this.socket.emit('leaveCollectionRoom', setEntityId, () => {
-                    /* nop */
+                subject.next({
+                    collection: initialData.data.collection,
+                    objects: initialData.data.elements,
+                    publishedCollection: initialData.data.publishedCollection,
+                    publishedElements: initialData.data.publishedElements,
+                    ownRole: initialData.data.userRelationship,
                 });
-                this._collectionSubscriptions.delete(setEntityId);
+            }
+        );
+
+        this._collectionSubscriptions.get(collectionEntityId)?.subscribe({
+            complete: () => {
+                this.socket.emit(
+                    'leaveCollectionRoom',
+                    collectionEntityId,
+                    () => {
+                        /* nop */
+                    }
+                );
+                this._collectionSubscriptions.delete(collectionEntityId);
             },
         });
 
@@ -323,12 +331,12 @@ export class CollectionService {
     }
 
     public async getLatestElementsByCollectionId(
-        collectionId: CollectionEntityId
+        collectionEntityId: CollectionEntityId
     ) {
         const data = await lastValueFrom(
             this.httpClient.get<
                 typeof Marketplace.Collection.GetLatestElementsBySetVersionId.Response
-            >(`${this.ENDPOINT}/${collectionId}/latest`)
+            >(`${this.ENDPOINT}/${collectionEntityId}/latest`)
         );
 
         return data;
@@ -336,12 +344,12 @@ export class CollectionService {
 
     public async deleteElement(
         elementEntityId: ElementEntityId,
-        setEntityId: CollectionEntityId,
+        collectionEntityId: CollectionEntityId,
         acceptedCascadingDeletions: ElementVersionId[] = []
     ) {
         const result = await lastValueFrom(
             this.httpClient.delete<typeof Marketplace.Element.Delete.Response>(
-                `${this.ENDPOINT}/${setEntityId}/element/${elementEntityId}`,
+                `${this.ENDPOINT}/${collectionEntityId}/element/${elementEntityId}`,
                 {
                     body: Marketplace.Element.Delete.requestSchema.encode({
                         conflictResolution: {
@@ -408,12 +416,12 @@ export class CollectionService {
     }
 
     public async createElement(
-        setEntityId: CollectionEntityId,
+        collectionEntityId: CollectionEntityId,
         content: object
     ) {
         const data = await lastValueFrom(
             this.httpClient.post<typeof Marketplace.Element.Create.Response>(
-                `${this.ENDPOINT}/${setEntityId}/create`,
+                `${this.ENDPOINT}/${collectionEntityId}/create`,
                 Marketplace.Element.Create.requestSchema.parse({
                     data: [content],
                 })
@@ -439,12 +447,12 @@ export class CollectionService {
     public async updateElement(
         entityId: ElementEntityId,
         content: object,
-        setEntityId: CollectionEntityId,
+        collectionEntityId: CollectionEntityId,
         conflictResolution?: Marketplace.Element.EditConflictResolution
     ) {
         const data = await lastValueFrom(
             this.httpClient.put<typeof Marketplace.Element.Edit.Response>(
-                `${this.ENDPOINT}/${setEntityId}/element/${entityId}`,
+                `${this.ENDPOINT}/${collectionEntityId}/element/${entityId}`,
                 Marketplace.Element.Edit.requestSchema.parse({
                     data: content,
                     conflictResolution,
@@ -461,12 +469,12 @@ export class CollectionService {
         return data.result;
     }
 
-    public async makeCollectionPublic(setEntityId: CollectionEntityId) {
+    public async makeCollectionPublic(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.post<
                 typeof Marketplace.Collection.ChangeVisibility.Response
             >(
-                `${this.ENDPOINT}/${setEntityId}/change-visibility`,
+                `${this.ENDPOINT}/${collectionEntityId}/change-visibility`,
                 Marketplace.Collection.ChangeVisibility.requestSchema.parse({
                     visibility: 'public',
                 })
@@ -508,9 +516,12 @@ export class CollectionService {
 
         return parsedData.createdCollection;
     }
-    public async archiveCollection(setEntityId: CollectionEntityId) {
+    public async archiveCollection(collectionEntityId: CollectionEntityId) {
         await lastValueFrom(
-            this.httpClient.post(`${this.ENDPOINT}/${setEntityId}/archive`, {})
+            this.httpClient.post(
+                `${this.ENDPOINT}/${collectionEntityId}/archive`,
+                {}
+            )
         );
 
         this.messageService.postMessage({
@@ -520,10 +531,10 @@ export class CollectionService {
         });
     }
 
-    public async unarchiveCollection(setEntityId: CollectionEntityId) {
+    public async unarchiveCollection(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.post(
-                `${this.ENDPOINT}/${setEntityId}/unarchive`,
+                `${this.ENDPOINT}/${collectionEntityId}/unarchive`,
                 {}
             )
         );

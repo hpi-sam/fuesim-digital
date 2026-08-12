@@ -8,10 +8,11 @@ function createCollection(name: string) {
 
 describe('A trainer in the marketplace', () => {
     let collectionName: string;
-    let collectionId: string;
+    let collectionEntityId: string;
     const findOurCollection = () =>
         cy.get(`[data-cy="collectionCard"][title="${collectionName}"]`);
-    const goToOurCollection = () => cy.visit(`/collections/${collectionId}`);
+    const goToOurCollection = () =>
+        cy.visit(`/collections/${collectionEntityId}`);
 
     beforeEach(() => {
         cy.visit('http://localhost:3201/api/auth/indev-generate-token');
@@ -22,7 +23,7 @@ describe('A trainer in the marketplace', () => {
             .invoke('attr', 'data-entity')
             .then((id) => {
                 expect(id).to.be.a('string');
-                collectionId = id!;
+                collectionEntityId = id!;
             });
     });
 
@@ -179,7 +180,7 @@ describe('A trainer in the marketplace', () => {
         cy.get('[data-cy="availableCollectionsList"]')
             .should('exist')
             .find(
-                `[data-cy="availableCollectionItem"][data-entity="${collectionId}"]`
+                `[data-cy="availableCollectionItem"][data-entity="${collectionEntityId}"]`
             )
             .should('exist')
             .scrollIntoView()

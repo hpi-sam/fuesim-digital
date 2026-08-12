@@ -14,7 +14,7 @@ import {
 } from 'fuesim-digital-shared';
 import { AuthService } from '../../../../../core/auth.service';
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
-import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../core/collection.service';
 import { ApiService } from '../../../../../core/api.service';
 
 @Component({

@@ -10,7 +10,7 @@ import { checkCollectionMembershipRole } from 'fuesim-digital-shared';
 import {
     CollectionService,
     CollectionSubscriptionData,
-} from '../../../../core/exercise-element.service';
+} from '../../../../core/collection.service';
 import { openSelectCollectionModal } from '../../shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { UsedCollectionItemComponent } from './used-collection-item/used-collection-item.component';
 

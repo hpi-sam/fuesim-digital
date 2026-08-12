@@ -17,7 +17,7 @@ import { Immutable } from 'immer';
 import { EditConflictResolutionComponent } from '../edit-conflict-resolution/edit-conflict-resolution.component';
 import { VersionedElementModalData } from '../base-versioned-element-submodal';
 import { VersionedElementFormComponent } from '../versioned-element-form/versioned-element-form.component';
-import { CollectionService } from '../../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../../core/collection.service';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
 import { marketplaceComponentDefinitions } from '../../../definitions';

@@ -15,7 +15,7 @@ import {
 import { Subject } from 'rxjs';
 import { AppState } from '../../../../../state/app.state';
 import { selectSelectedCollections } from '../../../../../state/application/selectors/exercise.selectors';
-import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../core/collection.service';
 import { ElementCardComponent } from '../../../../marketplace/shared/cards/element-card/element-card.component';
 
 @Component({

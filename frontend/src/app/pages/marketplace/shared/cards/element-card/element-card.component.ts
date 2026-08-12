@@ -21,7 +21,7 @@ import {
     GenericElementCardOutputInjectionToken,
 } from '../generic-element-card/generic-element-card.component';
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
-import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../core/collection.service';
 import { EditingVersionedElementModalData } from '../../modals/editor-modals/base-versioned-element-submodal';
 // it's a necessary evil
 // eslint-disable-next-line import-x/no-cycle

@@ -5,7 +5,7 @@ import {
     ChangeDetectionStrategy,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CollectionService } from '../../../core/exercise-element.service';
+import { CollectionService } from '../../../core/collection.service';
 import { CollectionCardComponent } from '../shared/cards/collection-card/collection-card.component';
 
 @Component({

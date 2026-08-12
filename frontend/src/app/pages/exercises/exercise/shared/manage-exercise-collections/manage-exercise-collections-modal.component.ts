@@ -17,7 +17,7 @@ import {
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import { RouterLink } from '@angular/router';
-import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../core/collection.service';
 import { ExerciseService } from '../../../../../core/exercise.service';
 import { AppState } from '../../../../../state/app.state';
 import { openSelectCollectionModal } from '../../../../marketplace/shared/modals/marketplace-select-collection-modal/select-collection-modal';

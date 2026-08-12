@@ -353,11 +353,11 @@ export class CollectionService {
 
     public async getCollectionByJoinCode(joinCode: string) {
         return this.collectionRepository.transaction(async (tx) => {
-            const collectionId = this.exists(
+            const collectionEntityId = this.exists(
                 await tx.getCollectionByJoinCode(joinCode)
             );
             const collection = this.exists(
-                await tx.getLatestCollectionByEntityId(collectionId)
+                await tx.getLatestCollectionByEntityId(collectionEntityId)
             );
             return collection;
         });

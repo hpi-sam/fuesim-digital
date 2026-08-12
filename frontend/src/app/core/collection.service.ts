@@ -433,15 +433,15 @@ export class CollectionService {
     }
 
     public async uploadImage(
-        setEntityId: CollectionEntityId,
-        content: UploadedImageUploadInput
+        collectionEntityId: CollectionEntityId,
+        data: UploadedImageUploadInput
     ) {
-        const data = await lastValueFrom(
+        const result = await lastValueFrom(
             this.httpClient
                 .post(
-                    `${this.ENDPOINT}/${setEntityId}/upload`,
+                    `${this.ENDPOINT}/${collectionEntityId}/upload`,
                     Marketplace.Element.UploadImage.requestSchema.encode({
-                        data: content,
+                        data,
                     })
                 )
                 .pipe(
@@ -451,7 +451,7 @@ export class CollectionService {
                 )
         );
 
-        return data.result;
+        return result.result;
     }
 
     public async getElementVersions(

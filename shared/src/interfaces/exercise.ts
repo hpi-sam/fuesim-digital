@@ -66,7 +66,7 @@ export type ExerciseExistsResponseDataInput = z.input<
 
 export const postExerciseRequestDataSchema = z.object({
     organisationId: organisationIdSchema.nullable(),
-    importObject: z.any(),
+    importObject: z.any().optional(),
 });
 export type PostExerciseRequestData = z.infer<
     typeof postExerciseRequestDataSchema

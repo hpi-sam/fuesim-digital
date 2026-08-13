@@ -1,4 +1,10 @@
-import { Component, inject, OnInit, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    OnInit,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormsModule } from '@angular/forms';
 import {
@@ -23,13 +29,13 @@ import {
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
-import { VehicleTemplateDisplayComponent } from '../vehicle-template-display/vehicle-template-display.component';
 import { AlarmGroupVehicleItemComponent } from '../alarm-group-vehicle-item/alarm-group-vehicle-item.component';
 
 @Component({
     selector: 'app-alarm-group-item',
     templateUrl: './alarm-group-item.component.html',
     styleUrls: ['./alarm-group-item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AppSaveOnTypingDirective,
@@ -37,7 +43,6 @@ import { AlarmGroupVehicleItemComponent } from '../alarm-group-vehicle-item/alar
         NgbDropdownModule,
         NgbDropdownToggle,
         NgbDropdownMenu,
-        VehicleTemplateDisplayComponent,
         AsyncPipe,
         ValuesPipe,
         AlarmGroupVehicleItemComponent,

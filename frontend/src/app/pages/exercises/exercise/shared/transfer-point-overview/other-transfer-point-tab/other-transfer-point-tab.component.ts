@@ -1,5 +1,11 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input, viewChild } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    viewChild,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
@@ -24,6 +30,7 @@ import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
     selector: 'app-other-transfer-point-tab',
     templateUrl: './other-transfer-point-tab.component.html',
     styleUrls: ['./other-transfer-point-tab.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         TransferPointNameComponent,
         FormsModule,

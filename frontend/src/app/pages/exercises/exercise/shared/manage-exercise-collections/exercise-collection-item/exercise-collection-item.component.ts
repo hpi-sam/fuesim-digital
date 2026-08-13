@@ -1,4 +1,10 @@
-import { Component, inject, input, resource } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    resource,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     TemplateVersion,
     CollectionVersion,
@@ -18,7 +24,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { CollectionService } from '../../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../../core/collection.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import {
     selectSelectedCollections,
@@ -35,6 +41,7 @@ import { openMarketplaceCollectionUpdateImpactModal } from '../../../../../marke
     selector: 'app-exercise-collection-item-component',
     templateUrl: './exercise-collection-item.component.html',
     styleUrl: './exercise-collection-item.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [RouterLink, DatePipe],
 })
 export class ExerciseColletionItemComponent {

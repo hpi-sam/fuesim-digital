@@ -144,7 +144,7 @@ Die Behandlung von Patienten ist die zentrale Herausforderung in einer MANV-Lage
 
 Übungsleitende können Patienten aus dem Editor heraus auf der Karte platzieren. Sowohl Übungsleitende als auch Teilnehmende können Patienten per Drag-and-Drop auf der Karte verschieben.
 
-Das Patientensymbol auf der Karte zeigt, ob ein Patient gehfähig ist (stehendes Icon) oder nicht (liegendes Icon). Zusätzlich zeigt ein Punkt in der Mitte die aktuelle Sichtungsfarbe an. Wenn [Personal und Material](#fahrzeuge-mit-personal-und-material) neben einen Patienten geschoben werden, erscheinen Verbindungslinien, die anzeigen, welches medizinische Personal welchen Patienten aktuell behandelt.
+Das Patientensymbol auf der Karte zeigt, ob ein Patient gehfähig ist (stehendes Icon) oder nicht (liegendes Icon). Zusätzlich zeigt ein Punkt in der Mitte die aktuelle Sichtungsfarbe an. Wenn [Personal und Material](#fahrzeuge-mit-personal-und-material) neben einen Patienten geschoben werden, erscheinen Verbindungslinien, die anzeigen, welches medizinische Personal welchen Patienten aktuell behandelt. Wurde dem Patienten ein Ticket zugewiesen, wird dies über ein Ticket-Symbol über dem Patienten dargestellt.
 
 Teilnehmende sehen, wenn sie Patienten anklicken, ein Pop-up mit der Patienten-ID und dem Sichtungsstatus in der Überschrift sowie vier Tabs für den Inhalt. Im Tab <kbd>Allgemein</kbd> sind die Stammdaten (ID, Name, Alter, Geschlecht, Anschrift, Biometrie) sowie ein Feld für Anmerkungen zu finden, das durch die Teilnehmenden ausgefüllt werden kann. Im Tab <kbd>Vorsichtung</kbd> sind medizinische Informationen sowie ein Auswahlmenü zu finden, in dem eine Sichtungskategorie ausgewählt und Patienten als Transportpriorität markiert werden können. Im Tab <kbd>QR-Code</kbd> ist ein QR-Code zu sehen, der standardmäßig die Patienten-ID repräsentiert. Der als QR-Code angezeigte Text kann manuell überschrieben werden. Im Tab <kbd>Erkundung</kbd> können Übungsleitende zusätzliche Informationen hinterlegen, die Teilnehmende dann während der Übung aufrufen können. Die Patienten erhalten dann ein zusätzliches Sprechblasen-Symbol, welches das Vorhandensein von Erkundungsinformationen kennzeichnet. Siehe [Erkundungselemente](#erkundungselemente) für Details.
 
@@ -175,16 +175,20 @@ Patienten können während der laufenden Übung auch von Teilnehmenden verschobe
 
 Die medizinischen Details und das manuelle Auswählen einer Sichtungsfarbe durch Teilnehmende im Tab <kbd>Vorsichtung</kbd> ermöglichen, dass Teilnehmende die Besatzung eines ersteintreffenden Rettungsmittels spielen und entsprechend die Vorsicht übernehmen müssen. Sobald weitere Kräfte eintreffen, sollten die Teilnehmenden allerdings die Rolle einer Führungskraft einnehmen und die unterstellten Einsatzkräfte vorsichten lassen. Dazu muss, wie bei der medizinischen Behandlung, das entsprechende Personal neben die Patienten geschoben werden, bis eine Verbindungslinie erscheint. Pro Patient wird eine Minute zur Vorsichtung benötigt.
 
+Ebenso kann im Tab <kbd>Vorsichtung</kbd> jedem Patienten ein Ticket zugewiesen werden. Diese Zuweisung dient ausschließlich dazu, Patienten mit Ticket auf der Karte optisch unterscheiden zu können, wie wenn ein Ticket auf eine physische Patientenanhängekarte geklebt wurde. Darüber hinaus hat die Zuweisung eines Tickets keine Funktion, insbesondere können Patienten unabhängig davon, ob ein, und wenn ja, welches Ticket zugewiesen wurde, in jedes erreichbare Krankenhaus transportiert werden. Die Art der Ticket-Zuweisung kann in den [Übungseinstellungen](1_general.html#patienten) festgelegt werden.
+
 ## Technische Herausforderungen
 
 > [!WARNING]
 > Das Erstellen von eigenen technischen Herausforderungen ist derzeit noch in Entwicklung.
-> Es gibt im Moment nur eine geringe Menge an Vorlagen und die Bearbeitung ist nur sehr eingeschränkt möglich.
+> Es gibt im Moment nur eine geringe Menge an Vorlagen und die Bearbeitung ist nur eingeschränkt möglich.
 
 Neben Patienten kann es viele weitere Herausforderungen in einem Einsatz geben.
 Technische Herausforderungen sind in der FüSim Digital der Überbegriff für Kartenelemente, wo von Personal konkrete Aufgaben erfüllt werden müssen.
 
-![Übungsleitendenansicht einer technischen Herausforderung](exercise_elements_technical_challenge_overview.png)
+Technische Herausforderungen bestehen aus einer oder mehreren _Teilherausforderungen_.
+Einzelne Teilherausforderungen können verschiedene Zustände mit eigenen Erkundungsinformationen haben.
+Die erste Teilherausforderung legt zusätzlich fest, welche Grafik auf der Karte angezeigt werden soll.
 
 ### Interaktion auf der Übungskarte
 
@@ -192,16 +196,36 @@ Analog zu den Ansichten kann mit einem anhaltenden Klick (oder einer Berührung 
 den Rand eine technische Herausforderung verschoben werden.
 Wird die Ecke angeklickt oder berührt, kann die Größe geändert werden.
 
+Mit einem Klick auf die technische Herausforderung öffnet sich für Übungsleitende eine Übersichtsansicht.
+Hierbei gibt es einen Tab für jede Teilherausforderung, wo jeweils
+
+- der aktuelle Zustand,
+- der Fortschritt aller Timer und Aufgaben,
+- der Fortschritt aktuell möglicher Übergänge,
+- und aktuell zugewiesenes Personal mit deren Aufgaben
+
+sichtbar sind.
+
+![Übungsleitendenansicht einer technischen Herausforderung](exercise_elements_technical_challenge_overview.png)
+
 Teilnehmende können Personal per Drag-and-Drop auf die technischen Herausforderungen ziehen und bekommen dann mögliche Aufgaben angezeigt.
 
 ![Zuweisen einer Aufgabe](exercise_elements_technical_challenge_assignment.png)
 
 Teilnehmende sehen, wenn sie eine technische Herausforderung anklicken, ein Pop-up mit den dynamischen Erkundungstexten aller Teilherausforderungen.
+Für jede Teilherausforderung wird ein einzelner Tab mit dem jeweiligen aktuellen Erkundungstext angezeigt.
 Siehe [Erkundungselemente](#erkundungselemente) für Details.
 
 ### Einstellungsmöglichkeiten
 
-Bei Vorlagen von technischen Herausforderungen kann man eigene Erkundungstexte für die verschiedenen Zustände aller Teilherausforderungen einstellen.
+Übungsleitende können bei bestehende Vorlagen im Editor und bei bereits platzierten Herausforderungen auf der Karte
+die einzelnen Teilherausforderungen bearbeiten.
+Für eine Teilherausforderung ist Folgendes einstellbar:
+
+- der Name der Teilherausforderung
+- der Erkundungstext eines jeden Zustands
+- die Zeitdauer jedes Timers
+- die benötigte Zeit jeder Aufgabe
 
 ## Bilder
 

@@ -1,4 +1,10 @@
-import { computed, signal, type OnDestroy, type OnInit } from '@angular/core';
+import {
+    computed,
+    signal,
+    type OnDestroy,
+    type OnInit,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { getTransferPointFullName, uuid } from 'fuesim-digital-shared';
@@ -41,6 +47,7 @@ let firstVehiclesCount = 0;
     selector: 'app-send-alarm-group-interface',
     templateUrl: './send-alarm-group-interface.component.html',
     styleUrls: ['./send-alarm-group-interface.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         NgbPopover,

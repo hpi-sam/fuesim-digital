@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Material } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -13,6 +13,7 @@ import { MaterialDetailsComponent } from '../../../../../../../shared/components
     selector: 'app-material-popup',
     templateUrl: './material-popup.component.html',
     styleUrls: ['./material-popup.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MaterialDetailsComponent, AsyncPipe],
 })
 export class MaterialPopupComponent implements OnInit {

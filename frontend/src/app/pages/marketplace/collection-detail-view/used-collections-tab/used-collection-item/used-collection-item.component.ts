@@ -1,4 +1,10 @@
-import { Component, inject, input, resource } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    resource,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     NgbDropdownModule,
     NgbModal,
@@ -17,7 +23,7 @@ import {
 } from 'fuesim-digital-shared';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../core/collection.service';
 import { LoadingModalService } from '../../../../../core/loading-modal/loading-modal.service';
 import { CollectionElementsListComponent } from '../../../shared/collection-elements-list/collection-elements-list.component';
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
@@ -32,6 +38,7 @@ import { CollectionUpgradeImpactModalComponent } from '../../../shared/modals/ma
         RouterLink,
     ],
     templateUrl: './used-collection-item.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './used-collection-item.component.scss',
 })
 export class UsedCollectionItemComponent {

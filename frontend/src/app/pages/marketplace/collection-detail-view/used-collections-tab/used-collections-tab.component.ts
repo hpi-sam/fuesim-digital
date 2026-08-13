@@ -1,10 +1,16 @@
-import { Component, computed, inject, input } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { checkCollectionMembershipRole } from 'fuesim-digital-shared';
 import {
     CollectionService,
     CollectionSubscriptionData,
-} from '../../../../core/exercise-element.service';
+} from '../../../../core/collection.service';
 import { openSelectCollectionModal } from '../../shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { UsedCollectionItemComponent } from './used-collection-item/used-collection-item.component';
 
@@ -12,6 +18,7 @@ import { UsedCollectionItemComponent } from './used-collection-item/used-collect
     selector: 'app-used-collections-tab',
     imports: [UsedCollectionItemComponent],
     templateUrl: './used-collections-tab.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './used-collections-tab.component.scss',
 })
 export class UsedCollectionsTabComponent {

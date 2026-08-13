@@ -437,7 +437,9 @@ export type TransferTemplate =
       }
     | {
           type: 'technicalChallenge';
-          template: TechnicalChallengeTemplate;
+          template: TechnicalChallengeTemplate & {
+              image: ImageProperties;
+          };
       }
     | {
           type: 'transferPoint';

@@ -1,0 +1,1 @@
+ALTER TABLE "collections" ADD COLUMN "defaultForNewExercises" boolean DEFAULT false NOT NULL;

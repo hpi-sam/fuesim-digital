@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ExerciseRadiogram, UUID } from 'fuesim-digital-shared';
 import {
@@ -26,6 +31,7 @@ import { RadiogramCardComponent } from './radiogram-card/radiogram-card.componen
     selector: 'app-radiogram-list',
     templateUrl: './radiogram-list.component.html',
     styleUrls: ['./radiogram-list.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, RadiogramCardComponent, AsyncPipe],
 })
 export class RadiogramListComponent implements OnInit {

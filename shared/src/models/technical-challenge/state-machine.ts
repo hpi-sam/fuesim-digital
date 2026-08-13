@@ -14,6 +14,7 @@ import {
 } from '../user-generated-content.js';
 import { type Personnel, personnelSchema } from '../personnel.js';
 import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
+// eslint-disable-next-line import-x/no-cycle
 import {
     logTechnicalChallengePersonnelUnassigned,
     logTechnicalChallengeStateTransition,
@@ -28,13 +29,14 @@ const taskSchema = z.object({
     taskTypeId: taskTypeSchema.shape.id,
     totalDuration: z.number().nonnegative(),
 });
+export type Task = Immutable<z.infer<typeof taskSchema>>;
 
 const timerSchema = z.object({
     id: uuidSchema.brand<'TimerId'>(),
     name: z.string(),
     totalDuration: z.number().nonnegative(),
 });
-type Timer = z.infer<typeof timerSchema>;
+export type Timer = Immutable<z.infer<typeof timerSchema>>;
 
 const taskGuardSchema = z.object({
     type: z.literal('taskGuard'),
@@ -104,7 +106,7 @@ export const transitionSchema = z.object({
 export const stateMachineStateSchema = z.object({
     id: stateMachineStateIdSchema,
     title: z.string(),
-    image: imagePropertiesSchema,
+    image: imagePropertiesSchema.optional(),
     userGeneratedContent: userGeneratedContentSchema,
     viewedByParticipants: z.boolean().optional().default(false),
     /**
@@ -162,7 +164,7 @@ export function getTaskProgress(
     stateMachine: StateMachine
 ): TaskProgress {
     console.assert(
-        stateMachine.tasks[taskId],
+        !!stateMachine.tasks[taskId],
         `Task ${taskId} does not exist on stateMachine.`,
         stateMachine
     );
@@ -291,6 +293,9 @@ export const stateMachineSchema = z
             });
         }
     });
+export type StateMachineDefinition = Immutable<
+    z.infer<typeof stateMachineDefinitionSchema>
+>;
 export type StateMachine = Immutable<z.infer<typeof stateMachineSchema>>;
 
 export function currentStateOf(

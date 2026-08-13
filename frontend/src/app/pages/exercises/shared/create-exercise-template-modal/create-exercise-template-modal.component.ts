@@ -1,4 +1,11 @@
-import { output, signal, Component, inject, effect } from '@angular/core';
+import {
+    output,
+    signal,
+    Component,
+    inject,
+    effect,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import {
@@ -20,12 +27,14 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
 import { DisplayModelValidationComponent } from '../../../../shared/validation/display-model-validation/display-model-validation.component.js';
 import { AuthService } from '../../../../core/auth.service.js';
 import { FileInputDirective } from '../../../../shared/directives/file-input.directive.js';
+// eslint-disable-next-line import-x/no-cycle
 import { ExerciseService } from '../../../../core/exercise.service.js';
 
 @Component({
     selector: 'app-create-exercise-template-modal',
     templateUrl: './create-exercise-template-modal.component.html',
     styleUrls: ['./create-exercise-template-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         AutofocusDirective,
@@ -52,10 +61,10 @@ export class CreateExerciseTemplateModalComponent {
     readonly organisationLocked = signal<boolean>(false);
 
     readonly exerciseTemplateForm = form(this.model, (schemaPath) => {
-        disabled(
-            schemaPath.organisationId,
-            () => this.organisations.isLoading() || this.organisationLocked()
-        );
+        disabled(schemaPath.organisationId, {
+            when: () =>
+                this.organisations.isLoading() || this.organisationLocked(),
+        });
         validateStandardSchema(
             schemaPath,
             postExerciseTemplateRequestDataSchema

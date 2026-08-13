@@ -1,4 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import {
+    Component,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type { PatientStatus } from 'fuesim-digital-shared';
 import {
     NgbDropdown,
@@ -13,6 +18,7 @@ import { PatientStatusBadgeComponent } from '../patient-status-badge/patient-sta
     selector: 'app-patient-status-dropdown',
     templateUrl: './patient-status-dropdown.component.html',
     styleUrls: ['./patient-status-dropdown.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbDropdown,
         NgbDropdownToggle,

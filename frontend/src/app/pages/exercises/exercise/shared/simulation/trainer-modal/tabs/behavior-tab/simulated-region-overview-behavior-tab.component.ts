@@ -1,5 +1,10 @@
 import type { OnChanges, OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseSimulationBehaviorState,
@@ -47,6 +52,7 @@ let globalLastBehaviorType: ExerciseSimulationBehaviorType | undefined;
     selector: 'app-simulated-region-overview-behavior-tab',
     templateUrl: './simulated-region-overview-behavior-tab.component.html',
     styleUrls: ['./simulated-region-overview-behavior-tab.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         SimulatedRegionOverviewBehaviorAssignLeaderComponent,
         SimulatedRegionOverviewBehaviorTreatPatientsComponent,

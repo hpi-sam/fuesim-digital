@@ -183,8 +183,10 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
         const isFeatureLikeTechnicalChallenge = (f: FeatureLike) =>
             this.getElementFromFeature(f as Feature).type ===
             'technicalChallenge';
-        const challenge = features.find(isFeatureLikeTechnicalChallenge);
-        if (challenge) {
+        const challengeOnDropLocation = features.some(
+            isFeatureLikeTechnicalChallenge
+        );
+        if (challengeOnDropLocation) {
             return;
         }
 

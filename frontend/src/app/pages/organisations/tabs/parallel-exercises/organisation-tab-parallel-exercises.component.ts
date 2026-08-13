@@ -5,6 +5,7 @@ import {
     type OnInit,
     output,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     GetOrganisationDetailsResponseData,
@@ -19,6 +20,7 @@ import { ParallelExerciseCardComponent } from '../../../../shared/components/par
     selector: 'app-organisation-tab-parallel-exercises',
     imports: [FormsModule, ParallelExerciseCardComponent],
     templateUrl: './organisation-tab-parallel-exercises.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './organisation-tab-parallel-exercises.component.scss',
 })
 export class OrganisationTabParallelExercisesComponent implements OnInit {

@@ -73,7 +73,10 @@ and Fry1989
 [fire-single-personnel.svg](fire-single-personnel.svg)
 <https://commons.wikimedia.org/wiki/File:Person_(63361)_-_The_Noun_Project.svg> (edited)
 
-[fire-sf-personnel.svg](fire-sf-personnel.svg)
+[fire-leader-red-personnel.svg](fire-leader-red-personnel.svg) and
+[fire-leader-blue-personnel.svg](fire-leader-blue-personnel.svg) and
+[fire-leader-yellow-personnel.svg](fire-leader-white-personnel.svg) and
+[fire-leader-yellow-personnel.svg](fire-leader-yellow-personnel.svg)
 <https://commons.wikimedia.org/wiki/File:Person_(63361)_-_The_Noun_Project.svg> (edited)
 and Fry1989  
 <https://commons.wikimedia.org/wiki/File:MUTCD_RS-094.svg> (edited)
@@ -84,6 +87,10 @@ Bootstrap-Icon `bi-trash-fill` (edited)
 [naw-vehicle.png](naw-vehicle.png):  
 Lukas Radermacher, based on <https://commons.wikimedia.org/wiki/File:RTW_Altenburg.png> by Florian Greiz 23  
 License: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+[hlf-vehicle.png](hlf-vehicle.png):  
+Florian Greiz 23  
+<https://commons.wikimedia.org/wiki/File:HLF_Gera_PNG.png> (edited)
 
 [favicon.png](favicon.png): created by Freepik - Flaticon <https://www.flaticon.com/de/kostenlose-icons/alarm>
 
@@ -97,5 +104,6 @@ License: [MIT](https://github.com/twbs/icons/blob/main/LICENSE)
 Felix Koch, based on <https://illustoon.com/?dl=9476> and <https://illustoon.com/?id=2723> by [DESIGNALIKE](https://illustoon.com)
 License: CC0 1.0
 
-[lhf-vehicle](lhf-vehicle.svg):
-provided by Berliner Feuerwehr with permit to use within FüSim Digital
+[ticket.svg](ticket.svg):  
+<https://icons.getbootstrap.com/icons/ticket-perforated/> (edited)  
+License: [MIT](https://github.com/twbs/icons/blob/main/LICENSE)

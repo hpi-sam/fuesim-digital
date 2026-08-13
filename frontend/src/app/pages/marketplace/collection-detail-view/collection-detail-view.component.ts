@@ -1,4 +1,11 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    OnDestroy,
+    OnInit,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -18,11 +25,10 @@ import { DatePipe } from '@angular/common';
 import {
     CollectionService,
     CollectionSubscriptionData,
-} from '../../../core/exercise-element.service';
+} from '../../../core/collection.service';
 import { CollectionUpgradeImpactModalComponent } from '../shared/modals/marketplace-collection-update-impact-modal/marketplace-collection-update-impact-modal.component';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { CollectionDataResolverResult } from '../collection-data.resolver';
-import { openSelectCollectionModal } from '../shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { openCreateCollectionModal } from '../shared/modals/create-collection-modal/open-create-collection-modal';
 import { MessageService } from '../../../core/messages/message.service';
 import { UsedCollectionsTabComponent } from './used-collections-tab/used-collections-tab.component';
@@ -42,6 +48,7 @@ import { CollectionElementsTabComponent } from './collection-elements-tab/collec
         CollectionDetailsTabComponent,
     ],
     templateUrl: './collection-detail-view.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './collection-detail-view.component.scss',
 })
 export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
@@ -89,6 +96,7 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
 
     constructor() {
         // TODO: @Quixelation remove this before prod
+
         this.router.routeReuseStrategy.shouldReuseRoute = () => false;
         this.activatedRoute.queryParamMap
             .pipe(takeUntil(this.destroy$))
@@ -122,15 +130,6 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
                     };
                 }
             });
-    }
-
-    public async useCollection() {
-        openSelectCollectionModal(this.ngbModalService, {
-            allowCreate: true,
-            restrictToEditable: true,
-            selectionInfoText:
-                'Wollen Sie die Sammlung in der ausgewählten Sammlung verwenden?',
-        });
     }
 
     public async duplicateCollection() {

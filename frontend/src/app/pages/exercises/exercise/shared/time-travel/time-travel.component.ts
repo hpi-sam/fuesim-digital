@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { currentStateVersion, StateExport } from 'fuesim-digital-shared';
@@ -26,6 +26,7 @@ import { ExerciseService } from '../../../../../core/exercise.service.js';
     selector: 'app-time-travel',
     templateUrl: './time-travel.component.html',
     styleUrls: ['./time-travel.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ExerciseMapComponent,
         FormsModule,

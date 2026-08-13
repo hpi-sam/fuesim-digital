@@ -5,6 +5,7 @@ import {
     OnDestroy,
     signal,
     viewChild,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { NgbNav, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { OperationalSectionsTabComponent } from './operational-sections/operational-sections.component';
@@ -14,6 +15,7 @@ import { OperationDetailsTabComponent } from './operation-details/operation-deta
     selector: 'app-operations-tablet-view',
     templateUrl: './operations-tablet-view.component.html',
     styleUrl: './operations-tablet-view.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbNav,
         NgbNavModule,

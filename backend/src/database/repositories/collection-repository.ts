@@ -64,6 +64,21 @@ export class CollectionRepository extends BaseRepository {
             // This is slow with seperate queries, but we dont have that much default data and it is only run once,
             // so it should be fine for now :3
 
+            // check the default data for correctness
+            const defaultForNewExercisesCollectionAmount =
+                defaultCollectionData.reduce((acc, collection) => {
+                    if (collection.defaultForNewExercises) {
+                        return acc + 1;
+                    }
+                    return acc;
+                }, 0);
+
+            if (defaultForNewExercisesCollectionAmount !== 1) {
+                throw new Error(
+                    `There should be exactly one defaultForNewExercises collection, but there are ${defaultForNewExercisesCollectionAmount}`
+                );
+            }
+
             // CLEANUP existing default data to avoid conflicts
             const existingCollections = await tx.databaseConnection
                 .select()
@@ -108,6 +123,8 @@ export class CollectionRepository extends BaseRepository {
                     > = {
                         entityId: collection.entityId,
                         versionId: collection.versionId,
+                        defaultForNewExercises:
+                            collection.defaultForNewExercises,
                         title: collection.title,
                         description: collection.description,
                         archived: collection.archived,

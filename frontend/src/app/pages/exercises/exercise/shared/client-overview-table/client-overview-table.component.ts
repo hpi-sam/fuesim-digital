@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { SpecificRole } from 'fuesim-digital-shared';
@@ -25,6 +25,7 @@ import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
     selector: 'app-client-overview-table',
     templateUrl: './client-overview-table.component.html',
     styleUrls: ['./client-overview-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbDropdown,
         NgbDropdownToggle,

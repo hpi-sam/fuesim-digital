@@ -6,6 +6,7 @@ import {
     OnInit,
     output,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     disabled,
@@ -24,7 +25,7 @@ import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ApiService } from '../../../../../core/api.service';
 import { AuthService } from '../../../../../core/auth.service';
-import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../core/collection.service';
 import { AutofocusDirective } from '../../../../../shared/directives/autofocus.directive';
 import { DisplayModelValidationComponent } from '../../../../../shared/validation/display-model-validation/display-model-validation.component';
 
@@ -32,6 +33,7 @@ import { DisplayModelValidationComponent } from '../../../../../shared/validatio
     selector: 'app-create-collection-modal',
     templateUrl: './create-collection-modal.component.html',
     styleUrl: './create-collection-modal.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormField,
         DisplayModelValidationComponent,
@@ -58,9 +60,9 @@ export class CreateCollectionModalComponent implements OnInit {
     });
 
     public readonly collectionCreationForm = form(this.model, (schemaPath) => {
-        disabled(schemaPath.organisationId, () =>
-            this.organisations.isLoading()
-        );
+        disabled(schemaPath.organisationId, {
+            when: () => this.organisations.isLoading(),
+        });
         validateStandardSchema(
             schemaPath,
             Marketplace.Collection.Create.requestSchema
@@ -94,7 +96,7 @@ export class CreateCollectionModalComponent implements OnInit {
     }
 
     public async createNewCollection() {
-        let createdCollection: CollectionVersion | null = null;
+        let createdCollection: CollectionVersion | null;
         if (this.basedOnCollection === null) {
             createdCollection = await this.collectionService.createColletion(
                 this.collectionCreationForm.title().value(),

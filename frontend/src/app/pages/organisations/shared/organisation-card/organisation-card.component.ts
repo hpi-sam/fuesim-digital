@@ -1,4 +1,10 @@
-import { Component, input, output, inject } from '@angular/core';
+import {
+    Component,
+    input,
+    output,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type {
     GetOrganisationsResponseData,
     PatchOrganisationRequestData,
@@ -13,6 +19,7 @@ import { MessageService } from '../../../../core/messages/message.service';
     selector: 'app-organisation-card',
     templateUrl: './organisation-card.component.html',
     styleUrls: ['./organisation-card.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [RouterLink, NgbTooltip],
 })
 export class OrganisationCardComponent {

@@ -1,13 +1,20 @@
 <div class="modal-header">
     <h4 class="modal-title">
         Vorlage der Technischen Herausforderung bearbeiten
-        <!-- TODO: Help-Button -->
+        <app-help-button
+            url="2_exercises/3_exercise_elements.html#technische-herausforderungen"
+            [trainerOnly]="true"
+        />
     </h4>
     <button type="button" class="btn-close" (click)="close()"></button>
 </div>
 <div class="modal-body">
     <app-technical-challenge-template-form
         [technicalChallengeTemplate]="technicalChallengeTemplate()"
+        (technicalChallengeTemplateChange)="
+            updateTechnicalChallengeTemplate($event)
+        "
+        [taskNameMap]="taskNameMap()"
     >
     </app-technical-challenge-template-form>
 </div>

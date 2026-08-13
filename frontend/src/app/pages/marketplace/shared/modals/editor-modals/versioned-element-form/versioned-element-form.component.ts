@@ -1,4 +1,11 @@
-import { Component, computed, Injector, input, output } from '@angular/core';
+import {
+    Component,
+    computed,
+    Injector,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { marketplaceElementsDefinitions } from 'fuesim-digital-shared';
 import { NgComponentOutlet } from '@angular/common';
 import {
@@ -11,6 +18,7 @@ import { marketplaceComponentDefinitions } from '../../../definitions';
     selector: 'app-versioned-element-form',
     templateUrl: './versioned-element-form.component.html',
     styleUrl: './versioned-element-form.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgComponentOutlet],
 })
 export class VersionedElementFormComponent {

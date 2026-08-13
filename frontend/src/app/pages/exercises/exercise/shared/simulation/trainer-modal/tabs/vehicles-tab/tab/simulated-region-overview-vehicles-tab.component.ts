@@ -1,5 +1,11 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, VehicleTemplate } from 'fuesim-digital-shared';
 import { SimulatedRegion } from 'fuesim-digital-shared';
@@ -21,6 +27,7 @@ import { SimulatedRegionOverviewVehicleDetailsComponent } from '../details/simul
     selector: 'app-simulated-region-overview-vehicles-tab',
     templateUrl: './simulated-region-overview-vehicles-tab.component.html',
     styleUrls: ['./simulated-region-overview-vehicles-tab.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [SimulatedRegionOverviewVehicleDetailsComponent, AsyncPipe],
 })
 export class SimulatedRegionOverviewVehiclesTabComponent implements OnInit {

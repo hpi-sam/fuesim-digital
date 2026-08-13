@@ -5,6 +5,7 @@ import {
     input,
     OnInit,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ChangeZIndexMapImageAction, UUID } from 'fuesim-digital-shared';
@@ -34,6 +35,7 @@ import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.di
     selector: 'app-map-images-details',
     templateUrl: './map-images-details.component.html',
     styleUrls: ['./map-images-details.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         DisplayValidationComponent,
         ScoutableElementNavItemComponent,

@@ -84,30 +84,23 @@ function buildKellerexplosionTemplate(): TechnicalChallengeTemplate {
         name: 'Kellerexplosion in Mehrfamilienhaus',
         // TODO: Replace with an image fitting a basement explosion scene
         image: newImageProperties('/assets/kellerexplosion/base.png', 300, 1),
+        primaryStateMachineId: sm1Id,
         stateMachines: {
             [sm1Id]: {
                 id: sm1Id,
                 name: 'Struktursicherung',
                 initialStateId: StateMachineTesting.sm1StructureUnstable.id,
-                currentStateId: StateMachineTesting.sm1StructureUnstable.id,
                 states: sm1States,
                 tasks: sm1Tasks,
                 timers: sm1Timers,
-                simulationStartTime: 0,
-                taskTimeSpent: {},
-                assignedPersonnel: {},
             },
             [sm2Id]: {
                 id: sm2Id,
                 name: 'Personenrettung',
                 initialStateId: StateMachineTesting.sm2PersonMissing.id,
-                currentStateId: StateMachineTesting.sm2PersonMissing.id,
                 states: sm2States,
                 tasks: sm2Tasks,
                 timers: sm2Timers,
-                simulationStartTime: 0,
-                taskTimeSpent: {},
-                assignedPersonnel: {},
             },
         },
     };

@@ -1,5 +1,10 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -11,6 +16,7 @@ import { createSelectVehicle } from '../../../state/application/selectors/exerci
     selector: 'app-vehicle-available-slots-display',
     templateUrl: './vehicle-available-slots-display.component.html',
     styleUrls: ['./vehicle-available-slots-display.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe, KeyValuePipe],
 })
 export class VehicleAvailableSlotsDisplayComponent implements OnChanges {

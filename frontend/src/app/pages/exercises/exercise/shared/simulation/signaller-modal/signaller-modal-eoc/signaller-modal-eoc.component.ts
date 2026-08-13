@@ -1,4 +1,10 @@
-import { Component, TemplateRef, inject, viewChild } from '@angular/core';
+import {
+    Component,
+    TemplateRef,
+    inject,
+    viewChild,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component';
 import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
@@ -11,6 +17,7 @@ import { SendAlarmGroupInterfaceComponent } from '../../../../../../../shared/co
     selector: 'app-signaller-modal-eoc',
     templateUrl: './signaller-modal-eoc.component.html',
     styleUrls: ['./signaller-modal-eoc.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         SignallerModalInteractionsComponent,
         SignallerModalEocInformationAlarmGroupsSentComponent,

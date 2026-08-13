@@ -1,9 +1,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { defineConfig, globalIgnores } from 'eslint/config';
+import { defineConfig, globalIgnores, includeIgnoreFile } from 'eslint/config';
 import prettier from 'eslint-config-prettier/flat';
-import { includeIgnoreFile } from '@eslint/compat';
-import _import from 'eslint-plugin-import';
+import _import from 'eslint-plugin-import-x';
 import unicorn from 'eslint-plugin-unicorn';
 import ts from 'typescript-eslint';
 import js from '@eslint/js';
@@ -54,6 +53,8 @@ export default defineConfig([
         rules: {
             // TODO: Temporarily disabled, see #1121
             '@typescript-eslint/explicit-member-accessibility': 'off',
+            // TODO: Temporarily disable, until all are checked and migrated
+            '@angular-eslint/prefer-on-push-component-change-detection': 'off',
         },
     },
     {

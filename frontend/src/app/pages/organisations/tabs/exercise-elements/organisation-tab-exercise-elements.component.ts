@@ -5,6 +5,7 @@ import {
     type OnInit,
     output,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     CollectionVersion,
@@ -13,11 +14,8 @@ import {
 } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FileInputDirective } from '../../../../shared/directives/file-input.directive.js';
-import { HelpButtonComponent } from '../../../../help-button/help-button.component.js';
-import { ExerciseTemplateCardComponent } from '../../../../shared/components/exercise-template-card/exercise-template-card.component.js';
 import { openCreateCollectionModal } from '../../../marketplace/shared/modals/create-collection-modal/open-create-collection-modal';
-import { CollectionService } from '../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../core/collection.service';
 import { CollectionCardComponent } from '../../../marketplace/shared/cards/collection-card/collection-card.component';
 import { ConfirmationModalService } from '../../../../core/confirmation-modal/confirmation-modal.service';
 import { showJoinCollectionWorkflow } from '../../../marketplace/shared/modals/show-join-collection-workflow';
@@ -25,14 +23,9 @@ import { PromptModalService } from '../../../../core/prompt-modal/prompt-modal.s
 
 @Component({
     selector: 'app-organisation-tab-exercise-elements',
-    imports: [
-        FormsModule,
-        FileInputDirective,
-        HelpButtonComponent,
-        ExerciseTemplateCardComponent,
-        CollectionCardComponent,
-    ],
+    imports: [FormsModule, CollectionCardComponent],
     templateUrl: './organisation-tab-exercise-elements.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './organisation-tab-exercise-elements.component.scss',
 })
 export class OrganisationTabExerciseElementsComponent implements OnInit {

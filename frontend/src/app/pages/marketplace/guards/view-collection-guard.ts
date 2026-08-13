@@ -4,7 +4,7 @@ import type {
     RouterStateSnapshot,
 } from '@angular/router';
 import { RedirectCommand, Router } from '@angular/router';
-import { CollectionService } from '../../../core/exercise-element.service';
+import { CollectionService } from '../../../core/collection.service';
 import { MessageService } from '../../../core/messages/message.service';
 
 @Injectable({

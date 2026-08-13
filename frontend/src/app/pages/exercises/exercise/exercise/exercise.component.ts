@@ -1,5 +1,10 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, computed, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     NgbModal,
     NgbTooltip,
@@ -53,12 +58,13 @@ import { MapOperatorMapComponent } from '../shared/map-operator-map/map-operator
 import { openSelectCollectionModal } from '../../../marketplace/shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { LoadingModalService } from '../../../../core/loading-modal/loading-modal.service';
 import { openManageExerciseCollectionsModal } from '../shared/manage-exercise-collections/open-manage-exercise-collections-modal';
-import { CollectionService } from '../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../core/collection.service';
 
 @Component({
     selector: 'app-exercise',
     templateUrl: './exercise.component.html',
     styleUrls: ['./exercise.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ExerciseStateBadgeComponent,
         NgbTooltip,

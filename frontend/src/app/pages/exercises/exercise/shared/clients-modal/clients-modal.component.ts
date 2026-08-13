@@ -1,4 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
@@ -23,6 +29,7 @@ import { HelpButtonComponent } from '../../../../../help-button/help-button.comp
         HelpButtonComponent,
     ],
     templateUrl: './clients-modal.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './clients-modal.component.scss',
 })
 export class ClientsModalComponent {

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { UUID } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { PopupService } from '../../utility/popup.service';
@@ -11,6 +11,7 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
     selector: 'app-map-image-popup',
     templateUrl: './map-image-popup.component.html',
     styleUrls: ['./map-image-popup.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MapImagesDetailsComponent, HelpButtonComponent],
 })
 export class MapImagePopupComponent {

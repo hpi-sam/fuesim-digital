@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
     selector: 'app-health-page',
     templateUrl: './health-page.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./health-page.component.scss'],
 })
 /**

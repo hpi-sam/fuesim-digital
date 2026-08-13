@@ -1,15 +1,24 @@
 <nav #nav="ngbNav" ngbNav class="nav-tabs">
     @for (stateMachine of stateMachines(); track stateMachine.id) {
         <ng-container [ngbNavItem]="stateMachine.id">
-            <a ngbNavLink (click)="scoutStateMachine(stateMachine)">{{
-                stateMachine.name
-            }}</a>
-            @if (this.currentRole() === 'trainer') {
+            <a ngbNavLink (click)="scoutStateMachine(stateMachine)">
+                {{ stateMachine.name }}
+                @if (isTrainer()) {
+                    <button
+                        class="btn btn-sm btn-outline-warning ms-2"
+                        (click)="editStateMachine(stateMachine)"
+                    >
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                }
+            </a>
+            @if (isTrainer()) {
                 <ng-template ngbNavContent>
                     <app-state-machine-details [stateMachine]="stateMachine" />
                 </ng-template>
             } @else {
-                <ng-template ngbNavContent>
+                <ng-template ngbNavContent
+                    >F
                     @let userGeneratedContent =
                         currentStateOf(stateMachine).userGeneratedContent;
                     <app-user-generated-content-editor

@@ -1,4 +1,9 @@
-import { Component, inject, output } from '@angular/core';
+import {
+    Component,
+    inject,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { catchAllHospitalId, newHospital } from 'fuesim-digital-shared';
@@ -9,19 +14,13 @@ import type { AppState } from '../../../../../state/app.state';
 import { selectHospitals } from '../../../../../state/application/selectors/exercise.selectors';
 import { AppSaveOnTypingDirective } from '../../../../../shared/directives/app-save-on-typing.directive';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
-import { HelpButtonComponent } from '../../../../../help-button/help-button.component';
 
 @Component({
     selector: 'app-hospital-editor-page',
     templateUrl: './hospital-editor-page.component.html',
     styleUrls: ['./hospital-editor-page.component.scss'],
-    imports: [
-        FormsModule,
-        AppSaveOnTypingDirective,
-        AsyncPipe,
-        ValuesPipe,
-        HelpButtonComponent,
-    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [FormsModule, AppSaveOnTypingDirective, AsyncPipe, ValuesPipe],
 })
 export class HospitalEditorPageComponent {
     private readonly store = inject<Store<AppState>>(Store);

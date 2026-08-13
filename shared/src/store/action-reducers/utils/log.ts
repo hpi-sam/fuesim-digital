@@ -46,6 +46,7 @@ import { formatDuration } from '../../../utils/format-duration.js';
 import type { ExerciseRadiogram } from '../../../models/radiogram/exercise-radiogram.js';
 import { TypeAssertedObject } from '../../../utils/type-asserted-object.js';
 import type { StateMachineState } from '../../../models/technical-challenge/state-machine.js';
+// eslint-disable-next-line import-x/no-cycle
 import { TechnicalChallenge } from '../../../models/technical-challenge/technical-challenge.js';
 import {
     getElement,

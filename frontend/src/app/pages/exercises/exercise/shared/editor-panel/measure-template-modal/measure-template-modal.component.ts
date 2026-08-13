@@ -7,6 +7,7 @@ import {
     Injector,
     OnDestroy,
     OnInit,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -32,6 +33,7 @@ import type { MeasureTemplateValues } from '../measure-template-form/measure-tem
     selector: 'app-measure-template-modal',
     imports: [MeasureTemplateFormComponent],
     templateUrl: './measure-template-modal.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './measure-template-modal.component.scss',
 })
 export class MeasureTemplateModalComponent

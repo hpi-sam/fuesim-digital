@@ -5,6 +5,7 @@ import {
     OnDestroy,
     inject,
     input,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { NgClass } from '@angular/common';
@@ -14,6 +15,7 @@ import type { Hotkey, HotkeyState } from '../../services/hotkeys.service';
     selector: 'app-hotkey-indicator',
     templateUrl: './hotkey-indicator.component.html',
     styleUrls: ['./hotkey-indicator.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgClass],
 })
 export class HotkeyIndicatorComponent implements OnChanges, OnDestroy {

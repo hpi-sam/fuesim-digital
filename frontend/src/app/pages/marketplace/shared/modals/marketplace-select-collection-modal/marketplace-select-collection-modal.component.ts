@@ -5,6 +5,7 @@ import {
     inject,
     resource,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     CollectionVersion,
@@ -21,14 +22,15 @@ import {
 import { Subject } from 'rxjs';
 import { RouterLink, RouterLinkWithHref } from '@angular/router';
 // we cannot get around it
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import { CollectionElementsListComponent } from '../../collection-elements-list/collection-elements-list.component';
-import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../core/collection.service';
 
 @Component({
     selector: 'app-select-collection-modal',
     templateUrl: './marketplace-select-collection-modal.component.html',
     styleUrl: './marketplace-select-collection-modal.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CollectionElementsListComponent,
         RouterLink,
@@ -64,13 +66,19 @@ export class MarketplaceSelectCollectionModalComponent {
 
             const userAvailableCollections =
                 this.userAvailableCollections.value();
-            if (this.skipOnNoChoice && userAvailableCollections.length === 1) {
-                const firstCollection = userAvailableCollections[0];
-                if (firstCollection === undefined) {
-                    console.warn('only collection is undefined');
+            const userCreatedCollections = userAvailableCollections.filter(
+                (collection) => collection.visibility !== 'embedded'
+            );
+
+            if (this.skipOnNoChoice && userCreatedCollections.length === 0) {
+                const defaultCollection = userAvailableCollections.find(
+                    (collection) => collection.defaultForNewExercises
+                );
+                if (defaultCollection === undefined) {
+                    console.warn('default collection is undefined');
                     return;
                 }
-                this.close(firstCollection);
+                this.close(defaultCollection);
             }
         });
     }

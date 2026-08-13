@@ -167,13 +167,13 @@ async function main() {
                 await collectionService.upgradeAllElementStateVersionsToLatest();
             const endTime = performance.now();
             console.log(
-                `✅ Successfully upgraded ${versionCount} Element StateVersions in ${(
+                `✅ Successfully migrated ${versionCount} collection element(s) to current state version in ${(
                     endTime - startTime
                 ).toFixed(3)} ms.`
             );
         } catch (e: unknown) {
             console.error(
-                '❌ An error occurred while upgrading Element StateVersions.'
+                '❌ An error occurred while migrating collection elements to current state version.'
             );
             throw e;
         }

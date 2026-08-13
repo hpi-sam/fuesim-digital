@@ -1,4 +1,11 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    effect,
+    inject,
+    input,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     disabled,
     form,
@@ -28,6 +35,7 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
     selector: 'app-material-template-form',
     templateUrl: './material-template-form.component.html',
     styleUrl: './material-template-form.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CaterForFormComponent,
         DisplayModelValidationComponent,
@@ -66,7 +74,7 @@ export class MaterialTemplateFormComponent implements BaseVersionedElementSubmod
     });
 
     public readonly materialForm = form(this.values, (schema) => {
-        disabled(schema, this.disabled);
+        disabled(schema, { when: () => this.disabled() });
         validateStandardSchema(
             schema,
             stripEntityFromElementSchema(materialTemplateSchema)

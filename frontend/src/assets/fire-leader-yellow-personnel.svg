@@ -9,8 +9,8 @@
    enable-background="new 0 0 100 100"
    xml:space="preserve"
    id="svg6587"
-   sodipodi:docname="sf-personnel.svg"
-   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   sodipodi:docname="fire-leader-yellow-personnel.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -26,13 +26,13 @@
    inkscape:deskcolor="#505050"
    showgrid="false"
    inkscape:zoom="7.5719349"
-   inkscape:cx="45.893157"
-   inkscape:cy="56.128322"
-   inkscape:window-width="2560"
-   inkscape:window-height="1371"
-   inkscape:window-x="0"
-   inkscape:window-y="0"
-   inkscape:window-maximized="1"
+   inkscape:cx="45.827124"
+   inkscape:cy="56.260389"
+   inkscape:window-width="841"
+   inkscape:window-height="1120"
+   inkscape:window-x="2077"
+   inkscape:window-y="15"
+   inkscape:window-maximized="0"
    inkscape:current-layer="svg6587" />
     <circle
    stroke="#fefefe"
@@ -74,32 +74,32 @@
    preserveAspectRatio="none"
    viewBox="-250 -55 460.68748 355.68749"
    id="svg6585"
-   style="stroke-width:0.99965512;stroke-dasharray:none;opacity:1;fill:#c00000;fill-opacity:1">
+   style="stroke-width:0.99965512;stroke-dasharray:none;opacity:1;fill:#ffff00;fill-opacity:1">
         <path
    fill="#0044cb"
    d="m 124.2554,155.74907 0,38.6962 c 0,0 1.35114,10.18117 -11.43,10.18117 l -50.387254,0 c -12.774083,0 -11.43,-10.18117 -11.43,-10.18117 l 0,-38.6962 73.247254,0 z"
    id="path6575"
-   style="stroke-width:0.99965512;stroke-dasharray:none;fill:#c00000;fill-opacity:1" />
+   style="stroke-width:0.99965512;stroke-dasharray:none;fill:#ffff00;fill-opacity:1" />
         <path
    fill="#0044cb"
    d="m 101.05673,51.01641 c -1.763889,-2.843389 -4.914195,-4.73075 -8.509,-4.73075 l -16.248945,0.0388 c -5.697361,0 -10.31875,4.624917 -10.31875,10.322278 0,2.007306 0.564444,3.866445 1.548694,5.450417 l 0.123472,0.179916 c 4.797778,6.787445 7.602361,15.053028 7.602361,23.985361 0,15.158863 -8.089194,28.419773 -20.196527,35.697583 l -0.123472,0.0811 c -2.328333,1.46755 -3.887611,4.01814 -3.887611,6.98853 l 0,12.29783 73.278998,0 0,-45.137915 c 0,0 0.0811,-4.162778 -2.72344,-9.3345 L 101.05673,51.01641 z"
    id="path6577"
-   style="stroke-width:0.99965512;stroke-dasharray:none;fill:#c00000;fill-opacity:1" />
+   style="stroke-width:0.99965512;stroke-dasharray:none;fill:#ffff00;fill-opacity:1" />
         <path
    fill="#0044cb"
    d="m 154.36498,51.01641 c 1.77095,-2.843389 4.92125,-4.73075 8.509,-4.73075 l 16.256,0.0388 c 5.69736,0 10.32228,4.624917 10.32228,10.322278 0,2.007306 -0.5715,3.866445 -1.55222,5.450417 l -0.13053,0.179916 c -4.78014,6.787445 -7.59178,15.053028 -7.59178,23.985361 0,15.158863 8.09625,28.419773 20.193,35.697583 l 0.11289,0.0811 c 2.3495,1.46755 3.90525,4.01814 3.90525,6.98853 l 0,12.29783 -73.27547,0 0,-45.137915 c 0,0 -0.0988,-4.162778 2.71286,-9.3345 L 154.36498,51.01641 z"
    id="path6579"
-   style="stroke-width:0.99965512;stroke-dasharray:none;fill:#c00000;fill-opacity:1" />
+   style="stroke-width:0.99965512;stroke-dasharray:none;fill:#ffff00;fill-opacity:1" />
         <path
    fill="#0044cb"
    d="m 204.34654,155.74907 0,38.6962 c 0,0 1.35114,10.18117 -11.41589,10.18117 l -50.40137,0 c -12.76702,0 -11.42294,-10.18117 -11.42294,-10.18117 l 0,-38.6962 73.2402,0 z"
    id="path6581"
-   style="stroke-width:0.99965512;stroke-dasharray:none;fill:#c00000;fill-opacity:1" />
+   style="stroke-width:0.99965512;stroke-dasharray:none;fill:#ffff00;fill-opacity:1" />
         <path
    fill="#0044cb"
    d="m 133.91092,152.1578 c 1.90853,0 3.45017,-1.54164 3.45017,-3.44311 0,-1.90853 -1.54164,-3.4537 -3.45017,-3.4537 l -11.70869,0 c -1.90853,0 -3.45722,1.54517 -3.45722,3.4537 0,1.90147 1.54869,3.44311 3.45722,3.44311 l 11.70869,0 z"
    id="path6583"
-   style="stroke-width:0.99965512;stroke-dasharray:none;fill:#c00000;fill-opacity:1" />
+   style="stroke-width:0.99965512;stroke-dasharray:none;fill:#ffff00;fill-opacity:1" />
     </svg>
 <text
    xml:space="preserve"
@@ -111,4 +111,4 @@
      id="tspan6593"
      style="font-weight:bold;stroke-width:1.04167"
      x="49.319065"
-     y="32.198444">SF</tspan></text></svg>
+     y="32.198444" /></text></svg>

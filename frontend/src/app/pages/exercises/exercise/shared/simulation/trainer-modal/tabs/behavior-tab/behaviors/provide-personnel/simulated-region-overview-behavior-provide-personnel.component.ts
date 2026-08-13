@@ -1,5 +1,10 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ProvidePersonnelBehaviorState,
@@ -32,6 +37,7 @@ import {
     styleUrls: [
         './simulated-region-overview-behavior-provide-personnel.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbDropdown,
         NgbDropdownToggle,

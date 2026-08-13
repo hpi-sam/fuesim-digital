@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     ChangeElementType,
     TemplateVersion,
@@ -14,13 +21,12 @@ import {
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
 import { VersionedElementDisplayNamePipe } from '../../../../shared/pipes/versioned-element-type-display-name.pipe';
-// its a nessesary evil
-// eslint-disable-next-line import/no-cycle
+// it's a necessary evil
+// eslint-disable-next-line import-x/no-cycle
 import { ElementCardComponent } from '../cards/element-card/element-card.component';
 import { CreatingVersionedElementModalData } from '../modals/editor-modals/base-versioned-element-submodal';
-import { CollectionService } from '../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../core/collection.service';
 import { GenericElementCardIndicator } from '../cards/generic-element-card/generic-element-card.component';
-import { FileInputDirective } from '../../../../shared/directives/file-input.directive';
 import { openVersionedElementModal } from '../modals/editor-modals/versioned-element-modal/open-versioned-element-model';
 import { ConfirmationModalService } from '../../../../core/confirmation-modal/confirmation-modal.service';
 
@@ -28,11 +34,8 @@ import { ConfirmationModalService } from '../../../../core/confirmation-modal/co
     selector: 'app-collection-elements-list',
     templateUrl: './collection-elements-list.component.html',
     styleUrl: './collection-elements-list.component.scss',
-    imports: [
-        ElementCardComponent,
-        VersionedElementDisplayNamePipe,
-        FileInputDirective,
-    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [ElementCardComponent, VersionedElementDisplayNamePipe],
 })
 export class CollectionElementsListComponent {
     private readonly confirmationService = inject(ConfirmationModalService);

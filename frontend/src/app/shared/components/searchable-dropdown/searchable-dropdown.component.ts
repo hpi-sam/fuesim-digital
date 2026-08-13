@@ -6,6 +6,7 @@ import {
     input,
     output,
     viewChild,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type { HotkeyLayer } from '../../services/hotkeys.service';
@@ -23,6 +24,7 @@ export interface SearchableDropdownOption {
     selector: 'app-searchable-dropdown',
     templateUrl: './searchable-dropdown.component.html',
     styleUrls: ['./searchable-dropdown.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, HotkeyIndicatorComponent],
 })
 export class SearchableDropdownComponent

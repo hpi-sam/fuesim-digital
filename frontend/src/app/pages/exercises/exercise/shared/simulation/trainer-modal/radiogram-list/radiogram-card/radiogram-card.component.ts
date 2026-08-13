@@ -4,7 +4,12 @@ import type {
     OnInit,
     SimpleChanges,
 } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     ExerciseRadiogram,
@@ -52,6 +57,7 @@ const unavailableClient = newClient(
     selector: 'app-radiogram-card',
     templateUrl: './radiogram-card.component.html',
     styleUrls: ['./radiogram-card.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgClass,
         RadiogramCardContentComponent,

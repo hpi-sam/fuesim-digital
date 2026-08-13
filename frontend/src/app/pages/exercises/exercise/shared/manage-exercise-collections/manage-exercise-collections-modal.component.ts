@@ -1,4 +1,10 @@
-import { Component, inject, resource, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    resource,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     NgbAccordionModule,
     NgbActiveModal,
@@ -11,12 +17,11 @@ import {
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import { RouterLink } from '@angular/router';
-import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../core/collection.service';
 import { ExerciseService } from '../../../../../core/exercise.service';
 import { AppState } from '../../../../../state/app.state';
 import { openSelectCollectionModal } from '../../../../marketplace/shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { DragElementService } from '../core/drag-element.service';
-import { CollectionElementsListComponent } from '../../../../marketplace/shared/collection-elements-list/collection-elements-list.component';
 import { selectSelectedCollections } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectExerciseKey } from '../../../../../state/application/selectors/application.selectors';
 import { ExerciseColletionItemComponent } from './exercise-collection-item/exercise-collection-item.component';
@@ -25,12 +30,8 @@ import { ExerciseColletionItemComponent } from './exercise-collection-item/exerc
     selector: 'app-manage-exercise-collections-modal',
     templateUrl: './manage-exercise-collections-modal.component.html',
     styleUrl: './manage-exercise-collections-modal.component.scss',
-    imports: [
-        ExerciseColletionItemComponent,
-        NgbAccordionModule,
-        CollectionElementsListComponent,
-        RouterLink,
-    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [ExerciseColletionItemComponent, NgbAccordionModule, RouterLink],
 })
 export class ManageExerciseCollectionsModalComponent {
     private readonly activeModal = inject(NgbActiveModal);

@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import type { TreatmentProgress } from 'fuesim-digital-shared';
 import { TreatmentProgressToGermanNamePipe } from '../tabs/behavior-tab/utils/treatment-progress-to-german-name.pipe';
 
@@ -6,6 +6,7 @@ import { TreatmentProgressToGermanNamePipe } from '../tabs/behavior-tab/utils/tr
     selector: 'app-treatment-status-badge',
     templateUrl: './treatment-status-badge.component.html',
     styleUrls: ['./treatment-status-badge.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [TreatmentProgressToGermanNamePipe],
 })
 export class TreatmentStatusBadgeComponent {

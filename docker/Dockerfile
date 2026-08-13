@@ -17,7 +17,7 @@ WORKDIR $PRODUCTION_PATH/docs
 RUN mdbook build
 
 # Use official node image as the base image
-FROM node:24.13.0-trixie-slim AS builder
+FROM node:26.5.0-trixie-slim AS builder
 
 # Disable interactive frontend to prevent install dialogues
 ARG DEBIAN_FRONTEND=noninteractive
@@ -45,7 +45,7 @@ RUN npm run deployment
 ####  prod container ####
 
 # Use official node image as the base image, important to be on debian based for apt-get
-FROM node:24.13.0-trixie-slim
+FROM node:26.5.0-trixie-slim
 
 # needed to use PRODUCTION_PATH before the first FROM
 ARG PRODUCTION_PATH
@@ -88,7 +88,7 @@ COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/node_modu
 COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/package.json $PRODUCTION_PATH/backend
 
 # copy docs
-COPY --chown=www-data:www-data --from=docs-builder $PRODUCTION_PATH/docs/book $PRODUCTION_PATH/frontend/about/help
+COPY --chown=www-data:www-data --from=docs-builder $PRODUCTION_PATH/docs/book $PRODUCTION_PATH/docs
 
 # set correct working directory for docker-entrypoint.sh
 WORKDIR $PRODUCTION_PATH/backend

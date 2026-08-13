@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -17,6 +17,7 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
     selector: 'app-vehicle-popup',
     templateUrl: './vehicle-popup.component.html',
     styleUrls: ['./vehicle-popup.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         VehicleNameEditorComponent,
         VehicleAvailableSlotsDisplayComponent,

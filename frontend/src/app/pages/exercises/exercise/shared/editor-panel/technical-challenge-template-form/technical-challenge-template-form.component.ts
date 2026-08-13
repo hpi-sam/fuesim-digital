@@ -1,46 +1,122 @@
-import { Component, inject, input, linkedSignal } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    linkedSignal,
+    model,
+} from '@angular/core';
 import {
     TechnicalChallengeTemplate,
     cloneDeepMutable,
 } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
-import { disabled, form, FormField } from '@angular/forms/signals';
-import type { StateMachine } from 'fuesim-digital-shared';
-import type { WritableDraft } from 'immer';
+import {
+    applyEach,
+    disabled,
+    form,
+    FormField,
+    readonly,
+} from '@angular/forms/signals';
+import { castDraft, type WritableDraft } from 'immer';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EditStateMachineModalComponent } from '../edit-state-machine-modal/edit-state-machine-modal.component.js';
-
+import type {
+    StateMachineDefinition,
+    StateMachine,
+} from 'fuesim-digital-shared';
+import {
+    CdkDrag,
+    type CdkDragDrop,
+    CdkDropList,
+    moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import type { TaskNameMap } from '../edit-state-machine-form/edit-state-machine-form.component.js';
+import { openEditStateMachineTemplateModal } from '../edit-state-machine-template-modal/edit-state-machine-template-modal.component.js';
 @Component({
     selector: 'app-technical-challenge-template-form',
-    imports: [FormsModule, FormField],
+    imports: [FormsModule, FormField, CdkDropList, CdkDrag],
     templateUrl: './technical-challenge-template-form.component.html',
 })
 export class TechnicalChallengeTemplateFormComponent {
     readonly technicalChallengeTemplate =
-        input.required<TechnicalChallengeTemplate>();
+        model.required<TechnicalChallengeTemplate>();
+    readonly taskNameMap = input.required<TaskNameMap>();
 
     readonly formModel = linkedSignal({
         source: this.technicalChallengeTemplate,
         computation: domainToFormModel,
     });
 
-    readonly templateForm = form(this.formModel, (schema) => {
-        disabled(schema.name);
-    });
+    readonly templateForm = form(
+        this.formModel,
+        (schema) => {
+            readonly(schema.id);
+            disabled(schema.name);
+            applyEach(schema.stateMachines, readonly);
+        },
+        {
+            submission: {
+                action: async (tree) =>
+                    this.technicalChallengeTemplate.set(
+                        this.formToDomainModel(tree().value())
+                    ),
+            },
+        }
+    );
     private readonly ngbModalService = inject(NgbModal);
 
     public async editStateMachine(stateMachine: StateMachineFormModel) {
-        const modalRef = this.ngbModalService.open(
-            EditStateMachineModalComponent,
-            {
-                size: 'lg',
-            }
+        openEditStateMachineTemplateModal(
+            this.ngbModalService,
+            computed(
+                () =>
+                    this.technicalChallengeTemplate().stateMachines[
+                        stateMachine.id as StateMachine['id']
+                    ]!
+            ),
+            computed(
+                () => this.formModel().primaryStateMachineId === stateMachine.id
+            ),
+            async (updatedStateMachine: StateMachineDefinition) => {
+                this.technicalChallengeTemplate.update((currentTemplate) => {
+                    const updatedTemplate = cloneDeepMutable(currentTemplate);
+                    updatedTemplate.stateMachines[updatedStateMachine.id] =
+                        castDraft(updatedStateMachine);
+                    return updatedTemplate;
+                });
+            },
+            computed(() => this.taskNameMap())
         );
-        const componentInstance =
-            modalRef.componentInstance as EditStateMachineModalComponent;
-        componentInstance.initialStateMachineId = stateMachine.id;
-        componentInstance.containingTechnicalChallengeTemplateId =
-            this.technicalChallengeTemplate().id;
+    }
+
+    stateMachineDropped(event: CdkDragDrop<StateMachineFormModel[]>) {
+        this.templateForm.stateMachines().value.update((oldStateMachines) => {
+            moveItemInArray(
+                oldStateMachines,
+                event.previousIndex,
+                event.currentIndex
+            );
+            return oldStateMachines;
+        });
+    }
+
+    private formToDomainModel(
+        formValue: TechnicalChallengeFormModel
+    ): TechnicalChallengeTemplate {
+        const previousTemplate = this.technicalChallengeTemplate();
+
+        const stateMachines = Object.fromEntries(
+            formValue.stateMachines.map(({ id, name }) => [
+                id,
+                previousTemplate.stateMachines[id as StateMachine['id']]!,
+            ])
+        );
+
+        return {
+            ...previousTemplate,
+            name: formValue.name,
+            stateMachines,
+        };
     }
 }
 
@@ -48,6 +124,7 @@ interface TechnicalChallengeFormModel {
     id: string;
     name: string;
     stateMachines: StateMachineFormModel[];
+    primaryStateMachineId: string;
 }
 interface StateMachineFormModel {
     id: string;
@@ -55,7 +132,7 @@ interface StateMachineFormModel {
 }
 
 function stateMachineToFormModel(
-    stateMachine: WritableDraft<StateMachine>
+    stateMachine: WritableDraft<StateMachineDefinition>
 ): StateMachineFormModel {
     return {
         id: stateMachine.id,
@@ -72,5 +149,6 @@ function domainToFormModel(
         stateMachines: Object.values(mutableCopy.stateMachines).map(
             stateMachineToFormModel
         ),
+        primaryStateMachineId: mutableCopy.primaryStateMachineId,
     };
 }

@@ -1,4 +1,11 @@
-import { OnInit, inject, Component, computed, signal } from '@angular/core';
+import {
+    OnInit,
+    inject,
+    Component,
+    computed,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     NgbModal,
     NgbAccordionDirective,
@@ -18,8 +25,6 @@ import {
     bystanderCategories,
     scoutableMapImageTemplate,
     getEntityFromElement,
-} from 'fuesim-digital-shared';
-import type {
     PatientCategory,
     UUID,
     TechnicalChallengeTemplate,
@@ -30,12 +35,7 @@ import type {
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, KeyValuePipe, NgTemplateOutlet } from '@angular/common';
-import {
-    CdkDrag,
-    CdkDragPlaceholder,
-    CdkDropList,
-    CdkDropListGroup,
-} from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import {
     DragElementService,
     TransferTemplate,
@@ -59,7 +59,6 @@ import {
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
-import { FileInputDirective } from '../../../../../shared/directives/file-input.directive';
 import { PatientStatusBadgeComponent } from '../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
@@ -69,8 +68,9 @@ import { MapEditorCardComponent } from '../../../../../shared/components/map-edi
 import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group-overview-page.component';
 import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
 import { openManageExerciseCollectionsModal } from '../manage-exercise-collections/open-manage-exercise-collections-modal';
-import { CollectionService } from '../../../../../core/exercise-element.service';
-import { openEditTechnicalChallengeTemplateModal } from '../editor-panel/edit-technical-challenge-template-modal/open-edit-technical-challenge-template-modal.js';
+import { CollectionService } from '../../../../../core/collection.service';
+import { openUploadTechnicalChallengeModal } from '../editor-panel/upload-technical-challenge-template-modal/upload-technical-challenge-template-modal.component.js';
+import { openEditTechnicalChallengeTemplateModal } from '../editor-panel/edit-technical-challenge-template-modal/edit-technical-challenge-template-modal.component.js';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -86,9 +86,9 @@ type FilterCategory =
     selector: 'app-trainer-map-editor',
     templateUrl: './trainer-map-editor.component.html',
     styleUrls: ['./trainer-map-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ExerciseMapComponent,
-        FileInputDirective,
         NgbAccordionDirective,
         NgbAccordionItem,
         NgbAccordionHeader,
@@ -109,7 +109,6 @@ type FilterCategory =
         CdkDropList,
         CdkDropListGroup,
         NgTemplateOutlet,
-        CdkDragPlaceholder,
         AlarmGroupOverviewPageComponent,
         HospitalEditorPageComponent,
     ],
@@ -226,6 +225,10 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public editMapImageTemplate(mapImageTemplateId: UUID) {
         openEditImageTemplateModal(this.ngbModalService, mapImageTemplateId);
+    }
+
+    public addTechnicalChallengeTemplate() {
+        openUploadTechnicalChallengeModal(this.ngbModalService);
     }
 
     public editTechnicalChallengeTemplate(technicalChallengeTemplateId: UUID) {
@@ -354,4 +357,7 @@ export class TrainerMapEditorComponent implements OnInit {
             this.importingTemplates = false;
         }
     }
+
+    protected readonly getTechnicalChallengeTemplateImage =
+        TechnicalChallengeTemplate.getImage;
 }

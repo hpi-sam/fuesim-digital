@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { uuid } from 'fuesim-digital-shared';
 import { Router } from '@angular/router';
@@ -18,6 +18,7 @@ import { ApiService } from '../../../core/api.service.js';
 @Component({
     selector: 'app-start-pause-button',
     templateUrl: './start-pause-button.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./start-pause-button.component.scss'],
 })
 export class StartPauseButtonComponent {

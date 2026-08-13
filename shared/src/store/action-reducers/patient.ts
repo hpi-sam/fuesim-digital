@@ -113,22 +113,16 @@ export type SetPatientTransportPriorityAction = Immutable<
     z.infer<typeof setPatientTransportPriorityActionSchema>
 >;
 
+const setPatientTicketActionSchema = z.strictObject({
+    type: z.literal('[Patient] Set Ticket'),
+    patientId: patientSchema.shape.id,
+    ticket: patientSchema.shape.ticket,
+});
+export type SetPatientTicketAction = Immutable<
+    z.infer<typeof setPatientTicketActionSchema>
+>;
+
 export namespace PatientActionReducers {
-    export const setPatientTransportPriority: ActionReducer<SetPatientTransportPriorityAction> =
-        {
-            type: setPatientTransportPriorityActionSchema.shape.type.value,
-            actionSchema: setPatientTransportPriorityActionSchema,
-            reducer: (draftState, { patientId, hasTransportPriority }) => {
-                const patient = getElement(draftState, 'patient', patientId);
-                if (patient.hasTransportPriority !== hasTransportPriority) {
-                    patient.hasTransportPriority = hasTransportPriority;
-                }
-
-                return draftState;
-            },
-            rights: 'participant',
-        };
-
     export const addPatient: ActionReducer<AddPatientAction> = {
         type: addPatientActionSchema.shape.type.value,
         actionSchema: addPatientActionSchema,
@@ -294,6 +288,29 @@ export namespace PatientActionReducers {
         reducer: (draftState, { patientId, customQRCode }) => {
             const patient = getElement(draftState, 'patient', patientId);
             patient.customQRCode = customQRCode;
+            return draftState;
+        },
+        rights: 'participant',
+    };
+
+    export const setPatientTransportPriority: ActionReducer<SetPatientTransportPriorityAction> =
+        {
+            type: setPatientTransportPriorityActionSchema.shape.type.value,
+            actionSchema: setPatientTransportPriorityActionSchema,
+            reducer: (draftState, { patientId, hasTransportPriority }) => {
+                const patient = getElement(draftState, 'patient', patientId);
+                patient.hasTransportPriority = hasTransportPriority;
+                return draftState;
+            },
+            rights: 'participant',
+        };
+
+    export const setPatientTicket: ActionReducer<SetPatientTicketAction> = {
+        type: setPatientTicketActionSchema.shape.type.value,
+        actionSchema: setPatientTicketActionSchema,
+        reducer: (draftState, { patientId, ticket }) => {
+            const patient = getElement(draftState, 'patient', patientId);
+            patient.ticket = ticket;
             return draftState;
         },
         rights: 'participant',

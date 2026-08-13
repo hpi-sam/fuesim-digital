@@ -5,6 +5,7 @@ import {
     inject,
     input,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     AlarmGroup,
@@ -30,7 +31,6 @@ import {
     FormOutputInjectionToken,
     VersionedElementModalData,
 } from '../../base-versioned-element-submodal';
-import { MapEditorCardComponent } from '../../../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { ValuesPipe } from '../../../../../../../shared/pipes/values.pipe';
 import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 import { AlarmGroupVehicleItemComponent } from '../../../../../../exercises/exercise/shared/alarm-group-page/alarm-group-vehicle-item/alarm-group-vehicle-item.component';
@@ -39,7 +39,6 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
 @Component({
     selector: 'app-alarmgroup-form',
     imports: [
-        MapEditorCardComponent,
         DisplayModelValidationComponent,
         FormsModule,
         NgbDropdownModule,
@@ -49,6 +48,7 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
         MarketplaceFormSubmitButtonBarComponent,
     ],
     templateUrl: './alarmgroup-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './alarmgroup-form.component.scss',
 })
 export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<AlarmGroup> {
@@ -70,7 +70,7 @@ export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<Ala
     });
 
     public readonly agForm = form(this.values, (schema) => {
-        disabled(schema, this.disabled);
+        disabled(schema, { when: () => this.disabled() });
         validateStandardSchema(
             schema,
             stripEntityFromElementSchema(alarmGroupSchema)

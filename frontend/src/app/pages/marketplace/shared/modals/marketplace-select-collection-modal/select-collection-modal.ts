@@ -1,8 +1,8 @@
 import type { CollectionEntityId } from 'fuesim-digital-shared';
 import { lastValueFrom } from 'rxjs';
 import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-// its a nessesary evil
-// eslint-disable-next-line import/no-cycle
+// it's a necessary evil
+// eslint-disable-next-line import-x/no-cycle
 import { MarketplaceSelectCollectionModalComponent } from './marketplace-select-collection-modal.component';
 
 export async function openSelectCollectionModal(

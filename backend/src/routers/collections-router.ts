@@ -32,8 +32,11 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             paramName: string
         ) =>
         (req: ExpressRequest, named?: string): U => {
-            const collectionEntityId = req.params[named ?? paramName] ?? '';
-            if (!validator(collectionEntityId)) {
+            const collectionEntityId = req.params[named ?? paramName];
+            if (
+                typeof collectionEntityId !== 'string' ||
+                !validator(collectionEntityId)
+            ) {
                 throw new Error(`Invalid ${paramName}`);
             }
             return collectionEntityId;
@@ -198,7 +201,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     });
 
     publicRouter.get('/usable', async (req, res) => {
-        let collections: ExtendedCollectionVersion[] = [];
+        let collections: ExtendedCollectionVersion[];
         if (req.session) {
             collections = await collectionService.getLatestUsableCollections(
                 req.session

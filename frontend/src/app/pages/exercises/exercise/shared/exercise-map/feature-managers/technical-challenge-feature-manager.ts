@@ -1,16 +1,17 @@
 import type { Store } from '@ngrx/store';
+import type {
+    StateMachine,
+    StateMachineState,
+    TechnicalChallengeId,
+    Element as StateElement,
+    TaskType,
+    ImageProperties,
+} from 'fuesim-digital-shared';
 import {
     currentStateOf,
     newMapCoordinatesAt,
     newSize,
-} from 'fuesim-digital-shared';
-import type {
-    StateMachine,
-    StateMachineState,
     TechnicalChallenge,
-    TechnicalChallengeId,
-    Element as StateElement,
-    TaskType,
 } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
@@ -60,14 +61,17 @@ export class TechnicalChallengeFeatureManager
         );
     }
 
-    private currentStateOfFeature(feature: Feature): StateMachineState {
-        // TODO@Felix: handle which state(s) are displayed on map
-        return currentStateOf(
-            Object.values(
-                (this.getElementFromFeature(feature) as TechnicalChallenge)
-                    .stateMachines
-            ).at(0)!
-        );
+    private currentStateOfFeature(
+        feature: Feature
+    ): StateMachineState & { image: ImageProperties } {
+        const challenge = this.getElementFromFeature(
+            feature
+        ) as TechnicalChallenge;
+        const primaryStateMachine =
+            TechnicalChallenge.getPrimaryStateMachine(challenge);
+        return currentStateOf(primaryStateMachine) as StateMachineState & {
+            image: ImageProperties;
+        };
     }
 
     private readonly imageStyleHelper = new ImageStyleHelper(

@@ -23,7 +23,6 @@ export default {
         '@angular-eslint/component-class-suffix': 'warn',
         '@angular-eslint/component-max-inline-declarations': 'warn',
         '@angular-eslint/no-attribute-decorator': 'warn',
-        '@angular-eslint/no-conflicting-lifecycle': 'warn',
         '@angular-eslint/no-input-rename': 'warn',
         '@angular-eslint/no-inputs-metadata-property': 'warn',
         '@angular-eslint/no-lifecycle-call': 'warn',

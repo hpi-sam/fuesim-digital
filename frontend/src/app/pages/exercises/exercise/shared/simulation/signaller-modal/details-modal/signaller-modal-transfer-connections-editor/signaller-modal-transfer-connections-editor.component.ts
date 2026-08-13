@@ -1,5 +1,10 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { getTransferPointFullName } from 'fuesim-digital-shared';
@@ -32,6 +37,7 @@ import { HotkeyIndicatorComponent } from '../../../../../../../../shared/compone
     selector: 'app-signaller-modal-transfer-connections-editor',
     templateUrl: './signaller-modal-transfer-connections-editor.component.html',
     styleUrls: ['./signaller-modal-transfer-connections-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         NgbPopover,

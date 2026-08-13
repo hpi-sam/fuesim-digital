@@ -7,11 +7,13 @@ import {
     ElementRef,
     inject,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 
 @Component({
     selector: 'app-scroll-buttons',
     templateUrl: './scroll-buttons.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './scroll-buttons.component.scss',
 })
 export class ScrollButtonsComponent {

@@ -2,11 +2,10 @@
     <h5 class="popover-header">
         {{ vehicle.name }}
 
-        @if (currentRole() === 'trainer') {
-            <app-help-button
-                url="2_exercises/3_exercise_elements.html#fahrzeuge-mit-personal-und-material"
-            />
-        }
+        <app-help-button
+            url="2_exercises/3_exercise_elements.html#fahrzeuge-mit-personal-und-material"
+            [trainerOnly]="true"
+        />
 
         <button
             (click)="closePopup()"

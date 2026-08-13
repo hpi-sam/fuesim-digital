@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MeasureService } from '../../../../../../../core/measure.service';
 
 @Component({
     selector: 'app-measure-details',
     imports: [],
     templateUrl: './measure-details.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './measure-details.component.scss',
 })
 export class MeasureDetailsComponent {

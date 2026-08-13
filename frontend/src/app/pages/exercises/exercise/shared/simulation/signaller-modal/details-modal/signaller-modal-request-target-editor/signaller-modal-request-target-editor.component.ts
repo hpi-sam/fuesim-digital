@@ -1,5 +1,10 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseRequestTargetConfiguration,
@@ -38,6 +43,7 @@ import { HotkeyIndicatorComponent } from '../../../../../../../../shared/compone
     selector: 'app-signaller-modal-request-target-editor',
     templateUrl: './signaller-modal-request-target-editor.component.html',
     styleUrls: ['./signaller-modal-request-target-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         NgbPopover,

@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -12,6 +17,7 @@ import { createSelectSimulatedRegion } from '../../../state/application/selector
     selector: 'app-simulated-region-name',
     templateUrl: './simulated-region-name.component.html',
     styleUrls: ['./simulated-region-name.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe],
 })
 export class SimulatedRegionNameComponent implements OnInit {

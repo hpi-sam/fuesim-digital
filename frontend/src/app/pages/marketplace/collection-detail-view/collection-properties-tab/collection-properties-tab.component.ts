@@ -5,6 +5,7 @@ import {
     input,
     resource,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     collectionOrganisationRelationshipTypeAllowedValues,
@@ -13,7 +14,7 @@ import {
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { CollectionService } from '../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../core/collection.service';
 import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
 import { AuthService } from '../../../../core/auth.service';
 import { ConfirmationModalService } from '../../../../core/confirmation-modal/confirmation-modal.service';
@@ -31,6 +32,7 @@ import { CollectionMemberItemComponent } from './collection-member-item/collecti
         CollectionMemberItemComponent,
     ],
     templateUrl: './collection-properties-tab.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './collection-properties-tab.component.scss',
 })
 export class CollectionDetailsTabComponent {

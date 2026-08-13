@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import type { ExerciseRadiogram } from 'fuesim-digital-shared';
 import { HumanReadableRadiogramTypePipe } from '../../human-readable-radiogram-type.pipe';
 
@@ -6,6 +6,7 @@ import { HumanReadableRadiogramTypePipe } from '../../human-readable-radiogram-t
     selector: 'app-radiogram-card-content-fallback',
     templateUrl: './radiogram-card-content-fallback.component.html',
     styleUrls: ['./radiogram-card-content-fallback.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [HumanReadableRadiogramTypePipe],
 })
 export class RadiogramCardContentFallbackComponent {

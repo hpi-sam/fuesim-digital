@@ -14,10 +14,8 @@ import type {
     VersionedElementPartial,
     OrganisationId,
     CollectionOrganisationRelationshipType,
-    ExerciseState,
     CollectionMembershipRole,
     CollectionVisibility,
-    AlarmGroup,
 } from 'fuesim-digital-shared';
 import {
     applyMigrations,
@@ -34,7 +32,7 @@ import {
     extendedCollectionVersionReducer,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
-import type { WritableDraft } from 'immer';
+import { castDraft, type WritableDraft } from 'immer';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ExerciseService } from './exercise-service.js';
@@ -266,7 +264,7 @@ export class CollectionService {
         );
 
         // if we dont have direct rights, the highest role we can get is other
-        return rolesInParents.some((r) => r) ? 'other' : null;
+        return rolesInParents.includes(true) ? 'other' : null;
     }
 
     public async addCollectionOrganisation(
@@ -353,11 +351,11 @@ export class CollectionService {
 
     public async getCollectionByJoinCode(joinCode: string) {
         return this.collectionRepository.transaction(async (tx) => {
-            const collectionId = this.exists(
+            const collectionEntityId = this.exists(
                 await tx.getCollectionByJoinCode(joinCode)
             );
             const collection = this.exists(
-                await tx.getLatestCollectionByEntityId(collectionId)
+                await tx.getLatestCollectionByEntityId(collectionEntityId)
             );
             return collection;
         });
@@ -1899,17 +1897,14 @@ export class CollectionService {
                     );
                 }
 
-                let state = cloneDeepMutable(
-                    newExerciseState(
-                        '123456' as ParticipantKey
-                    ) as WritableDraft<ExerciseState>
+                let state = castDraft(
+                    newExerciseState('123456' as ParticipantKey)
                 );
 
                 state = Object.assign(state, {
                     templates: allElementsOfStateVersion.reduce<{
                         [T in ElementVersionId]: WritableDraft<TemplateVersionContent>;
                     }>((acc, element) => {
-                        if (element.content.type === 'alarmGroup') return acc;
                         acc[element.versionId] = {
                             ...cloneDeepMutable(element.content),
                             entity: {
@@ -1920,21 +1915,7 @@ export class CollectionService {
                         };
                         return acc;
                     }, {}),
-                    alarmGroups: allElementsOfStateVersion.reduce<{
-                        [T in ElementVersionId]: WritableDraft<AlarmGroup>;
-                    }>((acc, element) => {
-                        if (element.content.type !== 'alarmGroup') return acc;
-                        acc[element.versionId] = {
-                            ...cloneDeepMutable(element.content),
-                            entity: {
-                                entityId: element.entityId,
-                                versionId: element.versionId,
-                                type: 'direct',
-                            },
-                        };
-                        return acc;
-                    }, {}),
-                } satisfies { [T in keyof ExerciseState]?: any });
+                });
 
                 const migratedState = applyMigrations(currentElementVersion, {
                     currentState: state,
@@ -1943,14 +1924,9 @@ export class CollectionService {
 
                 const affectedElementCount = await tx.UNSAFE_overwriteElements(
                     currentStateVersion,
-                    [
-                        ...Object.values(
-                            migratedState.currentState.templates
-                        ).filter(isMarketplaceElementContent),
-                        ...Object.values(
-                            migratedState.currentState.alarmGroups
-                        ).filter(isMarketplaceElementContent),
-                    ]
+                    Object.values(migratedState.currentState.templates).filter(
+                        isMarketplaceElementContent
+                    )
                 );
 
                 combinedAffectedElementCount += affectedElementCount;
@@ -1961,7 +1937,9 @@ export class CollectionService {
             await Promise.all(
                 Object.entries(allElementVersions).map(
                     async ([oldStateVersion]) =>
-                        migrateStateVersion(Number.parseInt(oldStateVersion))
+                        migrateStateVersion(
+                            Number.parseInt(oldStateVersion, 10)
+                        )
                 )
             );
 

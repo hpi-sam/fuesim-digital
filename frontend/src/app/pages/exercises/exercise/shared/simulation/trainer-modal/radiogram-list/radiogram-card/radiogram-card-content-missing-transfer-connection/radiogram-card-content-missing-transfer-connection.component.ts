@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     MissingTransferConnectionRadiogram,
@@ -21,6 +26,7 @@ import {
     styleUrls: [
         './radiogram-card-content-missing-transfer-connection.component.scss',
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe],
 })
 export class RadigoramCardContentMissingTransferConnectionComponent implements OnInit {

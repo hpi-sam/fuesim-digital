@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { uuid } from 'fuesim-digital-shared';
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
@@ -13,6 +18,7 @@ import { VehiclesOnLocationComponent } from './vehicles-on-location/vehicles-on-
     selector: 'app-operational-sections-tab',
     templateUrl: './operational-sections.component.html',
     styleUrl: './operational-sections.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         LocalOperationalLeaderComponent,
         OperationalSectionContainerComponent,

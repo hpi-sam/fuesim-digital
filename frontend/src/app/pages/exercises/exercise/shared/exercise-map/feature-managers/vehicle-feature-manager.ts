@@ -13,6 +13,7 @@ import type {
     Element,
     PatientStatus,
     Patient,
+    ExerciseConfiguration,
 } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type Point from 'ol/geom/Point';
@@ -115,10 +116,13 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
                 )
             )
             .pipe(
-                startWith({
+                startWith<{
+                    configuration: ExerciseConfiguration;
+                    vehicles: { readonly [key: UUID]: Vehicle };
+                    currentTime: number;
+                }>({
                     configuration: newExerciseConfiguration(),
-                    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-                    vehicles: {} as { [key: UUID]: Vehicle },
+                    vehicles: {},
                     currentTime: -1,
                 }),
                 pairwise(),

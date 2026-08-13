@@ -1,12 +1,18 @@
-import { Component, inject, resource } from '@angular/core';
+import {
+    Component,
+    inject,
+    resource,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CollectionService } from '../../../core/exercise-element.service';
+import { CollectionService } from '../../../core/collection.service';
 import { CollectionCardComponent } from '../shared/cards/collection-card/collection-card.component';
 
 @Component({
     selector: 'app-marketplace-archive',
     imports: [RouterLink, CollectionCardComponent],
     templateUrl: './marketplace-archive.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './marketplace-archive.component.scss',
 })
 export class MarketplaceArchiveComponent {

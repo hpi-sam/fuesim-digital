@@ -5,6 +5,7 @@ import {
     input,
     output,
     resource,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     CollectionVersion,
@@ -13,13 +14,14 @@ import {
 } from 'fuesim-digital-shared';
 import { AuthService } from '../../../../../core/auth.service';
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
-import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../core/collection.service';
 import { ApiService } from '../../../../../core/api.service';
 
 @Component({
     selector: 'app-collection-member-item',
     templateUrl: './collection-member-item.component.html',
     styleUrl: './collection-member-item.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [],
 })
 export class CollectionMemberItemComponent {

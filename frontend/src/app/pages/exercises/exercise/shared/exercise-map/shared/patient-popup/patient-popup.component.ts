@@ -1,6 +1,11 @@
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { Component, OnInit, inject } from '@angular/core';
+import {
+    Component,
+    OnInit,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import type { Patient, UUID } from 'fuesim-digital-shared';
 import { NgClass, AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
@@ -8,13 +13,13 @@ import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectPatient } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { PatientHeaderComponent } from '../../../../../../../shared/components/patient-header/patient-header.component';
 import { PatientsDetailsComponent } from '../../../../../../../shared/components/patients-details/patients-details.component';
-import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors.js';
 import { HelpButtonComponent } from '../../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-patient-popup',
     templateUrl: './patient-popup.component.html',
     styleUrls: ['./patient-popup.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgClass,
         PatientHeaderComponent,
@@ -31,8 +36,6 @@ export class PatientPopupComponent implements OnInit {
     public patientId!: UUID;
     patient$!: Observable<Patient>;
     public openScoutInfo!: boolean;
-
-    readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
 
     ngOnInit() {
         this.patient$ = this.store.select(createSelectPatient(this.patientId));

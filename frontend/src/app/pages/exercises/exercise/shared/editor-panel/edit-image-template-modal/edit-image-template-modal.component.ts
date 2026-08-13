@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { MapImageTemplate, UUID } from 'fuesim-digital-shared';
@@ -17,6 +17,7 @@ import { HelpButtonComponent } from '../../../../../../help-button/help-button.c
     selector: 'app-edit-image-template-modal',
     templateUrl: './edit-image-template-modal.component.html',
     styleUrls: ['./edit-image-template-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ImageTemplateFormComponent, HelpButtonComponent],
 })
 export class EditImageTemplateModalComponent implements OnInit {

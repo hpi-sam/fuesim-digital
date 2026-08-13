@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Personnel } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -13,6 +13,7 @@ import { PersonnelDetailsComponent } from '../../../../../../../shared/component
     selector: 'app-personnel-popup',
     templateUrl: './personnel-popup.component.html',
     styleUrls: ['./personnel-popup.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [PersonnelDetailsComponent, AsyncPipe],
 })
 export class PersonnelPopupComponent implements OnInit {

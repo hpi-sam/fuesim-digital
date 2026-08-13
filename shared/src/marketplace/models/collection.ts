@@ -20,6 +20,7 @@ export const collectionVersionSchema = z.object({
     visibility: collectionVisibilitySchema,
     draftState: z.boolean(),
     archived: z.boolean(),
+    defaultForNewExercises: z.boolean(),
 });
 
 export type CollectionVersion = z.infer<typeof collectionVersionSchema>;

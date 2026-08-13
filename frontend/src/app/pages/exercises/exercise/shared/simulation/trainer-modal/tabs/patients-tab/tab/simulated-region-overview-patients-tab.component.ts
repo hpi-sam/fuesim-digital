@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import {
@@ -23,6 +28,7 @@ import { SimulatedRegionOverviewPatientDetailsComponent } from '../details/simul
     selector: 'app-simulated-region-overview-patients-tab',
     templateUrl: './simulated-region-overview-patients-tab.component.html',
     styleUrls: ['./simulated-region-overview-patients-tab.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         SimulatedRegionOverviewPatientsTableComponent,
         SimulatedRegionOverviewPatientDetailsComponent,

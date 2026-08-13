@@ -18,7 +18,7 @@ export const addAlarmGroupIdToAlarmGroupStartPoint36: Migration = {
             if (typedAction.startPoint.type === 'alarmGroupStartPoint') {
                 migrateAlarmGroupStartPoint(
                     typedAction.startPoint,
-                    intermediaryState as StateStub
+                    intermediaryState
                 );
             }
         }

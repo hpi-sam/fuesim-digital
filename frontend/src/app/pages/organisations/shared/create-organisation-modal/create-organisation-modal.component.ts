@@ -1,4 +1,10 @@
-import { Component, inject, output, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    output,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import {
     postOrganisationRequestDataSchema,
@@ -18,6 +24,7 @@ import { DisplayModelValidationComponent } from '../../../../shared/validation/d
     selector: 'app-create-organisation-modal',
     templateUrl: './create-organisation-modal.component.html',
     styleUrls: ['./create-organisation-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         AutofocusDirective,
         FormField,

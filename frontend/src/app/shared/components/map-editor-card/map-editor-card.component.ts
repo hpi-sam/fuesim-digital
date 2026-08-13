@@ -1,10 +1,16 @@
-import { Component, output, input } from '@angular/core';
+import {
+    Component,
+    output,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'app-map-editor-card',
     templateUrl: './map-editor-card.component.html',
     styleUrls: ['./map-editor-card.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgbTooltip],
 })
 export class MapEditorCardComponent {

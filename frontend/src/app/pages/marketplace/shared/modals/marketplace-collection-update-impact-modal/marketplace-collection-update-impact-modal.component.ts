@@ -1,4 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import {
     ChangeDependencies,
@@ -16,6 +21,7 @@ import { VersionedElementDisplayNamePipe } from '../../../../../shared/pipes/ver
     selector: 'app-marketplace-collection-update-impact-modal',
     styleUrl: './marketplace-collection-update-impact-modal.component.scss',
     templateUrl: './marketplace-collection-update-impact-modal.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [VersionedElementFormComponent, VersionedElementDisplayNamePipe],
 })
 export class CollectionUpgradeImpactModalComponent {

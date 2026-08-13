@@ -1,4 +1,11 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    OnDestroy,
+    OnInit,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { createSelector, Store } from '@ngrx/store';
 import {
@@ -41,6 +48,7 @@ import { SimulatedRegionOverviewVehicleDetailsComponent } from '../tabs/vehicles
     selector: 'app-simulated-region-preview',
     templateUrl: './simulated-region-preview.component.html',
     styleUrls: ['./simulated-region-preview.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         SimulatedRegionPreviewCardComponent,
         PatientHeaderComponent,

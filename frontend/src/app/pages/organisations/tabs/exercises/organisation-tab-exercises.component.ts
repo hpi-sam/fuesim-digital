@@ -5,6 +5,7 @@ import {
     type OnInit,
     output,
     signal,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     GetExercisesResponseData,
@@ -27,6 +28,7 @@ import { httpOrigin } from '../../../../core/api-origins.js';
         HelpButtonComponent,
     ],
     templateUrl: './organisation-tab-exercises.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './organisation-tab-exercises.component.scss',
 })
 export class OrganisationTabExercisesComponent implements OnInit {

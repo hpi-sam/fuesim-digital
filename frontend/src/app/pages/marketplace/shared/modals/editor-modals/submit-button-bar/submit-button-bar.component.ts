@@ -1,4 +1,10 @@
-import { Component, computed, input, output } from '@angular/core';
+import {
+    Component,
+    computed,
+    input,
+    output,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import {
     MarketplaceElementContent,
@@ -9,6 +15,7 @@ import {
     selector: 'app-marketplace-form-submit-button-bar',
     templateUrl: './submit-button-bar.component.html',
     styleUrl: './submit-button-bar.component.scss',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [],
 })
 export class MarketplaceFormSubmitButtonBarComponent {

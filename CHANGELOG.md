@@ -7,6 +7,19 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [1.0.0-rc.2] - 2026-08-13
+
+### Added
+
+- A simple ticket system allows tickets to be assigned to patients. A patient who has a ticket assigned shows a ticket icon above them on the map. Tickets do not affect the exercise logic (i.e., patients can be loaded into vehicles and sent to hospitals regardless of their ticket status).
+- Trainers can edit the timers and tasks of technical challenges and their templates. Trainers can edit user generated content of technical challenges.
+- A default element collection with fire department related content for users to start building fire department scenarios.
+- Trainers can upload technical challenge templates which were created using an external editor.
+
+### Fixed
+
+- The help link in the footer now works.
+
 ## [1.0.0-rc.1] - 2026-07-28
 
 ### Added
@@ -526,7 +539,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v1.0.0-rc.1...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v1.0.0-rc.2...HEAD
+[1.0.0-rc.2]: https://github.com/hpi-sam/fuesim-digital/compare/v1.0.0-rc.1...v1.0.0-rc.2
 [1.0.0-rc.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.17.1...v1.0.0-rc.1
 [0.17.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.16.0...v0.17.0

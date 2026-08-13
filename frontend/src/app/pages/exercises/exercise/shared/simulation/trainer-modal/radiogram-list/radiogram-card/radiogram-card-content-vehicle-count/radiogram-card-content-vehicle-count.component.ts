@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { VehicleCountRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -12,6 +17,7 @@ import { createSelectRadiogram } from '../../../../../../../../../state/applicat
     selector: 'app-radiogram-card-content-vehicle-count',
     templateUrl: './radiogram-card-content-vehicle-count.component.html',
     styleUrls: ['./radiogram-card-content-vehicle-count.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [AsyncPipe, KeyValuePipe],
 })
 export class RadiogramCardContentVehicleCountComponent implements OnInit {

@@ -1,5 +1,10 @@
 import type { OnInit } from '@angular/core';
-import { Component, ViewEncapsulation, inject } from '@angular/core';
+import {
+    Component,
+    ViewEncapsulation,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import {
     NgbActiveModal,
     NgbNav,
@@ -43,6 +48,7 @@ import { HelpButtonComponent } from '../../../../../../help-button/help-button.c
     templateUrl: './exercise-statistics-modal.component.html',
     styleUrls: ['./exercise-statistics-modal.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgbNav,
         NgbNavItem,

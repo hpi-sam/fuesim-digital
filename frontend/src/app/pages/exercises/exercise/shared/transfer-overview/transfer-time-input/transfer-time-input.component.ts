@@ -1,4 +1,9 @@
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Transfer } from 'fuesim-digital-shared';
 import { NgClass, AsyncPipe } from '@angular/common';
@@ -11,6 +16,7 @@ import { FormatDurationPipe } from '../../../../../../shared/pipes/format-durati
     selector: 'app-transfer-time-input',
     templateUrl: './transfer-time-input.component.html',
     styleUrls: ['./transfer-time-input.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgClass, AsyncPipe, FormatDurationPipe],
 })
 export class TransferTimeInputComponent {

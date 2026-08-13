@@ -1,4 +1,9 @@
-import { OnDestroy, Component, inject } from '@angular/core';
+import {
+    OnDestroy,
+    Component,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import type { ExerciseKey } from 'fuesim-digital-shared';
@@ -10,6 +15,7 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
     selector: 'app-join-exercise-modal',
     templateUrl: './join-exercise-modal.component.html',
     styleUrls: ['./join-exercise-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, AutofocusDirective],
 })
 export class JoinExerciseModalComponent implements OnDestroy {

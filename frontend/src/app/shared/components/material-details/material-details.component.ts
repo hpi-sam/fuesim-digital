@@ -1,4 +1,10 @@
-import { input, OnInit, Component, inject } from '@angular/core';
+import {
+    input,
+    OnInit,
+    Component,
+    inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Material, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -12,6 +18,7 @@ import { CaterCapacityCountPipe } from '../../pipes/cater-capacity-count.pipe';
     selector: 'app-material-details',
     templateUrl: './material-details.component.html',
     styleUrls: ['./material-details.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [CaterCapacityComponent, AsyncPipe, CaterCapacityCountPipe],
 })
 export class MaterialDetailsComponent implements OnInit {

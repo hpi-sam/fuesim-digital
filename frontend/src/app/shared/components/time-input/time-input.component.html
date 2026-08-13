@@ -1,0 +1,15 @@
+<div
+    [title]="title()"
+    class="input-group input-group-sm"
+    style="flex-wrap: nowrap"
+>
+    <input
+        min="0"
+        [required]="required()"
+        [(ngModel)]="displayValue"
+        type="number"
+        class="form-control form-control-sm d-inline-block no-validation"
+        style="width: 5em"
+    />
+    <span class="input-group-text">{{ unitDescription() }}</span>
+</div>

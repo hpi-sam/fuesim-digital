@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import type { GetOrganisationsResponseData } from 'fuesim-digital-shared';
 import { HttpResourceRef } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -12,6 +12,7 @@ import { CreateOrganisationModalComponent } from '../shared/create-organisation-
     selector: 'app-organisation-list',
     templateUrl: './organisation-list.component.html',
     styleUrls: ['./organisation-list.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [HeaderComponent, FooterComponent, OrganisationCardComponent],
 })
 export class OrganisationListComponent {

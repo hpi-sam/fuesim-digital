@@ -1,4 +1,10 @@
-import { Component, inject, output, signal } from '@angular/core';
+import {
+    Component,
+    inject,
+    output,
+    signal,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../core/api.service';
@@ -9,6 +15,7 @@ import { CopyButtonComponent } from '../copy-button/copy-button.component';
     selector: 'app-create-invite-modal',
     templateUrl: './create-invite-modal.component.html',
     styleUrls: ['./create-invite-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, CopyButtonComponent, NgbTooltip],
 })
 export class CreateInviteModalComponent {

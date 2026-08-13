@@ -1,7 +1,7 @@
 import type { OrganisationId } from 'fuesim-digital-shared';
 import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import type { PromptModalService } from '../../../../core/prompt-modal/prompt-modal.service';
-import type { CollectionService } from '../../../../core/exercise-element.service';
+import type { CollectionService } from '../../../../core/collection.service';
 import { openSelectOrganisationModal } from './select-organisation-modal/open-select-organisation-modal';
 
 export async function showJoinCollectionWorkflow(

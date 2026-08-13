@@ -1,5 +1,10 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import {
+    Component,
+    inject,
+    input,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { SimulatedRegion, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -15,6 +20,7 @@ import { SignallerModalNoLeaderOverlayComponent } from '../signaller-modal-no-le
     selector: 'app-signaller-modal-region',
     templateUrl: './signaller-modal-region.component.html',
     styleUrls: ['./signaller-modal-region.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         SignallerModalRegionLeaderComponent,
         SignallerModalRegionInformationComponent,

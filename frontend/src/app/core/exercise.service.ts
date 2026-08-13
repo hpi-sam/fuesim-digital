@@ -59,7 +59,9 @@ import {
     selectVisibleVehicles,
 } from '../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
+// eslint-disable-next-line import-x/no-cycle
 import { CreateExerciseModalComponent } from '../pages/exercises/shared/create-exercise-modal/create-exercise-modal.component.js';
+// eslint-disable-next-line import-x/no-cycle
 import { CreateExerciseTemplateModalComponent } from '../pages/exercises/shared/create-exercise-template-modal/create-exercise-template-modal.component.js';
 import { saveBlob } from '../shared/functions/save-blob.js';
 import { websocketOrigin } from './api-origins';
@@ -73,7 +75,7 @@ import { OptimisticActionHandler } from './optimistic-action-handler';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
 import { AuthService } from './auth.service.js';
 import { ApiService } from './api.service.js';
-import { CollectionService } from './exercise-element.service';
+import { CollectionService } from './collection.service';
 
 /**
  * This Service deals with the state synchronization of a live exercise.
@@ -218,11 +220,7 @@ export class ExerciseService {
             async (action) => {
                 const response = await new Promise<SocketResponse>(
                     (resolve) => {
-                        this.socket.emit(
-                            'proposeAction',
-                            action as WritableDraft<ExerciseAction>,
-                            resolve
-                        );
+                        this.socket.emit('proposeAction', action, resolve);
                     }
                 );
                 if (!response.success) {

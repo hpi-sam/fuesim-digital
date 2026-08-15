@@ -1,4 +1,5 @@
 import type { MarketplaceElementContent } from 'fuesim-digital-shared';
+import { CollectionService } from '../../../core/collection.service';
 import { AlarmgroupFormComponent } from './modals/editor-modals/element-forms/alarmgroup-form/alarmgroup-form.component';
 import { MapImageTemplateFormComponent } from './modals/editor-modals/element-forms/map-image-template-form/map-image-template-form.component';
 import { MaterialTemplateFormComponent } from './modals/editor-modals/element-forms/material-template-form/material-template-form.component';
@@ -42,7 +43,7 @@ export const marketplaceComponentDefinitions: {
         helpUrl: '2_exercises/3_exercise_elements.html#bilder', // TODO
         elementCard: (content) => ({
             title: content.name,
-            // image: content.image.url,
+            image: CollectionService.getUploadedImageUrl(content),
         }),
     },
     materialTemplate: {

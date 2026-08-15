@@ -12,10 +12,10 @@ rpc_secret = "23c39ec3dc33b9db0d2b10796ee38bbf1e5354167381e1372269c6623afbf457"
 
 [s3_api]
 s3_region = "garage"
-api_bind_addr = "[::]:3900"
-root_domain = "localhost"
+api_bind_addr = "[::]:9092"
+root_domain = ".s3.garage.localhost"
 
 [s3_web]
 bind_addr = "[::]:3902"
-root_domain = "localhost"
+root_domain = ".web.garage.localhost"
 index = "index.html"

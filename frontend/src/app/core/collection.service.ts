@@ -20,6 +20,7 @@ import {
     collectionEntityIdSchema,
     collectionVersionIdSchema,
     UploadedImageUploadInput,
+    UploadedImage,
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, lastValueFrom, map } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
@@ -91,6 +92,10 @@ export class CollectionService {
             }
             this.socketErrorHandler(reason);
         });
+    }
+
+    static getUploadedImageUrl(uploadedImage: UploadedImage) {
+        return `${httpOrigin}/api/collections/image/${uploadedImage.id}`;
     }
 
     private socketErrorHandler(error: any) {

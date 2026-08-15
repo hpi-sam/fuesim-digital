@@ -1,28 +1,23 @@
 import {
     Component,
-    effect,
     inject,
     input,
     signal,
     ChangeDetectionStrategy,
 } from '@angular/core';
 import {
-    cloneDeepMutable,
-    stripEntityFromElementSchema,
     uuid,
     UploadedImage,
-    uploadedImageSchema,
     allowedImageFileTypes,
     UploadedImageUploadInput,
 } from 'fuesim-digital-shared';
-import { form, disabled, validateStandardSchema } from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
     FormOutputInjectionToken,
     VersionedElementModalData,
 } from '../../base-versioned-element-submodal';
 import { MessageService } from '../../../../../../../core/messages/message.service';
-import { CollectionService } from '../../../../../../../core/exercise-element.service';
+import { CollectionService } from '../../../../../../../core/collection.service';
 
 @Component({
     selector: 'app-uploaded-image-form',
@@ -43,31 +38,6 @@ export class UploadedImageFormComponent implements BaseVersionedElementSubmodal<
     public readonly formOutput = inject(FormOutputInjectionToken);
 
     allowedImageFileTypes = allowedImageFileTypes;
-
-    public readonly values = signal<UploadedImage>({
-        id: uuid(),
-        type: 'uploadedImage',
-        name: '',
-        path: '',
-        aspectRatio: 1,
-    });
-
-    public readonly mapImageForm = form(this.values, (schema) => {
-        disabled(schema, { when: () => this.disabled() });
-        validateStandardSchema(
-            schema,
-            stripEntityFromElementSchema(uploadedImageSchema)
-        );
-    });
-
-    constructor() {
-        effect(() => {
-            const data = this.data();
-            if (data.mode !== 'create') {
-                this.values.set(cloneDeepMutable(data.element.content));
-            }
-        });
-    }
 
     onDragover(e: Event) {
         e.preventDefault();

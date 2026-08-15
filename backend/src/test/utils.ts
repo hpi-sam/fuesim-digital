@@ -255,6 +255,7 @@ export function createTestEnvironment(): TestEnvironment {
             databaseService.databaseConnection
         );
         collectionService = new CollectionService(
+            s3Service,
             exerciseService,
             organisationService,
             collectionRepository

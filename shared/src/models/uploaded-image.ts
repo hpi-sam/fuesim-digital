@@ -20,7 +20,6 @@ export const uploadedImageSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('uploadedImage'),
     name: z.string().nonempty(),
-    path: z.string().nonempty(), // TODO
 
     aspectRatio: z.number().positive(),
 });
@@ -39,11 +38,8 @@ export type UploadedImageUploadInput = Immutable<
 >;
 export type UploadedImage = Immutable<z.infer<typeof uploadedImageSchema>>;
 
-/*
-export function newUploadedImage(
-    name: string,
-    image: ImageProperties
-): MapImageTemplate {
-    return { id: uuid(), type: 'mapImageTemplate', name, image };
+export function getKeyForUploadedImage(
+    uploadedImageId: UploadedImage['id']
+): string {
+    return `uploaded-image/${uploadedImageId}`;
 }
-*/

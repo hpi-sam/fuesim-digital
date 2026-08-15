@@ -90,6 +90,7 @@ async function main() {
         repositories.userRepository
     );
     const collectionService = new CollectionService(
+        s3Service,
         exerciseService,
         organisationService,
         repositories.collectionRepository

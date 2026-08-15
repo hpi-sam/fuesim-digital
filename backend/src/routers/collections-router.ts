@@ -17,12 +17,12 @@ import {
     cloneDeepMutable,
     checkCollectionMembershipRole,
     organisationIdSchema,
+    uploadedImageSchema,
 } from 'fuesim-digital-shared';
 import { z } from 'zod';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { NotFoundError, PermissionDeniedError } from '../utils/http.js';
 import type { CollectionService } from '../database/services/collection-service.js';
-
 export function createCollectionsRouter(collectionService: CollectionService) {
     const publicRouter = Router();
 
@@ -399,6 +399,13 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             );
         }
     );
+
+    publicRouter.get('/image/:imageId', async (req, res) => {
+        const id = uploadedImageSchema.shape.id.parse(req.params.imageId);
+        const file = await collectionService.getUploadedImage(id);
+
+        res.send(await file.transformToByteArray());
+    });
 
     publicRouter.get(
         '/:collectionEntityId/invitecode',

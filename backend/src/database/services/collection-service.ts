@@ -1,44 +1,47 @@
 import type {
-    CollectionVersion,
     CollectionElements,
     CollectionElementsSingle,
     CollectionEntityId,
+    CollectionMembershipRole,
+    CollectionOrganisationRelationshipType,
+    CollectionVersion,
     CollectionVersionId,
-    TemplateVersion,
+    CollectionVisibility,
     ElementEntityId,
     ElementVersionId,
     ExtendedCollectionVersion,
     Marketplace,
-    ParticipantKey,
-    TemplateVersionContent,
-    VersionedElementPartial,
     OrganisationId,
-    CollectionOrganisationRelationshipType,
-    CollectionMembershipRole,
-    CollectionVisibility,
-    AlarmGroup,
-    UploadedImageUpload,
+    ParticipantKey,
+    TemplateVersion,
+    TemplateVersionContent,
     UploadedImage,
+    UploadedImageUpload,
+    VersionedElementPartial,
 } from 'fuesim-digital-shared';
 import {
     applyMigrations,
     checkCollectionOrganisationRole,
     cloneDeepMutable,
-    newExerciseState,
+    currentStateVersion,
+    extendedCollectionVersionReducer,
     gatherAllDirectCollectionElements,
     getCollectionElementDiff,
     getDependencyChecker,
     getElementDependencies,
+    getKeyForUploadedImage,
     isMarketplaceElementContent,
+    newExerciseState,
     replaceDependencies,
-    currentStateVersion,
-    extendedCollectionVersionReducer,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import { castDraft, type WritableDraft } from 'immer';
+import { NoSuchKey } from '@aws-sdk/client-s3';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import { validateImage } from '../../utils/image.js';
+import type { S3Service } from '../../s3/s3-service.js';
+import { NotFoundError } from '../../utils/http.js';
 import type { ExerciseService } from './exercise-service.js';
 import type { OrganisationService } from './organisation-service.js';
 
@@ -53,6 +56,7 @@ export class CollectionService {
     ): Promise<T> {
         return this.collectionRepository.transaction(async (tx) => {
             const serviceCopy = new CollectionService(
+                this.s3Service,
                 this.exerciseService,
                 this.organisationService,
                 tx,
@@ -138,6 +142,7 @@ export class CollectionService {
     }
 
     public constructor(
+        private readonly s3Service: S3Service,
         private readonly exerciseService: ExerciseService,
         private readonly organisationService: OrganisationService,
         private readonly collectionRepository: CollectionRepository,
@@ -787,16 +792,16 @@ export class CollectionService {
         return this.reduce(
             collectionEntityId,
             async (tx, draftState, eventBuffer) => {
-                const { metadata, image } = await validateImage(content.file);
+                const { metadata } = await validateImage(content.file);
 
-                // TODO Store in S3 here
+                const key = getKeyForUploadedImage(content.id);
+                await this.s3Service.uploadFile(key, content.file);
 
                 const actualContent = {
                     id: content.id,
                     type: 'uploadedImage',
                     name: content.name,
                     aspectRatio: metadata.width / metadata.height,
-                    path: 'https://example.org', // TODO
                 } satisfies UploadedImage;
 
                 const result = this.exists(
@@ -1217,6 +1222,17 @@ export class CollectionService {
         }
 
         return [true, latestVersionOfContainingCollection];
+    }
+
+    public async getUploadedImage(id: UploadedImage['id']) {
+        try {
+            return (await this.s3Service.getFile(getKeyForUploadedImage(id)))!;
+        } catch (error: unknown) {
+            if (error instanceof NoSuchKey) {
+                throw new NotFoundError();
+            }
+            throw error;
+        }
     }
 
     public async updateElement(

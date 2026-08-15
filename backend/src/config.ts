@@ -40,6 +40,7 @@ export class Config {
     private static _authSelfServiceUrl?: string;
 
     private static _s3Endpoint?: string;
+    private static _s3Region?: string;
     private static _s3Bucket?: string;
     private static _s3AccessKeyId?: string;
     private static _s3SecretAccessKey?: string;
@@ -145,6 +146,11 @@ export class Config {
     public static get s3Endpoint(): string {
         this.throwIfNotInitialized();
         return this._s3Endpoint!;
+    }
+
+    public static get s3Region(): string {
+        this.throwIfNotInitialized();
+        return this._s3Region!;
     }
 
     public static get s3Bucket(): string {
@@ -259,6 +265,7 @@ export class Config {
             DFM_AUTH_SELF_SERVICE_URL: url({ default: '' }),
             DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
             DFM_S3_ENDPOINT: str({ default: 'http://localhost:9092' }),
+            DFM_S3_REGION: str({ default: 'garage' }),
             DFM_S3_BUCKET: str({ default: 'fuesim-digital' }),
             DFM_S3_ACCESS_KEY_ID: str({ default: 'fuesim-digital-key' }),
             DFM_S3_SECRET_ACCESS_KEY: str({ default: '' }),
@@ -350,9 +357,10 @@ export class Config {
                 ? env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 : env.DFM_AUTH_SELF_SERVICE_URL;
         this._s3Endpoint = env.DFM_S3_ENDPOINT;
+        this._s3Region = env.DFM_S3_REGION;
         this._s3Bucket = env.DFM_S3_BUCKET;
         this._s3AccessKeyId = env.DFM_S3_ACCESS_KEY_ID;
-        this._s3SecretAccessKey = env.DFM_S3_ACCESS_KEY_ID;
+        this._s3SecretAccessKey = env.DFM_S3_SECRET_ACCESS_KEY;
         this._devNoWaitingRoom = env.DFM_DEV_NO_WAITING_ROOM;
         this._parallelExercisesEnabled = testing
             ? true

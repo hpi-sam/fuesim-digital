@@ -46,14 +46,19 @@ services:
             - ./docker/authelia-config:/config:ro
             - authelia-secrets:/secrets
     garage:
-        image: dxflrs/garage:v2.2.0
+        image: docker.io/dxflrs/garage:v2.3.0
         restart: unless-stopped
+        command: "/garage server --single-node --default-bucket"
+        environment:
+            - GARAGE_DEFAULT_ACCESS_KEY=${DFM_S3_ACCESS_KEY_ID}
+            - GARAGE_DEFAULT_SECRET_KEY=${DFM_S3_SECRET_ACCESS_KEY}
+            - GARAGE_DEFAULT_BUCKET=${DFM_S3_BUCKET}
         volumes:
             - ./docker/garage.toml:/etc/garage.toml:ro
             - garage-meta:/var/lib/garage/meta
             - garage-data:/var/lib/garage/data
         ports:
-            - "9092:3900"
+            - "9092:9092"
 volumes:
     # database is in this volume
     db:

@@ -1,6 +1,7 @@
-# Line-endings behavior
-* text=auto
-# docker-entrypoint.sh needs LF (see https://github.com/hpi-sam/fuesim-digital/issues/479)
-docker/docker-entrypoint.sh eol=lf
+# Disable automatic conversion to CRLF line endings on Windows
+# Prettier enforces LF line endings, so it will reformat all files on Windows
+# See https://github.com/hpi-sam/fuesim-digital/issues/1623
+* text=auto eol=lf
+
 # with this export-ignore the zip file won't include itself when using git archive
 frontend/src/assets/source-code/fuesim-digital.zip export-ignore

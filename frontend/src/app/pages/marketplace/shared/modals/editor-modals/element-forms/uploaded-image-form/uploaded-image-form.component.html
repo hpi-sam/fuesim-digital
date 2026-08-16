@@ -1,28 +1,59 @@
-<div
-    (dragover)="onDragover($event)"
-    (dragenter)="onDragleave($event)"
-    (drop)="onDropped($event)"
-    class="card dropzone"
-    [class.text-bg-light]="currentlyDragging()"
->
-    <div class="card-body d-flex flex-column align-items-center">
-        <label for="fileInput" class="lead"> Datei hierher ziehen </label>
-
+@if (values().name) {
+    <div class="form-group mb-3">
+        <label class="form-label">Name</label>
         <input
-            #fileInput
-            type="file"
-            [accept]="allowedImageFileTypes"
-            (change)="onSelected($event)"
-            class="d-none"
+            [formField]="uploadedImageForm.name"
+            type="text"
+            class="form-control"
+            placeholder="z.B. Brennendes Haus"
         />
-
-        <div class="mt-1 mb-2 text-muted">oder</div>
-
-        <button
-            (click)="fileInput.click()"
-            class="btn btn-sm btn-outline-primary"
-        >
-            Datei auswählen
-        </button>
+        <app-display-model-validation
+            [field]="uploadedImageForm.name()"
+        ></app-display-model-validation>
     </div>
-</div>
+
+    <div class="mb-3">
+        <img
+            [src]="uploadedImageUrl()"
+            [alt]="values().name"
+            class="img-fluid rounded"
+        />
+    </div>
+
+    <app-marketplace-form-submit-button-bar
+        [form]="uploadedImageForm"
+        [type]="data().type"
+        [disabled]="disabled()"
+        (submitData)="submitData()"
+        (discardChanges)="formOutput.discardChanges()"
+    />
+} @else {
+    <div
+        (dragover)="onDragover($event)"
+        (dragenter)="onDragleave($event)"
+        (drop)="onDropped($event)"
+        class="card dropzone"
+        [class.text-bg-light]="currentlyDragging()"
+    >
+        <div class="card-body d-flex flex-column align-items-center">
+            <label for="fileInput" class="lead"> Datei hierher ziehen </label>
+
+            <input
+                #fileInput
+                type="file"
+                [accept]="allowedImageFileTypes"
+                (change)="onSelected($event)"
+                class="d-none"
+            />
+
+            <div class="mt-1 mb-2 text-muted">oder</div>
+
+            <button
+                (click)="fileInput.click()"
+                class="btn btn-sm btn-outline-primary"
+            >
+                Datei auswählen
+            </button>
+        </div>
+    </div>
+}

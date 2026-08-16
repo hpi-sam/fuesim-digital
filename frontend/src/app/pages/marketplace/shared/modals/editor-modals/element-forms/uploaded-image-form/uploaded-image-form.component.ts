@@ -4,13 +4,24 @@ import {
     input,
     signal,
     ChangeDetectionStrategy,
+    effect,
+    computed,
 } from '@angular/core';
 import {
     uuid,
     UploadedImage,
     allowedImageFileTypes,
     UploadedImageUploadInput,
+    stripEntityFromElementSchema,
+    uploadedImageSchema,
+    cloneDeepMutable,
 } from 'fuesim-digital-shared';
+import {
+    disabled,
+    form,
+    FormField,
+    validateStandardSchema,
+} from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
     FormOutputInjectionToken,
@@ -18,12 +29,21 @@ import {
 } from '../../base-versioned-element-submodal';
 import { MessageService } from '../../../../../../../core/messages/message.service';
 import { CollectionService } from '../../../../../../../core/collection.service';
+import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component.js';
+import { ImagePartialFormComponent } from '../image-partial-form/image-partial-form.component.js';
+import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar/submit-button-bar.component.js';
 
 @Component({
     selector: 'app-uploaded-image-form',
     templateUrl: './uploaded-image-form.component.html',
     styleUrl: './uploaded-image-form.component.scss',
     changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [
+        DisplayModelValidationComponent,
+        ImagePartialFormComponent,
+        MarketplaceFormSubmitButtonBarComponent,
+        FormField,
+    ],
 })
 export class UploadedImageFormComponent implements BaseVersionedElementSubmodal<UploadedImage> {
     private readonly messageService = inject(MessageService);
@@ -38,6 +58,34 @@ export class UploadedImageFormComponent implements BaseVersionedElementSubmodal<
     public readonly formOutput = inject(FormOutputInjectionToken);
 
     allowedImageFileTypes = allowedImageFileTypes;
+
+    public readonly values = signal<UploadedImage>({
+        id: uuid(),
+        type: 'uploadedImage',
+        name: '',
+        aspectRatio: 1,
+    });
+
+    public readonly uploadedImageUrl = computed(() =>
+        CollectionService.getUploadedImageUrl(this.values())
+    );
+
+    public readonly uploadedImageForm = form(this.values, (schema) => {
+        disabled(schema, { when: () => this.disabled() });
+        validateStandardSchema(
+            schema,
+            stripEntityFromElementSchema(uploadedImageSchema)
+        );
+    });
+
+    constructor() {
+        effect(() => {
+            const data = this.data();
+            if (data.mode !== 'create') {
+                this.values.set(cloneDeepMutable(data.element.content));
+            }
+        });
+    }
 
     onDragover(e: Event) {
         e.preventDefault();
@@ -79,7 +127,7 @@ export class UploadedImageFormComponent implements BaseVersionedElementSubmodal<
             });
         }
 
-        await this.submitData(file);
+        await this.createImage(file);
     }
 
     // almost no validation is needed here
@@ -87,10 +135,10 @@ export class UploadedImageFormComponent implements BaseVersionedElementSubmodal<
         const target = e.target as HTMLInputElement;
         if (!target.files?.length) return;
 
-        await this.submitData(target.files[0]!);
+        await this.createImage(target.files[0]!);
     }
 
-    public async submitData(file: File) {
+    public async createImage(file: File) {
         const data = {
             id: uuid(),
             type: 'uploadedImage',
@@ -102,5 +150,9 @@ export class UploadedImageFormComponent implements BaseVersionedElementSubmodal<
             data
         );
         this.formOutput.discardChanges();
+    }
+
+    public async submitData() {
+        this.formOutput.dataSubmit(this.uploadedImageForm().value());
     }
 }

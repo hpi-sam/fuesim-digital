@@ -30,7 +30,6 @@ import {
 import { MessageService } from '../../../../../../../core/messages/message.service';
 import { CollectionService } from '../../../../../../../core/collection.service';
 import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component.js';
-import { ImagePartialFormComponent } from '../image-partial-form/image-partial-form.component.js';
 import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar/submit-button-bar.component.js';
 
 @Component({
@@ -40,7 +39,6 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         DisplayModelValidationComponent,
-        ImagePartialFormComponent,
         MarketplaceFormSubmitButtonBarComponent,
         FormField,
     ],
@@ -66,9 +64,14 @@ export class UploadedImageFormComponent implements BaseVersionedElementSubmodal<
         aspectRatio: 1,
     });
 
-    public readonly uploadedImageUrl = computed(() =>
-        CollectionService.getUploadedImageUrl(this.values())
-    );
+    public readonly uploadedImageUrl = computed(() => {
+        const data = this.data();
+        if (data.mode !== 'create')
+            return CollectionService.getUploadedImageUrl(
+                data.element.versionId
+            );
+        return '';
+    });
 
     public readonly uploadedImageForm = form(this.values, (schema) => {
         disabled(schema, { when: () => this.disabled() });

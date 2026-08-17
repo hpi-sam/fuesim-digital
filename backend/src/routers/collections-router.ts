@@ -17,7 +17,6 @@ import {
     cloneDeepMutable,
     checkCollectionMembershipRole,
     organisationIdSchema,
-    uploadedImageSchema,
 } from 'fuesim-digital-shared';
 import { z } from 'zod';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
@@ -400,9 +399,9 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    publicRouter.get('/image/:imageId', async (req, res) => {
-        const id = uploadedImageSchema.shape.id.parse(req.params.imageId);
-        const file = await collectionService.getUploadedImage(id);
+    publicRouter.get('/image/:elementVersionId', async (req, res) => {
+        const elementVersionId = getElementVersionId(req);
+        const file = await collectionService.getUploadedImage(elementVersionId);
 
         res.send(await file.transformToByteArray());
     });

@@ -1,28 +1,77 @@
-<div class="form-group mb-3">
-    <label class="form-label">Bildadresse:</label>
-    <input
-        [formField]="imageForm().url"
-        appImageExistsValidator
-        type="url"
-        class="form-control"
-        placeholder="https://example.com/image.png"
-        data-cy="imageUrlInput"
-    />
-    <app-display-model-validation
-        [field]="imageForm().url()"
-    ></app-display-model-validation>
-</div>
-<div class="form-group mb-3">
-    <label class="form-label">Bildhöhe:</label>
-    <input
-        [formField]="imageForm().height"
-        step="1"
-        appIntegerValidator
-        type="number"
-        class="form-control"
-        placeholder="100"
-    />
-    <app-display-model-validation
-        [field]="imageForm().height()"
-    ></app-display-model-validation>
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">Bild</h5>
+        @if (imageForm().url().disabled()) {
+            <div class="d-flex justify-content-center mb-3">
+                <img
+                    [src]="imageForm().url().value()"
+                    class="img-fluid img-thumbnail"
+                    style="max-height: 20em"
+                />
+            </div>
+        } @else {
+            <label class="form-label small"
+                >Bild aus der Sammlung auswählen:</label
+            >
+
+            <div class="row">
+                @for (
+                    image of availableUploadedImages();
+                    track image.entityId
+                ) {
+                    <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-3">
+                        <div class="image-selector-container">
+                            <img
+                                [src]="getUploadedImageUrl(image.content)"
+                                class="img-thumbnail"
+                                [alt]="image.content.name"
+                                (click)="chooseImage(image)"
+                            />
+                            @if (
+                                imageForm().url().value() ===
+                                getUploadedImageUrl(image.content)
+                            ) {
+                                <div
+                                    class="image-selected d-flex align-items-center justify-content-center"
+                                >
+                                    <i
+                                        class="bi bi-check-circle-fill h3 text-white"
+                                    ></i>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="row mb-3">
+            <div class="col-9">
+                <label class="form-label small">Bildadresse:</label>
+                <input
+                    [formField]="imageForm().url"
+                    type="url"
+                    class="form-control form-control-sm"
+                    placeholder="https://example.com/image.png"
+                    data-cy="imageUrlInput"
+                />
+                <app-display-model-validation
+                    [field]="imageForm().url()"
+                ></app-display-model-validation>
+            </div>
+            <div class="col-3">
+                <label class="form-label small">Bildhöhe:</label>
+                <input
+                    [formField]="imageForm().height"
+                    step="1"
+                    type="number"
+                    class="form-control form-control-sm"
+                    placeholder="100"
+                />
+                <app-display-model-validation
+                    [field]="imageForm().height()"
+                ></app-display-model-validation>
+            </div>
+        </div>
+    </div>
 </div>

@@ -571,16 +571,6 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
-                                <div class="mb-2">
-                                    <button
-                                        class="btn btn-sm btn-outline-primary"
-                                        (click)="addImageTemplate()"
-                                    >
-                                        <i class="bi bi-plus"></i>
-                                        Hinzufügen
-                                    </button>
-                                </div>
-
                                 <ng-template
                                     #mapImageTemplateCard
                                     let-mapImageTemplate="element"
@@ -595,16 +585,6 @@
                                         dataCy="draggableMapImageDiv"
                                         [imageUrl]="mapImageTemplate.image.url"
                                         [title]="mapImageTemplate.name"
-                                        [enableEditButton]="
-                                            getEntityOfElement(
-                                                mapImageTemplate
-                                            ) === undefined
-                                        "
-                                        (elementEdit)="
-                                            editMapImageTemplate(
-                                                mapImageTemplate.id
-                                            )
-                                        "
                                     >
                                     </app-map-editor-card>
                                 </ng-template>
@@ -615,7 +595,8 @@
                                         elements:
                                             mapImageTemplates$ | async | values,
                                         handler: mapImageTemplateCard,
-                                        emptyText: 'Keine Bilder vorhanden',
+                                        emptyText:
+                                            'Sie haben keine Bilder aus Sammlungen',
                                     }"
                                 >
                                 </ng-template>

@@ -21,13 +21,9 @@ import {
 import { AppState } from '../../../state/app.state';
 import { ExerciseService } from '../../../core/exercise.service';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
-import {
-    createSelectMapImage,
-    createSelectScoutable,
-} from '../../../state/application/selectors/exercise.selectors';
+import { createSelectMapImage } from '../../../state/application/selectors/exercise.selectors';
 import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
 import { ScoutableElementNavItemComponent } from '../scoutable-element-nav-item/scoutable-element-nav-item.component';
-import { ImageExistsValidatorDirective } from '../../validation/image-exists-validator.directive';
 import { IntegerValidatorDirective } from '../../validation/integer-validator.directive';
 import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.directive';
 
@@ -40,7 +36,6 @@ import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.di
         DisplayValidationComponent,
         ScoutableElementNavItemComponent,
         FormsModule,
-        ImageExistsValidatorDirective,
         DisplayValidationComponent,
         IntegerValidatorDirective,
         AppSaveOnTypingDirective,
@@ -65,30 +60,13 @@ export class MapImagesDetailsComponent implements OnInit {
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
     public url?: string;
 
-    readonly isScoutableTabVisible = computed(() => {
-        const mapImage = this.mapImage();
-        if (!mapImage.scoutableId) return false;
-        return (
-            this.currentRole() === 'trainer' ||
-            this.store.selectSignal(
-                createSelectScoutable(mapImage.scoutableId)
-            )().isVisibleForParticipants
-        );
-    });
-
     ngOnInit(): void {
         this.url = this.mapImage().image.url;
         if (this.openScoutInfo()) {
             this.activeId.set('scout-Info');
         }
     }
-    public saveUrl() {
-        this.exerciseService.proposeAction({
-            type: '[MapImage] Reconfigure Url',
-            mapImageId: this.mapImageId(),
-            newUrl: this.url!,
-        });
-    }
+
     public resizeImage(newHeight: number) {
         this.exerciseService.proposeAction({
             type: '[MapImage] Scale MapImage',
@@ -96,6 +74,7 @@ export class MapImagesDetailsComponent implements OnInit {
             newHeight,
         });
     }
+
     public setLocked(newLocked: boolean) {
         this.exerciseService.proposeAction({
             type: '[MapImage] Set isLocked',

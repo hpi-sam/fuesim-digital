@@ -102,6 +102,7 @@ export const selectMaterialTemplates =
     selectTemplatesFactory('materialTemplate');
 export const selectMapImagesTemplates =
     selectTemplatesFactory('mapImageTemplate');
+export const selectUploadedImages = selectTemplatesFactory('uploadedImage');
 export const selectAlarmgroupTemplates = selectTemplatesFactory('alarmGroup');
 export const selectMeasureTemplates = selectTemplatesFactory('measureTemplate');
 export const selectCategorizedMeasureTemplates =

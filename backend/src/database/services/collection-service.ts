@@ -794,9 +794,6 @@ export class CollectionService {
             async (tx, draftState, eventBuffer) => {
                 const { metadata } = await validateImage(content.file);
 
-                const key = getKeyForUploadedImage(content.id);
-                await this.s3Service.uploadFile(key, content.file);
-
                 const actualContent = {
                     id: content.id,
                     type: 'uploadedImage',
@@ -810,6 +807,9 @@ export class CollectionService {
                         content: actualContent,
                     })
                 );
+
+                const key = getKeyForUploadedImage(result.entityId);
+                await this.s3Service.uploadFile(key, content.file);
 
                 await tx.collectionRepository.attachElementToCollectionVersion(
                     result.versionId,
@@ -1224,9 +1224,18 @@ export class CollectionService {
         return [true, latestVersionOfContainingCollection];
     }
 
-    public async getUploadedImage(id: UploadedImage['id']) {
+    public async getUploadedImage(elementVersionId: ElementVersionId) {
+        const elementVersion =
+            await this.collectionRepository.getElementVersionByVersionId(
+                elementVersionId
+            );
+        if (elementVersion?.content.type !== 'uploadedImage') {
+            throw new NotFoundError();
+        }
         try {
-            return (await this.s3Service.getFile(getKeyForUploadedImage(id)))!;
+            return (await this.s3Service.getFile(
+                getKeyForUploadedImage(elementVersion.entityId)
+            ))!;
         } catch (error: unknown) {
             if (error instanceof NoSuchKey) {
                 throw new NotFoundError();

@@ -565,7 +565,7 @@
                             ngbAccordionButton
                             data-cy="mapImagesAccordionButton"
                         >
-                            Bilder
+                            Kartenbilder
                         </button>
                     </h5>
                     <div ngbAccordionCollapse>
@@ -596,7 +596,7 @@
                                             mapImageTemplates$ | async | values,
                                         handler: mapImageTemplateCard,
                                         emptyText:
-                                            'Sie haben keine Bilder aus Sammlungen',
+                                            'Sie haben keine Kartenbilder aus Sammlungen',
                                     }"
                                 >
                                 </ng-template>
@@ -606,12 +606,12 @@
                                         goToTemplateManagementModal
                                     "
                                     [ngTemplateOutletContext]="{
-                                        type: 'Bilder',
+                                        type: 'Kartenbilder',
                                     }"
                                 />
                                 <app-help-banner
                                     url="2_exercises/3_exercise_elements.html#bilder"
-                                    label="Mehr Informationen zu Bildern"
+                                    label="Mehr Informationen zu Kartenbildern"
                                 />
                             </ng-template>
                         </div>
@@ -674,7 +674,8 @@
                                 >
                                     <i class="bi bi-info-circle me-2"></i>
                                     Erkundungsinformationen können auch zu
-                                    Bildern und Patienten hinzugefügt werden.
+                                    Kartenbildern und Patienten hinzugefügt
+                                    werden.
                                 </div>
                                 <app-help-banner
                                     url="2_exercises/3_exercise_elements.html#erkundungselemente"

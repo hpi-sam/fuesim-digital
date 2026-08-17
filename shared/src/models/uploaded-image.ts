@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { uuidSchema } from '../utils/uuid.js';
 import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
+import type { ElementEntityId } from '../marketplace/models/versioned-id-schema.js';
 
 const base64ToBytes = z.codec(z.base64(), z.instanceof(Uint8Array), {
     decode: (base64String) => z.util.base64ToUint8Array(base64String),
@@ -39,7 +40,7 @@ export type UploadedImageUploadInput = Immutable<
 export type UploadedImage = Immutable<z.infer<typeof uploadedImageSchema>>;
 
 export function getKeyForUploadedImage(
-    uploadedImageId: UploadedImage['id']
+    elementEntityId: ElementEntityId
 ): string {
-    return `uploaded-image/${uploadedImageId}`;
+    return `uploaded-image/${elementEntityId}`;
 }

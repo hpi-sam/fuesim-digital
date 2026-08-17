@@ -94,8 +94,10 @@ export class CollectionService {
         });
     }
 
-    static getUploadedImageUrl(uploadedImage: UploadedImage) {
-        return `${httpOrigin}/api/collections/image/${uploadedImage.id}`;
+    static getUploadedImageUrl(
+        uploadedImageId: ElementVersionId | UploadedImage['id']
+    ) {
+        return `${httpOrigin}/api/collections/image/${uploadedImageId}`;
     }
 
     private socketErrorHandler(error: any) {

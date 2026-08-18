@@ -401,7 +401,10 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
     publicRouter.get('/image/:elementVersionId', async (req, res) => {
         const elementVersionId = getElementVersionId(req);
-        const file = await collectionService.getUploadedImage(elementVersionId);
+        const file = await collectionService.getUploadedImage(
+            elementVersionId,
+            req.query['secret'] as string
+        );
 
         res.send(await file.transformToByteArray());
     });

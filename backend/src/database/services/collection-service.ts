@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import type {
     CollectionElements,
     CollectionElementsSingle,
@@ -41,7 +42,7 @@ import type { CollectionRepository } from '../repositories/collection-repository
 import type { SessionInformation } from '../../auth/auth-service.js';
 import { validateImage } from '../../utils/image.js';
 import type { S3Service } from '../../s3/s3-service.js';
-import { NotFoundError } from '../../utils/http.js';
+import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
 import type { ExerciseService } from './exercise-service.js';
 import type { OrganisationService } from './organisation-service.js';
 
@@ -798,6 +799,7 @@ export class CollectionService {
                     id: content.id,
                     type: 'uploadedImage',
                     name: content.name,
+                    secret: crypto.randomBytes(32).toString('hex'),
                     aspectRatio: metadata.width / metadata.height,
                 } satisfies UploadedImage;
 
@@ -1224,13 +1226,19 @@ export class CollectionService {
         return [true, latestVersionOfContainingCollection];
     }
 
-    public async getUploadedImage(elementVersionId: ElementVersionId) {
+    public async getUploadedImage(
+        elementVersionId: ElementVersionId,
+        secret: string
+    ) {
         const elementVersion =
             await this.collectionRepository.getElementVersionByVersionId(
                 elementVersionId
             );
         if (elementVersion?.content.type !== 'uploadedImage') {
             throw new NotFoundError();
+        }
+        if (elementVersion.content.secret !== secret) {
+            throw new PermissionDeniedError();
         }
         try {
             return (await this.s3Service.getFile(

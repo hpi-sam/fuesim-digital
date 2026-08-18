@@ -8,7 +8,7 @@
             <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-3">
                 <div class="image-selector-container">
                     <img
-                        [src]="getUploadedImageUrl(image.id)"
+                        [src]="getUploadedImageUrl(image.id, image)"
                         class="img-thumbnail"
                         [alt]="image.name"
                         (click)="chooseImage(image)"

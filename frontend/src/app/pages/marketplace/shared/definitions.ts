@@ -47,7 +47,10 @@ export const marketplaceComponentDefinitions: {
         helpUrl: '2_exercises/3_exercise_elements.html#bilder', // TODO
         elementCard: (element) => ({
             title: element.content.name,
-            image: CollectionService.getUploadedImageUrl(element.versionId),
+            image: CollectionService.getUploadedImageUrl(
+                element.versionId,
+                element.content
+            ),
         }),
     },
     materialTemplate: {

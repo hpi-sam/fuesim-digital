@@ -84,10 +84,12 @@ export class UserGeneratedContentEditorComponent implements OnInit, OnDestroy {
         );
         componentInstance.imageChosen.subscribe(
             (uploadedImage: UploadedImage) => {
-                console.log(uploadedImage);
                 this.editor.commands
                     .insertImage(
-                        CollectionService.getUploadedImageUrl(uploadedImage.id)
+                        CollectionService.getUploadedImageUrl(
+                            uploadedImage.id,
+                            uploadedImage
+                        )
                     )
                     .exec();
             }

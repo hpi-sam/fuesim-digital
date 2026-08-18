@@ -61,6 +61,7 @@ export class UploadedImageFormComponent implements BaseVersionedElementSubmodal<
         id: uuid(),
         type: 'uploadedImage',
         name: '',
+        secret: '',
         aspectRatio: 1,
     });
 
@@ -68,7 +69,8 @@ export class UploadedImageFormComponent implements BaseVersionedElementSubmodal<
         const data = this.data();
         if (data.mode !== 'create')
             return CollectionService.getUploadedImageUrl(
-                data.element.versionId
+                data.element.versionId,
+                data.element.content
             );
         return '';
     });

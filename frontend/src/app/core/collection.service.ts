@@ -95,9 +95,10 @@ export class CollectionService {
     }
 
     static getUploadedImageUrl(
-        uploadedImageId: ElementVersionId | UploadedImage['id']
+        uploadedImageId: ElementVersionId | UploadedImage['id'],
+        uploadedImage: UploadedImage
     ) {
-        return `${httpOrigin}/api/collections/image/${uploadedImageId}`;
+        return `${httpOrigin}/api/collections/image/${uploadedImageId}?secret=${uploadedImage.secret}`;
     }
 
     private socketErrorHandler(error: any) {

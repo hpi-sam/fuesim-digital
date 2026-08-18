@@ -21,7 +21,7 @@ export const uploadedImageSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('uploadedImage'),
     name: z.string().nonempty(),
-
+    secret: z.string().nonempty(),
     aspectRatio: z.number().positive(),
 });
 export const uploadedImageUploadSchema = z.strictObject({

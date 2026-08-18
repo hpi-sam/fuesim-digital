@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import {
-    ElementVersionId,
     ImageProperties,
     TemplateVersion,
     TypedTemplateVersion,
@@ -42,10 +41,15 @@ export class ImagePartialFormComponent {
         ).map((v) => ({ ...v.content, id: v.versionId }))
     );
 
-    chooseImage(elementVersionId: ElementVersionId) {
+    chooseImage(uploadedImage: UploadedImage) {
         this.imageForm()
             .url()
-            .value.set(this.getUploadedImageUrl(elementVersionId));
+            .value.set(
+                CollectionService.getUploadedImageUrl(
+                    uploadedImage.id,
+                    uploadedImage
+                )
+            );
     }
 
     chooseImageFromCollection() {
@@ -55,10 +59,8 @@ export class ImagePartialFormComponent {
         );
         componentInstance.imageChosen.subscribe(
             (uploadedImage: UploadedImage) => {
-                this.chooseImage(uploadedImage.id as ElementVersionId);
+                this.chooseImage(uploadedImage);
             }
         );
     }
-
-    getUploadedImageUrl = CollectionService.getUploadedImageUrl;
 }

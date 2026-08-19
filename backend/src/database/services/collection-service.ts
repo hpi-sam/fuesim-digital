@@ -40,9 +40,13 @@ import { castDraft, type WritableDraft } from 'immer';
 import { NoSuchKey } from '@aws-sdk/client-s3';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import { validateImage } from '../../utils/image.js';
+import { ImageValidationError, validateImage } from '../../utils/image.js';
 import type { S3Service } from '../../s3/s3-service.js';
-import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
+import {
+    ApiError,
+    NotFoundError,
+    PermissionDeniedError,
+} from '../../utils/http.js';
 import type { ExerciseService } from './exercise-service.js';
 import type { OrganisationService } from './organisation-service.js';
 
@@ -793,8 +797,15 @@ export class CollectionService {
         return this.reduce(
             collectionEntityId,
             async (tx, draftState, eventBuffer) => {
-                const { metadata } = await validateImage(content.file);
-
+                let metadata;
+                try {
+                    metadata = (await validateImage(content.file)).metadata;
+                } catch (e: unknown) {
+                    if (e instanceof ImageValidationError) {
+                        throw new ApiError(e.message);
+                    }
+                    throw e;
+                }
                 const actualContent = {
                     id: content.id,
                     type: 'uploadedImage',

@@ -65,6 +65,7 @@
         "@eslint/compat": "^2.1.0",
         "@eslint/js": "~10.0.1",
         "@types/archiver": "^8.0.0",
+        "@types/bytes": "^3.1.5",
         "@types/cookie": "^0.6.0",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.1",

@@ -1,6 +1,7 @@
 import './utils/dotenv-config.js';
 import dotenv from 'dotenv';
 import { bool, cleanEnv, makeValidator, num, str, url } from 'envalid';
+import bytes from 'bytes';
 
 export class Config {
     private static _websocketPort?: number;
@@ -12,6 +13,8 @@ export class Config {
     private static _httpFrontendUrl?: string;
 
     private static _uploadLimit?: string;
+
+    private static _imageUploadLimit?: string;
 
     private static _autoDeleteDays?: number;
 
@@ -76,6 +79,15 @@ export class Config {
     public static get uploadLimit(): string {
         this.throwIfNotInitialized();
         return this._uploadLimit!;
+    }
+
+    public static get imageUploadLimit(): number {
+        this.throwIfNotInitialized();
+        const parsedLimit = bytes.parse(`${this._imageUploadLimit!}b`);
+        if (!parsedLimit) {
+            throw new Error(`${this._imageUploadLimit} is not a valid size.`);
+        }
+        return parsedLimit;
     }
 
     public static get autoDeleteDays(): number {
@@ -218,6 +230,7 @@ export class Config {
                 default: 'http://localhost:14200',
             }),
             DFM_UPLOAD_LIMIT: str({ default: '200m' }),
+            DFM_IMAGE_UPLOAD_LIMIT: str({ default: '4m' }),
             DFM_AUTO_DELETE_DAYS: num({ default: 30 }),
             DFM_USE_DB: bool(),
             DFM_USE_DB_TESTING: bool({ default: undefined }),
@@ -307,6 +320,7 @@ export class Config {
                 ? env.DFM_HTTP_FRONTEND_URL_TESTING
                 : env.DFM_HTTP_FRONTEND_URL;
         this._uploadLimit = env.DFM_UPLOAD_LIMIT;
+        this._imageUploadLimit = env.DFM_IMAGE_UPLOAD_LIMIT;
         this._autoDeleteDays = env.DFM_AUTO_DELETE_DAYS;
         this._useDb =
             testing && env.DFM_USE_DB_TESTING

@@ -1,22 +1,24 @@
-@if (messageService.messages$ | async; as messages) {
+@if (messageService.messages(); as messages) {
     <div
-        class="position-absolute p-2"
+        class="position-fixed p-2"
         style="top: 0; right: 0; width: max-content; z-index: 10000"
     >
         <!-- Show the 5 oldest toasts, the newest should appear at the bottom -->
         @for (message of messages | slice: 0 : 5; track message.id) {
             <div
-                (mouseenter)="message.destroyTimer?.pause()"
-                (mouseleave)="message.destroyTimer?.start()"
-                (click)="message.increaseDestroyTimeout(null)"
+                (mouseenter)="message.paused.set(true)"
+                (mouseleave)="message.paused.set(false)"
+                (click)="message.timeout.set(null)"
                 class="toast show position-relative mb-3"
                 style="min-width: 200px"
-                @fade
+                animate.enter="enter-animation"
             >
-                @if (message.destroyTimer) {
+                @if (message.timeout(); as timeout) {
                     <app-custom-timer-progress-bar
-                        [timer]="message.destroyTimer"
+                        [timeout]="timeout"
+                        [paused]="message.paused()"
                         [color]="message.config.color"
+                        (destroyed)="message.destroy()"
                     ></app-custom-timer-progress-bar>
                 }
                 <div class="toast-header">
@@ -24,11 +26,6 @@
                         <!-- TODO: Display an icon according to the color -->
                         {{ message.config.title }}
                     </strong>
-                    @if (message.amount > 1) {
-                        <span class="ms-2 badge bg-secondary">{{
-                            message.amount
-                        }}</span>
-                    }
                     <button
                         type="button"
                         class="ms-2 mb-1 btn-close"

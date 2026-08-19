@@ -1,6 +1,9 @@
 <div class="progress w-100" style="height: 0.3rem">
     <div
-        [@addProgress]="animationParams$ | async"
+        animate.enter="animate-progress"
+        [style.animation-duration]="`${timeout()}ms`"
+        [style.animation-play-state]="paused() ? 'paused' : 'running'"
+        (animationend)="destroyed.emit()"
         style="width: 0; --bs-bg-opacity: 0.5"
         [class]="'progress-bar ' + (color() ? 'bg-' + color() : '')"
     ></div>

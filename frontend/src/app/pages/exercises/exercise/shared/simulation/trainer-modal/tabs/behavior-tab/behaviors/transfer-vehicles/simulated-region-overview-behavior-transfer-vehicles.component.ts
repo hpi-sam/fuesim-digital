@@ -55,6 +55,7 @@ import { PatientIdentifierComponent } from '../../../../../../../../../../shared
 import { PatientStatusBadgeComponent } from '../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 import { PatientStatusDisplayComponent } from '../../../../../../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
+import { HelpButtonComponent } from '../../../../../../../../../../help-button/help-button.component';
 
 let globalLastInformationCollapsed = true;
 let globalLastSettingsCollapsed = true;
@@ -82,6 +83,7 @@ let globalLastTransferCollapsed = true;
         PatientStatusDisplayComponent,
         FormatDurationPipe,
         AsyncPipe,
+        HelpButtonComponent,
     ],
 })
 export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent

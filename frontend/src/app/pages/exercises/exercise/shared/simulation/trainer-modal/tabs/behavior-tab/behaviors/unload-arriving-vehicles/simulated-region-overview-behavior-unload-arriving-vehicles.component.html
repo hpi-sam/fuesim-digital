@@ -1,5 +1,10 @@
 <div class="h-100 mh-100 overflow-auto">
-    <h6>Aus eintreffenden Fahrzeugen aussteigen</h6>
+    <h4>
+        Aus eintreffenden Fahrzeugen aussteigen
+        <app-help-button
+            url="3_simulation/2_behaviors.html#fahrzeuge-entladen"
+        />
+    </h4>
     <div class="form-group mb-3">
         <label
             class="form-label"
@@ -24,7 +29,7 @@
         <app-display-validation [ngModelInput]="timeInput" />
     </div>
 
-    <h6>Gerade aussteigend</h6>
+    <h5>Gerade aussteigend</h5>
     @if ((vehiclesStatus$ | async)?.length) {
         <table class="table table-striped">
             <thead>

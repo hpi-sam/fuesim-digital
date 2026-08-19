@@ -19,7 +19,7 @@ Für eine möglichst natürliche Interaktion der Teilnehmenden mit einem simulie
 
 Die Simulation ist in simulierten Bereichen organisiert, die auf der Karte angeordnet werden. Jeder Bereich kann einzeln konfiguriert werden und dadurch individuelles Verhalten aufweisen.
 
-Simulierte Bereiche können wie Ansichten auf der Karte platziert und Fahrzeuge, Personal und Patienten hinzugefügt werden. Ihre innere räumliche Anordnung bleibt jedoch verborgen. Informationen aus der Simulation können per Funkspruch abgefragt werden.
+Simulierte Bereiche können wie Ansichten auf der Karte platziert und miteinander oder mit Transferpunkten verbunden werden. Per Drag-and-Drop werden Fahrzeuge, Personal und Patienten hinzugefügt. Ihre innere räumliche Anordnung bleibt jedoch verborgen. Informationen aus der Simulation können per Funkspruch abgefragt werden.
 
 ### Verhaltensweise
 

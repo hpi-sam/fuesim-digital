@@ -26,6 +26,7 @@ import { StartPauseButtonComponent } from '../../../../../../../shared/component
 import { RadiogramListComponent } from '../radiogram-list/radiogram-list.component';
 import { SimulatedRegionNameComponent } from '../../../../../../../shared/components/simulated-region-name/simulated-region-name.component';
 import { SimulatedRegionOverviewGeneralComponent } from '../overview/simulated-region-overview.component';
+import { HelpButtonComponent } from '../../../../../../../help-button/help-button.component';
 
 @Component({
     selector: 'app-simulated-regions-modal',
@@ -45,6 +46,7 @@ import { SimulatedRegionOverviewGeneralComponent } from '../overview/simulated-r
         SimulatedRegionOverviewGeneralComponent,
         NgbNavOutlet,
         AsyncPipe,
+        HelpButtonComponent,
     ],
 })
 export class SimulatedRegionsModalComponent implements OnInit {

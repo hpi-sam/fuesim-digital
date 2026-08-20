@@ -11,6 +11,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Documentation on simulated regions and their behaviors is now available.
 
+### Fixed
+
+- On longer pages, messages were shown outside the viewport.
+
 ## [1.0.0-rc.2] - 2026-08-13
 
 ### Added

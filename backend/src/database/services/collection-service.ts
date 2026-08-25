@@ -42,11 +42,7 @@ import type { CollectionRepository } from '../repositories/collection-repository
 import type { SessionInformation } from '../../auth/auth-service.js';
 import { ImageValidationError, validateImage } from '../../utils/image.js';
 import type { S3Service } from '../../s3/s3-service.js';
-import {
-    ApiError,
-    NotFoundError,
-    PermissionDeniedError,
-} from '../../utils/http.js';
+import { ApiError, PermissionDeniedError } from '../../utils/http.js';
 import type { ExerciseService } from './exercise-service.js';
 import type { OrganisationService } from './organisation-service.js';
 
@@ -1246,7 +1242,7 @@ export class CollectionService {
                 elementVersionId
             );
         if (elementVersion?.content.type !== 'uploadedImage') {
-            throw new NotFoundError();
+            throw new PermissionDeniedError();
         }
         if (elementVersion.content.secret !== secret) {
             throw new PermissionDeniedError();
@@ -1257,7 +1253,7 @@ export class CollectionService {
             ))!;
         } catch (error: unknown) {
             if (error instanceof NoSuchKey) {
-                throw new NotFoundError();
+                throw new PermissionDeniedError();
             }
             throw error;
         }

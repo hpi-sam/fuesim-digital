@@ -320,7 +320,7 @@ export class Config {
                 ? env.DFM_HTTP_FRONTEND_URL_TESTING
                 : env.DFM_HTTP_FRONTEND_URL;
         this._uploadLimit = env.DFM_UPLOAD_LIMIT;
-        this._imageUploadLimit = env.DFM_IMAGE_UPLOAD_LIMIT;
+        this._imageUploadLimit = testing ? '500b' : env.DFM_IMAGE_UPLOAD_LIMIT;
         this._autoDeleteDays = env.DFM_AUTO_DELETE_DAYS;
         this._useDb =
             testing && env.DFM_USE_DB_TESTING

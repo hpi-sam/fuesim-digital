@@ -1,5 +1,5 @@
 import { allowedImageFileTypes } from 'fuesim-digital-shared';
-import { type Sharp, type SharpInput } from 'sharp';
+import { type Metadata, type Sharp, type SharpInput } from 'sharp';
 import bytes from 'bytes';
 // eslint-disable-next-line import-x/no-named-as-default
 import sharp from 'sharp';
@@ -9,13 +9,14 @@ export class ImageValidationError extends Error {}
 
 export async function validateImage(buffer: SharpInput) {
     let image: Sharp;
+    let metadata: Metadata;
+
     try {
         image = sharp(buffer);
+        metadata = await image.metadata();
     } catch {
         throw new ImageValidationError('Das Bild ist kaputt.');
     }
-
-    const metadata = await image.metadata();
 
     if (
         !metadata.mediaType ||

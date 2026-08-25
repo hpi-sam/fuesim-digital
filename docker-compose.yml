@@ -58,7 +58,7 @@ services:
             - garage-meta:/var/lib/garage/meta
             - garage-data:/var/lib/garage/data
         ports:
-            - "9092:9092"
+            - 127.0.0.1:9092:9092
 volumes:
     # database is in this volume
     db:

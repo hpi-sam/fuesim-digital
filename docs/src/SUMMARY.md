@@ -19,7 +19,5 @@
     - [Verhaltensweisen](3_simulation/2_behaviors.md)
     - [Schnittstellenfunker](3_simulation/3_ifs.md)
 - [Übungselemente und Vorlagen](4_editing/index.md)
-    - [Übungen und Übungsvorlagen](4_editing/1_exercises.md)
-    - [Übungselemente und Sammlungen](4_editing/2_elements.md)
 - [Benutzerverwaltung](5_users/index.md)
 - [Änderungshistorie](release_notes.md)

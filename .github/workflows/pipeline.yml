@@ -173,8 +173,8 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
-            - name: Start Authelia
-              uses: ./.github/actions/start-authelia
+            - name: Start Testing Containers
+              uses: ./.github/actions/start-testing-containers
             - name: Create .env
               run: >
                   cat ./.env.example
@@ -235,8 +235,8 @@ jobs:
               with:
                   submodules: true
             - uses: ./.github/actions/setup-install
-            - name: Start Authelia
-              uses: ./.github/actions/start-authelia
+            - name: Start Testing Containers
+              uses: ./.github/actions/start-testing-containers
             - name: Create .env
               run: >
                   cat ./.env.example
@@ -285,8 +285,8 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
-            - name: Start Authelia
-              uses: ./.github/actions/start-authelia
+            - name: Start Testing Containers
+              uses: ./.github/actions/start-testing-containers
             - name: Create .env
               run: >
                   cat ./.env.example

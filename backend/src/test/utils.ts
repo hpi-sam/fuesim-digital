@@ -254,12 +254,6 @@ export function createTestEnvironment(): TestEnvironment {
         collectionRepository = new CollectionRepository(
             databaseService.databaseConnection
         );
-        collectionService = new CollectionService(
-            s3Service,
-            exerciseService,
-            organisationService,
-            collectionRepository
-        );
 
         exerciseService = new ExerciseService(
             exerciseRepository,
@@ -280,6 +274,14 @@ export function createTestEnvironment(): TestEnvironment {
             sessionRepository,
             organisationService
         ).initialize({ skipOidcDiscovery: true });
+
+        collectionService = new CollectionService(
+            s3Service,
+            exerciseService,
+            organisationService,
+            collectionRepository
+        );
+
         exerciseManagerService = new ExerciseManagerService(
             exerciseRepository,
             exerciseService,

@@ -19,6 +19,9 @@ export class S3Service {
             },
             forcePathStyle: true,
         });
+        console.log(
+            `S3 client configured with endpoint ${Config.s3Endpoint}, region ${Config.s3Region} and bucket ${Config.s3Bucket}`
+        );
 
         return new S3Service(client);
     }

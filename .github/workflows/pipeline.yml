@@ -175,13 +175,15 @@ jobs:
               with:
                   submodules: true
             - uses: ./.github/actions/setup-install
-            - name: Start Authelia
-              uses: ./.github/actions/start-authelia
+            - name: Start Testing Containers
+              uses: ./.github/actions/start-testing-containers
             - name: Create .env
               run: >
                   cat ./.env.dev.example
                   | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://localhost:${{ env.AUTHELIA_CONTAINER_PORT }}|"
+                  | sed -e "s|^DFM_S3_ENDPOINT=.*$|DFM_S3_ENDPOINT=http://localhost:${{ env.GARAGE_CONTAINER_PORT }}|"
+                  | sed -e "s|^#DFM_S3_SECRET_ACCESS_KEY=.*$|DFM_S3_SECRET_ACCESS_KEY=fuesim-digital-key|"
                   > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run
@@ -237,13 +239,15 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
-            - name: Start Authelia
-              uses: ./.github/actions/start-authelia
+            - name: Start Testing Containers
+              uses: ./.github/actions/start-testing-containers
             - name: Create .env
               run: >
                   cat ./.env.dev.example
                   | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://localhost:${{ env.AUTHELIA_CONTAINER_PORT }}|"
+                  | sed -e "s|^DFM_S3_ENDPOINT=.*$|DFM_S3_ENDPOINT=http://localhost:${{ env.GARAGE_CONTAINER_PORT }}|"
+                  | sed -e "s|^#DFM_S3_SECRET_ACCESS_KEY=.*$|DFM_S3_SECRET_ACCESS_KEY=fuesim-digital-key|"
                   > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run

@@ -10,7 +10,7 @@ Parallelübungen sind ein besonderes Übungsformat: Im Gegensatz zu normalen Meh
 
 ## Parallelübungen vorbereiten
 
-Um eine Parallelübung vorzubereiten, muss zunächst eine [Übungsvorlage erstellt](../4_editing/index.md#übungsvorlagen-verwalten) werden. In dieser kann das Szenario vorbereitet werden. Besonders hilfreich bei Parallelübungen sind [Maßnahmen](3_exercise_elements.md#maßnahmen), um eigenständige Interaktionen der Teilnehmenden zu erlauben, und [Erkundungselemente](3_exercise_elements.md#erkundungselemente), um die Erkundung der Lage darzustellen. Wichtig ist aber, dass die Parallelübung mindestens eine [Ansicht](3_exercise_elements.md#ansichten) enthält, in der die Teilnehmenden später automatisch der Übung beitreten.
+Um eine Parallelübung vorzubereiten, muss zunächst eine [Übungsvorlage erstellt](../4_editing/1_exercises.md#übungsvorlagen-verwalten) werden. In dieser kann das Szenario vorbereitet werden. Besonders hilfreich bei Parallelübungen sind [Maßnahmen](3_exercise_elements.md#maßnahmen), um eigenständige Interaktionen der Teilnehmenden zu erlauben, und [Erkundungselemente](3_exercise_elements.md#erkundungselemente), um die Erkundung der Lage darzustellen. Wichtig ist aber, dass die Parallelübung mindestens eine [Ansicht](3_exercise_elements.md#ansichten) enthält, in der die Teilnehmenden später automatisch der Übung beitreten.
 
 ## Parallelübung durchführen
 

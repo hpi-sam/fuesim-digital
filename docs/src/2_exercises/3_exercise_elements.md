@@ -2,6 +2,12 @@
 
 Mit Übungselementen sind all jene Objekte gemeint, die im Laufe einer Übung durch die Teilnehmenden direkt oder indirekt verwaltet oder betrachtet werden. Ein Großteil ist auf der Übungskarte zu sehen.
 
+> [!TIP]
+> Einige Übungselemente werden zentral in Sammlungen, außerhalb der Übung, verwaltet.
+> Dort können sie bearbeitet, gelöscht oder neu erstellt werden.
+> Siehe [Übungselemente verwalten](./../4_editing/2_elements.md).
+> !["Weitere Fahrzeuge verwalten" Knopf](./editor_jump_to_collections.png)
+
 ## Ansichten
 
 Bei Ansichten handelt es sich um Bereiche einer Übung, die mit einem weißen Rechteck markiert sind.
@@ -104,27 +110,13 @@ Das ausgestiegene Personal und Material können auf der Karte gleichermaßen per
 > [!WARNING]
 > Es gibt keine automatischen Kontrollmechanismen für die Bewegung von Fahrzeugen, Personal und Material in der Übung. Das heißt, sofern keine [Zone](#zonen) eingerichtet wurde, können sie auch auf Bereiche der Karte bewegt werden, die in der realen Welt unerreichbar wären (z. B. auf Hausdächer). Gleichermaßen können Fahrzeuge zudem auch dann bewegt werden, wenn kein Personal als Kraftfahrer an Bord ist.
 
-### Einstellungsmöglichkeiten
+### Einstellungsmöglichkeiten in der Übung
 
-![Editor für Fahrzeuge (mit Personal und Material)](./exercise_elements_vehicle_editor.png)
+- <kbd>Fahrzeugnahme</kbd>: Individueller Name, welcher unter dem Fahrzeug auf der Karte sowie in Auswertungsansichten angezeigt wird.
 
-Übungsleitende können im Editor Fahrzeugvorlagen neu erstellen und bestehende Vorlagen bearbeiten. Im entsprechenden Bearbeitungsfenster kann Folgendes angegeben werden:
-
-- <kbd>**Standardname**</kbd>: Individueller Name, mit dem neu platzierte Fahrzeuge initial versehen werden. Fahrzeuge, die ein "#" im Namen haben, werden automatisch fortlaufend innerhalb des gleichen Fahrzeug-Typs nummeriert.
-- <kbd>**Typ**</kbd>: Bezeichnung des Fahrzeugtyps ohne Platzhalter für die genaue Kennung; wird im Editor angezeigt und für die Sortierung der Fahrzeuge in der Statistik verwendet.
-- <kbd>**Bildadresse**</kbd>: URL zu einer Bilddatei. Das Bild sollte idealerweise eine Vektorgrafik (`.svg`) mit transparentem Hintergrund sein.
-- <kbd>**Bildhöhe**</kbd>: Höhe des Bildes in Punkten, wobei 100 ca. der Höhe eines normalen Sprinter-RTWs entspricht. Die Breite wird analog skaliert.
-- <kbd>**Patientenkapazität**</kbd>: Anzahl der Patienten, die im Fahrzeug transportiert werden können. Kann 0 sein für Fahrzeuge, die keine Patienten transportieren können (z.B. Führungsfahrzeuge).
-- <kbd>**Ladezeit pro Patient**</kbd>: Wie lange es dauert, einen Patienten in dieses Fahrzeug zu laden. Ist eine Zeit größer 0 eingestellt, kann immer nur ein Patient gleichzeitig eingeladen werden und während der Ladezeit kann das Fahrzeug nicht bewegt werden (inklusive Transfers und Fahrt zum Krankenhaus). Um Ladezeiten für diesen Typ Fahrzeug zu deaktivieren, kann hier 0 eingetragen werden. Alternativ können Ladezeiten [in den Einstellungen](1_general.html#fahrzeuge) für die gesamte Übung deaktiviert werden.
-- <kbd>**Materialien**</kbd>: Hier können Materialien hinzugefügt oder entfernt werden. Standardmäßig steht _Standardmaterial_ (entspricht einem Rettungsdienst-Rucksack) und _erweitertes Material_ (entspricht einer Gruppe GW-San-Kisten und ermöglicht die Behandlung vieler Patienten) zur Verfügung.
-- <kbd>**Personal**</kbd>: Hier kann Personal hinzugefügt oder entfernt werden. Standardmäßig stehen die medizinischen Qualifikationsstufen _Sanitäter_ (ehrenamtliche Sanitätshelfer ohne rettungsdienstliche Qualifikation), _Rettungssanitäter_, _Notfallsanitäter_, _Notarzt_ und _Gruppenführer_ (hat keine Behandlungskapazität) zur Verfügung.
-
-Am unteren Rand des Bearbeitungsfensters befindet sich ein Button zum <kbd>Hinzufügen</kbd>, bzw. im Falle der Bearbeitung einer existierenden Vorlage zum <kbd>Speichern</kbd> oder <kbd>Löschen</kbd>.
-
-Nach dem Platzieren auf der Karte können Übungsleitende nur den Namen des Fahrzeugs noch anpassen; alle anderen Einstellungen sind wie oben genannt auf Ebene der Vorlage zu treffen.
-
-> [!WARNING]
-> Änderungen an Fahrzeugvorlagen wirken nur für die Zukunft. Fahrzeuge, die zum Zeitpunkt der Änderung bereits auf der Karte platziert wurden, bleiben unverändert.
+> [!TIP]
+> Weitere Einstellungsmöglichkeiten für Fahrzeugvorlagen, sowie deren Personal und Material, sind in Sammlungen verfügbar.
+> Siehe [Übungselemente verwalten](./../4_editing/2_elements.md).
 
 ### Nutzung in Übungen
 
@@ -243,20 +235,16 @@ Alle anderen Übungselemente werden über den Bildern angezeigt.
 
 ### Einstellungsmöglichkeiten
 
-Im Editor befindet sich eine Liste aller Bild-Vorlagen. Dort besteht die Möglichkeit, neue Vorlagen hinzuzufügen und bestehende zu bearbeiten und zu löschen.
-
-Dabei können folgende Eigenschaften gesetzt werden:
-
-- <kbd>**Bildadresse**</kbd>: URL zu einer Bilddatei. Das Bild sollte idealerweise eine Vektorgrafik (`.svg`) mit transparentem Hintergrund sein.
-- <kbd>**Name**</kbd>: Bezeichnung des Bildes, die in der Liste im Editor angezeigt wird.
-- <kbd>**Höhe**</kbd>: Höhe des Bildes in Punkten, wobei 100 ca. der Höhe eines normalen Sprinter-RTWs entspricht. Die Breite wird analog skaliert.
-
-Nach dem Platzieren können im Einstellungsfenster die <kbd>Bildadresse</kbd> sowie die <kbd>Höhe</kbd> weiterhin geändert werden. Zusätzlich kann Folgendes für platzierte Bilder eingestellt werden:
+Nach dem Platzieren können im Einstellungsfenster die <kbd>Bildadresse</kbd> sowie die <kbd>Höhe</kbd> geändert werden. Zusätzlich kann Folgendes für platzierte Bilder eingestellt werden:
 
 - <kbd>**Position sperren**</kbd>: Wenn diese Option aktiviert ist, können Übungsleiter das Bild nicht mehr versehentlich verschieben. Das ist nützlich, z.B. wenn Bilder als Hintergrund für die Übungsfläche genutzt werden.
 - <kbd>**Reihenfolge**</kbd>: Legt fest, in welcher Ebene sich überlappende Bilder angezeigt werden. Ein Bild mit einer höheren Zahl überdeckt ggf. eines mit einer niedrigeren. Die Buttons <kbd>Vordergrund</kbd> und <kbd>Hintergrund</kbd> geben einem Bild automatisch eine Ebene, die größer oder kleiner als die aller anderen Bilder ist.
 
 Zudem lassen sich im Tab <kbd>Erkundung</kbd> zusätzliche Informationen hinterlegen, die Teilnehmende dann während der Übung aufrufen können. Die Bilder erhalten dann ein zusätzliches Lupen-Symbol, welches das Vorhandensein von Erkundungsinformationen kennzeichnet. Siehe [Erkundungselemente](#erkundungselemente) für Details.
+
+> [!TIP]
+> Weitere Einstellungsmöglichkeiten für Kartenbilder sind in Sammlungen verfügbar.
+> Siehe [Übungselemente verwalten](./../4_editing/2_elements.md).
 
 ### Nutzung in Übungen
 
@@ -323,6 +311,10 @@ Alarmgruppen werden im Fenster <kbd>Alarmgruppen</kbd> erstellt, das von Übungs
 In dem Fenster können neue Alarmgruppen hinzugefügt sowie wieder gelöscht werden. Jeder Gruppe kann ein individueller Name zugewiesen werden (standardmäßig „???“). Mit einem Klick auf das entsprechende Häkchen kann zudem ein Limit für die maximale Anzahl an Auslösungen festgelegt werden, wodurch sich versehentliche Doppelarmierungen vermeiden lassen.
 
 Jede Alarmgruppe kann mit Fahrzeugen gefüllt werden; für jedes Fahrzeug können ein individueller Name sowie eine Eintreffzeit (in Minuten) festgelegt werden. Fahrzeuge können mit einem Klick wieder aus der Gruppe entfernt werden.
+
+> [!TIP]
+> Alarmgruppen können auch als Vorlagen in Sammlungen gespeichert werden, um sie in anderen Übungen wiederzuverwenden.
+> Siehe [Übungselemente verwalten](./../4_editing/2_elements.md).
 
 ### Nutzung in Übungen
 

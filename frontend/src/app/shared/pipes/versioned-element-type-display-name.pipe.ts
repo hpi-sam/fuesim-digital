@@ -1,8 +1,8 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
 import {
+    getMarketplaceElementByType,
     MarketplaceElementContent,
-    marketplaceElementsDefinitions,
 } from 'fuesim-digital-shared';
 
 @Pipe({ name: 'versionedElementDisplayName' })
@@ -13,6 +13,6 @@ export class VersionedElementDisplayNamePipe implements PipeTransform {
               plural: string;
           }
         | undefined {
-        return marketplaceElementsDefinitions[element].naming;
+        return getMarketplaceElementByType(element).naming;
     }
 }

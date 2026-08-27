@@ -345,6 +345,47 @@ If you need to read from the state to change it, you should do this inside the a
 
 - Currently, every client maintains the whole state, and every action is sent to all clients. There is no way to only subscribe to a part of the state and only receive updates for that part.
 
+### Marketplace
+
+The FüSim Digital includes a marketplace system, from which elements can be imported into exercises via collections.
+
+Developers can either add new elements on the exercise-state-level, where they can only be created and managed for the current exercise and are only stored therein, or decide to add them into the marketplace, for them to be managed by the marketplace versioning and dependency system and be importable and reusable across exercises.
+
+#### Adding new elements to the marketplace
+
+Most elements are divided into instance (e.g. used on map) and template. Only few exceptions, like alarmgroups exist.
+
+The `type` attribute of the instance will most likely be `<element>`, while for the template it will be `<element>Template`. This will become important in the following.
+
+##### Shared
+
+1. Create a schema for the data that will later be stored in the database (template schema) in `shared/src/models/`.
+
+2. All Marketplace Elements are defined with their own file in `shared/src/marketplace/elements/<element-type>.marketplace.ts`. They export `defineMarketplaceElement()`
+
+    2.a. reference the previously created template schema in the `templateSchema` field
+    2.b. the `types` attribute needs to be filled with both the `type` literal (`<element>`) from the instance AND the `type` literal (`<element>Template`) from the template. This is later used to find the right registry entry for any object (instance or template) in the state.
+
+3. Add the new registry file into `shared/src/marketplace/elements/registry.ts` with both an entry in the `marketplaceElements` array and its corresponsing `satisfies` type.
+
+4. Don't forget the frontend
+
+##### Frontend
+
+1. Create a form component in `frontend/src/app/pages/marketplace/shared/modals/editor-modals/element-forms/`
+
+2. Create a marketplace definition in `frontend/src/app/pages/marketplace/shared/definitions.ts`.
+
+    2.a. The `elementCard` attribute defines how the element will be displayed in the marketplace based on the given template content.
+
+3. Don't forget the shared
+
+##### Backend
+
+1. No changes needed :)
+2. don't forget shared
+3. don't forget frontend
+
 ## Licenses and Attributions
 
 FüSim Digital

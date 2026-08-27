@@ -27,7 +27,7 @@ import { EditingVersionedElementModalData } from '../../modals/editor-modals/bas
 // eslint-disable-next-line import-x/no-cycle
 import { openSelectCollectionModal } from '../../modals/marketplace-select-collection-modal/select-collection-modal';
 import { openVersionedElementModal } from '../../modals/editor-modals/versioned-element-modal/open-versioned-element-model';
-import { marketplaceComponentDefinitions } from '../../definitions';
+import { getMarketplaceComponentDefinition } from '../../definitions';
 
 @Component({
     selector: 'app-element-card',
@@ -60,8 +60,9 @@ export class ElementCardComponent {
     public readonly genericElementCardComponent = GenericElementCardComponent;
 
     public readonly genericElementCardInput = computed(() => {
-        const definition =
-            marketplaceComponentDefinitions[this.element().content.type];
+        const definition = getMarketplaceComponentDefinition(
+            this.element().content
+        );
         return {
             ...definition.elementCard(this.element().content),
             editable: this.mode() === 'edit',

@@ -9,13 +9,15 @@ import {
 } from './elements/registry.js';
 
 export {
+    marketplaceElementContentSchema,
     marketplaceElements,
+    type MarketplaceElementContent,
 } from './elements/registry.js';
 
 export function getMarketplaceElementByType(type: string) {
     const element = marketplaceElements.find((e) => e.types.includes(type));
     if (!element) {
-        throw new Error(`No marketplace element found for type: ${ type }`);
+        throw new Error(`No marketplace element found for type: ${type}`);
     }
     return element;
 }

@@ -3,8 +3,8 @@
 Mit Übungselementen sind all jene Objekte gemeint, die im Laufe einer Übung durch die Teilnehmenden direkt oder indirekt verwaltet oder betrachtet werden. Ein Großteil ist auf der Übungskarte zu sehen.
 
 > [!TIP]
-> Einige Übungselemente werden zentral in Sammlungen, außerhalb der Übung, verwaltet.
-> Dort können sie bearbeitet, gelöscht oder neu erstellt werden.
+> Einige Übungselemente werden außerhalb der Übung in Sammlungen verwaltet.
+> Sammlungen können zentral erstellt, bearbeitet, gelöscht und geteilt sowie in Übungen eingebunden werden.
 > Siehe [Übungselemente verwalten](./../4_editing/2_elements.md).
 > !["Weitere Fahrzeuge verwalten" Knopf](./editor_jump_to_collections.png)
 

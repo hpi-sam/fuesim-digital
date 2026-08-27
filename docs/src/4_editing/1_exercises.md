@@ -1,4 +1,4 @@
-# Vorlagen und Übungselemente
+# Übungen und Übungsvorlagen
 
 ## Übungen verwalten
 
@@ -6,7 +6,7 @@ Wenn man mit einem [Benutzerkonto](../5_users/) angemeldet ist, werden sowohl ü
 
 ![Liste der Übungen im Benutzerkonto](./exercises_list.png)
 
-Für jede Übung werden neben der [Teilnehmenden-PIN](../2_exercises/1_general.md#teilnehmenden-pin) (große, 6-stellige Zahl) und der Übungsleitenden-PIN (kleine, 8-stellige Zahl) das jeweilige Erstellungsdatum sowie das Datum der letzten Benutzung (also der Zeitpunkt, zudem die Übung das letzte geöffnet wurde) angezeigt. Weiterhin ist es hier auch möglich, die Übung im Übungseditor zu öffnen oder sie zu löschen.
+Für jede Übung werden neben der [Teilnehmenden-PIN](../2_exercises/1_general.md#teilnehmenden-pin) (große, 6-stellige Zahl) und der Übungsleitenden-PIN (kleine, 8-stellige Zahl) das jeweilige Erstellungsdatum sowie das Datum der letzten Benutzung (also der Zeitpunkt, zu dem die Übung das letzte Mal geöffnet wurde) angezeigt. Weiterhin ist es hier auch möglich, die Übung im Übungseditor zu öffnen oder sie zu löschen.
 
 ## Übungsvorlagen verwalten
 

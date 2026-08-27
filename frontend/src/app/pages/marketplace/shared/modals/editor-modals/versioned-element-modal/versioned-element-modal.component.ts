@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
-    marketplaceElementsDefinitions,
+    getMarketplaceElementByType,
     TemplateVersion,
 } from 'fuesim-digital-shared';
 import { DatePipe } from '@angular/common';
@@ -84,8 +84,8 @@ export class VersionedElementModalComponent implements OnInit {
     });
 
     public readonly modalHeaderString = computed(() => {
-        const typeName =
-            marketplaceElementsDefinitions[this.data.type].naming.singular;
+        const typeName = getMarketplaceElementByType(this.data.type).naming
+            .singular;
         const actionString =
             this.data.mode === 'create' ? 'erstellen' : 'bearbeiten';
         return `${typeName} ${actionString}`;

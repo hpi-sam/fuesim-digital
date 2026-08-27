@@ -63,7 +63,7 @@ export class ElementCardComponent {
         const definition =
             marketplaceComponentDefinitions[this.element().content.type];
         return {
-            ...definition.elementCard(this.element().content as any),
+            ...definition.elementCard(this.element().content),
             editable: this.mode() === 'edit',
             showIndicator: this.effectiveIndicator(),
             small: this.small(),

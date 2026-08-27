@@ -1,10 +1,14 @@
-import type { MarketplaceRegistryEntry } from './marketplace-elements.js';
+import { mapImageTemplateSchema } from '../../models/map-image-template.js';
+import { defineMarketplaceElement } from '../marketplace-registry-element.js';
 
-export const marketplaceMapImage: MarketplaceRegistryEntry = {
+export const marketplaceMapImage = defineMarketplaceElement({
     naming: {
         singular: 'Kartenbild',
         plural: 'Kartenbilder',
     },
+    templateSchema: mapImageTemplateSchema,
+    types: ['mapImage', 'mapImageTemplate'],
+
     // TODO:
     changeApply: (draftState, change) => {
         throw new Error('Not implemented yet');
@@ -12,4 +16,4 @@ export const marketplaceMapImage: MarketplaceRegistryEntry = {
     changeImpact: (draftState, change) => {
         throw new Error('Not implemented yet');
     },
-};
+});

@@ -1,27 +1,16 @@
-import type { WritableDraft, Immutable } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { z } from 'zod';
-import { alarmGroupSchema } from '../models/alarm-group.js';
-import { vehicleTemplateSchema } from '../models/vehicle-template.js';
-import { personnelTemplateSchema } from '../models/personnel-template.js';
-import { materialTemplateSchema } from '../models/material-template.js';
-import { mapImageTemplateSchema } from '../models/map-image-template.js';
-import type { VersionedElementModel } from './models/versioned-element-content.js';
-import { versionedElementModelSchema } from './models/versioned-element-content.js';
-import { marketplaceElements } from './elements/registry.js';
+import type { VersionedElementModel } from './models/versioned-element-model.js';
+import { versionedElementModelSchema } from './models/versioned-element-model.js';
+import {
+    marketplaceElementContentSchema,
+    marketplaceElements,
+    type MarketplaceElementContent,
+} from './elements/registry.js';
 
-export { marketplaceElements } from './elements/registry.js';
-
-export const marketplaceElementContentSchema = z.discriminatedUnion('type', [
-    alarmGroupSchema,
-    vehicleTemplateSchema,
-    personnelTemplateSchema,
-    materialTemplateSchema,
-    mapImageTemplateSchema,
-]);
-
-export type MarketplaceElementContent = Immutable<
-    z.infer<typeof marketplaceElementContentSchema>
->;
+export {
+    marketplaceElements,
+} from './elements/registry.js';
 
 export function getMarketplaceElementByType(type: string) {
     const element = marketplaceElements.find((e) => e.types.includes(type));

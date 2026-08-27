@@ -1,22 +1,14 @@
 import { z } from 'zod';
 import type { Immutable, WritableDraft } from 'immer';
-import { marketplaceElements } from '../elements/registry.js';
+import { marketplaceElementContentSchema } from '../elements/registry.js';
 import { versionedElementModelSchema } from './versioned-element-model.js';
-type MarketplaceElements = typeof marketplaceElements;
-type TemplateSchema = MarketplaceElements[number]['templateSchema'];
-const templateSchemas = marketplaceElements.map(
-    (entry) => entry.templateSchema
-) as [TemplateSchema, ...TemplateSchema[]];
 
 export {
     type VersionedElementModel,
     versionedElementModelSchema,
 } from './versioned-element-model.js';
 
-export const templateVersionContentSchema = z.discriminatedUnion(
-    'type',
-    templateSchemas
-);
+export const templateVersionContentSchema = marketplaceElementContentSchema;
 
 export type TemplateVersionContent = Immutable<
     z.infer<typeof templateVersionContentSchema>

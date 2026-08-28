@@ -14,6 +14,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Fixed
 
 - On longer pages, messages were shown outside the viewport.
+- When a new vehicle with automatic numbering (#) is added to an exericse, it's the names of personnel and materials are updated as well.
 
 ## [1.0.0-rc.2] - 2026-08-13
 

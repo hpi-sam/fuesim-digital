@@ -303,6 +303,7 @@ export namespace VehicleActionReducers {
                     newVehiclePositionIn(vehicle.id),
                     draftState
                 );
+                material.vehicleName = draftState.vehicles[vehicle.id]!.name;
                 draftState.materials[material.id] = material;
             }
             for (const person of cloneDeepMutable(personnel)) {
@@ -311,6 +312,7 @@ export namespace VehicleActionReducers {
                     newVehiclePositionIn(vehicle.id),
                     draftState
                 );
+                person.vehicleName = draftState.vehicles[vehicle.id]!.name;
                 draftState.personnel[person.id] = person;
             }
 

@@ -113,9 +113,7 @@
                     class="btn btn-outline-secondary btn-sm flex-grow-1 px-2"
                     ngbTooltip="Ansehen"
                     placement="top"
-                    (click)="
-                        $event.stopPropagation(); output.duplicateExternal()
-                    "
+                    (click)="$event.stopPropagation(); output.click()"
                 >
                     <i class="bi bi-eye"></i>
                 </button>

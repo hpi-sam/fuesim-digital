@@ -14,6 +14,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Fixed
 
 - On longer pages, messages were shown outside the viewport.
+- The view button of elements cards shown in the marketplace now actually opens the element's details view instead of the duplicate modal.
 
 ## [1.0.0-rc.2] - 2026-08-13
 

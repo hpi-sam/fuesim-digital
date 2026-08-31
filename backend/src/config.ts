@@ -278,19 +278,10 @@ export class Config {
             DFM_AUTH_SELF_SERVICE_URL: url({ default: '' }),
             DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
             DFM_S3_ENDPOINT: str({ default: 'http://localhost:9092' }),
-            DFM_S3_ENDPOINT_TESTING: str({ default: 'http://localhost:9092' }),
             DFM_S3_REGION: str({ default: 'garage' }),
-            DFM_S3_REGION_TESTING: str({ default: 'garage' }),
             DFM_S3_BUCKET: str({ default: 'fuesim-digital' }),
-            DFM_S3_BUCKET_TESTING: str({ default: 'fuesim-digital' }),
             DFM_S3_ACCESS_KEY_ID: str({ default: 'fuesim-digital-key' }),
-            DFM_S3_ACCESS_KEY_ID_TESTING: str({
-                default: 'fuesim-digital-key',
-            }),
             DFM_S3_SECRET_ACCESS_KEY: str({ default: '' }),
-            DFM_S3_SECRET_ACCESS_KEY_TESTING: str({
-                default: 'fuesim-digital-key',
-            }),
             DFM_DEV_NO_WAITING_ROOM: bool({ default: false }),
             DFM_PARALLEL_EXERCISES_ENABLED: bool({ default: true }),
             DFM_BANNER_TYPE: str({ default: undefined }),
@@ -379,26 +370,11 @@ export class Config {
             testing && env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 ? env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 : env.DFM_AUTH_SELF_SERVICE_URL;
-        this._s3Endpoint =
-            testing && env.DFM_S3_ENDPOINT_TESTING
-                ? env.DFM_S3_ENDPOINT_TESTING
-                : env.DFM_S3_ENDPOINT;
-        this._s3Region =
-            testing && env.DFM_S3_REGION_TESTING
-                ? env.DFM_S3_REGION_TESTING
-                : env.DFM_S3_REGION;
-        this._s3Bucket =
-            testing && env.DFM_S3_BUCKET_TESTING
-                ? env.DFM_S3_BUCKET_TESTING
-                : env.DFM_S3_BUCKET;
-        this._s3AccessKeyId =
-            testing && env.DFM_S3_ACCESS_KEY_ID_TESTING
-                ? env.DFM_S3_ACCESS_KEY_ID_TESTING
-                : env.DFM_S3_ACCESS_KEY_ID;
-        this._s3SecretAccessKey =
-            testing && env.DFM_S3_SECRET_ACCESS_KEY_TESTING
-                ? env.DFM_S3_SECRET_ACCESS_KEY_TESTING
-                : env.DFM_S3_SECRET_ACCESS_KEY;
+        this._s3Endpoint = env.DFM_S3_ENDPOINT;
+        this._s3Region = env.DFM_S3_REGION;
+        this._s3Bucket = env.DFM_S3_BUCKET;
+        this._s3AccessKeyId = env.DFM_S3_ACCESS_KEY_ID;
+        this._s3SecretAccessKey = env.DFM_S3_SECRET_ACCESS_KEY;
         this._devNoWaitingRoom = env.DFM_DEV_NO_WAITING_ROOM;
         this._parallelExercisesEnabled = testing
             ? true

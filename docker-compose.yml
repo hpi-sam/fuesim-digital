@@ -37,7 +37,7 @@ services:
         image: docker.io/authelia/authelia:4.39.16
         restart: unless-stopped
         ports:
-            - 127.0.0.1:9091:9091
+            - 9091:9091
         networks:
             default:
                 aliases:

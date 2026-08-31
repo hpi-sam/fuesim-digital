@@ -13,7 +13,10 @@ runs:
           shell: bash
         - name: Start Garage Docker container
           run: |
-              export GARAGE_CONTAINER_ID=$(docker run -p 9092/tcp -v ${GITHUB_WORKSPACE}/docker/garage.toml:/etc/garage.toml:ro -v garage-meta:/var/lib/garage/meta -v garage-data:/var/lib/garage/data -e GARAGE_DEFAULT_ACCESS_KEY=fuesim-digital-key -e GARAGE_DEFAULT_SECRET_KEY=fuesim-digital-key -e GARAGE_DEFAULT_BUCKET=fuesim-digital -d docker.io/dxflrs/garage:v2.3.0)
+              export GARAGE_DEFAULT_ACCESS_KEY=fuesim-digital-key
+              export GARAGE_DEFAULT_SECRET_KEY=fuesim-digital-key
+              export GARAGE_DEFAULT_BUCKET=fuesim-digital
+              export GARAGE_CONTAINER_ID=$(docker run -p 9092/tcp -v ${GITHUB_WORKSPACE}/docker/garage.toml:/etc/garage.toml:ro -v garage-meta:/var/lib/garage/meta -v garage-data:/var/lib/garage/data -e GARAGE_DEFAULT_ACCESS_KEY=fuesim-digital-key -e GARAGE_DEFAULT_SECRET_KEY=fuesim-digital-key -e GARAGE_DEFAULT_BUCKET=fuesim-digital -d docker.io/dxflrs/garage:v2.3.0 /garage server --single-node --default-bucket)
               export GARAGE_CONTAINER_PORT=$(docker port $GARAGE_CONTAINER_ID 9092/tcp | grep 0.0.0.0 | cut -c 9-)
               echo "Garage container started with ID $GARAGE_CONTAINER_ID on port $GARAGE_CONTAINER_PORT"
               echo "GARAGE_CONTAINER_ID=$GARAGE_CONTAINER_ID" >> "$GITHUB_ENV"

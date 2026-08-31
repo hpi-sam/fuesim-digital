@@ -185,7 +185,7 @@ jobs:
                   | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/"
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
                   | sed -e "s|^DFM_S3_ENDPOINT=.*$|DFM_S3_ENDPOINT=http://127.0.0.1:${{ env.GARAGE_CONTAINER_PORT }}|"
-                  | sed -e "s|^#DFM_S3_SECRET_ACCESS_KEY=.*$|DFM_S3_SECRET_ACCESS_KEY=fuesim-digital-key|"
+                  | sed -e "s|^#DFM_S3_SECRET_ACCESS_KEY=.*$|DFM_S3_SECRET_ACCESS_KEY=${{ env.GARAGE_DEFAULT_SECRET_KEY }}|"
                   > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run
@@ -249,7 +249,7 @@ jobs:
                   | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/"
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
                   | sed -e "s|^DFM_S3_ENDPOINT=.*$|DFM_S3_ENDPOINT=http://127.0.0.1:${{ env.GARAGE_CONTAINER_PORT }}|"
-                  | sed -e "s|^#DFM_S3_SECRET_ACCESS_KEY=.*$|DFM_S3_SECRET_ACCESS_KEY=fuesim-digital-key|"
+                  | sed -e "s|^#DFM_S3_SECRET_ACCESS_KEY=.*$|DFM_S3_SECRET_ACCESS_KEY=${{ env.GARAGE_DEFAULT_SECRET_KEY }}|"
                   > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run
@@ -301,7 +301,7 @@ jobs:
                   | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/"
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
                   | sed -e "s|^DFM_S3_ENDPOINT=.*$|DFM_S3_ENDPOINT=http://127.0.0.1:${{ env.GARAGE_CONTAINER_PORT }}|"
-                  | sed -e "s|^#DFM_S3_SECRET_ACCESS_KEY=.*$|DFM_S3_SECRET_ACCESS_KEY=fuesim-digital-key|"
+                  | sed -e "s|^#DFM_S3_SECRET_ACCESS_KEY=.*$|DFM_S3_SECRET_ACCESS_KEY=${{ env.GARAGE_DEFAULT_SECRET_KEY }}|"
                   > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run

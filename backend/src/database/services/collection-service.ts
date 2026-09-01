@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { promises as fs } from 'node:fs';
 import type {
     CollectionElements,
     CollectionElementsSingle,
@@ -16,6 +17,7 @@ import type {
     ParticipantKey,
     TemplateVersion,
     TemplateVersionContent,
+    TypedTemplateVersion,
     UploadedImage,
     UploadedImageUpload,
     VersionedElementPartial,
@@ -38,6 +40,7 @@ import {
 import { Subject } from 'rxjs';
 import { castDraft, type WritableDraft } from 'immer';
 import { NoSuchKey } from '@aws-sdk/client-s3';
+import sharp from 'sharp';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import { ImageValidationError, validateImage } from '../../utils/image.js';
@@ -1530,6 +1533,13 @@ export class CollectionService {
                     );
                 }
 
+                if (latestElementVersion.content.type === 'uploadedImage') {
+                    // For uploaded images, we want to replace the uploaded S3 file with a placeholder
+                    await this.handleDeletedUploadedImageElement(
+                        latestElementVersion as TypedTemplateVersion<UploadedImage>
+                    );
+                }
+
                 eventBuffer.next({
                     event: 'element:delete',
                     data: {
@@ -1546,6 +1556,31 @@ export class CollectionService {
                 };
             }
         );
+    }
+
+    public async handleDeletedUploadedImageElement(
+        uploadedImageVersion: TypedTemplateVersion<UploadedImage>
+    ) {
+        const key = getKeyForUploadedImage(uploadedImageVersion.entityId);
+        await this.s3Service.deleteFile(key);
+
+        // Get placeholder and scale it to same aspect ratio as the original image
+        const buffer = await fs.readFile(
+            '../frontend/src/assets/deleted-placeholder.svg'
+        );
+        const height = 500;
+        const width = Math.round(
+            height * uploadedImageVersion.content.aspectRatio
+        );
+        const newBuffer = await new sharp(buffer)
+            .resize({
+                fit: 'contain',
+                width,
+                height,
+            })
+            .toBuffer();
+
+        await this.s3Service.uploadFile(key, newBuffer);
     }
 
     public async restoreDeletedElementVersion(

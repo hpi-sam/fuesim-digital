@@ -1,4 +1,5 @@
 import {
+    DeleteObjectCommand,
     GetObjectCommand,
     PutObjectCommand,
     S3Client,
@@ -42,5 +43,13 @@ export class S3Service {
         });
         const response = await this.client.send(command);
         return response.Body;
+    }
+
+    public async deleteFile(key: string) {
+        const command = new DeleteObjectCommand({
+            Bucket: Config.s3Bucket,
+            Key: key,
+        });
+        await this.client.send(command);
     }
 }

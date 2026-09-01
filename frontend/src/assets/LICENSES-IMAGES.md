@@ -107,3 +107,7 @@ License: CC0 1.0
 [ticket.svg](ticket.svg):  
 <https://icons.getbootstrap.com/icons/ticket-perforated/> (edited)  
 License: [MIT](https://github.com/twbs/icons/blob/main/LICENSE)
+
+[deleted-placeholder.svg](deleted-placeholder.svg):
+created by Jonathan Weth, using Bootstrap Icons <https://icons.getbootstrap.com/>
+License: [MIT](https://github.com/twbs/icons/blob/main/LICENSE)

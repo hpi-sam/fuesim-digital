@@ -40,6 +40,7 @@ import {
 import { Subject } from 'rxjs';
 import { castDraft, type WritableDraft } from 'immer';
 import { NoSuchKey } from '@aws-sdk/client-s3';
+// eslint-disable-next-line import-x/no-named-as-default
 import sharp from 'sharp';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';

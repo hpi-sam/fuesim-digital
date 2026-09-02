@@ -42,6 +42,7 @@
         "@aws-sdk/client-s3": "^3.985.0",
         "@electric-sql/pglite": "^0.3.14",
         "@types/cookie-parser": "^1.4.10",
+        "@types/yauzl": "^3.4.0",
         "archiver": "^8.0.0",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
@@ -59,6 +60,7 @@
         "sharp": "^0.35.3",
         "socket.io": "^4.8.1",
         "supertest": "^7.1.0",
+        "yauzl": "^3.4.0",
         "zod": "^4.1.13"
     },
     "devDependencies": {

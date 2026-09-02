@@ -96,11 +96,13 @@ async function main() {
         repositories.collectionRepository
     );
     const userDataService = new UserDataService(
+        s3Service,
         repositories.exerciseRepository,
         repositories.sessionRepository,
         repositories.userRepository,
         repositories.parallelExerciseRepository,
-        repositories.organisationRepository
+        repositories.organisationRepository,
+        repositories.collectionRepository
     );
 
     await collectionService.initialize();

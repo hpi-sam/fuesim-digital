@@ -295,11 +295,13 @@ export function createTestEnvironment(): TestEnvironment {
             organisationRepository
         );
         userDataService = new UserDataService(
+            s3Service,
             exerciseRepository,
             sessionRepository,
             userRepository,
             parallelExerciseRepository,
-            organisationRepository
+            organisationRepository,
+            collectionRepository
         );
 
         const repositories: Repositories = {

@@ -25,10 +25,10 @@
                 Abmelden
             </a>
 
-            <button ngbDropdownItem (click)="downloadUserdata()">
+            <a ngbDropdownItem [href]="`${httpOrigin}/api/userdata/dump`">
                 <i class="bi bi-download me-1"></i>
                 Nutzerdaten
-            </button>
+            </a>
         </div>
     </div>
 } @else if (authData.user === null) {

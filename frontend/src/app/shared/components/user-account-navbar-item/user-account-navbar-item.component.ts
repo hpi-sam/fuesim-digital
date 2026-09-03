@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 import { environment } from '../../../../environments/environment.js';
 import { ApiService } from '../../../core/api.service';
-import { saveBlob } from '../../functions/save-blob';
+import { httpOrigin } from '../../../core/api-origins.js';
 
 @Component({
     selector: 'app-user-account-navbar-item',
@@ -33,13 +33,5 @@ export class UserAccountNavbarItemComponent {
     public userSelfServiceUrl = this.auth.userSelfServiceUrl;
     public userRegistrationsUrl = this.auth.userRegistrationsUrl;
     readonly docsUrl = environment.docsUrl;
-
-    public async downloadUserdata() {
-        const userdata = await this.apiService.downloadUserdataDump();
-        const blob = new Blob([JSON.stringify(userdata)]);
-        saveBlob(
-            blob,
-            `fuesim-digital-userdata-${this.auth.authData().user?.username}.json`
-        );
-    }
+    protected readonly httpOrigin = httpOrigin;
 }

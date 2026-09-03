@@ -1632,4 +1632,16 @@ export class CollectionRepository extends BaseRepository {
             return result.length;
         });
     }
+
+    public async getAllElementsOfTypeOfUser(
+        userId: string,
+        elementType: string
+    ) {
+        // TODO Make this to get all current element versions of a user with a certain type (e. g. 'uploadedImage')
+        // TODO also fix typing in function header
+        const res = await this.databaseConnection
+            .select(getTableColumns(elementTable))
+            .from(elementTable);
+        return res.filter((element) => element.content.type === elementType);
+    }
 }

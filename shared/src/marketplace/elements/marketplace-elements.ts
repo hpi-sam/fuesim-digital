@@ -11,11 +11,13 @@ import { mapImageTemplateSchema } from '../../models/map-image-template.js';
 import type { ChangedTemplateVersion } from '../collection-element-diff.js';
 import type { VersionedElementModel } from '../models/versioned-element-content.js';
 import { versionedElementModelSchema } from '../models/versioned-element-content.js';
+import { uploadedImageSchema } from '../../models/uploaded-image.js';
 import { marketplaceAlarmGroup } from './alarm-group.marketplace.js';
 import { marketplaceVehicleTemplate } from './vehicle-template.marketplace.js';
 import { marketplacePersonnel } from './personnel.marketplace.js';
 import { marketplaceMaterial } from './material.marketplace.js';
 import { marketplaceMapImage } from './map-image-template.marketplace.js';
+import { marketplaceUploadedImage } from './uploaded-image.marketplace.js';
 
 export const marketplaceElementContentSchema = z.discriminatedUnion('type', [
     alarmGroupSchema,
@@ -23,6 +25,7 @@ export const marketplaceElementContentSchema = z.discriminatedUnion('type', [
     personnelTemplateSchema,
     materialTemplateSchema,
     mapImageTemplateSchema,
+    uploadedImageSchema,
 ]);
 
 export type MarketplaceElementContent = Immutable<
@@ -37,6 +40,7 @@ export const marketplaceElementsDefinitions: {
     personnelTemplate: marketplacePersonnel,
     materialTemplate: marketplaceMaterial,
     mapImageTemplate: marketplaceMapImage,
+    uploadedImage: marketplaceUploadedImage,
 };
 
 export function isMarketplaceElementContent(

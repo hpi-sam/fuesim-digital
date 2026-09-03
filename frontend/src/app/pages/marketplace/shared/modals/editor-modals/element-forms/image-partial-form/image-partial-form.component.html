@@ -1,28 +1,53 @@
-<div class="form-group mb-3">
-    <label class="form-label">Bildadresse:</label>
-    <input
-        [formField]="imageForm().url"
-        appImageExistsValidator
-        type="url"
-        class="form-control"
-        placeholder="https://example.com/image.png"
-        data-cy="imageUrlInput"
-    />
-    <app-display-model-validation
-        [field]="imageForm().url()"
-    ></app-display-model-validation>
-</div>
-<div class="form-group mb-3">
-    <label class="form-label">Bildhöhe:</label>
-    <input
-        [formField]="imageForm().height"
-        step="1"
-        appIntegerValidator
-        type="number"
-        class="form-control"
-        placeholder="100"
-    />
-    <app-display-model-validation
-        [field]="imageForm().height()"
-    ></app-display-model-validation>
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-12 col-lg-7">
+                <h5 class="card-title mb-3">Bild</h5>
+
+                @if (!imageForm().url().disabled()) {
+                    <button
+                        class="btn btn-outline-primary mb-3"
+                        (click)="chooseImageFromCollection()"
+                    >
+                        <i class="bi bi-images me-2"></i>
+                        Bild aus der Sammlung auswählen
+                    </button>
+                }
+
+                <div class="mb-3">
+                    <label class="form-label">Bildadresse:</label>
+                    <input
+                        [formField]="imageForm().url"
+                        type="url"
+                        class="form-control"
+                        placeholder="https://example.com/image.png"
+                        data-cy="imageUrlInput"
+                    />
+                    <app-display-model-validation
+                        [field]="imageForm().url()"
+                    ></app-display-model-validation>
+                </div>
+                <div>
+                    <label class="form-label">Bildhöhe:</label>
+                    <input
+                        [formField]="imageForm().height"
+                        step="1"
+                        type="number"
+                        class="form-control"
+                        placeholder="100"
+                    />
+                    <app-display-model-validation
+                        [field]="imageForm().height()"
+                    ></app-display-model-validation>
+                </div>
+            </div>
+            <div class="col-md-12 col-lg-5">
+                <img
+                    [src]="imageForm().url().value()"
+                    class="img-fluid img-thumbnail"
+                    style="max-height: 20em"
+                />
+            </div>
+        </div>
+    </div>
 </div>

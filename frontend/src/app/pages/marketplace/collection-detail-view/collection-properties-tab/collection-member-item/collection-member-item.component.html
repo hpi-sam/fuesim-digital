@@ -2,20 +2,25 @@
     @let isPersonalOrganisationMember =
         member().personalOrganisationOf === ownUserId();
     <span>
-        {{ member().name }}
-        @if (isPersonalOrganisationMember) {
-            <span class="badge text-bg-info text-white ms-1"
-                >Ihre Private Organisation</span
-            >
+        @if (member().personalOrganisationOf){
+            {{ member().personalOrganisationOfName }}
+            @if (isPersonalOrganisationMember) {
+                <span class="badge text-bg-primary text-white ms-1">
+                    <i class="bi bi-person me-1"></i>
+                    Das sind sie
+                </span>
+            }
+        }@else{
+            {{ member().name }}
         }
-        @if (member().owner) {
-            <span class="badge text-bg-primary ms-1">Besitzer</span>
+        @if (member().isOwner) {
+            <span class="badge text-bg-info ms-1">Besitzer</span>
         }
-        @if (!member().owner && !isPersonalOrganisationMember) {
+        @else {
             <span class="badge text-bg-secondary ms-1">Betrachter</span>
         }
     </span>
-    @if (!member().owner) {
+    @if (!member().isOwner) {
         <button
             class="btn btn-outline-info btn-sm ms-auto"
             (click)="setCollectionOwner(member().id, member().name)"

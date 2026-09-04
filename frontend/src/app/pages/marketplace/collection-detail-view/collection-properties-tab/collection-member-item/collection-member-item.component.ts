@@ -60,7 +60,7 @@ export class CollectionMemberItemComponent {
         return (
             (orgData.value().userRole === 'editor' ||
                 orgData.value().userRole === 'admin') &&
-            !this.member().owner
+            !this.member().isOwner
         );
     });
 

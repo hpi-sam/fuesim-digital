@@ -66,7 +66,7 @@ export class CollectionDetailsTabComponent {
                     })
             )
                 .sort((a, b) => b.name.localeCompare(a.name))
-                .sort((a, b) => Number(b.owner) - Number(a.owner)),
+                .sort((a, b) => Number(b.isOwner) - Number(a.isOwner)),
     });
 
     public readonly userIsEditor = resource({
@@ -81,7 +81,7 @@ export class CollectionDetailsTabComponent {
             const userId = this.authService.authData().user?.id;
             if (!userId) return false;
 
-            const ownerOrganisation = members.find((member) => member.owner);
+            const ownerOrganisation = members.find((member) => member.isOwner);
             if (!ownerOrganisation) return false;
 
             try {
@@ -112,7 +112,7 @@ export class CollectionDetailsTabComponent {
             this.ngbModalService,
             {
                 descriptionText:
-                    'Bitte wählen Sie eine Organisation aus, die Sie zu dieser Sammlung hinzufügen möchten. Die Organisation wird als Betrachter hinzugefügt.',
+                    'Bitte wählen Sie eine der Organisationen, bei der sie Bearbeiter oder Administrator sind, aus, um sie zu dieser Sammlung als Mitglied hinzuzufügen. Die Organisation wird als Betrachter hinzugefügt.',
             }
         );
 
@@ -128,7 +128,8 @@ export class CollectionDetailsTabComponent {
             title: 'Mitglieder einladen',
             description: `Sie können an dieser Stelle einen Zugriffscode erstellen, den sie an andere
                 Personen weitergeben können und welcher sieben Tage lang gültig ist.
-                Diese können dann über die Übungselemente-Startseite mit einer Organisation dieser Sammlung als Betrachter beitreten.
+                Diese können dann über die Übungselemente-Startseite mit ihrem Benutzeraccount oder mit einer Organisationen bei der sie Mitglied sind dieser Sammlung beitreten.
+                Der neu begetretene Benutzeraccount bzw. die neu beigetretene Organisationen wird initial als Betrachter geführt.
                 `,
             type: 'Zugriffscode',
             createInviteFn: async () =>

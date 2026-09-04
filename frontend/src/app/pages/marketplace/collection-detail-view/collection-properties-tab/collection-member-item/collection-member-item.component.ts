@@ -4,7 +4,6 @@ import {
     inject,
     input,
     output,
-    resource,
     ChangeDetectionStrategy,
 } from '@angular/core';
 import {

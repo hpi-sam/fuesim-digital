@@ -187,8 +187,9 @@ export namespace Marketplace {
                     z.object({
                         id: organisationIdSchema,
                         name: z.string(),
-                        owner: z.boolean(),
+                        isOwner: z.boolean(),
                         personalOrganisationOf: z.string().nullable(),
+                        personalOrganisationOfName: z.string().nullable(),
                     })
                 ),
             }),

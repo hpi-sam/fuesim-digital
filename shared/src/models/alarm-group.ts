@@ -4,6 +4,7 @@ import { getIdMapSchema, uuid, uuidSchema } from '../utils/uuid.js';
 import { isElementVersionId } from '../marketplace/models/versioned-id-schema.js';
 import { cloneDeepMutable } from '../utils/clone-deep.js';
 import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
+import { validationMessages } from '../validation-messages.js';
 import { alarmGroupVehicleSchema } from './utils/alarm-group-vehicle.js';
 import { registerDependency } from './utils/dependency-registry.js';
 
@@ -11,10 +12,13 @@ export const alarmGroupSchema = z.strictObject({
     ...versionedElementModelSchema.shape,
     id: uuidSchema,
     type: z.literal('alarmGroup'),
-    name: z.string(),
+    name: z.string().trim().nonempty(validationMessages.required),
     alarmGroupVehicles: getIdMapSchema(alarmGroupVehicleSchema),
-    triggerCount: z.number().nonnegative(),
-    triggerLimit: z.number().nonnegative().nullable(),
+    triggerCount: z.int().nonnegative(),
+    triggerLimit: z
+        .int()
+        .nonnegative(validationMessages.notNonNegative)
+        .nullable(),
 });
 export type AlarmGroup = Immutable<z.infer<typeof alarmGroupSchema>>;
 

@@ -7,7 +7,6 @@ export * from './vehicle.js';
 export * from './viewport.js';
 export * from './map-image.js';
 export * from './action-reducers.js';
-export * from './vehicle-templates.js';
 export * from './operational-section.js';
 export * from './restricted-zone.js';
 export * from './scoutable.js';

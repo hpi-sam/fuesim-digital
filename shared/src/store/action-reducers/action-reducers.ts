@@ -18,7 +18,6 @@ import { EmergencyOperationCenterActionReducers } from './emergency-operation-ce
 import { SimulatedRegionActionReducers } from './simulated-region.js';
 import { SimulationActionReducers } from './simulation.js';
 import { RadiogramActionReducers } from './radiogram.js';
-import { VehicleTemplateActionReducers } from './vehicle-templates.js';
 import { RestrictedZoneActionReducers } from './restricted-zone.js';
 import { OperationalSectionActionReducers } from './operational-section.js';
 import { ScoutableActionReducers } from './scoutable.js';
@@ -52,7 +51,6 @@ const actionReducers = {
     ...SimulatedRegionActionReducers,
     ...SimulationActionReducers,
     ...RadiogramActionReducers,
-    ...VehicleTemplateActionReducers,
     ...RestrictedZoneActionReducers,
     ...CollectionReducers,
     ...OperationalSectionActionReducers,

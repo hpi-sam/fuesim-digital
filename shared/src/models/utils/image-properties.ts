@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
+import { validationMessages } from '../../validation-messages.js';
 
 export const imagePropertiesSchema = z.strictObject({
     /**
@@ -8,7 +9,7 @@ export const imagePropertiesSchema = z.strictObject({
      * Supported image types are: jpg, jpeg, png, svg. (Others are not tested)
      * @example '/assets/image.svg'
      */
-    url: z.string(),
+    url: z.url(validationMessages.noUrl),
     /**
      * The height of the image in pixels at the {@link normalZoom}
      *

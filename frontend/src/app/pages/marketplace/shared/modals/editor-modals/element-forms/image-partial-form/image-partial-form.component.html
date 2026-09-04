@@ -2,7 +2,6 @@
     <label class="form-label">Bildadresse:</label>
     <input
         [formField]="imageForm().url"
-        appImageExistsValidator
         type="url"
         class="form-control"
         placeholder="https://example.com/image.png"
@@ -17,7 +16,6 @@
     <input
         [formField]="imageForm().height"
         step="1"
-        appIntegerValidator
         type="number"
         class="form-control"
         placeholder="100"

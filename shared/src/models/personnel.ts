@@ -15,14 +15,14 @@ export const personnelSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('personnel'),
     vehicleId: uuidSchema,
-    vehicleName: z.string(),
+    vehicleName: z.string().trim().nonempty(),
     /**
      * @deprecated This will be refactored into a capability-based system. Please already consider using {@link templateId} if you only need an opaque identifier of the type and you don't assert any properties of the personnel.
      */
-    personnelType: z.string(),
+    personnelType: z.string().trim().nonempty(),
     templateId: uuidSchema,
-    typeName: z.string(),
-    typeAbbreviation: z.string(),
+    typeName: z.string().trim().nonempty(),
+    typeAbbreviation: z.string().trim().nonempty(),
     assignedPatientIds: uuidSetSchema,
 
     canCaterFor: canCaterForSchema,
@@ -31,13 +31,13 @@ export const personnelSchema = z.strictObject({
      * Guaranteed to be <= {@link maxTreatmentRange}.
      * Setting this to `0` means deactivating this range.
      */
-    overrideTreatmentRange: z.number().min(0).max(maxTreatmentRange),
+    overrideTreatmentRange: z.number().nonnegative().max(maxTreatmentRange),
     /**
      * Only patients in this range around the personnel's position can be treated.
      * Guaranteed to be <= {@link maxTreatmentRange}.
      * Setting this to `0` means deactivating this range.
      */
-    treatmentRange: z.number().min(0).max(maxTreatmentRange),
+    treatmentRange: z.number().nonnegative().max(maxTreatmentRange),
     image: imagePropertiesSchema,
     position: positionSchema,
 });

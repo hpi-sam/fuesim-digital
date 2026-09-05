@@ -12,11 +12,14 @@ import {
     personnelTemplateSchema,
     stripEntityFromElementSchema,
     uuid,
+    maxTreatmentRange,
 } from 'fuesim-digital-shared';
 import {
     disabled,
     form,
     FormField,
+    max,
+    min,
     validateStandardSchema,
 } from '@angular/forms/signals';
 import {
@@ -30,6 +33,7 @@ import { getImageAspectRatio } from '../../../../../../../shared/functions/get-i
 import { MessageService } from '../../../../../../../core/messages/message.service';
 import { ImagePartialFormComponent } from '../image-partial-form/image-partial-form.component';
 import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar/submit-button-bar.component';
+import { validateImage } from '../../../../../../../shared/validation/custom-validators.js';
 
 @Component({
     selector: 'app-personnel-template-form',
@@ -77,10 +81,20 @@ export class PersonnelTemplateFormComponent implements BaseVersionedElementSubmo
 
     public readonly personnelForm = form(this.values, (schema) => {
         disabled(schema, { when: () => this.disabled() });
+
+        min(schema.canCaterFor.green, 0);
+        min(schema.canCaterFor.yellow, 0);
+        min(schema.canCaterFor.red, 0);
+        min(schema.overrideTreatmentRange, 0);
+        max(schema.overrideTreatmentRange, maxTreatmentRange);
+        min(schema.treatmentRange, 0);
+        max(schema.treatmentRange, maxTreatmentRange);
+
         validateStandardSchema(
             schema,
             stripEntityFromElementSchema(personnelTemplateSchema)
         );
+        validateImage(schema.image);
     });
 
     constructor() {
@@ -93,16 +107,17 @@ export class PersonnelTemplateFormComponent implements BaseVersionedElementSubmo
     }
     public async submitData() {
         const valuesOnSubmit = cloneDeepMutable(this.personnelForm().value());
-        const aspectRatio = await getImageAspectRatio(
-            this.values().image.url
-        ).catch((error) => {
+        let aspectRatio;
+        try {
+            aspectRatio = await getImageAspectRatio(this.values().image.url);
+        } catch (error) {
             this.messageService.postError({
                 title: 'Ungültige URL',
                 body: 'Bitte überprüfen Sie die Bildadresse.',
                 error,
             });
-            return valuesOnSubmit.image.aspectRatio;
-        });
+            return;
+        }
 
         this.formOutput.dataSubmit({
             ...valuesOnSubmit,

@@ -24,6 +24,7 @@ import {
     disabled,
     form,
     FormField,
+    min,
     validateStandardSchema,
 } from '@angular/forms/signals';
 import {
@@ -37,6 +38,7 @@ import { MapEditorCardComponent } from '../../../../../../../shared/components/m
 import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 import { ImagePartialFormComponent } from '../image-partial-form/image-partial-form.component';
 import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar/submit-button-bar.component';
+import { validateImage } from '../../../../../../../shared/validation/custom-validators.js';
 
 @Component({
     selector: 'app-vehicle-template-form-marketplace',
@@ -81,10 +83,13 @@ export class VehicleTemplateFormMarketplaceComponent implements BaseVersionedEle
 
     public readonly vehicleForm = form(this.values, (schema) => {
         disabled(schema, { when: () => this.disabled() });
+        min(schema.patientCapacity, 0);
+        min(schema.patientLoadMinutes, 0);
         validateStandardSchema(
             schema,
             stripEntityFromElementSchema(vehicleTemplateSchema)
         );
+        validateImage(schema.image);
     });
 
     public readonly availableMaterialTemplates = computed(() => {
@@ -116,16 +121,17 @@ export class VehicleTemplateFormMarketplaceComponent implements BaseVersionedEle
      */
     public async submitData() {
         const valuesOnSubmit = cloneDeepMutable(this.vehicleForm().value());
-        const aspectRatio = await getImageAspectRatio(
-            this.values().image.url
-        ).catch((error) => {
+        let aspectRatio;
+        try {
+            aspectRatio = await getImageAspectRatio(this.values().image.url);
+        } catch (error) {
             this.messageService.postError({
                 title: 'Ungültige URL',
                 body: 'Bitte überprüfen Sie die Bildadresse.',
                 error,
             });
-            return valuesOnSubmit.image.aspectRatio;
-        });
+            return;
+        }
 
         this.formOutput.dataSubmit({
             ...valuesOnSubmit,

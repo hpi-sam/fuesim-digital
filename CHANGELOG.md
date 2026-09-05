@@ -14,8 +14,9 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Fixed
 
 - On longer pages, messages were shown outside the viewport.
-- When a new vehicle with automatic numbering (#) is added to an exericse, it's the names of personnel and materials are updated as well.
+- When a new vehicle with automatic numbering (#) is added to an exercise, the names of personnel and materials are updated as well.
 - The view button of elements cards shown in the marketplace now actually opens the element's details view instead of the duplicate modal.
+- Attributes of elements in the marketplace (e.g. name, image) are now properly validated.
 
 ## [1.0.0-rc.2] - 2026-08-13
 

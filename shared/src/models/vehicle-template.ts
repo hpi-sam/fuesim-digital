@@ -4,6 +4,7 @@ import { uuidSchema } from '../utils/uuid.js';
 import { cloneDeepMutable } from '../utils/clone-deep.js';
 import type { ElementVersionId } from '../marketplace/models/versioned-id-schema.js';
 import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
+import { validationMessages } from '../validation-messages.js';
 import { imagePropertiesSchema } from './utils/image-properties.js';
 import { registerEditableValue } from './utils/editable-values-registry.js';
 import { registerDependency } from './utils/dependency-registry.js';
@@ -12,11 +13,13 @@ export const vehicleTemplateSchema = z.strictObject({
     ...versionedElementModelSchema.shape,
     id: uuidSchema,
     type: z.literal('vehicleTemplate'),
-    vehicleType: z.string(),
-    name: z.string(),
+    vehicleType: z.string().trim().nonempty(validationMessages.required),
+    name: z.string().trim().nonempty(validationMessages.required),
     image: imagePropertiesSchema,
-    patientCapacity: z.number(),
-    patientLoadMinutes: z.number().nonnegative(),
+    patientCapacity: z.int().nonnegative(validationMessages.notNonNegative),
+    patientLoadMinutes: z
+        .number()
+        .nonnegative(validationMessages.notNonNegative),
     personnelTemplateIds: z.array(uuidSchema),
     materialTemplateIds: z.array(uuidSchema),
 });

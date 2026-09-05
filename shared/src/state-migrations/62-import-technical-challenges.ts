@@ -16,7 +16,7 @@ function migrateTemplateStateMachines(template: any): void {
     }
 }
 
-export const importTechnicalChallenges: Migration = {
+export const importTechnicalChallenges62: Migration = {
     state: (state: any) => {
         for (const challenge of Object.values<any>(state.technicalChallenges)) {
             delete challenge.image;

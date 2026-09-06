@@ -33,6 +33,8 @@ export const patientTemplateSchema = z.strictObject({
     type: z.literal('patientTemplate'),
     biometricInformation: biometricInformationSchema,
     pretriageInformation: pretriageInformationSchema,
+    /** Patient Assignment Code, Patientenzuweisungscode (PZC),  see https://www.ivena-niedersachsen.de/pzc.php */
+    pzc: z.int().nonnegative(),
     image: imagePropertiesSchema,
     healthStates: z.record(uuidSchema, patientHealthStateSchema),
     startingHealthStateId: uuidSchema,
@@ -44,6 +46,7 @@ export function newPatientTemplate(
     biometricInformation: BiometricInformation,
     pretriageInformation: PretriageInformation,
     healthStates: { readonly [stateId: UUID]: PatientHealthState },
+    pzc: number,
     image: ImageProperties,
     health: HealthPoints,
     startingHealthStateId: UUID
@@ -54,6 +57,7 @@ export function newPatientTemplate(
         biometricInformation,
         pretriageInformation,
         healthStates,
+        pzc,
         image,
         health,
         startingHealthStateId,
@@ -99,6 +103,7 @@ export function newPatientFromTemplate(
         status,
         healthStates,
         template.startingHealthStateId,
+        template.pzc,
         template.image,
         template.health,
         '',

@@ -835,6 +835,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 isWalkable: true,
             },
             { [noChangesState.id]: noChangesState },
+            214,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             noChangesState.id
@@ -867,6 +868,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [noChangesState.id]: noChangesState,
                 [greenUntilPhase10State.id]: greenUntilPhase10State,
             },
+            779,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             greenUntilPhase10State.id
@@ -895,6 +897,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [noChangesState.id]: noChangesState,
                 [greenUntilPhase11State.id]: greenUntilPhase11State,
             },
+            779,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             greenUntilPhase11State.id
@@ -923,6 +926,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [noChangesState.id]: noChangesState,
                 [greenUntilPhase12State.id]: greenUntilPhase12State,
             },
+            779,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             greenUntilPhase12State.id
@@ -957,6 +961,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [waitForYellowToGreenState.id]: waitForYellowToGreenState,
                 [yellowToGreenState.id]: yellowToGreenState,
             },
+            225,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             greenUntilPhase7State.id
@@ -986,6 +991,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [waitForYellowToGreenState.id]: waitForYellowToGreenState,
                 [yellowToGreenState.id]: yellowToGreenState,
             },
+            272,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             greenUntilPhase8State.id
@@ -1021,6 +1027,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [yellowFor2PhasesState.id]: yellowFor2PhasesState,
                 [recoverToGreenState.id]: recoverToGreenState,
             },
+            214,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             greenUntilPhase2State.id
@@ -1058,6 +1065,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [greenStartPhase11RADecisionState.id]:
                     greenStartPhase11RADecisionState,
             },
+            276,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             greenUntilPhase9State.id
@@ -1094,6 +1102,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                     greenStartPhase5RADecisionState,
                 [waitForTransportState.id]: waitForTransportState,
             },
+            272,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             greenUntilPhase4State.id
@@ -1127,6 +1136,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [noChangesState.id]: noChangesState,
                 [yellowUntilPhase5State.id]: yellowUntilPhase5State,
             },
+            214,
             defaultPatientImage,
             healthPointsDefaults.yellowAverage,
             yellowUntilPhase5State.id
@@ -1161,6 +1171,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [yellowUntilPhase4State.id]: yellowUntilPhase4State,
                 [recoverWithRSState.id]: recoverWithRSState,
             },
+            214,
             defaultPatientImage,
             healthPointsDefaults.yellowAverage,
             yellowUntilPhase4State.id
@@ -1196,6 +1207,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [yellowStartPhase4RSDecisionState.id]:
                     yellowStartPhase4RSDecisionState,
             },
+            214,
             defaultPatientImage,
             healthPointsDefaults.yellowAverage,
             yellowUntilRedPhase4State.id
@@ -1226,6 +1238,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 isWalkable: false,
             },
             { [noChangesState.id]: noChangesState },
+            214,
             defaultPatientImage,
             healthPointsDefaults.yellowAverage,
             noChangesState.id
@@ -1268,6 +1281,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [yellowStartPhase9RADecisionState.id]:
                     yellowStartPhase9RADecisionState,
             },
+            214,
             defaultPatientImage,
             healthPointsDefaults.yellowAverage,
             yellowUntilPhase3State.id
@@ -1303,6 +1317,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                     yellowUntilPrioRedPhase4State,
                 [redUntilBlack2PhasesState.id]: redUntilBlack2PhasesState,
             },
+            212,
             defaultPatientImage,
             healthPointsDefaults.yellowAverage,
             yellowUntilPrioRedPhase4State.id
@@ -1336,6 +1351,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [noChangesState.id]: noChangesState,
                 [redUntilBlackPhase2State.id]: redUntilBlackPhase2State,
             },
+            211,
             defaultPatientImage,
             healthPointsDefaults.redAverage,
             redUntilBlackPhase2State.id
@@ -1365,6 +1381,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [noChangesState.id]: noChangesState,
                 [redUntilBlackPhase2State.id]: redUntilBlackPhase2State,
             },
+            272,
             defaultPatientImage,
             healthPointsDefaults.redAverage,
             redUntilBlackPhase2State.id
@@ -1394,6 +1411,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [noChangesState.id]: noChangesState,
                 [redUntilBlackPhase2State.id]: redUntilBlackPhase2State,
             },
+            211,
             defaultPatientImage,
             healthPointsDefaults.redAverage,
             redUntilBlackPhase2State.id
@@ -1427,6 +1445,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [noChangesState.id]: noChangesState,
                 [redUntilBlackPhase2State.id]: redUntilBlackPhase2State,
             },
+            212,
             defaultPatientImage,
             healthPointsDefaults.redAverage,
             redUntilBlackPhase2State.id
@@ -1464,6 +1483,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                     redIntoTransportFor2PhasesState,
                 [redInstantTransportState.id]: redInstantTransportState,
             },
+            212,
             defaultPatientImage,
             healthPointsDefaults.redAverage,
             redUntilPhase2State.id
@@ -1498,6 +1518,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [prioRedUntilPhase2State.id]: prioRedUntilPhase2State,
                 [redInstantTransportState.id]: redInstantTransportState,
             },
+            212,
             defaultPatientImage,
             healthPointsDefaults.redAverage,
             prioRedUntilPhase2State.id
@@ -1531,6 +1552,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
                 [noChangesState.id]: noChangesState,
                 [redInstantTransportState.id]: redInstantTransportState,
             },
+            212,
             defaultPatientImage,
             healthPointsDefaults.redAverage,
             redInstantTransportState.id
@@ -1561,6 +1583,7 @@ export const bystanderCategories = [
                 isWalkable: true,
             },
             { [noChangesState.id]: noChangesState },
+            0,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             noChangesState.id
@@ -1587,6 +1610,7 @@ export const bystanderCategories = [
                 isWalkable: true,
             },
             { [noChangesState.id]: noChangesState },
+            0,
             defaultPatientImage,
             healthPointsDefaults.greenMax,
             noChangesState.id

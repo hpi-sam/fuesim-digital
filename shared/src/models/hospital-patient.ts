@@ -36,6 +36,8 @@ export const hospitalPatientSchema = z.strictObject({
     realStatus: patientStatusSchema,
     hasTransportPriority: z.boolean(),
     ticket: z.string(),
+    /** Patient Assignment Code, Patientenzuweisungscode (PZC),  see https://www.ivena-niedersachsen.de/pzc.php */
+    pzc: z.int().nonnegative(),
     image: imagePropertiesSchema,
     healthStates: z.record(uuidSchema, patientHealthStateSchema),
     /**
@@ -76,6 +78,7 @@ export function newHospitalPatientFromPatient(
         ticket: patient.ticket,
         healthStates: patient.healthStates,
         currentHealthStateId: patient.currentHealthStateId,
+        pzc: patient.pzc,
         image: patient.image,
         health: patient.health,
         treatmentTime: patient.treatmentTime,

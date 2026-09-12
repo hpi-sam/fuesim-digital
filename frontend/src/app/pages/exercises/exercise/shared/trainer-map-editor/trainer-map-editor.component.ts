@@ -158,7 +158,7 @@ export class TrainerMapEditorComponent implements OnInit {
         selectAlarmgroupTemplates
     );
 
-    public readonly selectedCollections$ = this.store.selectSignal(
+    public readonly selectedCollections = this.store.selectSignal(
         selectSelectedCollections
     );
 
@@ -284,7 +284,7 @@ export class TrainerMapEditorComponent implements OnInit {
             return [];
         }
 
-        const collectionElements = this.selectedCollections$().map(
+        const collectionElements = this.selectedCollections().map(
             (collection) => ({
                 collection,
                 elements:

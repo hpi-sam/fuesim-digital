@@ -34,7 +34,7 @@ export class UserDataService {
 
         // Get uploaded images and add them to archive
         const uploadedImages =
-            await this.collectionRepository.getAllElementsOfTypeOfUser(
+            await this.collectionRepository.getAllAccessableElementsOfTypeOfUser(
                 userId,
                 'uploadedImage'
             );

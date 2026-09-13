@@ -24,7 +24,6 @@ import { OperationalSectionActionReducers } from './operational-section.js';
 import { ScoutableActionReducers } from './scoutable.js';
 import { MeasureActionReducers } from './measure.js';
 import { MeasureTemplateActionReducers } from './measure-templates.js';
-import { MeasureTemplateActionReducers as MeasureTemplateCategoryActionReducers } from './measure-template-categories.js';
 import { DrawingActionReducers } from './drawing.js';
 import { TechnicalChallengeActionReducers } from './technical-challenge.js';
 import { CollectionReducers } from './collections.js';
@@ -61,7 +60,6 @@ const actionReducers = {
     ...TechnicalChallengeTemplateActionReducers,
     ...MeasureActionReducers,
     ...MeasureTemplateActionReducers,
-    ...MeasureTemplateCategoryActionReducers,
     ...DrawingActionReducers,
 } as const;
 

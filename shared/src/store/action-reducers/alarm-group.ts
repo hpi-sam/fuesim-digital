@@ -6,6 +6,7 @@ import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { type UUID } from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { getTemplates } from '../../models/template.js';
 import { getElement } from './utils/get-element.js';
 
 export const addAlarmGroupActionSchema = z.strictObject({
@@ -123,14 +124,14 @@ export namespace AlarmGroupActionReducers {
             getElement(draftState, 'alarmGroup', alarmGroupId);
             delete draftState.alarmGroups[alarmGroupId];
             // Remove this alarm group from every measure template's alarm properties
-            for (const category of Object.values(draftState.measureTemplates)) {
-                for (const template of Object.values(category.templates)) {
-                    for (const property of template.properties) {
-                        if (property.type === 'alarm') {
-                            property.alarmGroups = property.alarmGroups.filter(
-                                (id) => id !== alarmGroupId
-                            );
-                        }
+            for (const template of Object.values(
+                getTemplates(draftState, 'measureTemplate')
+            )) {
+                for (const property of template.properties) {
+                    if (property.type === 'alarm') {
+                        property.alarmGroups = property.alarmGroups.filter(
+                            (id) => id !== alarmGroupId
+                        );
                     }
                 }
             }

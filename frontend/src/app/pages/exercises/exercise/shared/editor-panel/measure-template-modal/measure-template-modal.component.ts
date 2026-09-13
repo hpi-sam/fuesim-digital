@@ -24,7 +24,7 @@ import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
     createSelectMeasureTemplate,
-    selectMeasureTemplateCategories,
+    selectMeasureTemplates,
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { MeasureTemplateValues } from '../measure-template-form/measure-template-form-utils';
@@ -59,12 +59,16 @@ export class MeasureTemplateModalComponent
     public measureTemplateValues?: MeasureTemplateValues;
 
     public categoryName?: string;
-    public readonly categories = this.store.selectSignal(
-        selectMeasureTemplateCategories
+    public readonly measureTemplates = this.store.selectSignal(
+        selectMeasureTemplates
     );
-    public readonly categoryNames = computed(() =>
-        Object.values(this.categories()).map((v) => v.name)
-    );
+    public readonly categoryNames = computed(() => [
+        ...new Set(
+            Object.values(this.measureTemplates()).map(
+                (template) => template.category
+            )
+        ),
+    ]);
 
     get isEditMode(): boolean {
         return this.measureTemplateId !== undefined;
@@ -79,13 +83,10 @@ export class MeasureTemplateModalComponent
                 )
             );
 
-            const currentCategory = Object.values(this.categories()).find(
-                (c) => c.templates[this.measureTemplateId!] !== undefined
-            );
             this.measureTemplateValues = {
                 name: measureTemplate.name,
                 properties: measureTemplate.properties,
-                categoryName: currentCategory?.name ?? '',
+                categoryName: measureTemplate.category,
                 replacePrevious: measureTemplate.replacePrevious,
             };
         } else {
@@ -136,6 +137,7 @@ export class MeasureTemplateModalComponent
                       type: '[MeasureTemplate] Edit MeasureTemplate',
                       id: this.measureTemplateId!,
                       name,
+                      category: categoryName,
                       properties,
                       replacePrevious,
                   }
@@ -143,10 +145,10 @@ export class MeasureTemplateModalComponent
                       type: '[MeasureTemplate] Add MeasureTemplate',
                       measureTemplate: newMeasureTemplate(
                           name,
+                          categoryName,
                           properties,
                           replacePrevious
                       ),
-                      categoryName,
                   };
 
         this.exerciseService.proposeAction(action).then((response) => {

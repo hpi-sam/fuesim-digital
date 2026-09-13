@@ -60,6 +60,7 @@ import { addCollections59 } from './59-add-collections.js';
 import { tickets60 } from './60-tickets.js';
 import { updateTechnicalChallenges61 } from './61-generalize-update-technical-challenge-action.js';
 import { importTechnicalChallenges } from './62-import-technical-challenges.js';
+import { flattenMeasureTemplates63 } from './63-flatten-measure-templates.js';
 
 /**
  * Migrate a single action
@@ -149,4 +150,5 @@ export const migrations: {
     60: tickets60,
     61: updateTechnicalChallenges61,
     62: importTechnicalChallenges,
+    63: flattenMeasureTemplates63,
 };

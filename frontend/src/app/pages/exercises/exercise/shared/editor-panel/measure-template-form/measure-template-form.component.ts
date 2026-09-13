@@ -170,7 +170,12 @@ export class MeasureTemplateFormComponent implements OnChanges {
             const { name, properties, replacePrevious, categoryName } =
                 this.values();
             this.submitMeasureTemplate.emit({
-                ...newMeasureTemplate(name, properties, replacePrevious),
+                ...newMeasureTemplate(
+                    name,
+                    categoryName,
+                    properties,
+                    replacePrevious
+                ),
                 categoryName,
             });
         } catch (e: unknown) {

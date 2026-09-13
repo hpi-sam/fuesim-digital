@@ -5,7 +5,7 @@ import type { ActionReducer } from '../action-reducer.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { DrawingActionReducers } from './drawing.js';
 import { EmergencyOperationCenterActionReducers } from './emergency-operation-center.js';
-import { getMeasureTemplate } from './utils/measures.js';
+import { getMeasureTemplate } from './measure-templates.js';
 import { logMeasure } from './utils/log.js';
 
 export const addMeasureActionSchema = z.strictObject({

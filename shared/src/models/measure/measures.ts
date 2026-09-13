@@ -3,6 +3,10 @@ import type { Immutable } from 'immer';
 import type { UUID } from '../../utils/uuid.js';
 import { uuid, uuidSchema } from '../../utils/uuid.js';
 import { validationMessages } from '../../validation-messages.js';
+import { isElementVersionId } from '../../marketplace/models/versioned-id-schema.js';
+import { versionedElementModelSchema } from '../../marketplace/models/versioned-element-model.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { registerDependency } from '../utils/dependency-registry.js';
 import type { MeasureProperty } from './properties.js';
 import {
     measurePropertyDefinitions,
@@ -12,10 +16,14 @@ import {
 import type { MeasurePropertyInstance } from './instances.js';
 import { measurePropertyInstanceSchema } from './instances.js';
 
+export const defaultMeasureTemplateCategory = 'Maßnahmen';
+
 export const measureTemplateSchema = z.strictObject({
+    ...versionedElementModelSchema.shape,
     type: z.literal('measureTemplate'),
     id: uuidSchema,
     name: z.string().nonempty({ error: validationMessages.required }),
+    category: z.string().nonempty({ error: validationMessages.required }),
     properties: z
         .array(measurePropertySchema)
         .superRefine((properties, ctx) => {
@@ -57,6 +65,7 @@ export type MeasureTemplate = Immutable<z.infer<typeof measureTemplateSchema>>;
 
 export function newMeasureTemplate(
     name: string,
+    category: string,
     properties: readonly MeasureProperty[],
     replacePrevious: boolean
 ): MeasureTemplate {
@@ -64,31 +73,46 @@ export function newMeasureTemplate(
         type: 'measureTemplate',
         id: uuid(),
         name,
+        category,
         properties,
         replacePrevious,
     });
 }
 
-export const measureTemplateCategorySchema = z.strictObject({
-    type: z.literal('measureTemplateCategory'),
-    name: z.string().nonempty({ error: validationMessages.required }),
-    templates: z.record(measureTemplateSchema.shape.id, measureTemplateSchema),
+registerDependency('measureTemplate', {
+    detect: (content) =>
+        content.properties
+            .filter((property) => property.type === 'alarm')
+            .flatMap((property) => property.alarmGroups)
+            .filter((id) => isElementVersionId(id)),
+    replace: (content, replacements) => {
+        const mutableContent = cloneDeepMutable(content);
+        mutableContent.properties = mutableContent.properties.map(
+            (property) => {
+                if (property.type !== 'alarm') {
+                    return property;
+                }
+                property.alarmGroups = property.alarmGroups
+                    .filter((id) => {
+                        const replacement = replacements.find(
+                            (r) => r.old === id
+                        );
+                        return replacement?.new !== null;
+                    })
+                    .map((id) => {
+                        const replacement = replacements.find(
+                            (r) => r.old === id
+                        );
+                        return replacement && replacement.new !== null
+                            ? replacement.new
+                            : id;
+                    });
+                return property;
+            }
+        );
+        return mutableContent;
+    },
 });
-
-export type MeasureTemplateCategory = Immutable<
-    z.infer<typeof measureTemplateCategorySchema>
->;
-
-export function newMeasureTemplateCategory(
-    name: string,
-    templates: MeasureTemplate[]
-): MeasureTemplateCategory {
-    return measureTemplateCategorySchema.parse({
-        type: 'measureTemplateCategory',
-        name,
-        templates: Object.fromEntries(templates.map((t) => [t.id, t])),
-    });
-}
 
 export const measureSchema = z.strictObject({
     type: z.literal('measure'),

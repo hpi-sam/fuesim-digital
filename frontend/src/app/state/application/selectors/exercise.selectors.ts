@@ -7,7 +7,6 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseSimulationBehaviorType,
     ExerciseState,
-    MeasureTemplate,
     TechnicalChallengeId,
     Template,
     UUID,
@@ -104,13 +103,7 @@ export const selectMaterialTemplates =
 export const selectMapImagesTemplates =
     selectTemplatesFactory('mapImageTemplate');
 export const selectAlarmgroupTemplates = selectTemplatesFactory('alarmGroup');
-export const selectMeasureTemplateCategories =
-    selectPropertyFactory('measureTemplates');
-export const selectMeasureTemplates = createSelector(
-    selectMeasureTemplateCategories,
-    (categories): { [key: UUID]: MeasureTemplate } =>
-        Object.assign({}, ...Object.values(categories).map((c) => c.templates))
-);
+export const selectMeasureTemplates = selectTemplatesFactory('measureTemplate');
 // Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');

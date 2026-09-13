@@ -42,6 +42,7 @@ import {
     collectionOrganisationMappingTable,
     organisationTable,
     exerciseTable,
+    organisationMembershipTable,
 } from '../schema.js';
 import { defaultCollectionData } from '../default-data/collection-default-data.js';
 import { DAG } from '../../utils/dag.js';
@@ -1633,15 +1634,42 @@ export class CollectionRepository extends BaseRepository {
         });
     }
 
-    public async getAllElementsOfTypeOfUser(
+    public async getAllAccessableElementsOfTypeOfUser(
         userId: string,
-        elementType: string
+        elementType: TemplateVersionContent['type']
     ) {
-        // TODO Make this to get all current element versions of a user with a certain type (e. g. 'uploadedImage')
-        // TODO also fix typing in function header
-        const res = await this.databaseConnection
+        // User -belongs to-> Organisation -has-> Collection -has-> Element (-has property-> type)
+        const elementsOfType = await this.databaseConnection
             .select(getTableColumns(elementTable))
-            .from(elementTable);
-        return res.filter((element) => element.content.type === elementType);
+            .from(organisationMembershipTable)
+            .leftJoin(
+                collectionOrganisationMappingTable,
+                eq(
+                    collectionOrganisationMappingTable.organisationId,
+                    organisationMembershipTable.organisationId
+                )
+            )
+            .leftJoin(
+                elementCollectionMappingTable,
+                eq(
+                    elementCollectionMappingTable.collectionEntityId,
+                    collectionOrganisationMappingTable.collection
+                )
+            )
+            .innerJoin(
+                elementTable,
+                eq(
+                    elementTable.versionId,
+                    elementCollectionMappingTable.elementVersionId
+                )
+            )
+            .where(
+                and(
+                    eq(organisationMembershipTable.userId, userId),
+                    sql`${elementTable.content}->>'type' = ${elementType}`
+                )
+            );
+
+        return elementsOfType;
     }
 }

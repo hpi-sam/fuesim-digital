@@ -7,7 +7,6 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseSimulationBehaviorType,
     ExerciseState,
-    MeasureTemplate,
     TechnicalChallengeId,
     Template,
     UUID,
@@ -104,13 +103,9 @@ export const selectMaterialTemplates =
 export const selectMapImagesTemplates =
     selectTemplatesFactory('mapImageTemplate');
 export const selectAlarmgroupTemplates = selectTemplatesFactory('alarmGroup');
-export const selectMeasureTemplateCategories =
+export const selectMeasureTemplates = selectTemplatesFactory('measureTemplate');
+export const selectCategorizedMeasureTemplates =
     selectPropertyFactory('measureTemplates');
-export const selectMeasureTemplates = createSelector(
-    selectMeasureTemplateCategories,
-    (categories): { [key: UUID]: MeasureTemplate } =>
-        Object.assign({}, ...Object.values(categories).map((c) => c.templates))
-);
 // Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');
@@ -189,6 +184,15 @@ export const createSelectScoutable =
 export const createSelectMeasureTemplate = createSelectElementFromMapFactory(
     selectMeasureTemplates
 );
+export function createSelectCategorizedMeasureTemplate(
+    categoryName: string,
+    id: UUID
+) {
+    return createSelector(
+        selectCategorizedMeasureTemplates,
+        (categories) => categories[categoryName]!.templates[id]!
+    );
+}
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,

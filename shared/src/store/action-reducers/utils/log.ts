@@ -48,12 +48,12 @@ import { TypeAssertedObject } from '../../../utils/type-asserted-object.js';
 import type { StateMachineState } from '../../../models/technical-challenge/state-machine.js';
 // eslint-disable-next-line import-x/no-cycle
 import { TechnicalChallenge } from '../../../models/technical-challenge/technical-challenge.js';
+import { findCategorizedMeasureTemplate } from '../measure-template-categories.js';
 import {
     getElement,
     getExerciseBehaviorById,
     getExerciseRadiogramById,
 } from './get-element.js';
-import { getMeasureTemplate } from './measures.js';
 
 export function log(
     state: WritableDraft<ExerciseState>,
@@ -82,7 +82,11 @@ export function logMeasure(
 
     if (!measure) return;
 
-    const measureTemplate = getMeasureTemplate(state, measure.templateId);
+    const measureTemplate = findCategorizedMeasureTemplate(
+        state,
+        measure.templateId
+    );
+    if (!measureTemplate) return;
 
     log(
         state,

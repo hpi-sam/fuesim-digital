@@ -5,6 +5,7 @@ import { marketplaceMapImage } from './map-image-template.marketplace.js';
 import { marketplaceMaterial } from './material.marketplace.js';
 import { marketplacePersonnel } from './personnel.marketplace.js';
 import { marketplaceVehicle } from './vehicle-template.marketplace.js';
+import { marketplaceMeasureTemplate } from './measure-template.marketplace.js';
 
 export const marketplaceElements = [
     marketplaceVehicle,
@@ -12,6 +13,7 @@ export const marketplaceElements = [
     marketplaceMaterial,
     marketplacePersonnel,
     marketplaceMapImage,
+    marketplaceMeasureTemplate,
 ] as const;
 
 type MarketplaceElements = typeof marketplaceElements;

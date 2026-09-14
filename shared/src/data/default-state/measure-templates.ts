@@ -1,7 +1,4 @@
-import type {
-    MeasureTemplate,
-    MeasureTemplateCategory,
-} from '../../models/measure/measures.js';
+import type { MeasureTemplate } from '../../models/measure/measures.js';
 
 const alarmMeasureTemplate: MeasureTemplate = {
     type: 'measureTemplate',
@@ -80,19 +77,10 @@ export const defaultMeasureTemplates = {
     closure: closureMeasureTemplate,
 } as const;
 
-export const defaultMeasureTemplatesById = Object.fromEntries(
-    Object.values(defaultMeasureTemplates).map((template) => [
-        template.id,
-        template,
-    ])
-);
-
-export const defaultMeasureTemplateCategories: {
-    [key: string]: MeasureTemplateCategory;
-} = {
-    Maßnahmen: {
-        type: 'measureTemplateCategory',
-        name: 'Maßnahmen',
-        templates: defaultMeasureTemplatesById,
-    },
-};
+export const defaultMeasureTemplatesById: { [key: string]: MeasureTemplate } =
+    Object.fromEntries(
+        Object.values(defaultMeasureTemplates).map((template) => [
+            template.id,
+            template,
+        ])
+    );

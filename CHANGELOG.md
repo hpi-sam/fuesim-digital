@@ -7,6 +7,16 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Added
+
+- Measure templates can be shared via collections in the marketplace.
+
+### Changed
+
+- Measures are now managed in the editor of the trainer map instead of a separate window.
+- New exercises no longer contain a default measure category; the default measures are available as templates in the collection "FüSim Digital Feuerwehr 2026".
+- Deleting a measure category now also deletes the measures it contains, and the last category can be deleted as well.
+
 ### Fixed
 
 - Importing exercises with a state prior 63 now results in alarm groups to not be wronly limited to 0.

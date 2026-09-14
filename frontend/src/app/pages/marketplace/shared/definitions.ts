@@ -4,6 +4,7 @@ import { MapImageTemplateFormComponent } from './modals/editor-modals/element-fo
 import { MaterialTemplateFormComponent } from './modals/editor-modals/element-forms/material-template-form/material-template-form.component';
 import { PersonnelTemplateFormComponent } from './modals/editor-modals/element-forms/personnel-template-form/personnel-template-form.component';
 import { VehicleTemplateFormMarketplaceComponent } from './modals/editor-modals/element-forms/vehicle-template-form/vehicle-template-form.component';
+import { MeasureTemplateFormMarketplaceComponent } from './modals/editor-modals/element-forms/measure-template-form/measure-template-form.component';
 
 interface MarketplaceItemDefintition<C extends MarketplaceElementContent> {
     elementFormComponent: any;
@@ -59,6 +60,14 @@ export const marketplaceComponentDefinitions: {
             title: content.vehicleType,
             subtitle: content.name,
             image: content.image.url,
+        }),
+    },
+    measureTemplate: {
+        elementFormComponent: MeasureTemplateFormMarketplaceComponent,
+        helpUrl: '2_exercises/3_exercise_elements.html#maßnahmen',
+        elementCard: (content) => ({
+            title: content.name,
+            subtitle: `${content.properties.length} Schritte`,
         }),
     },
 };

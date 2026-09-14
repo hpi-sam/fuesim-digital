@@ -28,6 +28,7 @@ import {
     PatientCategory,
     UUID,
     TechnicalChallengeTemplate,
+    MeasureTemplate,
     Element as FuesimElement,
     CollectionEntityId,
     CollectionVersionId,
@@ -54,6 +55,7 @@ import {
     selectMapImagesTemplates,
     selectExerciseState,
     selectAlarmgroupTemplates,
+    selectMeasureTemplates,
     selectSelectedCollections,
     selectTechnicalChallengeTemplates,
 } from '../../../../../state/application/selectors/exercise.selectors';
@@ -67,10 +69,13 @@ import { HelpBannerComponent } from '../../../../../help-banner/help-banner.comp
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group-overview-page.component';
 import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
+import { MeasureTemplateOverviewPageComponent } from '../measure-template-overview-page/measure-template-overview-page.component';
+import type { MeasureTemplateDragData } from '../measure-template-overview-page/measure-template-drag-data';
 import { openManageExerciseCollectionsModal } from '../manage-exercise-collections/open-manage-exercise-collections-modal';
 import { CollectionService } from '../../../../../core/collection.service';
 import { openUploadTechnicalChallengeModal } from '../editor-panel/upload-technical-challenge-template-modal/upload-technical-challenge-template-modal.component.js';
 import { openEditTechnicalChallengeTemplateModal } from '../editor-panel/edit-technical-challenge-template-modal/edit-technical-challenge-template-modal.component.js';
+import { MeasureCardComponent } from '../editor-panel/measure-card/measure-card.component';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -111,6 +116,8 @@ type FilterCategory =
         NgTemplateOutlet,
         AlarmGroupOverviewPageComponent,
         HospitalEditorPageComponent,
+        MeasureTemplateOverviewPageComponent,
+        MeasureCardComponent,
     ],
 })
 /**
@@ -125,7 +132,7 @@ export class TrainerMapEditorComponent implements OnInit {
     private readonly collectionService = inject(CollectionService);
 
     public readonly overwriteTrainerMap = signal<
-        'alarmgroups' | 'hospitals' | null
+        'alarmgroups' | 'hospitals' | 'measuretemplates' | null
     >(null);
 
     public selectedCategories$: BehaviorSubject<{
@@ -156,6 +163,10 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public readonly alarmGroupTemplates$ = this.store.select(
         selectAlarmgroupTemplates
+    );
+
+    public readonly measureTemplates$ = this.store.select(
+        selectMeasureTemplates
     );
 
     public readonly selectedCollections$ = this.store.selectSignal(
@@ -236,6 +247,12 @@ export class TrainerMapEditorComponent implements OnInit {
             this.ngbModalService,
             technicalChallengeTemplateId
         );
+    }
+
+    public measureTemplateBlueprintDragData(
+        template: MeasureTemplate
+    ): MeasureTemplateDragData {
+        return { source: 'blueprint', template };
     }
 
     public setCurrentCategory(

@@ -106,6 +106,15 @@
                                 "
                             />
                         }
+                        @case ('measuretemplates') {
+                            <app-measure-template-overview-page
+                                class="h-100"
+                                (closeView)="
+                                    overwriteTrainerMap.set(null);
+                                    accordion.collapseAll()
+                                "
+                            />
+                        }
                     }
                 </div>
             }
@@ -798,6 +807,74 @@
                                     Bearbeiten Sie Krankenhäuser in der Ansicht
                                     links.
                                 </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    ngbAccordionItem="measuretemplates"
+                    (show)="overwriteTrainerMap.set('measuretemplates')"
+                    (hide)="overwriteTrainerMap.set(null)"
+                >
+                    <h5 ngbAccordionHeader>
+                        <button
+                            ngbAccordionButton
+                            data-cy="measureTemplatesAccordionButton"
+                        >
+                            Maßnahmen
+                        </button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div
+                                    class="alert alert-secondary small mb-0 px-2 py-1 d-flex align-items-center mb-2"
+                                >
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Diese Vorlagen können durch das Ziehen in
+                                    die Ansicht links verwendet werden
+                                </div>
+                                @let measureTemplates =
+                                    (measureTemplates$ | async | values) ?? [];
+                                @if (measureTemplates.length > 0) {
+                                    <div
+                                        class="cards"
+                                        cdkDropList
+                                        cdkDropListHasAnchor
+                                    >
+                                        @for (
+                                            measureTemplate of measureTemplates$
+                                                | async
+                                                | values;
+                                            track measureTemplate.id
+                                        ) {
+                                            <app-measure-card
+                                                cdkDrag
+                                                [cdkDragData]="
+                                                    measureTemplateBlueprintDragData(
+                                                        measureTemplate
+                                                    )
+                                                "
+                                                [name]="measureTemplate.name"
+                                            />
+                                        }
+                                    </div>
+                                } @else {
+                                    <i class="small text-muted"
+                                        >Sie haben keine Maßnahmen aus
+                                        Sammlungen</i
+                                    >
+                                }
+
+                                <ng-template
+                                    [ngTemplateOutlet]="
+                                        goToTemplateManagementModal
+                                    "
+                                    [ngTemplateOutletContext]="{
+                                        type: 'Maßnahmen',
+                                    }"
+                                />
                             </ng-template>
                         </div>
                     </div>

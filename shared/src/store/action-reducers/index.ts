@@ -15,6 +15,7 @@ export * from './configuration.js';
 export * from './technical-challenge.js';
 export * from './measure.js';
 export * from './measure-templates.js';
+export * from './measure-template-categories.js';
 export * from './drawing.js';
 export * from './collections.js';
 

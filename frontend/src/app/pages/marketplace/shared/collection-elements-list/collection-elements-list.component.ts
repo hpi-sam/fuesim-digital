@@ -24,7 +24,6 @@ import { VersionedElementDisplayNamePipe } from '../../../../shared/pipes/versio
 // it's a necessary evil
 // eslint-disable-next-line import-x/no-cycle
 import { ElementCardComponent } from '../cards/element-card/element-card.component';
-import { CreatingVersionedElementModalData } from '../modals/editor-modals/base-versioned-element-submodal';
 import { CollectionService } from '../../../../core/collection.service';
 import { GenericElementCardIndicator } from '../cards/generic-element-card/generic-element-card.component';
 import { openVersionedElementModal } from '../modals/editor-modals/versioned-element-modal/open-versioned-element-model';
@@ -88,6 +87,12 @@ export class CollectionElementsListComponent {
             },
         },
         {
+            type: 'technicalChallengeTemplate',
+            create: () => {
+                this.createElementHelper('technicalChallengeTemplate');
+            },
+        },
+        {
             type: 'mapImageTemplate',
             create: () => {
                 this.createElementHelper('mapImageTemplate');
@@ -124,10 +129,13 @@ export class CollectionElementsListComponent {
                     );
                 },
                 collection: this.collection(),
-                availableCollectionElements: gatherAllVisibleCollectionElements(
-                    this.collectionElements()
-                ),
-            } satisfies CreatingVersionedElementModalData<any>
+                // TODO: recheck, I needed this here to prevent a compiler errro
+                availableCollectionElements:
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
+                    gatherAllVisibleCollectionElements<any>(
+                        this.collectionElements()
+                    ),
+            }
         );
     }
 

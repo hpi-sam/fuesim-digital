@@ -28,6 +28,7 @@ import {
     NgbDropdownButtonItem,
     NgbDropdownItem,
     NgbNavOutlet,
+    NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { QrCodeComponent } from 'ng-qrcode';
@@ -75,6 +76,7 @@ import { ScoutableElementNavItemComponent } from '../scoutable-element-nav-item/
         NgbNavOutlet,
         AsyncPipe,
         ScoutableElementNavItemComponent,
+        NgbTooltip,
     ],
 })
 export class PatientsDetailsComponent implements OnChanges {

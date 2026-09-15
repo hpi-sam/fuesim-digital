@@ -47,7 +47,7 @@ const firefightingLeaderBluePersonnelTemplate: PersonnelTemplate =
         id: 'bb08d420-a292-451e-bafe-66edd412fc97',
         type: 'personnelTemplate',
         personnelType: 'feuerwehrGF',
-        name: 'Grppenführer',
+        name: 'Gruppenführer',
         image: {
             url: '/assets/fire-leader-blue-personnel.svg',
             height: 80,

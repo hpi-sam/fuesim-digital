@@ -93,8 +93,8 @@ export const selectOperationalSections = selectPropertyFactory(
 export const selectTechnicalChallenges = selectPropertyFactory(
     'technicalChallenges'
 );
-export const selectTechnicalChallengeTemplates = selectPropertyFactory(
-    'technicalChallengeTemplates'
+export const selectTechnicalChallengeTemplates = selectTemplatesFactory(
+    'technicalChallengeTemplate'
 );
 export const selectVehicleTemplates = selectTemplatesFactory('vehicleTemplate');
 export const selectPersonnelTemplates =

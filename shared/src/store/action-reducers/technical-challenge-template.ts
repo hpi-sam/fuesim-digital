@@ -29,9 +29,8 @@ export namespace TechnicalChallengeTemplateActionReducers {
             draftState,
             { technicalChallengeTemplate, additionalTasks }
         ) => {
-            draftState.technicalChallengeTemplates[
-                technicalChallengeTemplate.id
-            ] = cloneDeepMutable(technicalChallengeTemplate);
+            draftState.templates[technicalChallengeTemplate.id] =
+                cloneDeepMutable(technicalChallengeTemplate);
             for (const taskType of additionalTasks) {
                 draftState.taskTypes[taskType.id] = cloneDeepMutable(taskType);
             }
@@ -47,7 +46,7 @@ export namespace TechnicalChallengeTemplateActionReducers {
         actionSchema: updateTechnicalChallengeTemplateActionSchema,
         reducer: (draftState, action) => {
             const technicalChallengeTemplate =
-                draftState.technicalChallengeTemplates[
+                draftState.templates[
                     action.updatedTechnicalChallengeTemplate.id
                 ];
             if (!technicalChallengeTemplate) {
@@ -56,9 +55,8 @@ export namespace TechnicalChallengeTemplateActionReducers {
                 );
             }
 
-            draftState.technicalChallengeTemplates[
-                technicalChallengeTemplate.id
-            ] = cloneDeepMutable(action.updatedTechnicalChallengeTemplate);
+            draftState.templates[technicalChallengeTemplate.id] =
+                cloneDeepMutable(action.updatedTechnicalChallengeTemplate);
             return draftState;
         },
         rights: 'trainer',

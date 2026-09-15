@@ -6,11 +6,13 @@ import type { mapImageTemplateSchema } from '../../models/map-image-template.js'
 import type { materialTemplateSchema } from '../../models/material-template.js';
 import type { personnelTemplateSchema } from '../../models/personnel-template.js';
 import type { vehicleTemplateSchema } from '../../models/vehicle-template.js';
+import type { technicalChallengeTemplateSchema } from '../../models/technical-challenge/technical-challenge-template.js';
 import { marketplaceAlarmgroup } from './alarm-group.marketplace.js';
 import { marketplaceMapImage } from './map-image-template.marketplace.js';
 import { marketplaceMaterial } from './material.marketplace.js';
 import { marketplacePersonnel } from './personnel.marketplace.js';
 import { marketplaceVehicle } from './vehicle-template.marketplace.js';
+import { marketplaceTechnicalChallenge } from './technical-challenge-template.marketplace.js';
 
 export const marketplaceElements = [
     marketplaceVehicle,
@@ -18,12 +20,14 @@ export const marketplaceElements = [
     marketplaceMaterial,
     marketplacePersonnel,
     marketplaceMapImage,
+    marketplaceTechnicalChallenge,
 ] as const satisfies readonly [
     MarketplaceRegistryEntry<typeof vehicleTemplateSchema>,
     MarketplaceRegistryEntry<typeof alarmGroupSchema>,
     MarketplaceRegistryEntry<typeof materialTemplateSchema>,
     MarketplaceRegistryEntry<typeof personnelTemplateSchema>,
     MarketplaceRegistryEntry<typeof mapImageTemplateSchema>,
+    MarketplaceRegistryEntry<typeof technicalChallengeTemplateSchema>,
 ];
 
 type MarketplaceElements = typeof marketplaceElements;

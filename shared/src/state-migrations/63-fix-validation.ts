@@ -13,7 +13,7 @@ interface Vehicle {
 interface VehicleParameters {
     vehicle: Vehicle;
     personnel: Personnel[];
-    material: Material[];
+    materials: Material[];
 }
 interface VehicleTemplate {
     type: 'vehicleTemplate';
@@ -203,7 +203,7 @@ function migrateAlarmGroup(alarmGroup: AlarmGroup) {
 function migrateVehicleParamaters(vehicleParameters: VehicleParameters) {
     migrateVehicle(vehicleParameters.vehicle);
     vehicleParameters.personnel.forEach(migratePersonnel);
-    vehicleParameters.material.forEach(migrateMaterial);
+    vehicleParameters.materials.forEach(migrateMaterial);
 }
 
 type Template =

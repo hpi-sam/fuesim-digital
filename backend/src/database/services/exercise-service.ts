@@ -214,8 +214,7 @@ export class ExerciseService {
 
     public async createExerciseFromFile(
         data: Partial<ExerciseInsert>,
-        file: StateExport,
-        discardAllowed: boolean = true
+        file: StateExport
     ): Promise<ActiveExercise> {
         return this.exerciseRepository.transaction(
             async (exerciseRepository) => {
@@ -231,10 +230,7 @@ export class ExerciseService {
                     const trainerKey =
                         await accessKeyRepository.generateKey<TrainerKey>(8);
 
-                    const migratedImportObject = migrateStateExport(
-                        file,
-                        discardAllowed
-                    );
+                    const migratedImportObject = migrateStateExport(file);
                     validateExerciseExport(migratedImportObject);
 
                     const newInitialState = {

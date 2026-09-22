@@ -11,6 +11,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Documentation on simulated regions and their behaviors is now available.
 
+### Changed
+
+- Extend patients export for IVENA MANV with correct PZCs.
+
 ### Fixed
 
 - On longer pages, messages were shown outside the viewport.

@@ -48,6 +48,8 @@ export const patientSchema = z.strictObject({
     patientStatusCode: patientStatusCodeSchema,
     pretriageStatus: patientStatusSchema,
     realStatus: patientStatusSchema,
+    /** Patient Assignment Code, Patientenzuweisungscode (PZC),  see https://www.ivena-niedersachsen.de/pzc.php */
+    pzc: z.int().nonnegative(),
     image: imagePropertiesSchema,
     position: positionSchema,
     /**
@@ -92,6 +94,7 @@ export function newPatient(
     realStatus: PatientStatus,
     healthStates: { readonly [stateId: UUID]: PatientHealthState },
     currentHealthStateId: UUID,
+    pzc: number,
     image: ImageProperties,
     health: HealthPoints,
     remarks: string,
@@ -108,6 +111,7 @@ export function newPatient(
         realStatus,
         healthStates,
         currentHealthStateId,
+        pzc,
         image,
         health,
         remarks,

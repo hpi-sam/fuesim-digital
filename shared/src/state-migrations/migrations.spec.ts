@@ -17,40 +17,30 @@ const basePath = '../test-scenarios/migration-test-scenarios';
 
 describe('migration', () => {
     fs.readdirSync(basePath).forEach((stateDir) => {
-        if (!/from-state-\d+/u.test(stateDir)) {
-            console.warn(
-                `${stateDir} does not match the format 'from-state-[stateVersion]'`
-            );
-            return;
-        }
-        if (!fs.lstatSync(`${basePath}/${stateDir}`).isDirectory()) {
-            console.warn(
-                `${basePath}/${stateDir} was expected to be a directory but is not`
-            );
-            return;
-        }
+        // stateDir matches the format 'from-state-[stateVersion]'
+        expect(stateDir).toMatch(/from-state-\d+/u);
+
+        // stateDir is a directory
+        expect(
+            fs.lstatSync(`${basePath}/${stateDir}`).isDirectory()
+        ).toBeTrue();
+
         describe(stateDir, () => {
             fs.readdirSync(`${basePath}/${stateDir}`).forEach((typeDir) => {
-                if (
-                    typeDir !== 'combined-scenarios' &&
-                    typeDir !== 'one-action' &&
-                    typeDir !== 'state-altering-ui'
-                ) {
-                    console.warn(
-                        `${stateDir} does not match the naming convention, it should be named 'combined-scenarios', 'one-action' or 'state-altering-ui' depending on its contents`
-                    );
-                    return;
-                }
-                if (
-                    !fs
+                // typeDir matches 'combined-scenarios', 'one-action' or 'state-altering-ui'
+                expect([
+                    'combined-scenarios',
+                    'one-action',
+                    'state-altering-ui',
+                ]).toContain(typeDir);
+
+                // typeDir is a directory
+                expect(
+                    fs
                         .lstatSync(`${basePath}/${stateDir}/${typeDir}`)
                         .isDirectory()
-                ) {
-                    console.warn(
-                        `${basePath}/${stateDir}/${typeDir} was expected to be a directory but is not`
-                    );
-                    return;
-                }
+                ).toBeTrue();
+
                 const exercisePaths = fs.readdirSync(
                     `${basePath}/${stateDir}/${typeDir}`
                 );
@@ -59,71 +49,55 @@ describe('migration', () => {
                         !exercisePath.startsWith('EXCLUDE-FROM-TEST')
                 );
                 exercisePathsToTest.forEach((exercisePath) => {
-                    if (
-                        !fs
-                            .lstatSync(
-                                `${basePath}/${stateDir}/${typeDir}/${exercisePath}`
-                            )
-                            .isFile()
-                    ) {
-                        console.warn(
-                            `${basePath}/${stateDir}/${typeDir}/${exercisePath} was expected to be a file but is not`
-                        );
-                    }
-                });
-                const testableExercisePaths = exercisePathsToTest.filter(
-                    (exercisePath) =>
+                    // exercisePath is a file
+                    expect(
                         fs
                             .lstatSync(
                                 `${basePath}/${stateDir}/${typeDir}/${exercisePath}`
                             )
                             .isFile()
-                );
-                if (testableExercisePaths.length === 0) {
-                    console.warn(`${basePath}/${stateDir}/${typeDir} is empty`);
-                    return;
-                }
+                    ).toBeTrue();
+                });
+
+                expect(exercisePathsToTest).not.toHaveLength(0);
 
                 describe(typeDir, () => {
-                    describe.each(testableExercisePaths)(
-                        '%s',
-                        (exercisePath) => {
-                            it('current state', async () => {
-                                const exercise = JSON.parse(
-                                    fs.readFileSync(
-                                        `${basePath}/${stateDir}/${typeDir}/${exercisePath}`,
-                                        'utf8'
-                                    )
-                                );
+                    describe.each(exercisePathsToTest)('%s', (exercisePath) => {
+                        it('current state', async () => {
+                            const exercise = JSON.parse(
+                                fs.readFileSync(
+                                    `${basePath}/${stateDir}/${typeDir}/${exercisePath}`,
+                                    'utf8'
+                                )
+                            );
 
-                                const newState = migrateStateExport({
-                                    ...exercise,
-                                    history: undefined,
-                                });
+                            const newState = migrateStateExport({
+                                ...exercise,
+                                history: undefined,
+                            });
+                            expect(newState.dataVersion).toBe(
+                                currentStateVersion
+                            );
+                        });
+                        it('complete history', async () => {
+                            const exercise = JSON.parse(
+                                fs.readFileSync(
+                                    `${basePath}/${stateDir}/${typeDir}/${exercisePath}`,
+                                    'utf8'
+                                )
+                            );
+
+                            if (exercise.history) {
+                                const newState = migrateStateExport(
+                                    exercise,
+                                    false
+                                );
                                 expect(newState.dataVersion).toBe(
                                     currentStateVersion
                                 );
-                            });
-                            it('complete history', async () => {
-                                const exercise = JSON.parse(
-                                    fs.readFileSync(
-                                        `${basePath}/${stateDir}/${typeDir}/${exercisePath}`,
-                                        'utf8'
-                                    )
-                                );
-
-                                if (exercise.history) {
-                                    const newState = migrateStateExport(
-                                        exercise,
-                                        false
-                                    );
-                                    expect(newState.dataVersion).toBe(
-                                        currentStateVersion
-                                    );
-                                }
-                            });
-                        }
-                    );
+                            }
+                        });
+                    });
                 });
             });
         });

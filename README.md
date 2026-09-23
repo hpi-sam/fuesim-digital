@@ -353,28 +353,27 @@ Developers can either add new elements on the exercise-state-level, where they c
 
 #### Adding new elements to the marketplace
 
-Most elements are divided into instance (e.g. used on map) and template. Only few exceptions, like alarmgroups exist.
+Most elements exist both as an instance type (e.g. used on map) and as a template type (e.g. displayed in the editor.) Exceptions exist, for example alarm groups.
 
-The `type` attribute of the instance will most likely be `<element>`, while for the template it will be `<element>Template`. This will become important in the following.
-
+Here is what to do, to add a new element `Foo` with it's template type `FooTemplate`:
 ##### Shared
 
-1. Create a schema for the data that will later be stored in the database (template schema) in `shared/src/models/`.
+1. Create the models with the types `'foo'` and `'fooTemplate'` (see [shared/README.md](./shared/README.md#adding-new-models)). Don't forget to include `...versionedElementModelSchema.shape` in the schemas for compatibility with the marketplace.
 
-2. All Marketplace Elements are defined with their own file in `shared/src/marketplace/elements/<element-type>.marketplace.ts`. They export `defineMarketplaceElement()`
+2. Define the marketplace element in `shared/src/marketplace/elements/foo.marketplace.ts` by exporting the result of `defineMarketplaceElement()`.
 
     2.a. reference the previously created template schema in the `templateSchema` field
-    2.b. the `types` attribute needs to be filled with both the `type` literal (`<element>`) from the instance AND the `type` literal (`<element>Template`) from the template. This is later used to find the right registry entry for any object (instance or template) in the state.
+    2.b. the `types` attribute needs to be filled with the `type` literal of both the instance type (`'foo'`) AND the template type (`'fooTemplate'`.) This is later used to find the right registry entry for any object (instance or template) in the state.
 
-3. Add the new registry file into `shared/src/marketplace/elements/registry.ts` with both an entry in the `marketplaceElements` array and its corresponsing `satisfies` type.
+3. Register the new `.marketplace.ts` file in `shared/src/marketplace/elements/registry.ts` by adding an entry to both `marketplaceElements` and it's corresponding `satisfies` type expression.
 
 4. Don't forget the frontend
 
 ##### Frontend
 
-1. Create a form component in `frontend/src/app/pages/marketplace/shared/modals/editor-modals/element-forms/`
+1. Create the form component `foo-template-form` in `frontend/src/app/pages/marketplace/shared/modals/editor-modals/element-forms/`
 
-2. Create a marketplace definition in `frontend/src/app/pages/marketplace/shared/definitions.ts`.
+2. Add a marketplace definition to `marketplaceComponentDefinitions` in `frontend/src/app/pages/marketplace/shared/definitions.ts`.
 
     2.a. The `elementCard` attribute defines how the element will be displayed in the marketplace based on the given template content.
 

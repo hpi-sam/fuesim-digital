@@ -1,7 +1,7 @@
 import { alarmGroupSchema } from '../../models/alarm-group.js';
 import { defineMarketplaceElement } from '../marketplace-registry-element.js';
 
-export const marketplaceAlarmgroup = defineMarketplaceElement({
+export const marketplaceAlarmGroup = defineMarketplaceElement({
     naming: {
         singular: 'Alarmgruppe',
         plural: 'Alarmgruppen',
@@ -9,6 +9,7 @@ export const marketplaceAlarmgroup = defineMarketplaceElement({
     templateSchema: alarmGroupSchema,
     types: ['alarmGroup'],
 
+    // TODO
     changeApply: (draftState, change) => {
         throw new Error('Not implemented yet');
     },

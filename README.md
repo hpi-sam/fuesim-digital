@@ -356,6 +356,7 @@ Developers can either add new elements on the exercise-state-level, where they c
 Most elements exist both as an instance type (e.g. used on map) and as a template type (e.g. displayed in the editor.) Exceptions exist, for example alarm groups.
 
 Here is what to do, to add a new element `Foo` with it's template type `FooTemplate`:
+
 ##### Shared
 
 1. Create the models with the types `'foo'` and `'fooTemplate'` (see [shared/README.md](./shared/README.md#adding-new-models)). Don't forget to include `...versionedElementModelSchema.shape` in the schemas for compatibility with the marketplace.
@@ -365,7 +366,7 @@ Here is what to do, to add a new element `Foo` with it's template type `FooTempl
     2.a. reference the previously created template schema in the `templateSchema` field
     2.b. the `types` attribute needs to be filled with the `type` literal of both the instance type (`'foo'`) AND the template type (`'fooTemplate'`.) This is later used to find the right registry entry for any object (instance or template) in the state.
 
-3. Register the new `.marketplace.ts` file in `shared/src/marketplace/elements/registry.ts` by adding an entry to both `marketplaceElements` and it's corresponding `satisfies` type expression.
+3. Register the new `.marketplace.ts` file in `shared/src/marketplace/elements/registry.ts` by adding an entry to `marketplaceElements`.
 
 4. Don't forget the frontend
 

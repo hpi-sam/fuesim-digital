@@ -9,6 +9,7 @@ export const marketplaceMaterial = defineMarketplaceElement({
     templateSchema: materialTemplateSchema,
     types: ['material', 'materialTemplate'],
 
+    // TODO
     changeImpact: (draftState, change) => {
         throw new Error('Not implemented yet');
     },

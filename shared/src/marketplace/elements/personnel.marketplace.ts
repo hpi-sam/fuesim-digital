@@ -9,6 +9,7 @@ export const marketplacePersonnel = defineMarketplaceElement({
     templateSchema: personnelTemplateSchema,
     types: ['personnel', 'personnelTemplate'],
 
+    // TODO
     changeImpact: (draftState, change) => {
         throw new Error('Not implemented yet');
     },

@@ -9,7 +9,7 @@ export const marketplaceMapImage = defineMarketplaceElement({
     templateSchema: mapImageTemplateSchema,
     types: ['mapImage', 'mapImageTemplate'],
 
-    // TODO:
+    // TODO
     changeApply: (draftState, change) => {
         throw new Error('Not implemented yet');
     },

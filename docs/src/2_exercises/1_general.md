@@ -109,15 +109,13 @@ Auf der Startseite gibt es (neben dem Button zum [Anlegen einer neuen Übung](#�
 
 ### Vorlagen importieren
 
-Um bereits erstellte Patienten, Fahrzeuge und Bilder (siehe [Übungselemente](3_exercise_elements.md)) wiederzuverwenden, gibt es am oberen Rand des [Editors](2_user_interfaces.md#editor-nur-in-übungsleitenden-ansicht)) den Button <kbd>Vorlagen importieren</kbd>.
+Um bereits erstellte Patienten, Fahrzeuge und Bilder (siehe [Übungselemente](3_exercise_elements.md)) wiederzuverwenden, können diese global in Sammlungen erstellt und gespeichert werden und von dort in Übungen verwendet werden.
+Bei der Erstellung einer Übungsvorlage oder einer Übung wird entweder automatisch die Standardsammlung, welche bereits von den Entwicklern vorgefertigte Elemente enthält, hinzugefügt, oder ein Popup angezeigt, um eine Sammlung hinzuzufügen (wo auch unter anderem die Standardsammlung ausgewählt werden kann).
+Die Elemente der ausgewählten Sammlung können daraufhin in der Übungs verwendet werden.
 
-Nach Klick auf diesen Button muss eine Vorlage `.json`-Datei ausgewählt werden. Bevor der Import erfolgt, muss entschieden werden, ob die bestehenden Patienten-, Fahrzeug- und Bildvorlagen ergänzt oder ob sie gelöscht und vollständig durch die neuen überschrieben werden sollen.
+Um weitere Sammlungen zur Übung hinzuzufügen, kann der Knopf <kbd>Übungselemente verwalten</kbd> am oberen Rand des [Editors](2_user_interfaces.md#editor-nur-in-übungsleitenden-ansicht)) verwendet werden.
 
-> [!WARNING]
-> Wenn die Option <kbd>Ergänzen</kbd> zum Vorlagen-Import ausgewählt wird, werden Patienten-, Fahrzeug- und Bildvorlagen, die in der derzeitigen Übung _und_ in der `.json`-Datei existieren, möglicherweise doppelt angezeigt, auch wenn die Objekte identisch sind. Dadurch kann der Editor unübersichtlich werden.
-
-> [!IMPORTANT]
-> Das Überschreiben von Vorlagen ändert nicht die bereits in einer Übung platzierten Inhalte.
+![Collection hinzufügen Workflow](./collection_import_workflow.png)
 
 ## Übungseinstellungen
 

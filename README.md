@@ -170,11 +170,11 @@ In addition, you can make use of the following browser extensions:
 
 ### Migration tests
 
-Whenever adding a new action or new state altering ui components (things that a user can use to alter the state in new ways) one should add exports of exercises in which the new features where tested to the [Public test scenarios](https://github.com/hpi-sam/fuesim-digital-public-test-scenarios)
+Whenever adding a new action or new state altering UI components (things that a user can use to alter the state in new ways) one should add exports of exercises in which the new features where tested to the [Public test scenarios](https://github.com/hpi-sam/fuesim-digital-public-test-scenarios)
 
 The test scenarios are stored in a submodule. Use `--recurse-submodules` when cloning the repo or run `git submodule update --init --recursive` if you have cloned the repo already.
 
-If you wish to run the migration tests use `npm run test:migration`
+If you wish to run the migration tests, you can run the regular test suite for `shared` (see next section).
 
 ### Unit tests
 
@@ -185,7 +185,7 @@ You can run it during the development
 - from the terminal via `npm run test:watch` in the root, `/shared`, `/backend` or `/frontend` folder
 - or via the [recommended vscode extension](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest). **(Note: this option is currently broken)**
 
-### End to end tests
+### End-to-end tests
 
 We are using [cypress](https://www.npmjs.com/package/cypress) to run the end-to-end tests. You can find the code under `/frontend/cypress` in the repository.
 

@@ -172,66 +172,6 @@ jobs:
 
         steps:
             - uses: actions/checkout@v6
-            - uses: ./.github/actions/setup-install
-            - name: Start Authelia
-              uses: ./.github/actions/start-authelia
-            - name: Create .env
-              run: >
-                  cat ./.env.example
-                  | sed -e "s/^DFM_DB_USER=.*$/DFM_DB_USER=${{ env.POSTGRES_USER }}/"
-                  | sed -e "s/^#DFM_DB_PASSWORD=.*$/DFM_DB_PASSWORD=${{ env.POSTGRES_PASSWORD }}/"
-                  | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"
-                  | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
-                  | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/"
-                  | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
-                  > ./.env
-            - name: Run migrations
-              run: cd backend && npm run migration:run
-            - name: Run Backend Tests
-              run: cd backend && npm run test:ci-no-migration
-              if: always()
-            - name: Run Frontend Tests
-              run: cd frontend && npm run test:ci
-              if: always()
-            - name: Run Shared Tests
-              run: cd shared && npm run test:ci
-              if: always()
-            - name: Merge coverage
-              run: npm run merge-coverage
-              if: always()
-            - name: Upload coverage
-              uses: actions/upload-artifact@v6
-              if: always()
-              with:
-                  name: coverage-output
-                  path: coverage
-
-    migration-test:
-        timeout-minutes: 4
-        runs-on: ubuntu-latest
-
-        needs: build-shared
-
-        services:
-            postgres:
-                image: postgres:18
-                env:
-                    POSTGRES_DB: ${{ env.POSTGRES_DB }}
-                    POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-                    POSTGRES_USER: ${{ env.POSTGRES_USER }}
-                ports:
-                    - 5432/tcp
-                # Set health checks to wait until postgres has started
-                # Mount tmpfs as data directory to speed up db operations, tests don't need persistence
-                options: >-
-                    --health-cmd pg_isready
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
-                    --tmpfs /var/lib/postgresql
-
-        steps:
-            - uses: actions/checkout@v6
               with:
                   submodules: true
             - uses: ./.github/actions/setup-install
@@ -249,8 +189,24 @@ jobs:
                   > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run
-            - name: Run Migration Tests
-              run: cd backend && npm run test:ci-migration
+            - name: Run Backend Tests
+              run: cd backend && npm run test:ci
+              if: always()
+            - name: Run Frontend Tests
+              run: cd frontend && npm run test:ci
+              if: always()
+            - name: Run Shared Tests
+              run: cd shared && npm run test:ci
+              if: always()
+            - name: Merge coverage
+              run: npm run merge-coverage
+              if: always()
+            - name: Upload coverage
+              uses: actions/upload-artifact@v6
+              if: always()
+              with:
+                  name: coverage-output
+                  path: coverage
 
     cypress:
         timeout-minutes: 20
@@ -328,7 +284,6 @@ jobs:
             - test
             - cypress
             - lint
-            - migration-test
         runs-on: ubuntu-latest
         steps:
             - uses: matrix-org/done-action@v3

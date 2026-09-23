@@ -7,8 +7,8 @@ import type { ChangeApply } from '../../marketplace/exercise-collection-upgrade/
 import { changeApplySchema } from '../../marketplace/exercise-collection-upgrade/exercise-collection-change-apply.js';
 import {
     hasEntityProperties,
-    marketplaceElementsDefinitions,
-} from '../../marketplace/elements/marketplace-elements.js';
+    marketplaceElements,
+} from '../../marketplace/marketplace-elements.js';
 import { versionedCollectionPartialSchema } from '../../marketplace/models/versioned-id-schema.js';
 import { templateSchema } from '../../models/template.js';
 import type { DefinitelyTemplateVersionContent } from '../../marketplace/models/versioned-element-content.js';
@@ -128,7 +128,7 @@ function applyAllChangeApplies(
     changeApplies: Immutable<ChangeApply[]>
 ) {
     for (const changeApply of changeApplies) {
-        for (const entry of Object.values(marketplaceElementsDefinitions)) {
+        for (const entry of marketplaceElements) {
             entry.changeApply(draftState, changeApply);
         }
     }

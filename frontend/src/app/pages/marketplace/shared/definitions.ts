@@ -62,3 +62,11 @@ export const marketplaceComponentDefinitions: {
         }),
     },
 };
+
+export function getMarketplaceComponentDefinition<
+    C extends MarketplaceElementContent,
+>(content: C): MarketplaceItemDefintition<C> {
+    return marketplaceComponentDefinitions[
+        content.type
+    ] as MarketplaceItemDefintition<C>;
+}

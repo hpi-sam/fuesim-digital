@@ -345,6 +345,46 @@ If you need to read from the state to change it, you should do this inside the a
 
 - Currently, every client maintains the whole state, and every action is sent to all clients. There is no way to only subscribe to a part of the state and only receive updates for that part.
 
+### Marketplace
+
+The FüSim Digital includes a marketplace system, from which elements can be imported into exercises via collections.
+
+Developers can either add new elements on the exercise-state-level, where they can only be created and managed for the current exercise and are only stored therein, or decide to add them into the marketplace, for them to be managed by the marketplace versioning and dependency system and be importable and reusable across exercises.
+
+#### Adding new elements to the marketplace
+
+Most elements exist both as an instance type (e.g. used on map) and as a template type (e.g. displayed in the editor.) Exceptions exist, for example alarm groups.
+
+Here is what to do, to add a new element `Foo` with it's template type `FooTemplate`:
+##### Shared
+
+1. Create the models with the types `'foo'` and `'fooTemplate'` (see [shared/README.md](./shared/README.md#adding-new-models)). Don't forget to include `...versionedElementModelSchema.shape` in the schemas for compatibility with the marketplace.
+
+2. Define the marketplace element in `shared/src/marketplace/elements/foo.marketplace.ts` by exporting the result of `defineMarketplaceElement()`.
+
+    2.a. reference the previously created template schema in the `templateSchema` field
+    2.b. the `types` attribute needs to be filled with the `type` literal of both the instance type (`'foo'`) AND the template type (`'fooTemplate'`.) This is later used to find the right registry entry for any object (instance or template) in the state.
+
+3. Register the new `.marketplace.ts` file in `shared/src/marketplace/elements/registry.ts` by adding an entry to `marketplaceElements`.
+
+4. Don't forget the frontend
+
+##### Frontend
+
+1. Create the form component `foo-template-form` in `frontend/src/app/pages/marketplace/shared/modals/editor-modals/element-forms/`
+
+2. Add a marketplace definition to `marketplaceComponentDefinitions` in `frontend/src/app/pages/marketplace/shared/definitions.ts`.
+
+    2.a. The `elementCard` attribute defines how the element will be displayed in the marketplace based on the given template content.
+
+3. Don't forget the shared
+
+##### Backend
+
+1. No changes needed :)
+2. don't forget shared
+3. don't forget frontend
+
 ## Licenses and Attributions
 
 FüSim Digital

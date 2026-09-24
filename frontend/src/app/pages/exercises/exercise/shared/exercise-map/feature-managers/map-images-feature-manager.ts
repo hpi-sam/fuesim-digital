@@ -9,7 +9,7 @@ import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-ma
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
 import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
-import type { PopupService } from '../utility/popup.service';
+import type { FeatureSelectionService } from '../utility/feature-selection.service';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
@@ -40,7 +40,7 @@ export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
         olMap: OlMap,
         exerciseService: ExerciseService,
         private readonly store: Store<AppState>,
-        private readonly popupService: PopupService
+        private readonly popupService: FeatureSelectionService
     ) {
         super(
             olMap,

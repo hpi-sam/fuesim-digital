@@ -4,7 +4,7 @@ import {
     inject,
     ChangeDetectionStrategy,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
     NgbModal,
     NgbDropdown,
@@ -32,7 +32,6 @@ import { MessageService } from '../../../../../core/messages/message.service';
 import type { AppState } from '../../../../../state/app.state';
 import { selectExerciseKey } from '../../../../../state/application/selectors/application.selectors';
 import { selectExerciseType } from '../../../../../state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { StartPauseButtonComponent } from '../../../../../shared/components/start-pause-button/start-pause-button.component';
 import { openMeasuresOverviewModal } from '../measures-overview/open-measures-overview-modal';
 
@@ -47,6 +46,7 @@ import { openMeasuresOverviewModal } from '../measures-overview/open-measures-ov
         NgbDropdownMenu,
         NgbDropdownButtonItem,
         NgbDropdownItem,
+        RouterLink,
         StartPauseButtonComponent,
     ],
 })
@@ -57,10 +57,13 @@ export class TrainerToolbarComponent {
     readonly applicationService = inject(ApplicationService);
     private readonly modalService = inject(NgbModal);
     private readonly router = inject(Router);
+    protected readonly route = inject(ActivatedRoute);
     private readonly confirmationModalService = inject(
         ConfirmationModalService
     );
     private readonly messageService = inject(MessageService);
+
+    public readonly exerciseKey = this.store.selectSignal(selectExerciseKey);
 
     public readonly isExerciseTemplate = computed<boolean>(
         () => this.store.selectSignal(selectExerciseType)() === 'template'
@@ -114,11 +117,10 @@ export class TrainerToolbarComponent {
     }
 
     public async deleteExercise() {
-        const exerciseKey = selectStateSnapshot(selectExerciseKey, this.store)!;
         const deletionConfirmed = await this.confirmationModalService.confirm({
             title: `${this.exerciseTypeName()} löschen`,
             description: `Möchten Sie die ${this.exerciseTypeName()} wirklich unwiederbringlich löschen?`,
-            confirmationString: exerciseKey,
+            confirmationString: this.exerciseKey(),
         });
         if (!deletionConfirmed) {
             return;
@@ -130,7 +132,9 @@ export class TrainerToolbarComponent {
         await (
             templateId
                 ? this.apiService.deleteExerciseTemplate(templateId)
-                : this.apiService.deleteExercise(exerciseKey as TrainerKey)
+                : this.apiService.deleteExercise(
+                      this.exerciseKey() as TrainerKey
+                  )
         )
             .then((response) => {
                 this.messageService.postMessage({

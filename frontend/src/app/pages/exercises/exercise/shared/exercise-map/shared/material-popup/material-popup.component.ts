@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import type { UUID, Material } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
-import { PopupService } from '../../utility/popup.service';
+import { FeatureSelectionService } from '../../utility/feature-selection.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectMaterial } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { MaterialDetailsComponent } from '../../../../../../../shared/components/material-details/material-details.component';
@@ -18,7 +18,7 @@ import { MaterialDetailsComponent } from '../../../../../../../shared/components
 })
 export class MaterialPopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
-    private readonly popupService = inject(PopupService);
+    private readonly popupService = inject(FeatureSelectionService);
 
     public materialId!: UUID;
 

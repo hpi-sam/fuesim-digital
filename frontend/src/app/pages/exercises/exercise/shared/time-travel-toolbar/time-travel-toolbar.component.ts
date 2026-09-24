@@ -5,7 +5,6 @@ import { Store } from '@ngrx/store';
 import { currentStateVersion, StateExport } from 'fuesim-digital-shared';
 import { throttle } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
-import { AsyncPipe } from '@angular/common';
 import type { LogEntry } from 'fuesim-digital-shared';
 import { openClientsModal } from '../clients-modal/open-clients-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
@@ -17,25 +16,18 @@ import type { AppState } from '../../../../../state/app.state';
 import { selectTimeConstraints } from '../../../../../state/application/selectors/application.selectors';
 import { selectExerciseState } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
-import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { FormatDurationPipe } from '../../../../../shared/pipes/format-duration.pipe';
 import { HelpButtonComponent } from '../../../../../help-button/help-button.component.js';
 import { ExerciseService } from '../../../../../core/exercise.service.js';
 
 @Component({
-    selector: 'app-time-travel',
-    templateUrl: './time-travel.component.html',
-    styleUrls: ['./time-travel.component.scss'],
+    selector: 'app-time-travel-toolbar',
+    templateUrl: './time-travel-toolbar.component.html',
+    styleUrls: ['./time-travel-toolbar.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [
-        ExerciseMapComponent,
-        FormsModule,
-        AsyncPipe,
-        FormatDurationPipe,
-        HelpButtonComponent,
-    ],
+    imports: [FormsModule, FormatDurationPipe, HelpButtonComponent],
 })
-export class TimeTravelComponent implements OnDestroy {
+export class TimeTravelToolbarComponent implements OnDestroy {
     private readonly modalService = inject(NgbModal);
     private readonly apiService = inject(ApiService);
     private readonly timeTravelService = inject(TimeTravelService);
@@ -43,7 +35,9 @@ export class TimeTravelComponent implements OnDestroy {
     private readonly messageService = inject(MessageService);
     private readonly exerciseService = inject(ExerciseService);
 
-    public timeConstraints$ = this.store.select(selectTimeConstraints);
+    protected readonly timeConstraints = this.store.selectSignal(
+        selectTimeConstraints
+    );
 
     public openClientsModal() {
         openClientsModal(this.modalService);

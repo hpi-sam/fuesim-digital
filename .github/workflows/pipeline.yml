@@ -38,7 +38,7 @@ jobs:
         timeout-minutes: 10
         runs-on: ubuntu-latest
 
-        if: startsWith(github.ref, 'refs/heads/release/') || startsWith(github.ref, 'refs/head/dev') || github.ref == 'refs/head/main'
+        if: startsWith(github.ref, 'refs/heads/release/') || startsWith(github.ref, 'refs/heads/dev') || github.ref == 'refs/heads/main'
 
         needs: cache-dependencies
 

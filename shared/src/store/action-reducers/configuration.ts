@@ -40,6 +40,15 @@ export type SetBluePatientsEnabledFlagAction = Immutable<
     z.infer<typeof setBluePatientsEnabledFlagActionSchema>
 >;
 
+export const setPatientProgressionPausedActionSchema = z.strictObject({
+    type: z.literal('[Configuration] Set patientProgressionPaused'),
+    patientProgressionPaused:
+        exerciseConfigurationSchema.shape.patientProgressionPaused,
+});
+export type SetPatientProgressionPausedAction = Immutable<
+    z.infer<typeof setPatientProgressionPausedActionSchema>
+>;
+
 export const setPatientIdentifierPrefixActionSchema = z.strictObject({
     type: z.literal('[Configuration] Set patientIdentifierPrefix'),
     patientIdentifierPrefix:
@@ -148,6 +157,18 @@ export namespace ConfigurationActionReducers {
             reducer: (draftState, { bluePatientsEnabled }) => {
                 draftState.configuration.bluePatientsEnabled =
                     bluePatientsEnabled;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setPatientProgressionPaused: ActionReducer<SetPatientProgressionPausedAction> =
+        {
+            type: setPatientProgressionPausedActionSchema.shape.type.value,
+            actionSchema: setPatientProgressionPausedActionSchema,
+            reducer: (draftState, { patientProgressionPaused }) => {
+                draftState.configuration.patientProgressionPaused =
+                    patientProgressionPaused;
                 return draftState;
             },
             rights: 'trainer',

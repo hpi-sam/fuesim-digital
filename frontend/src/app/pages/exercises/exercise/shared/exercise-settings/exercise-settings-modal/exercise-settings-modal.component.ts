@@ -81,6 +81,13 @@ export class ExerciseSettingsModalComponent {
         });
     }
 
+    public setPatientProgressionPaused(patientProgressionPaused: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set patientProgressionPaused',
+            patientProgressionPaused,
+        });
+    }
+
     public updatePatientIdentifierPrefix(patientIdentifierPrefix: string) {
         this.exerciseService.proposeAction({
             type: '[Configuration] Set patientIdentifierPrefix',

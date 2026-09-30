@@ -62,6 +62,7 @@ import { updateTechnicalChallenges61 } from './61-generalize-update-technical-ch
 import { importTechnicalChallenges62 } from './62-import-technical-challenges.js';
 import { fixValidation63 } from './63-fix-validation.js';
 import { patientsPzc64 } from './64-patients-pzc.js';
+import { addPatientProgressionPaused65 } from './65-add-patient-progression-paused.js';
 
 /**
  * Migrate a single action
@@ -153,4 +154,5 @@ export const migrations: {
     62: importTechnicalChallenges62,
     63: fixValidation63,
     64: patientsPzc64,
+    65: addPatientProgressionPaused65,
 };

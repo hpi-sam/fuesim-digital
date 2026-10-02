@@ -169,7 +169,7 @@ Mit der Einstellung <kbd>**Mit Vorsichtung üben?**</kbd> wird das Vorsichten vo
 
 Die Einstellung <kbd>**Mit SK IV Patienten üben?**</kbd> regelt, ob die SK IV (blau) verfügbar ist. Wenn sie deaktiviert ist, wird die Sichtungskategorie SK IV (blau) dort, wo sie gesetzt ist, durch SK I (rot) ersetzt.
 
-Mit <kbd>**Patientendynamik pausieren?**</kbd> werden automatische Verbesserungen und Verschlechterungen des Gesundheitszustands sowie medizinische Zustandswechsel für alle Patienten angehalten. Die Einstellung gilt auch für neu hinzugefügte Patienten. Vorsichtung, Ressourcenzuweisung, Transporte und die übrige Übung laufen weiter. Beim Aufheben der Pause setzt die Patientenentwicklung am eingefrorenen Stand fort; die pausierte Zeit wird nicht nachgeholt. Standardmäßig ist die Dynamik *nicht* pausiert.
+Mit <kbd>**Patientendynamik pausieren?**</kbd> werden automatische Verbesserungen und Verschlechterungen des Gesundheitszustands sowie medizinische Zustandswechsel für alle Patienten angehalten. Die Einstellung gilt auch für neu hinzugefügte Patienten. Vorsichtung, Ressourcenzuweisung, Transporte und die übrige Übung laufen weiter. Beim Aufheben der Pause setzt die Patientenentwicklung am eingefrorenen Stand fort; die pausierte Zeit wird nicht nachgeholt. Standardmäßig ist die Dynamik _nicht_ pausiert.
 
 Die <kbd>**Art genutzter Tickets**</kbd> konfiguriert, welche Arten von [Tickets](3_exercise_elements.html#nutzung-in-übungen-4) Patienten zugewiesen werden können. Dabei gibt es folgende Möglichkeiten:
 

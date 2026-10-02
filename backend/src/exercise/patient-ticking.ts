@@ -55,7 +55,7 @@ export function patientTick(
             const nextStateTime =
                 nextStateId === patient.currentHealthStateId
                     ? patient.stateTime +
-                    patientTickInterval * patient.timeSpeed
+                      patientTickInterval * patient.timeSpeed
                     : 0;
             return {
                 id: patient.id,

@@ -10,6 +10,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Added
 
 - Documentation on simulated regions and their behaviors is now available.
+- Trainers can pause progression for all patient in an exercise. Pretriage is not affected.
 
 ### Changed
 

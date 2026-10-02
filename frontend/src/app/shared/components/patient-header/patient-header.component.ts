@@ -8,7 +8,10 @@ import {
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import type { AppState } from '../../../state/app.state';
-import { createSelectPatient } from '../../../state/application/selectors/exercise.selectors';
+import {
+    createSelectPatient,
+    selectConfiguration,
+} from '../../../state/application/selectors/exercise.selectors';
 import { PatientIdentifierComponent } from '../patient-identifier/patient-identifier.component';
 import { PatientHealthPointDisplayComponent } from '../patient-health-point-display/patient-health-point-display.component';
 
@@ -27,4 +30,9 @@ export class PatientHeaderComponent {
     readonly patient = computed(() =>
         this.store.selectSignal(createSelectPatient(this.patientId()))()
     );
+
+    readonly progressionPaused = computed(() =>
+        this.store.selectSignal(selectConfiguration)().patientProgressionPaused
+    );
+
 }

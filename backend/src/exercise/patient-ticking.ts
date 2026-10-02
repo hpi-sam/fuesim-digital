@@ -33,6 +33,19 @@ export function patientTick(
             const treatmentTime = isTreatedByPersonnel(patient)
                 ? patient.treatmentTime + patientTickInterval
                 : patient.treatmentTime;
+
+            if (state.configuration.patientProgressionPaused) {
+                // if progression is NOT paused, return previous health values
+                return {
+                    id: patient.id,
+                    nextHealthPoints: patient.health,
+                    nextStateId: patient.currentHealthStateId,
+                    nextStateTime: patient.stateTime,
+                    treatmentTime,
+                };
+            }
+
+            // if progression is NOT paused, compute and return new health values
             const nextHealthPoints = getNextPatientHealthPoints(
                 patient,
                 getDedicatedResources(state, patient),
@@ -42,7 +55,7 @@ export function patientTick(
             const nextStateTime =
                 nextStateId === patient.currentHealthStateId
                     ? patient.stateTime +
-                      patientTickInterval * patient.timeSpeed
+                    patientTickInterval * patient.timeSpeed
                     : 0;
             return {
                 id: patient.id,

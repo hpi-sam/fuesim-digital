@@ -31,8 +31,9 @@ export class PatientHeaderComponent {
         this.store.selectSignal(createSelectPatient(this.patientId()))()
     );
 
-    readonly progressionPaused = computed(() =>
-        this.store.selectSignal(selectConfiguration)().patientProgressionPaused
+    readonly progressionPaused = computed(
+        () =>
+            this.store.selectSignal(selectConfiguration)()
+                .patientProgressionPaused
     );
-
 }

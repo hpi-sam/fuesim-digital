@@ -35,7 +35,7 @@ export function patientTick(
                 : patient.treatmentTime;
 
             if (state.configuration.patientProgressionPaused) {
-                // if progression is NOT paused, return previous health values
+                // if progression IS paused, return previous health values
                 return {
                     id: patient.id,
                     nextHealthPoints: patient.health,
@@ -45,7 +45,7 @@ export function patientTick(
                 };
             }
 
-            // if progression is NOT paused, compute and return new health values
+            // if progression IS NOT paused, compute and return new health values
             const nextHealthPoints = getNextPatientHealthPoints(
                 patient,
                 getDedicatedResources(state, patient),

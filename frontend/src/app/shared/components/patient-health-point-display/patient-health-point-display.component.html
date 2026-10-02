@@ -1,17 +1,17 @@
 @if (isBystander()) {
-    <span [ngStyle]="{ 'background-color': 'grey' }" class="badge rounded-pill">
-        Passant
-    </span>
+    <span class="badge rounded-pill text-bg-secondary"> Passant </span>
 } @else if (
     currentRole() === 'participant' ? status().visible : status().real;
     as displayedStatus
 ) {
     <span
-        [ngStyle]="{ 'background-color': displayedStatus }"
-        [class.text-dark]="
-            displayedStatus === 'yellow' || displayedStatus === 'white'
-        "
         class="badge rounded-pill font-monospace"
+        [class.text-bg-dark]="displayedStatus === 'black'"
+        [class.text-bg-primary]="displayedStatus === 'blue'"
+        [class.text-bg-success]="displayedStatus === 'green'"
+        [class.text-bg-danger]="displayedStatus === 'red'"
+        [class.text-bg-light]="displayedStatus === 'white'"
+        [class.text-bg-warning]="displayedStatus === 'yellow'"
     >
         {{
             currentRole() !== 'participant'

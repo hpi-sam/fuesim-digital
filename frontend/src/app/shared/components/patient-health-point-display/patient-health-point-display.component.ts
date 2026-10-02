@@ -13,7 +13,7 @@ import {
     isPatientBystander,
     statusNames,
 } from 'fuesim-digital-shared';
-import { NgStyle, PercentPipe } from '@angular/common';
+import { PercentPipe } from '@angular/common';
 import type { AppState } from '../../../state/app.state';
 import {
     createSelectPatient,
@@ -26,7 +26,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     templateUrl: './patient-health-point-display.component.html',
     styleUrls: ['./patient-health-point-display.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [NgStyle, PercentPipe],
+    imports: [PercentPipe],
 })
 export class PatientHealthPointDisplayComponent {
     private readonly store = inject<Store<AppState>>(Store);

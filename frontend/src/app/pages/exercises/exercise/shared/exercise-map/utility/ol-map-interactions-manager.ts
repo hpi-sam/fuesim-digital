@@ -19,7 +19,7 @@ import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot'
 import type { FeatureManager } from './feature-manager';
 import type { PopupManager } from './popup-manager';
 import { TranslateInteraction } from './translate-interaction';
-import type { PopupService } from './popup.service';
+import type { FeatureSelectionService } from './feature-selection.service';
 
 export class OlMapInteractionsManager {
     private readonly featureLayers: VectorLayer[] = [];
@@ -38,7 +38,7 @@ export class OlMapInteractionsManager {
         private readonly mapInteractions: Collection<Interaction>,
         private readonly store: Store<AppState>,
         private readonly popupManager: PopupManager,
-        private readonly popupService: PopupService,
+        private readonly popupService: FeatureSelectionService,
         private readonly olMap: OlMap,
         private readonly layerFeatureManagerDictionary: Map<
             VectorLayer,
@@ -155,7 +155,6 @@ export class OlMapInteractionsManager {
         this.participantInteractions.forEach((interaction) => {
             interaction.setActive(areInteractionsActive);
         });
-        this.popupManager.setPopupsEnabled(!isPausedAndParticipant);
         this.getOlViewportElement().style.filter = isPausedAndParticipant
             ? 'brightness(50%)'
             : '';

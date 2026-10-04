@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import {
+    getMarketplaceElementByType,
     MarketplaceElementContent,
-    marketplaceElementsDefinitions,
 } from 'fuesim-digital-shared';
 
 @Component({
@@ -28,8 +28,7 @@ export class MarketplaceFormSubmitButtonBarComponent {
     public readonly discardChanges = output();
 
     public readonly submitButtonText = computed(() => {
-        const type =
-            marketplaceElementsDefinitions[this.type()].naming.singular;
+        const type = getMarketplaceElementByType(this.type()).naming.singular;
         return `${type} speichern`;
     });
 }

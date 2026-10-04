@@ -1,11 +1,15 @@
-import { type MarketplaceRegistryEntry } from './marketplace-elements.js';
+import { personnelTemplateSchema } from '../../models/personnel-template.js';
+import { defineMarketplaceElement } from '../marketplace-registry-element.js';
 
-export const marketplacePersonnel: MarketplaceRegistryEntry = {
+export const marketplacePersonnel = defineMarketplaceElement({
     naming: {
         singular: 'Personal',
         plural: 'Personal',
     },
+    templateSchema: personnelTemplateSchema,
+    types: ['personnel', 'personnelTemplate'],
 
+    // TODO
     changeImpact: (draftState, change) => {
         throw new Error('Not implemented yet');
     },
@@ -13,4 +17,4 @@ export const marketplacePersonnel: MarketplaceRegistryEntry = {
     changeApply: (draftState, change) => {
         throw new Error('Not implemented yet');
     },
-};
+});

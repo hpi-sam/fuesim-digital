@@ -6,8 +6,8 @@ import {
     output,
     ChangeDetectionStrategy,
 } from '@angular/core';
-import { marketplaceElementsDefinitions } from 'fuesim-digital-shared';
 import { NgComponentOutlet } from '@angular/common';
+import { getMarketplaceElementByType } from 'fuesim-digital-shared';
 import {
     FormOutputInjectionToken,
     VersionedElementModalData,
@@ -55,6 +55,6 @@ export class VersionedElementFormComponent {
 
     public generateButtonText() {
         const type = this.data().type;
-        return `${marketplaceElementsDefinitions[type].naming.singular} speichern`;
+        return `${getMarketplaceElementByType(type).naming.singular} speichern`;
     }
 }

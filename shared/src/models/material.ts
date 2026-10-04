@@ -14,9 +14,9 @@ export const materialSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('material'),
     templateId: uuidSchema,
-    typeName: z.string(),
+    typeName: z.string().trim().nonempty(),
     vehicleId: uuidSchema,
-    vehicleName: z.string(),
+    vehicleName: z.string().trim().nonempty(),
     assignedPatientIds: uuidSetSchema,
     canCaterFor: canCaterForSchema,
     /**

@@ -1,5 +1,10 @@
 @if (recurringActivities$ | async; as recurringActivities) {
-    <h5>Berichte</h5>
+    <h4>
+        Berichte
+        <app-help-button
+            url="3_simulation/2_behaviors.html#berichte-erstellen"
+        />
+    </h4>
 
     <div class="rounded-top" [class.bg-primary]="!createReportCollapsed">
         <button

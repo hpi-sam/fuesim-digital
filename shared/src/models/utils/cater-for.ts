@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
+import { validationMessages } from '../../validation-messages.js';
 
 export const logicalOperatorSchema = z.literal(['and', 'or']);
 export type LogicalOperator = Immutable<z.infer<typeof logicalOperatorSchema>>;
@@ -11,19 +12,19 @@ export const canCaterForSchema = z.strictObject({
      * also affects the number of possible {@link yellow} and {@link green} patients
      * that can be treated.
      */
-    red: z.int().min(0),
+    red: z.int().nonnegative(validationMessages.notNonNegative),
     /**
      * if {@link logicalOperator}  `=== 'and'` it is cumulative,
      * how many extra {@link yellow} and {@link green} patients can the catering treat
      * to the number already written in the {@link red} value
      */
-    yellow: z.int().min(0),
+    yellow: z.int().nonnegative(validationMessages.notNonNegative),
     /**
      * if {@link logicalOperator}  `=== 'and'` it is cumulative,
      * how many {@link green} patients can the catering treat
      * to the number already written in the {@link yellow} and {@link red} value
      */
-    green: z.int().min(0),
+    green: z.int().nonnegative(validationMessages.notNonNegative),
     logicalOperator: logicalOperatorSchema,
 });
 export type CanCaterFor = Immutable<z.infer<typeof canCaterForSchema>>;

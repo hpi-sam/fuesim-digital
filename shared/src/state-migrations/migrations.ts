@@ -26,12 +26,17 @@ import { migrations } from './migration-functions.js';
 import type { Migration } from './migration-functions.js';
 
 export function migrateStateExport(
-    stateExport: StateExport
+    stateExport: StateExport,
+    discardAllowed: boolean = true
 ): MigratedStateExport {
-    const { currentState, history } = applyMigrations(stateExport.dataVersion, {
-        currentState: stateExport.currentState,
-        history: stateExport.history,
-    });
+    const { currentState, history } = applyMigrations(
+        stateExport.dataVersion,
+        {
+            currentState: stateExport.currentState,
+            history: stateExport.history,
+        },
+        discardAllowed
+    );
 
     return {
         ...stateExport,
@@ -151,7 +156,8 @@ export function applyMigrations<H extends StateHistoryCompound | undefined>(
     propertiesToMigrate: {
         currentState: Immutable<object>;
         history: H;
-    }
+    },
+    discardAllowed: boolean = true
 ): {
     currentState: ExerciseState;
     history: H extends undefined
@@ -215,7 +221,10 @@ export function applyMigrations<H extends StateHistoryCompound | undefined>(
                 } as any,
             };
         } catch (e: unknown) {
-            if (e instanceof ReducerError) {
+            if (
+                e instanceof ReducerError &&
+                (discardAllowed || cannotMigrateHistory)
+            ) {
                 // Fall back to migrating currentState instead of recreating it from history
                 const exerciseId = (history.initialState as { id: UUID }).id;
                 console.warn(

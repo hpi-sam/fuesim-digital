@@ -12,6 +12,7 @@ import type { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../../../../state/app.state';
 import { createSelectPersonnel } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { HelpButtonComponent } from '../../../../../../../../../../help-button/help-button.component';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-assign-leader',
@@ -21,7 +22,7 @@ import { createSelectPersonnel } from '../../../../../../../../../../state/appli
         './simulated-region-overview-behavior-assign-leader.component.scss',
     ],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [AsyncPipe],
+    imports: [AsyncPipe, HelpButtonComponent],
 })
 export class SimulatedRegionOverviewBehaviorAssignLeaderComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

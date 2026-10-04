@@ -29,6 +29,7 @@ import { getImageAspectRatio } from '../../../../../../../shared/functions/get-i
 import { ImagePartialFormComponent } from '../image-partial-form/image-partial-form.component';
 import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar/submit-button-bar.component';
+import { validateImage } from '../../../../../../../shared/validation/custom-validators.js';
 
 @Component({
     selector: 'app-map-image-template-form',
@@ -69,6 +70,7 @@ export class MapImageTemplateFormComponent implements BaseVersionedElementSubmod
             schema,
             stripEntityFromElementSchema(mapImageTemplateSchema)
         );
+        validateImage(schema.image);
     });
 
     constructor() {
@@ -81,16 +83,17 @@ export class MapImageTemplateFormComponent implements BaseVersionedElementSubmod
     }
     public async submitData() {
         const valuesOnSubmit = cloneDeepMutable(this.mapImageForm().value());
-        const aspectRatio = await getImageAspectRatio(
-            this.values().image.url
-        ).catch((error) => {
+        let aspectRatio;
+        try {
+            aspectRatio = await getImageAspectRatio(this.values().image.url);
+        } catch (error) {
             this.messageService.postError({
                 title: 'Ungültige URL',
                 body: 'Bitte überprüfen Sie die Bildadresse.',
                 error,
             });
-            return valuesOnSubmit.image.aspectRatio;
-        });
+            return;
+        }
 
         this.formOutput.dataSubmit({
             ...valuesOnSubmit,

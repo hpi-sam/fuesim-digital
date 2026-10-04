@@ -29,6 +29,7 @@ import {
     createSelectBehaviorState,
     selectVehicleTemplates,
 } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { HelpButtonComponent } from '../../../../../../../../../../help-button/help-button.component';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-provide-personnel',
@@ -47,6 +48,7 @@ import {
         CdkDropList,
         CdkDrag,
         AsyncPipe,
+        HelpButtonComponent,
     ],
 })
 export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent

@@ -1,5 +1,6 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import type { UUID } from 'fuesim-digital-shared';
+import { HelpButtonComponent } from '../../../../../../../../../../help-button/help-button.component';
 import { ManagePatientTransportToHospitalStatusEditorComponent } from './shared/manage-patient-transport-to-hospital-status-editor/manage-patient-transport-to-hospital-status-editor.component';
 import { ManagePatientTransportToHospitalRequestTargetEditorComponent } from './shared/manage-patient-transport-to-hospital-request-target-editor/manage-patient-transport-to-hospital-request-target-editor.component';
 import { ManagePatientTransportToHospitalMaximumCategoryEditorComponent } from './shared/manage-patient-transport-to-hospital-maximum-category-editor/manage-patient-transport-to-hospital-maximum-category-editor.component';
@@ -23,6 +24,7 @@ import { ManagePatientTransportToHospitalSettingsEditorComponent } from './share
         ManagePatientTransportToHospitalManagedRegionsTableComponent,
         ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponent,
         ManagePatientTransportToHospitalSettingsEditorComponent,
+        HelpButtonComponent,
     ],
 })
 export class SimulatedRegionOverviewBehaviorManagePatientTransportToHospitalComponent {

@@ -227,7 +227,7 @@ describe('csv export', () => {
             const exportedPatient = patients[0]!;
             expect(exportedPatient.id).toBe(patient.identifier);
             expect(exportedPatient.age).toBe(patient.biometricInformation.age);
-            expect(exportedPatient.pzc).toBe('');
+            expect(exportedPatient.pzc).toBe(patient.pzc);
             expect(exportedPatient.ventilated).toBe('');
             expect(exportedPatient.doctorEscort).toBe('');
             expect(exportedPatient.patientTray).toBe('');

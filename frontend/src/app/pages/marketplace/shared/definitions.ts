@@ -1,9 +1,9 @@
 import type { MarketplaceElementContent } from 'fuesim-digital-shared';
-import { AlarmgroupFormComponent } from './modals/editor-modals/element-forms/alarmgroup-form/alarmgroup-form.component';
 import { MapImageTemplateFormComponent } from './modals/editor-modals/element-forms/map-image-template-form/map-image-template-form.component';
 import { MaterialTemplateFormComponent } from './modals/editor-modals/element-forms/material-template-form/material-template-form.component';
 import { PersonnelTemplateFormComponent } from './modals/editor-modals/element-forms/personnel-template-form/personnel-template-form.component';
 import { VehicleTemplateFormMarketplaceComponent } from './modals/editor-modals/element-forms/vehicle-template-form/vehicle-template-form.component';
+import { AlarmGroupFormComponent } from './modals/editor-modals/element-forms/alarm-group-form/alarm-group-form.component.js';
 
 interface MarketplaceItemDefintition<C extends MarketplaceElementContent> {
     elementFormComponent: any;
@@ -21,7 +21,7 @@ export const marketplaceComponentDefinitions: {
     >;
 } = {
     alarmGroup: {
-        elementFormComponent: AlarmgroupFormComponent,
+        elementFormComponent: AlarmGroupFormComponent,
         helpUrl: '2_exercises/3_exercise_elements.html#alarmgruppen',
         elementCard: (content) => ({
             title: content.name,

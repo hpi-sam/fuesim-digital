@@ -24,6 +24,7 @@ import {
     disabled,
     form,
     FormField,
+    min,
     validateStandardSchema,
 } from '@angular/forms/signals';
 import {
@@ -37,7 +38,7 @@ import { AlarmGroupVehicleItemComponent } from '../../../../../../exercises/exer
 import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar/submit-button-bar.component';
 
 @Component({
-    selector: 'app-alarmgroup-form',
+    selector: 'app-alarm-group-form',
     imports: [
         DisplayModelValidationComponent,
         FormsModule,
@@ -47,11 +48,11 @@ import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar
         AlarmGroupVehicleItemComponent,
         MarketplaceFormSubmitButtonBarComponent,
     ],
-    templateUrl: './alarmgroup-form.component.html',
+    templateUrl: './alarm-group-form.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrl: './alarmgroup-form.component.scss',
+    styleUrl: './alarm-group-form.component.scss',
 })
-export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<AlarmGroup> {
+export class AlarmGroupFormComponent implements BaseVersionedElementSubmodal<AlarmGroup> {
     public readonly data =
         input.required<VersionedElementModalData<AlarmGroup>>();
     public readonly btnText = input.required<string>();
@@ -71,6 +72,7 @@ export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<Ala
 
     public readonly agForm = form(this.values, (schema) => {
         disabled(schema, { when: () => this.disabled() });
+        min(schema.triggerLimit, 0);
         validateStandardSchema(
             schema,
             stripEntityFromElementSchema(alarmGroupSchema)

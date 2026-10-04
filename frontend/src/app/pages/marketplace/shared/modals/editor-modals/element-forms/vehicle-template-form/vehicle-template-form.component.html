@@ -38,7 +38,6 @@
     <input
         [formField]="vehicleForm.patientCapacity"
         step="1"
-        appIntegerValidator
         type="number"
         class="form-control"
         placeholder="1"
@@ -56,7 +55,7 @@
         placeholder="2"
     />
     <app-display-model-validation
-        [field]="vehicleForm.patientCapacity()"
+        [field]="vehicleForm.patientLoadMinutes()"
     ></app-display-model-validation>
 </div>
 <div class="form-group mb-3">

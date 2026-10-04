@@ -10,7 +10,7 @@ import {
     ChangeDetectionStrategy,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import { getBoundingBox } from 'fuesim-digital-shared';
 import { startingPosition } from '../../../starting-position';
 import { AppState } from '../../../../../../../state/app.state';
@@ -161,6 +161,9 @@ export class OperationsMapComponent implements OnDestroy {
         if (mapContainer === undefined) {
             throw new Error('Map container reference is undefined');
         }
+        maplibregl.setWorkerUrl(
+            new URL('maplibre-gl-worker.mjs', document.baseURI).href
+        );
         this.map = new maplibregl.Map({
             container: mapContainer,
             style: {

@@ -11,6 +11,7 @@ import { type UUID } from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getTemplates } from '../../models/template.js';
 
+/** @deprecated only here to keep existing actions working */
 export const addMapImageTemplateActionSchema = z.strictObject({
     type: z.literal('[MapImageTemplate] Add mapImageTemplate'),
     mapImageTemplate: mapImageTemplateSchema,
@@ -19,6 +20,7 @@ export type AddMapImageTemplateAction = Immutable<
     z.infer<typeof addMapImageTemplateActionSchema>
 >;
 
+/** @deprecated only here to keep existing actions working */
 export const editMapImageTemplateActionSchema = z.strictObject({
     type: z.literal('[MapImageTemplate] Edit mapImageTemplate'),
     id: mapImageTemplateSchema.shape.id,
@@ -29,6 +31,7 @@ export type EditMapImageTemplateAction = Immutable<
     z.infer<typeof editMapImageTemplateActionSchema>
 >;
 
+/** @deprecated only here to keep existing actions working */
 export const deleteMapImageTemplateActionSchema = z.strictObject({
     type: z.literal('[MapImageTemplate] Delete mapImageTemplate'),
     id: mapImageTemplateSchema.shape.id,

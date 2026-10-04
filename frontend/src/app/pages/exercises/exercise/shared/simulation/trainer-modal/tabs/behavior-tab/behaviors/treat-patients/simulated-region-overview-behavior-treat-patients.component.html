@@ -1,19 +1,25 @@
 <div class="container">
     @if (treatPatientsBehaviorState$ | async; as treatPatientsBehaviorState) {
+        <h4>
+            Patienten behandeln
+            <app-help-button
+                url="3_simulation/2_behaviors.html#patienten-behandeln"
+            />
+        </h4>
         <div
             class="row align-items-center m-3"
             (click)="informationCollapsed = !informationCollapsed"
             style="cursor: pointer"
         >
             <div class="col-sm">
-                <h4 class="ps-0 pe-0 text-nowrap">
+                <h5 class="ps-0 pe-0 text-nowrap">
                     @if (informationCollapsed) {
                         <i class="bi bi-caret-right-fill"></i>
                     } @else {
                         <i class="bi bi-caret-down-fill"></i>
                     }
                     Informationen
-                </h4>
+                </h5>
             </div>
             @if (informationCollapsed) {
                 <div class="col-sm justify-content-center">
@@ -30,7 +36,7 @@
             #collapse="ngbCollapse"
             [(ngbCollapse)]="informationCollapsed"
         >
-            <h5 class="mt-2">Allgemein</h5>
+            <h6 class="mt-2">Allgemein</h6>
         </div>
         <div
             class="row align-items-center m-3"
@@ -70,7 +76,7 @@
                 #collapse="ngbCollapse"
                 [(ngbCollapse)]="informationCollapsed"
             >
-                <h5 class="mt-2">Derzeitige Zuordnung</h5>
+                <h6 class="mt-2">Derzeitige Zuordnung</h6>
                 <p class="text-muted">
                     Klicken Sie auf einen Patienten, um die Details zu sehen.
                 </p>
@@ -84,13 +90,15 @@
                 [(ngbCollapse)]="informationCollapsed"
             >
                 <div class="col-sm justify-content-center">
-                    <h6 class="text-center">ID</h6>
+                    <span class="d-block text-center">ID</span>
                 </div>
                 <div class="col-sm justify-content-center">
-                    <h6 class="text-center">Sichtungs<wbr />kategorie</h6>
+                    <span class="d-block text-center"
+                        >Sichtungs<wbr />kategorie</span
+                    >
                 </div>
                 <div class="col-sm justify-content-center">
-                    <h6 class="text-center">Verlauf</h6>
+                    <span class="d-block text-center">Verlauf</span>
                 </div>
                 @if (
                     treatPatientsBehaviorState.treatmentProgress !==
@@ -98,7 +106,9 @@
                     treatPatientsBehaviorState.treatmentProgress !== 'unknown'
                 ) {
                     <div class="col-sm justify-content-center">
-                        <h6 class="text-center">Zugeteiltes Personal</h6>
+                        <span class="d-block text-center"
+                            >Zugeteiltes Personal</span
+                        >
                     </div>
                 }
             </div>
@@ -136,14 +146,14 @@
             style="cursor: pointer"
         >
             <div class="col-sm">
-                <h4 style="padding-left: 0; padding-right: 0">
+                <h5 style="padding-left: 0; padding-right: 0">
                     @if (settingsCollapsed) {
                         <i class="bi bi-caret-right-fill"></i>
                     } @else {
                         <i class="bi bi-caret-down-fill"></i>
                     }
                     Einstellungen
-                </h4>
+                </h5>
             </div>
         </div>
         <div
@@ -151,10 +161,10 @@
             #collapse="ngbCollapse"
             [(ngbCollapse)]="settingsCollapsed"
         >
-            <h5 class="mt-2">
+            <h6 class="mt-2">
                 Häufigkeit der Zuteilungs-Berechnung durch die Simulation in den
                 jeweiligen Zuständen
-            </h5>
+            </h6>
         </div>
         <div
             class="row align-items-center m-3"
@@ -309,13 +319,13 @@
             </div>
         </div>
         <div class="row m-3">
-            <h5
+            <h6
                 class="mt-2"
                 #collapse="ngbCollapse"
                 [(ngbCollapse)]="settingsCollapsed"
             >
                 Weiteres
-            </h5>
+            </h6>
         </div>
         <div
             class="row align-items-center m-3"

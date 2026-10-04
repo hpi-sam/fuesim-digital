@@ -4,7 +4,6 @@ import {
     inject,
     input,
     output,
-    resource,
     ChangeDetectionStrategy,
 } from '@angular/core';
 import {
@@ -41,28 +40,9 @@ export class CollectionMemberItemComponent {
     public readonly collection = input.required<CollectionVersion>();
     public readonly showRemoveButton = input<boolean>(false);
 
-    public organisationData = resource({
-        params: () => ({
-            memberId: this.member().id,
-        }),
-        loader: async ({ params: { memberId } }) =>
-            this.apiService.getOrganisation(memberId),
-    });
-
     public readonly ownUserId = computed(
         () => this.authService.authData().user?.id
     );
-
-    public readonly canLeaveCollection = computed(() => {
-        const orgData = this.organisationData;
-        if (!orgData.hasValue()) return false;
-
-        return (
-            (orgData.value().userRole === 'editor' ||
-                orgData.value().userRole === 'admin') &&
-            !this.member().owner
-        );
-    });
 
     public async removeCollectionMember(
         organisationId: OrganisationId,

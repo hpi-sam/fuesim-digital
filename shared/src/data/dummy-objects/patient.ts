@@ -26,6 +26,7 @@ export function generateDummyPatient(): Patient {
         'green',
         { [healthState.id]: healthState },
         healthState.id,
+        template.pzc,
         template.image,
         template.health,
         '',

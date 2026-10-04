@@ -26,6 +26,7 @@ import {
 import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
 import { DisplayValidationComponent } from '../../../../../../../../../../shared/validation/display-validation/display-validation.component';
 import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
+import { HelpButtonComponent } from '../../../../../../../../../../help-button/help-button.component';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-unload-arriving-vehicles',
@@ -41,6 +42,7 @@ import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/f
         DisplayValidationComponent,
         FormatDurationPipe,
         AsyncPipe,
+        HelpButtonComponent,
     ],
 })
 export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent implements OnInit {

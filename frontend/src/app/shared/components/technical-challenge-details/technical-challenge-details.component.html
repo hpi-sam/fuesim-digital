@@ -17,13 +17,14 @@
                     <app-state-machine-details [stateMachine]="stateMachine" />
                 </ng-template>
             } @else {
-                <ng-template ngbNavContent
-                    >F
+                <ng-template ngbNavContent>
                     @let userGeneratedContent =
                         currentStateOf(stateMachine).userGeneratedContent;
-                    <app-user-generated-content-editor
-                        [userGeneratedContent]="userGeneratedContent"
-                    />
+                    <div class="p-2">
+                        <app-user-generated-content-editor
+                            [userGeneratedContent]="userGeneratedContent"
+                        />
+                    </div>
                 </ng-template>
             }
         </ng-container>

@@ -1,6 +1,10 @@
 @if (simulatedRegion$ | async; as simulatedRegion) {
     <h5 class="popover-header">
         Simulierter Bereich {{ simulatedRegion.name }}
+        <app-help-button
+            url="3_simulation/1_general.html#aufbau-des-simulierte-bereich-fensters"
+            [trainerOnly]="true"
+        />
         <button
             (click)="closePopup()"
             type="button"

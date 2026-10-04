@@ -1,21 +1,25 @@
+<h4>
+    Fahrzeuge versenden
+    <app-help-button url="3_simulation/2_behaviors.html#fahrzeuge-versenden" />
+</h4>
 <div
     (click)="informationCollapsed = !informationCollapsed"
     style="cursor: pointer"
 >
     <div class="col-sm">
-        <h4 class="ps-0 pe-0 text-nowrap">
+        <h5 class="ps-0 pe-0 text-nowrap">
             @if (informationCollapsed) {
                 <i class="bi bi-caret-right-fill"> </i>
             } @else {
                 <i class="bi bi-caret-down-fill"> </i>
             }
             Informationen
-        </h4>
+        </h5>
     </div>
 </div>
 <div #collapse="ngbCollapse" [(ngbCollapse)]="informationCollapsed">
     @if (bufferedTransfers$ | async; as bufferedTransfers) {
-        <h5>Auf Transfer wartende Fahrzeuge</h5>
+        <h6>Auf Transfer wartende Fahrzeuge</h6>
 
         @if (bufferedTransfers.length > 0) {
             <span
@@ -59,7 +63,7 @@
     }
 
     @if (activeActivities$ | async; as activeActivities) {
-        <h5>Fahrzeuge, die gerade für den Transfer beladen werden</h5>
+        <h6>Fahrzeuge, die gerade für den Transfer beladen werden</h6>
 
         @if (activeActivities.length > 0) {
             <table class="table table-striped">
@@ -110,14 +114,14 @@
         style="cursor: pointer"
     >
         <div class="col-sm">
-            <h4 class="ps-0 pe-0 text-nowrap">
+            <h5 class="ps-0 pe-0 text-nowrap">
                 @if (settingsCollapsed) {
                     <i class="bi bi-caret-right-fill"></i>
                 } @else {
                     <i class="bi bi-caret-down-fill"></i>
                 }
                 Einstellungen
-            </h4>
+            </h5>
         </div>
     </div>
     <div #collapse="ngbCollapse" [(ngbCollapse)]="settingsCollapsed">
@@ -206,14 +210,14 @@
 }
 <div (click)="transferCollapsed = !transferCollapsed" style="cursor: pointer">
     <div class="col-sm">
-        <h4 class="ps-0 pe-0 text-nowrap">
+        <h5 class="ps-0 pe-0 text-nowrap">
             @if (transferCollapsed) {
                 <i class="bi bi-caret-right-fill"></i>
             } @else {
                 <i class="bi bi-caret-down-fill"></i>
             }
             Transfer initiieren
-        </h4>
+        </h5>
     </div>
 </div>
 

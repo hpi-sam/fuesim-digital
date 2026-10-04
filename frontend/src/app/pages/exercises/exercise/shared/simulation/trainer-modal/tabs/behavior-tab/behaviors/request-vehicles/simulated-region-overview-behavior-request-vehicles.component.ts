@@ -28,6 +28,7 @@ import {
 import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
 import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
 import { KeysPipe } from '../../../../../../../../../../shared/pipes/keys.pipe';
+import { HelpButtonComponent } from '../../../../../../../../../../help-button/help-button.component';
 
 type RequestTargetOption = UUID | 'trainees';
 
@@ -45,6 +46,7 @@ type RequestTargetOption = UUID | 'trainees';
         FormatDurationPipe,
         KeysPipe,
         AsyncPipe,
+        HelpButtonComponent,
     ],
 })
 export class RequestVehiclesComponent implements OnChanges {

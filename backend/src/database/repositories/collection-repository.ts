@@ -42,6 +42,7 @@ import {
     collectionOrganisationMappingTable,
     organisationTable,
     exerciseTable,
+    userTable,
 } from '../schema.js';
 import { defaultCollectionData } from '../default-data/collection-default-data.js';
 import { DAG } from '../../utils/dag.js';
@@ -330,9 +331,10 @@ export class CollectionRepository extends BaseRepository {
             .select({
                 id: organisationTable.id,
                 name: organisationTable.name,
-                owner: collectionOrganisationMappingTable.owner,
+                isOwner: collectionOrganisationMappingTable.owner,
                 personalOrganisationOf:
                     organisationTable.personalOrganisationOf,
+                personalOrganisationOfName: userTable.displayName,
             })
             .from(collectionOrganisationMappingTable)
             .innerJoin(
@@ -341,6 +343,10 @@ export class CollectionRepository extends BaseRepository {
                     collectionOrganisationMappingTable.organisationId,
                     organisationTable.id
                 )
+            )
+            .leftJoin(
+                userTable,
+                eq(organisationTable.personalOrganisationOf, userTable.id)
             )
             .where(
                 eq(

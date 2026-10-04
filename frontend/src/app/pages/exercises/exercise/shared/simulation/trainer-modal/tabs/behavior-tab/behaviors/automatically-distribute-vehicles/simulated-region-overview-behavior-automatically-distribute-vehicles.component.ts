@@ -36,6 +36,7 @@ import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/d
 import { TransferPointNameComponent } from '../../../../../../../../../../shared/components/transfer-point-name/transfer-point-name.component';
 import { ValuesPipe } from '../../../../../../../../../../shared/pipes/values.pipe';
 import { OrderByPipe } from '../../../../../../../../../../shared/pipes/order-by.pipe';
+import { HelpButtonComponent } from '../../../../../../../../../../help-button/help-button.component';
 
 @Component({
     selector:
@@ -58,6 +59,7 @@ import { OrderByPipe } from '../../../../../../../../../../shared/pipes/order-by
         ValuesPipe,
         OrderByPipe,
         AsyncPipe,
+        HelpButtonComponent,
     ],
 })
 export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent implements OnInit {

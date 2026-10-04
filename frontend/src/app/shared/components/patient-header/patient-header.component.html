@@ -1,5 +1,8 @@
 <app-patient-identifier [patientId]="patientId()" class="me-2" />
 <app-patient-health-point-display [patientId]="patientId()" />
 @if (patient().hasTransportPriority) {
-    <div class="badge" style="background-color: red">TP</div>
+    <div class="badge rounded-pill text-bg-danger ms-2">TP</div>
+}
+@if (progressionPaused()) {
+    <div class="badge rounded-pill text-bg-secondary ms-2">Pausiert</div>
 }

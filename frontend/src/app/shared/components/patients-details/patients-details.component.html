@@ -231,6 +231,24 @@
                                 </td>
                             </tr>
                         }
+                        @if (
+                            currentRole() !== 'participant' && !isBystander()
+                        ) {
+                            <tr>
+                                <th scope="col">
+                                    PZC
+                                    <span
+                                        class="text-info ms-2"
+                                        ngbTooltip="Patientenzuweisungscode"
+                                    >
+                                        <i class="bi bi-lightbulb"></i>
+                                    </span>
+                                </th>
+                                <td class="font-monospace">
+                                    {{ patient().pzc }}
+                                </td>
+                            </tr>
+                        }
                         <tr>
                             <th scope="col">Verletzungen</th>
                             <td class="font-monospace">

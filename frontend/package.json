@@ -44,7 +44,7 @@
         "@angular/material": "^21.2.9",
         "@angular/platform-browser": "~22.1.6",
         "@angular/platform-browser-dynamic": "~22.1.6",
-        "@angular/router": "~22.1.6",
+        "@angular/router": "~22.2.0",
         "@ng-bootstrap/ng-bootstrap": "^21.0.0",
         "@ngneat/hotkeys": "^4.1.0",
         "@ngrx/store": "^21.1.1",

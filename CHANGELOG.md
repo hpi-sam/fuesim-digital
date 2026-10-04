@@ -7,6 +7,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [1.0.0-rc.3] - 2026-10-04
+
 ### Added
 
 - Documentation on simulated regions and their behaviors is now available.
@@ -555,7 +557,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v1.0.0-rc.2...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v1.0.0-rc.3...HEAD
+[1.0.0-rc.3]: https://github.com/hpi-sam/fuesim-digital/compare/v1.0.0-rc.2...v1.0.0-rc.3
 [1.0.0-rc.2]: https://github.com/hpi-sam/fuesim-digital/compare/v1.0.0-rc.1...v1.0.0-rc.2
 [1.0.0-rc.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.17.1...v1.0.0-rc.1
 [0.17.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.17.0...v0.17.1

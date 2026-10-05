@@ -1,0 +1,16 @@
+$patient-status-colors:
+    ('black', #000000, #ffffff), ('blue', #0000ff, #ffffff),
+    ('green', #008000, #ffffff), ('red', #ff0000, #ffffff),
+    ('white', #ffffff, #000000), ('yellow', #ffff00, #000000),
+    ('grey', #adb5bd, #000000);
+
+@each $status, $background, $text in $patient-status-colors {
+    .patient-status-bg-#{$status} {
+        background-color: $background;
+        color: $text;
+    }
+
+    .patient-status-text-#{$status} {
+        color: $background;
+    }
+}

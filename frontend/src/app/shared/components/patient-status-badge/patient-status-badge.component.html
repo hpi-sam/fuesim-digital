@@ -1,11 +1,3 @@
-<span
-    class="badge rounded-pill"
-    [class.text-bg-dark]="status() === 'black'"
-    [class.text-bg-primary]="status() === 'blue'"
-    [class.text-bg-success]="status() === 'green'"
-    [class.text-bg-danger]="status() === 'red'"
-    [class.text-bg-light]="status() === 'white'"
-    [class.text-bg-warning]="status() === 'yellow'"
->
+<span class="badge rounded-pill" [class]="'patient-status-bg-' + status()">
     {{ statusNames[status()] }}
 </span>

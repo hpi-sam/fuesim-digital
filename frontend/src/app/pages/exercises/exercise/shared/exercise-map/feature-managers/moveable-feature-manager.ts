@@ -74,8 +74,9 @@ export abstract class MoveableFeatureManager<
     ) {
         if (!(await this.proposeMovementAction(newPosition, element)).success) {
             // Roll back movement if it wasn't successful
-            const oldPosition =
-                this.geometryHelper.getElementCoordinates(element);
+            const oldPosition = this.geometryHelper.getElementCoordinates(
+                this.getElementFromFeature(elementFeature)
+            );
             this.movementAnimator.animateFeatureMovement(
                 elementFeature,
                 oldPosition

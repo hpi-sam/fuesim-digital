@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Fixed
+
+- When a vehicle movement is blocked on the map, the vehicle now return to the correct location.
+
 ## [1.0.0-rc.3] - 2026-10-04
 
 ### Added

@@ -1,6 +1,8 @@
 @if (patient$ | async; as patient) {
     <div
-        [class.patient-popup-highlight-transportpriority]="patient.hasTransportPriority"
+        [class.patient-popup-highlight-transportpriority]="
+            patient.hasTransportPriority
+        "
     >
         <h5 class="popover-header d-flex align-items-center gap-1">
             <app-patient-header [patientId]="patientId" />

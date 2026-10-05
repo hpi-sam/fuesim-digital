@@ -7,7 +7,7 @@ import {
     ChangeDetectionStrategy,
 } from '@angular/core';
 import type { Patient, UUID } from 'fuesim-digital-shared';
-import { NgClass, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectPatient } from '../../../../../../../state/application/selectors/exercise.selectors';

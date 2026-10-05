@@ -1,7 +1,6 @@
 @if (patient$ | async; as patient) {
     <div
-        [ngClass]="{ 'border border-4 rounded': patient.hasTransportPriority }"
-        style="border-color: red !important"
+        [class.patient-popup-highlight-transportpriority]="patient.hasTransportPriority"
     >
         <h5 class="popover-header d-flex align-items-center gap-1">
             <app-patient-header [patientId]="patientId" />

@@ -21,7 +21,6 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
     styleUrls: ['./patient-popup.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
-        NgClass,
         PatientHeaderComponent,
         PatientsDetailsComponent,
         AsyncPipe,

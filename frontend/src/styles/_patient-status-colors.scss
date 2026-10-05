@@ -3,7 +3,7 @@ $patient-status-colors:
     ('green', #008000, #ffffff), ('red', #ff0000, #ffffff),
     ('white', #ffffff, #000000), ('yellow', #ffff00, #000000),
     ('grey', #adb5bd, #000000), ('transportpriority', #ff0000, #ffffff),
-    ('paused', #adb5bd, #000000);
+    ('paused', #6C757D, #ffffff);
 
 @each $status, $background, $text in $patient-status-colors {
     .patient-status-bg-#{$status} {

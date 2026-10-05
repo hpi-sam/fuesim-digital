@@ -1,15 +1,12 @@
 import type { CustomValidators } from './custom-validators';
-import type { ImageExistsValidatorError } from './image-exists-validator.directive';
 
 /**
  * A strongly typed version of the ValidationErrors interface.
  */
 export type CustomValidationErrors = Partial<
     UnionToIntersection<
-        | AngularValidationErrors
-        | Exclude<CustomValidationError, null>
+        AngularValidationErrors | Exclude<CustomValidationError, null>
         // These errors are not saved in CustomValidators
-        | ImageExistsValidatorError
     >
 >;
 

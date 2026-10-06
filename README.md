@@ -52,10 +52,9 @@ This project is currently developed as a [bachelor project](https://hpi.de/en/st
 4. Clone the repo by running `git clone https://github.com/hpi-sam/fuesim-digital`. To be able to run migration tests, you also have to clone the submodules: use `git clone --recurse-submodules https://github.com/hpi-sam/fuesim-digital` or run `git submodule update --init --recursive` if you have cloned the repo already.
 5. Run `npm run setup` from the root folder.
 6. Copy the [`.env.dev.example`](./.env.dev.example) file to `./.env`.
-7. Run the database migrations using `npm run migration:run` in the root folder.
-8. (Optional) We have a list of recommended [VS Code](https://code.visualstudio.com/) extensions. We strongly recommend you to use them if you are developing. You can see them via [the `@recommended` filter in the extensions panel](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
-9. (Optional) We have prepared default settings, tasks and debug configurations for VS Code. You can find them in `.vscode/*.example`. Crete a copy of those files removing the `.example` and adjust them to your needs. The files without `.example`-extensions are untracked so your adjustments won't be committed automatically.
-10. (Optional) If you want to edit the docs, setup `mdbook` by running `npm run docs:setup` in the project dir.
+7. (Optional) We have a list of recommended [VS Code](https://code.visualstudio.com/) extensions. We strongly recommend you to use them if you are developing. You can see them via [the `@recommended` filter in the extensions panel](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
+8. (Optional) We have prepared default settings, tasks and debug configurations for VS Code. You can find them in `.vscode/*.example`. Crete a copy of those files removing the `.example` and adjust them to your needs. The files without `.example`-extensions are untracked so your adjustments won't be committed automatically.
+9. (Optional) If you want to edit the docs, setup `mdbook` by running `npm run docs:setup` in the project dir.
 
 You can optionally choose not to use a database for development. Look at the [backend README](./backend/README.md#without-a-database) for further information.
 
@@ -67,12 +66,15 @@ If you are using [VS Code](https://code.visualstudio.com/), you can run the [tas
 Note that this _tries_ to start the database and the OIDC provider using `docker compose`. In case this fails please start the services in another way (see [those sections in the backend README](./backend/README.md#database)).
 If you're not using a database anyway or have the services already running in the background, you could use the task `Start all but services` instead.
 
+On the first start, the backend job won't start because the migrations haven't been executed yet. To run the database migrations, use `npm run migration:run` in the root folder.
+
 ### Option 2: Manually
 
 1. Start the OIDC provider and database in background by running `docker compose up -d` in the root directory
-2. Open a terminal in `/shared` and run `npm run watch`
-3. Open another terminal in `/frontend` and run `npm run start`
-4. Open another terminal in `/backend` and run `npm run start`
+2. On the first start, run the database migrations using `npm run migration:run` in the root folder.
+3. Open a terminal in `/shared` and run `npm run watch`
+4. Open another terminal in `/frontend` and run `npm run start`
+5. Open another terminal in `/backend` and run `npm run start`
 
 ### Using the FüSim Digital
 

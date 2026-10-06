@@ -3,7 +3,7 @@
     "version": "1.0.0-rc.3",
     "type": "module",
     "scripts": {
-        "start:once": "NODE_ENV=production node dist/src/index.js",
+        "start:production": "NODE_ENV=production node dist/src/index.js",
         "start": "NODE_ENV=development tsx watch src/index.ts 127.0.0.1",
         "build": "tsc --project ./tsconfig.build.json",
         "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,html}\"",

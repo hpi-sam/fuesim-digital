@@ -2,7 +2,7 @@
 
 This package contains utility functions, classes, types, etc. that are shared between the frontend and the backend.
 
-Keep in mind to add new exports to the `index.ts` file in the folde r.
+Keep in mind to add new exports to the `index.ts` file in the `src` folder.
 
 ## Architecture
 

@@ -40,73 +40,64 @@ This project is currently developed as a [bachelor project](https://hpi.de/en/st
     - For usage see the README.md in that repo
     - This repo is also a submodule of this repo. Use `--recurse-submodules` when cloning the repo or `run git submodule update --init --recursive` if you have cloned the repo already to get its contents.
 
-## Installation
+## Development usage
 
-1. Install [NodeJs](https://nodejs.org/)  
-   Please use the version specified at `devEngines.runtime.version` in `./package.json`. If you need different node versions on your machine we recommend [nvm](https://github.com/nvm-sh/nvm) or [nvm for windows](https://github.com/coreybutler/nvm-windows)
-2. [npm](https://www.npmjs.com/) should already come with NodeJs.  
-   The npm version specified by `devEngines.packageManager.version` matches the npm version that is bundled with the correct NodeJs version. Please do not update npm on your own.
-3. Clone the repo by running `git clone https://github.com/hpi-sam/fuesim-digital`. To be able to run migration tests, you also have to clone the submodules: use `git clone --recurse-submodules https://github.com/hpi-sam/fuesim-digital` or run `git submodule update --init --recursive` if you have cloned the repo already.
-4. Run `npm run setup` from the root folder
-5. Copy the [`.env.example`](./.env.example) file to `./.env` and adjust the settings as you need them. Note that some of the variables are explained under the next point.
-6. Choose whether you want to use a database:
-   You can (optionally) use a database for the persistence of exercise data. Look at the [relevant section](./backend/README.md#database) in the backend README for further information.
-   Note that to not use the database you have to edit an environment variable, see the [relevant section](./backend/README.md#without-a-database).
-7. Connect an OpenID-Connect provider for authentication in the `.env` file.
-8. (Optional) We have a list of recommended [vscode](https://code.visualstudio.com/) extensions. We strongly recommend you to use them if you are developing. You can see them via [the `@recommended` filter in the extensions panel](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
-9. (Optional) We have prepared default settings, tasks and debug configurations for VS Code. You can find them in `.vscode/*.example`. Crete a copy of those files removing the `.example` and adjust them to your needs. The files without `.example`-Extensions are untracked so your adjustments won't be committed automatically.
+### Installation
+
+1. If you use Windows, we recommend [installing the Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/install) and executing further commands within the WSL.
+2. Install [Node.js](https://nodejs.org/)  
+   Please use the version specified at `devEngines.runtime.version` in `./package.json`. If you need different node versions on your machine we recommend [nvm](https://github.com/nvm-sh/nvm).
+3. [npm](https://www.npmjs.com/) should already come with Node.js.  
+   The npm version specified by `devEngines.packageManager.version` matches the npm version that is bundled with the correct Node.js version. Please do not update npm on your own.
+4. Clone the repo by running `git clone https://github.com/hpi-sam/fuesim-digital`. To be able to run migration tests, you also have to clone the submodules: use `git clone --recurse-submodules https://github.com/hpi-sam/fuesim-digital` or run `git submodule update --init --recursive` if you have cloned the repo already.
+5. Run `npm run setup` from the root folder.
+6. Copy the [`.env.dev.example`](./.env.dev.example) file to `./.env`.
+7. Run the database migrations using `npm run migration:run` in the root folder.
+8. (Optional) We have a list of recommended [VS Code](https://code.visualstudio.com/) extensions. We strongly recommend you to use them if you are developing. You can see them via [the `@recommended` filter in the extensions panel](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
+9. (Optional) We have prepared default settings, tasks and debug configurations for VS Code. You can find them in `.vscode/*.example`. Crete a copy of those files removing the `.example` and adjust them to your needs. The files without `.example`-extensions are untracked so your adjustments won't be committed automatically.
 10. (Optional) If you want to edit the docs, setup `mdbook` by running `npm run docs:setup` in the project dir.
 
-## Starting for development
+You can optionally choose not to use a database for development. Look at the [backend README](./backend/README.md#without-a-database) for further information.
 
-### Option 1
+### Starting
 
-If you are using [vscode](https://code.visualstudio.com/), you can run the [task](https://code.visualstudio.com/docs/editor/tasks) `Start all` to start everything in one go.
-Note that this _tries_ to start the database using `docker compose`. In case this fails please start the database in another way (see [this section in the backend README](./backend/README.md#database)).
-If you're not using a database anyway, you could use the task `Start all but database` instead.
+### Option 1: VS Code
 
-### Option 2
+If you are using [VS Code](https://code.visualstudio.com/), you can run the [task](https://code.visualstudio.com/docs/editor/tasks) `Start all` to start everything in one go.
+Note that this _tries_ to start the database and the OIDC provider using `docker compose`. In case this fails please start the services in another way (see [those sections in the backend README](./backend/README.md#database)).
+If you're not using a database anyway or have the services already running in the background, you could use the task `Start all but services` instead.
 
-1. Open a terminal in `/shared` and run `npm run watch`
-2. Open another terminal in `/frontend` and run `npm run start`
-3. Open another terminal in `/backend` and run `npm run start`
-4. Consider the database and authentication -- see point 6+7 of the [installation](#installation).
+### Option 2: Manually
 
-## Starting for deployment (using docker)
+1. Start the OIDC provider and database in background by running `docker compose up -d` in the root directory
+2. Open a terminal in `/shared` and run `npm run watch`
+3. Open another terminal in `/frontend` and run `npm run start`
+4. Open another terminal in `/backend` and run `npm run start`
 
-You need to have [`docker`](https://www.docker.com/) installed.
+### Using the FüSim Digital
 
-### With docker compose (recommended)
+Now you can access the FüSim Digital at [http://localhost:4200](http://localhost:4200). For the development, there are two users `demo1` and `demo2` with the password `demo` that can be used for logging in.
 
-1. [`docker compose`](https://docs.docker.com/compose/) needs to be installed. Note that, depending on your setup, you may use `docker-compose` instead of `docker compose`. In this case, just replace the space in the commands with a dash (`-`). For more information, see the [relevant section of the documentation](https://docs.docker.com/compose/#compose-v2-and-the-new-docker-compose-command).
-2. Run `docker compose up -d` in the root directory. This also starts the database. If you don't want to start the database run `docker compose up -d app` instead.
+## Production deployment
 
-### Without docker compose
+For running in production, we recommend using [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/). Additionally, you need a properly configured
+OIDC authentication provider (e.g., [Keycloak](https://www.keycloak.org/)).
 
-1. Execute `docker run -p -d 80:80 digitalfuesimmanv/dfm`.
+1. Install [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/).
+2. Create a fresh directory for your configuration and copy the following files from the repository:
+    1. Copy the [`.env.example`](./.env.example) file to `.env` and adjust the settings as you need them. Especially generate safe secrets.
+    2. Copy the [`docker-compose.prod.yml`](./docker-compose.prod.yml) file to `docker-compose.yml`.
+3. Either configure and install an OIDC provider by adding it the `docker-compose.yml` file or use an existing OIDC provider. Set the configuration in the `.env` file.
+4. Set up a reverse proxy for proper TLS encryption (e.g., [Traefik](https://doc.traefik.io/traefik/)).
+5. Run `docker compose up -d` in this directory.
 
-The server will start listening using nginx on port `80` for all services (frontend, API, WebSockets).
-
-Note the database requirements depicted in [the installation section](#installation).
-
-### Building the container from scratch
-
-#### Option 1
-
-1. Uncomment the build section of [the docker compose file](./docker-compose.yml).
-2. Run `docker compose build`
-
-#### Option 2
-
-1. Run `docker build -f docker/Dockerfile -t fuesim-digital .`
-
-### Docker volumes / persistent data
+### Docker volumes/persistent data
 
 - All important volumes are listed in [the docker-compose file](./docker-compose.yml).
 
-### Docker ENVs
+### Environment variables/configuration
 
-- All available Docker ENVs are listed with their default values in [.env.example](./.env.example) file. Copy this file and name it `.env` (under Linux, this would be e.g. `cp .env.example .env`)
+- All available environment variables are listed with their default values in [.env.example](./.env.example) file.
 
 ## Administration
 

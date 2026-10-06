@@ -11,7 +11,7 @@
         "cy:run:chromium": "cypress run --browser chromium",
         "cy:update-snapshots": "cypress-image-diff -u",
         "ng": "ng",
-        "start": "ng serve --host 127.0.0.1",
+        "start": "ng serve --host localhost",
         "build": "ng build",
         "build:deployment": "ng build  --ts-config tsconfig.ci.json --configuration deployment",
         "watch": "ng build --watch --configuration development",

@@ -62,7 +62,7 @@ interface AlarmGroup {
     type: 'alarmGroup';
     name: string;
     triggerCount: number;
-    triggerLimit: number;
+    triggerLimit: number | null;
 }
 
 interface AlarmMeasurePropertyInstance {
@@ -195,7 +195,10 @@ function migrateAlarmGroup(alarmGroup: AlarmGroup) {
     if (!z.int().safeParse(alarmGroup.triggerCount).success) {
         alarmGroup.triggerCount = Math.floor(alarmGroup.triggerCount);
     }
-    if (!z.int().safeParse(alarmGroup.triggerLimit).success) {
+    if (
+        alarmGroup.triggerLimit !== null &&
+        !z.int().safeParse(alarmGroup.triggerLimit).success
+    ) {
         alarmGroup.triggerLimit = Math.floor(alarmGroup.triggerLimit);
     }
 }
@@ -221,7 +224,7 @@ type Action =
       }
     | {
           type: '[AlarmGroup] Limit AlarmGroup';
-          triggerLimit: number;
+          triggerLimit: number | null;
       }
     | {
           type: '[AlarmGroup] Rename AlarmGroup';
@@ -372,7 +375,10 @@ export const fixValidation63: Migration = {
                 migrateAlarmGroup(typedAction.alarmGroup);
                 break;
             case '[AlarmGroup] Limit AlarmGroup':
-                if (!z.int().safeParse(typedAction.triggerLimit).success) {
+                if (
+                    typedAction.triggerLimit !== null &&
+                    !z.int().safeParse(typedAction.triggerLimit).success
+                ) {
                     typedAction.triggerLimit = Math.floor(
                         typedAction.triggerLimit
                     );

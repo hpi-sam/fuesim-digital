@@ -9,7 +9,7 @@
         {
             "label": "Start all",
             "dependsOn": [
-                "Start database",
+                "Start services",
                 "Start frontend",
                 "Start backend",
                 "Watch shared"
@@ -18,7 +18,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Start all but database",
+            "label": "Start all but services",
             "dependsOn": ["Start frontend", "Start backend", "Watch shared"],
             "isBackground": true,
             "problemMatcher": []
@@ -35,9 +35,9 @@
             "problemMatcher": []
         },
         {
-            "label": "Start database",
+            "label": "Start services",
             "type": "shell",
-            "command": "docker compose up db || docker-compose up db"
+            "command": "docker compose up || docker-compose up"
         },
         {
             "label": "Start frontend",

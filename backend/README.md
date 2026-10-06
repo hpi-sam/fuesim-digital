@@ -1,17 +1,9 @@
 # Overview over the backend
 
-## Split in `src` and `test`
-
-The backend contains a `src` folder which is mainly intended for production code. It also contains unit test files.
-The `test` folder on the other hand contains integration/end-to-end tests for the backend.
-
-The rule of thumb for which test should go where is that if a test file tests the behavior of more than one source file, especially in case it tests the integration of those source files with each other or further parts of the backend, it should go in the `test` folder.
-All other test files, i.e. files that only test the isolated behavior of a single source file, should be named the same as the file they test with the suffix `.spec.ts` instead of `.ts`.
-
 ## Environment Variables
 
-A [`.env.example`](.env.example) file is provided, containing the default values for all environment variables (where such defaults exist).
-To use them, copy the file to a new file called `.env` in the same directory. You can adjust the variables there for your own needs. This file is excluded from git to not share any sensitive information one might store in environment variables.
+A [`.env.example`](../.env.example) file is provided, containing the default values for all environment variables (where such defaults exist).
+To use them, copy the file to a new file called `.env` in the same directory. You can adjust the variables there for your own needs. This file is excluded from Git to not share any sensitive information one might store in environment variables.
 To use other values during automated tests, you can append `_TESTING` to a variable, which will then be preferred over the non-`_TESTING` variable.
 For a more detailed view please look at the [`Config`](src/config.ts).
 
@@ -62,17 +54,12 @@ The credentials and other parameters of the database must match the [`.env` file
 
 #### Start the database
 
-There are two main ways to start the database.
+There are two main ways to start the database:
 
 ##### Option 1 using `docker compose` (recommended)
 
-(All `docker compose` commands have to be run in the project root directory, all `npm` scripts have to be run in the `backend/` folder.)
-
-1. Setup your environment file. If you don't have another service running on port 5432 you can use the default settings (otherwise just use another port as your `DFM_DB_PORT`), apart from the password where you should use a good one, and the host which should be changed from `db` to `localhost` in case you want to run the backend and the database on your host machine.
-2. Make sure to have `docker compose` installed, refer to [the relevant section of the root README for this](../README.md#starting-for-deployment-using-docker).
-3. If you want to start both the server and the database using `docker compose`, use `docker compose up -d`, in case you only want to start the database, use `docker compose up -d db`.
-   In the latter case you probably need the database exposed to your host machine. For this, uncomment the `ports` section of the [`docker-compose.yml`](../docker-compose.yml).
-4. Run all pending migrations, [see below](#npm-scripts).
+There are database configurations both for [development](./../docker-compose.yml) and [production](./../docker-compose.prod.yml) based on `docker compose`.
+For production, it is necessary to adjust the `.env` file and to generate safe secrets. How to run the database for development is described [here](./../README.md#development-usage).
 
 ##### Option 2 using PostgreSQL directly
 
@@ -80,9 +67,9 @@ You can also [install PostgreSQL 18 from the official page](https://www.postgres
 
 #### `npm` scripts
 
-Use the npm script `migration:run` to apply all pending migrations and `migration:generate -- --name <name>` to generate a new migration from the current changes between the models defined in code and present in the database.
+Use `npm run migration:run` to apply all pending migrations and `npm run migration:generate -- --name <name>` to generate a new migration from the current changes between the models defined in code and present in the database.
 
-You can use the npm script `db:purge` to remove all elements from the database (no need for `:windows` here).
+You can use `npm run db:purge` to remove all elements from the database.
 
 #### Without a database
 
@@ -90,11 +77,16 @@ If you want to, you can also disable the database.
 Set the environment variable `DFM_USE_DB` (in [`../.env`](../.env)) to `false` to achieve this.
 Note however that this results in a) all history being saved in memory instead of on disk, and b) once the backend exits, for whatever reason, all data is gone forever.
 
+### Authentication
+
+For authentication, the FüSim Digital uses [OpenID Connect (OIDC)](https://openid.net/developers/how-connect-works/). Therefore, a properly configured OIDC provider is needed. For development, an [Authelia](https://www.authelia.com/) can be started using `docker composes` as described [here](./../README.md#development-usage). For production, we recommend to set up a [Keycloak](https://www.keycloak.org/) instance or a similar Identity and Access Management (IAM) solution with OIDC support.
+The OIDC details then can be configured in the `.env` file.
+
 ### Note on long term storage
 
 An average exercise with four sections being actively played and about 45 minutes of exercise time seems to take up about 10 MB of storage in the database.
 This is not much in itself, but if many exercises of this size are run each day, it can scale quickly.
 Also, note that there can never be more than 10,000 exercises because then the id generator fails.
 
-Therefore, anonynmous, unused exercises automatically get deleted after a certain amount of time (per default 30 days, configurable via `DFM_AUTO_DELETE_DAYS`).
+Therefore, anonymous, unused exercises automatically get deleted after a certain amount of time (per default 30 days, configurable via `DFM_AUTO_DELETE_DAYS`).
 Exercises that are templates, part of a parallel exercise, or stored in a user account won't get deleted automatically.

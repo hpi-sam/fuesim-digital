@@ -11,9 +11,7 @@ services:
             dockerfile: docker/Dockerfile
         restart: unless-stopped
         ports:
-            - 8080:80
-        environment:
-            - NODE_ENV=development
+            - "8080:80"
         env_file: .env
     db:
         image: docker.io/postgres:18

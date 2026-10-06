@@ -5,7 +5,7 @@ services:
         image: ghcr.io/hpi-sam/fuesim-digital:latest
         restart: unless-stopped
         ports:
-            - 80:80
+            - '80:80'
         env_file: .env
         # volumes:
         # To overwrite the contents of the about pages, mount a directory into the container

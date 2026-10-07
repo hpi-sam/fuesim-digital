@@ -5,9 +5,7 @@
     "scripts": {
         "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,html}\"",
         "lint:fix": "eslint --fix \"./**/*.{ts,js,yml,html}\"",
-        "benchmark:linux-macos": "NODE_ENV=production tsx src/app.ts",
-        "benchmark:windows": "set NODE_ENV=production&& tsx src/app.ts",
-        "benchmark": "(pwd && npm run benchmark:linux-macos) || npm run benchmark:windows"
+        "benchmark": "NODE_ENV=production tsx src/app.ts"
     },
     "private": true,
     "devEngines": {

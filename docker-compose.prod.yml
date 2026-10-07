@@ -1,0 +1,26 @@
+services:
+    app:
+        depends_on:
+            - db
+        image: ghcr.io/hpi-sam/fuesim-digital:latest
+        restart: unless-stopped
+        ports:
+            - '80:80'
+        env_file: .env
+        # volumes:
+        # To overwrite the contents of the about pages, mount a directory into the container
+        # The directory can contain terms.html, license.html, privacy.html and imprint.html
+        # Example
+        # - ./about:/usr/local/app/frontend/assets/about
+    db:
+        image: docker.io/postgres:18
+        restart: unless-stopped
+        volumes:
+            - db:/var/lib/postgresql
+        environment:
+            - POSTGRES_USER=${DFM_DB_USER}
+            - POSTGRES_PASSWORD=${DFM_DB_PASSWORD}
+            - POSTGRES_DB=${DFM_DB_NAME}
+
+volumes:
+    db:

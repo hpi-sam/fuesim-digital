@@ -93,6 +93,12 @@ export class CollectionElementsListComponent {
                 this.createElementHelper('mapImageTemplate');
             },
         },
+        {
+            type: 'uploadedImage',
+            create: () => {
+                this.createElementHelper('uploadedImage');
+            },
+        },
     ];
 
     public getElementCardIndicatorForChangeType(

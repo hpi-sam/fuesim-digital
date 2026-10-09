@@ -1,40 +1,52 @@
+import crypto from 'node:crypto';
+import { promises as fs } from 'node:fs';
 import type {
-    CollectionVersion,
     CollectionElements,
     CollectionElementsSingle,
     CollectionEntityId,
+    CollectionMembershipRole,
+    CollectionOrganisationRelationshipType,
+    CollectionVersion,
     CollectionVersionId,
-    TemplateVersion,
+    CollectionVisibility,
     ElementEntityId,
     ElementVersionId,
     ExtendedCollectionVersion,
     Marketplace,
-    ParticipantKey,
-    TemplateVersionContent,
-    VersionedElementPartial,
     OrganisationId,
-    CollectionOrganisationRelationshipType,
-    CollectionMembershipRole,
-    CollectionVisibility,
+    ParticipantKey,
+    TemplateVersion,
+    TemplateVersionContent,
+    TypedTemplateVersion,
+    UploadedImage,
+    UploadedImageUpload,
+    VersionedElementPartial,
 } from 'fuesim-digital-shared';
 import {
     applyMigrations,
     checkCollectionOrganisationRole,
     cloneDeepMutable,
-    newExerciseState,
+    currentStateVersion,
+    extendedCollectionVersionReducer,
     gatherAllDirectCollectionElements,
     getCollectionElementDiff,
     getDependencyChecker,
     getElementDependencies,
+    getKeyForUploadedImage,
     isMarketplaceElementContent,
+    newExerciseState,
     replaceDependencies,
-    currentStateVersion,
-    extendedCollectionVersionReducer,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import { castDraft, type WritableDraft } from 'immer';
+import { NoSuchKey } from '@aws-sdk/client-s3';
+// eslint-disable-next-line import-x/no-named-as-default
+import sharp from 'sharp';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
+import { ImageValidationError, validateImage } from '../../utils/image.js';
+import type { S3Service } from '../../s3/s3-service.js';
+import { ApiError, PermissionDeniedError } from '../../utils/http.js';
 import type { ExerciseService } from './exercise-service.js';
 import type { OrganisationService } from './organisation-service.js';
 
@@ -49,6 +61,7 @@ export class CollectionService {
     ): Promise<T> {
         return this.collectionRepository.transaction(async (tx) => {
             const serviceCopy = new CollectionService(
+                this.s3Service,
                 this.exerciseService,
                 this.organisationService,
                 tx,
@@ -134,6 +147,7 @@ export class CollectionService {
     }
 
     public constructor(
+        private readonly s3Service: S3Service,
         private readonly exerciseService: ExerciseService,
         private readonly organisationService: OrganisationService,
         private readonly collectionRepository: CollectionRepository,
@@ -776,6 +790,59 @@ export class CollectionService {
         );
     }
 
+    public async createUploadedImage(
+        collectionEntityId: CollectionEntityId,
+        content: UploadedImageUpload
+    ) {
+        return this.reduce(
+            collectionEntityId,
+            async (tx, draftState, eventBuffer) => {
+                let metadata;
+                try {
+                    metadata = (await validateImage(content.file)).metadata;
+                } catch (e: unknown) {
+                    if (e instanceof ImageValidationError) {
+                        throw new ApiError(e.message);
+                    }
+                    throw e;
+                }
+                const actualContent = {
+                    id: content.id,
+                    type: 'uploadedImage',
+                    name: content.name,
+                    secret: crypto.randomBytes(32).toString('hex'),
+                    aspectRatio: metadata.width / metadata.height,
+                } satisfies UploadedImage;
+
+                const result = this.exists(
+                    await tx.collectionRepository.createElementVersion({
+                        version: 1,
+                        content: actualContent,
+                    })
+                );
+
+                const key = getKeyForUploadedImage(result.entityId);
+                await this.s3Service.uploadFile(key, content.file);
+
+                await tx.collectionRepository.attachElementToCollectionVersion(
+                    result.versionId,
+                    draftState.versionId
+                );
+
+                eventBuffer.next({
+                    event: 'element:create',
+                    data: result,
+                    collectionEntityId,
+                });
+
+                return {
+                    newSetVersionId: draftState.versionId,
+                    result,
+                };
+            }
+        );
+    }
+
     /**
      * This function is used for the integration of the marketplace into exercises,
      * where we need to resolve the structure of a collection
@@ -1170,6 +1237,32 @@ export class CollectionService {
         return [true, latestVersionOfContainingCollection];
     }
 
+    public async getUploadedImage(
+        elementVersionId: ElementVersionId,
+        secret: string
+    ) {
+        const elementVersion =
+            await this.collectionRepository.getElementVersionByVersionId(
+                elementVersionId
+            );
+        if (elementVersion?.content.type !== 'uploadedImage') {
+            throw new PermissionDeniedError();
+        }
+        if (elementVersion.content.secret !== secret) {
+            throw new PermissionDeniedError();
+        }
+        try {
+            return (await this.s3Service.getFile(
+                getKeyForUploadedImage(elementVersion.entityId)
+            ))!;
+        } catch (error: unknown) {
+            if (error instanceof NoSuchKey) {
+                throw new PermissionDeniedError();
+            }
+            throw error;
+        }
+    }
+
     public async updateElement(
         entityId: ElementEntityId,
         content: TemplateVersionContent,
@@ -1441,6 +1534,13 @@ export class CollectionService {
                     );
                 }
 
+                if (latestElementVersion.content.type === 'uploadedImage') {
+                    // For uploaded images, we want to replace the uploaded S3 file with a placeholder
+                    await this.handleDeletedUploadedImageElement(
+                        latestElementVersion as TypedTemplateVersion<UploadedImage>
+                    );
+                }
+
                 eventBuffer.next({
                     event: 'element:delete',
                     data: {
@@ -1457,6 +1557,31 @@ export class CollectionService {
                 };
             }
         );
+    }
+
+    public async handleDeletedUploadedImageElement(
+        uploadedImageVersion: TypedTemplateVersion<UploadedImage>
+    ) {
+        const key = getKeyForUploadedImage(uploadedImageVersion.entityId);
+        await this.s3Service.deleteFile(key);
+
+        // Get placeholder and scale it to same aspect ratio as the original image
+        const buffer = await fs.readFile(
+            '../frontend/src/assets/deleted-placeholder.svg'
+        );
+        const height = 500;
+        const width = Math.round(
+            height * uploadedImageVersion.content.aspectRatio
+        );
+        const newBuffer = await new sharp(buffer)
+            .resize({
+                fit: 'contain',
+                width,
+                height,
+            })
+            .toBuffer();
+
+        await this.s3Service.uploadFile(key, newBuffer);
     }
 
     public async restoreDeletedElementVersion(

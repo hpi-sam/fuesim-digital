@@ -22,7 +22,6 @@ import { z } from 'zod';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { NotFoundError, PermissionDeniedError } from '../utils/http.js';
 import type { CollectionService } from '../database/services/collection-service.js';
-
 export function createCollectionsRouter(collectionService: CollectionService) {
     const publicRouter = Router();
 
@@ -373,6 +372,42 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             );
         }
     );
+
+    /*
+     * Upload a new image as uploaded image in the collection
+     */
+    publicRouter.post(
+        '/:collectionEntityId/upload',
+        editorAccess,
+        async (req, res) => {
+            const collectionEntityId = getCollectionEntityId(req);
+
+            const parsedBody =
+                Marketplace.Element.UploadImage.requestSchema.parse(req.body);
+
+            const data = await collectionService.createUploadedImage(
+                collectionEntityId,
+                parsedBody.data
+            );
+
+            res.send(
+                Marketplace.Element.UploadImage.responseSchema.encode({
+                    newSetVersionId: data.newSetVersionId,
+                    result: cloneDeepMutable([data.result]),
+                })
+            );
+        }
+    );
+
+    publicRouter.get('/image/:elementVersionId', async (req, res) => {
+        const elementVersionId = getElementVersionId(req);
+        const file = await collectionService.getUploadedImage(
+            elementVersionId,
+            req.query['secret'] as string
+        );
+
+        res.send(await file.transformToByteArray());
+    });
 
     publicRouter.get(
         '/:collectionEntityId/invitecode',

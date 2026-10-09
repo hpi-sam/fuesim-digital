@@ -64,7 +64,7 @@ export class ElementCardComponent {
             this.element().content
         );
         return {
-            ...definition.elementCard(this.element().content),
+            ...definition.elementCard(this.element()),
             editable: this.mode() === 'edit',
             showIndicator: this.effectiveIndicator(),
             small: this.small(),

@@ -32,7 +32,12 @@
         [field]="vehicleForm.name()"
     ></app-display-model-validation>
 </div>
-<app-image-partial-form [imageForm]="vehicleForm.image" />
+
+<app-image-partial-form
+    [imageForm]="vehicleForm.image"
+    [availableCollectionElements]="this.data().availableCollectionElements"
+/>
+
 <div class="form-group mb-3">
     <label class="form-label">Patientenkapazität:</label>
     <input

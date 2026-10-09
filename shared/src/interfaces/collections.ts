@@ -22,6 +22,7 @@ import { templateVersionSchema } from '../marketplace/models/versioned-elements.
 import { templateVersionContentSchema } from '../marketplace/models/versioned-element-content.js';
 import { organisationIdSchema } from '../ids.js';
 import { collectionMembershipRole } from '../marketplace/models/collection-relationship.js';
+import { uploadedImageUploadSchema } from '../models/uploaded-image.js';
 import { Route, stringToDate } from './utils.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -31,6 +32,16 @@ export namespace Marketplace {
         export const Create = new Route({
             request: z.object({
                 data: z.array(templateVersionContentSchema),
+            }),
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema,
+                result: z.array(templateVersionSchema),
+            }),
+        });
+
+        export const UploadImage = new Route({
+            request: z.object({
+                data: uploadedImageUploadSchema,
             }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,

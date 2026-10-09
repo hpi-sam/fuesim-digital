@@ -25,7 +25,7 @@ import type { Immutable } from 'immer';
 import { TechnicalChallengePopupComponent } from '../shared/technical-challenge-popup/technical-challenge-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
-import type { PopupService } from '../utility/popup.service';
+import type { FeatureSelectionService } from '../utility/feature-selection.service';
 import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper';
 import type { FeatureManager } from '../utility/feature-manager';
 import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interaction';
@@ -84,7 +84,7 @@ export class TechnicalChallengeFeatureManager
         private readonly olMapManager: OlMapManager,
         private readonly exerciseService: ExerciseService,
         private readonly store: Store<AppState>,
-        private readonly popupService: PopupService
+        private readonly popupService: FeatureSelectionService
     ) {
         super(
             olMap,

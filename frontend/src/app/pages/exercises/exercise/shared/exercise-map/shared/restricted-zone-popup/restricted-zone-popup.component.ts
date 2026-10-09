@@ -25,7 +25,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, KeyValuePipe } from '@angular/common';
-import { PopupService } from '../../utility/popup.service';
+import { FeatureSelectionService } from '../../utility/feature-selection.service';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import {
@@ -66,7 +66,7 @@ let activeNavId: NavIds = 'settings';
 export class RestrictedZonePopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
-    private readonly popupService = inject(PopupService);
+    private readonly popupService = inject(FeatureSelectionService);
 
     // These properties are only set after OnInit
     public restrictedZoneId!: UUID;

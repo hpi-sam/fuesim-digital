@@ -6,6 +6,7 @@ import { personnelTemplateSchema } from './personnel-template.js';
 import { materialTemplateSchema } from './material-template.js';
 import { mapImageTemplateSchema } from './map-image-template.js';
 import { alarmGroupSchema } from './alarm-group.js';
+import { technicalChallengeTemplateSchema } from './technical-challenge/technical-challenge-template.js';
 
 export const templateSchema = z.union([
     vehicleTemplateSchema,
@@ -13,6 +14,7 @@ export const templateSchema = z.union([
     materialTemplateSchema,
     mapImageTemplateSchema,
     alarmGroupSchema,
+    technicalChallengeTemplateSchema,
 ]);
 
 export type Template = Immutable<z.infer<typeof templateSchema>>;

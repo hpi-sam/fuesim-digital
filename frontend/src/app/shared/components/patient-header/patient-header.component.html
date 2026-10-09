@@ -1,8 +1,10 @@
-<app-patient-identifier [patientId]="patientId()" class="me-2" />
-<app-patient-health-point-display [patientId]="patientId()" />
+<app-patient-identifier [patientId]="patientId()" />
+<app-patient-health-point-display [patientId]="patientId()" class="ms-2" />
 @if (patient().hasTransportPriority) {
-    <div class="badge rounded-pill text-bg-danger ms-2">TP</div>
+    <div class="badge rounded-pill patient-status-bg-transportpriority ms-2">
+        TP
+    </div>
 }
 @if (progressionPaused()) {
-    <div class="badge rounded-pill text-bg-secondary ms-2">Pausiert</div>
+    <div class="badge rounded-pill patient-status-bg-paused ms-2">Pausiert</div>
 }

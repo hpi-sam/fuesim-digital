@@ -8,6 +8,7 @@ import {
     collectionVersionIdSchema,
     defaultMapImagesTemplates,
     defaultMaterialTemplates,
+    defaultMeasureTemplates,
     defaultPersonnelTemplates,
     defaultVehicleTemplatesById,
     elementEntityIdSchema,
@@ -173,6 +174,17 @@ const fuesimDigitalFirefighting2026DefaultCollectionData: DefaultCollection = {
                 version: 1,
             })
         ),
+
+        ...Object.values(defaultMeasureTemplates).map((template) => ({
+            title: template.name,
+            description: '',
+            content: template,
+            entityId: newElementEntityId(template.id),
+            versionId: newElementVersionId(template.id),
+            createdAt: new Date(2026, 7, 31), // 31.07.2026
+            editedAt: new Date(2026, 7, 31), // 31.07.2026
+            version: 1,
+        })),
     ],
 };
 

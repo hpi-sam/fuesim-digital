@@ -10,17 +10,17 @@
                 role="group"
                 aria-label="Maßnahmenkategorien"
             >
-                @for (category of categories(); track category.name) {
+                @for (category of categories(); track category) {
                     <button
                         type="button"
                         class="map-toolbar-toggle btn btn-lg bg-body bg-opacity-75"
                         [class.active]="
                             isToolbarVisible() &&
-                            selectedCategoryName() === category.name
+                            selectedCategoryName() === category
                         "
-                        (click)="onCategoryClick(category.name)"
+                        (click)="onCategoryClick(category)"
                     >
-                        {{ category.name }}
+                        {{ category }}
                     </button>
                 }
             </div>

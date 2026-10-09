@@ -40,7 +40,6 @@ import {
     measureTemplateCategorySchema,
 } from './models/measure/measures.js';
 import { drawingSchema } from './models/drawing.js';
-import { defaultMeasureTemplateCategories } from './data/default-state/measure-templates.js';
 import { technicalChallengeSchema } from './models/technical-challenge/technical-challenge.js';
 import { taskTypeSchema } from './models/task-type.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
@@ -107,6 +106,7 @@ export const exerciseStateSchema = z.strictObject({
     hospitals: getIdMapSchema(hospitalSchema),
     hospitalPatients: z.record(uuidSchema, hospitalPatientSchema),
     alarmGroups: getIdMapSchema(alarmGroupSchema),
+    measureTemplates: z.record(z.string(), measureTemplateCategorySchema),
 
     clients: getIdMapSchema(clientSchema),
     /** All client names that are currently in the exercise or joined the exercise in the past */
@@ -117,7 +117,6 @@ export const exerciseStateSchema = z.strictObject({
     operationalSections: getIdMapSchema(operationalSectionSchema),
 
     patientCategories: z.array(patientCategorySchema),
-    measureTemplates: z.record(z.string(), measureTemplateCategorySchema),
 
     scoutables: getIdMapSchema(scoutableSchema),
 
@@ -172,12 +171,12 @@ export function newExerciseState(
         },
         hospitalPatients: {},
         alarmGroups: {},
+        measureTemplates: {},
         clients: {},
         collectedClientNames: [],
         radiograms: {},
         operationalSections: {},
         patientCategories: defaultPatientCategories,
-        measureTemplates: defaultMeasureTemplateCategories,
         technicalChallengeTemplates: defaultTechnicalChallengeTemplates,
         scoutables: {},
         templates: {},

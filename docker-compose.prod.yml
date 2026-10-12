@@ -11,7 +11,7 @@ services:
         # To overwrite the contents of the about pages, mount a directory into the container
         # The directory can contain terms.html, license.html, privacy.html and imprint.html
         # Example
-        # - ./about:/usr/local/app/frontend/assets/about
+        # - ./about:/usr/local/app/frontend/assets/about:ro
     db:
         image: docker.io/postgres:18
         restart: unless-stopped

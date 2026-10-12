@@ -79,12 +79,12 @@ Note however that this results in a) all history being saved in memory instead o
 
 ### Authentication
 
-For authentication, the FüSim Digital uses [OpenID Connect (OIDC)](https://openid.net/developers/how-connect-works/). Therefore, a properly configured OIDC provider is needed. For development, an [Authelia](https://www.authelia.com/) can be started using `docker composes` as described [here](./../README.md#development-usage). For production, we recommend to set up a [Keycloak](https://www.keycloak.org/) instance or a similar Identity and Access Management (IAM) solution with OIDC support.
-The OIDC details then can be configured in the `.env` file.
+For authentication, FüSim Digital uses [OpenID Connect (OIDC)](https://openid.net/developers/how-connect-works/). Therefore, a properly configured OIDC provider is needed. For development, [Authelia](https://www.authelia.com/) can be started using `docker compose` as described [here](./../README.md#development-usage). For production, we recommend to set up a [Keycloak](https://www.keycloak.org/) instance or a similar Identity and Access Management (IAM) solution with OIDC support.
+The OIDC details can then be configured in the `.env` file.
 
 ### Note on long term storage
 
-An average exercise with four sections being actively played and about 45 minutes of exercise time seems to take up about 10 MB of storage in the database.
+An average exercise with four clients being actively played and about 45 minutes of exercise time seems to take up about 10 MB of storage in the database.
 This is not much in itself, but if many exercises of this size are run each day, it can scale quickly.
 Also, note that there can never be more than 10,000 exercises because then the id generator fails.
 

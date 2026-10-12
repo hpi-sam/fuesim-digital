@@ -44,7 +44,7 @@ This project is currently developed as a [bachelor project](https://hpi.de/en/st
 
 ### Installation
 
-1. If you use Windows, we recommend [installing the Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/install) and executing further commands within the WSL.
+1. If you use Windows, we recommend [installing the Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/install) and executing further commands within the WSL. Without WSL, some of the following commands and scripts will not work.
 2. Install [Node.js](https://nodejs.org/)  
    Please use the version specified at `devEngines.runtime.version` in `./package.json`. If you need different node versions on your machine we recommend [nvm](https://github.com/nvm-sh/nvm).
 3. [npm](https://www.npmjs.com/) should already come with Node.js.  
@@ -64,7 +64,7 @@ You can optionally choose not to use a database for development. Look at the [ba
 
 If you are using [VS Code](https://code.visualstudio.com/), you can run the [task](https://code.visualstudio.com/docs/editor/tasks) `Start all` to start everything in one go.
 Note that this _tries_ to start the database and the OIDC provider using `docker compose`. In case this fails please start the services in another way (see [those sections in the backend README](./backend/README.md#database)).
-If you're not using a database anyway or have the services already running in the background, you could use the task `Start all but services` instead.
+If you're not using a database anyway or have the services already running in the background, you could use the task `Start application` instead.
 
 On the first start, the backend job won't start because the migrations haven't been executed yet. To run the database migrations, use `npm run migration:run` in the root folder.
 
@@ -78,7 +78,7 @@ On the first start, the backend job won't start because the migrations haven't b
 
 ### Using the FüSim Digital
 
-Now you can access the FüSim Digital at [http://localhost:4200](http://localhost:4200). For the development, there are two users `demo1` and `demo2` with the password `demo` that can be used for logging in.
+Now you can access the FüSim Digital at <http://localhost:4200>. For the development, there are two users `demo1` and `demo2` with the password `demo` that can be used for logging in.
 
 ## Production deployment
 

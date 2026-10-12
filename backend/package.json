@@ -4,7 +4,7 @@
     "type": "module",
     "scripts": {
         "start:production": "NODE_ENV=production node dist/src/index.js",
-        "start": "NODE_ENV=development tsx watch src/index.ts 127.0.0.1",
+        "start": "NODE_ENV=development tsx watch src/index.ts",
         "build": "tsc --project ./tsconfig.build.json",
         "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,html}\"",
         "lint:fix": "eslint --fix \"./**/*.{ts,js,yml,html}\"",

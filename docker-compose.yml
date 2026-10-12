@@ -1,43 +1,34 @@
+# Development Services
 services:
     app:
+        # don't start app container per default
+        profiles: [app]
         depends_on:
-            # - authelia # for development setup only
+            - authelia
             - db
-        image: ghcr.io/hpi-sam/fuesim-digital
-        # Use this to build the container for yourself:
-        #build:
-        #    context: .
-        #    dockerfile: docker/Dockerfile
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
         restart: unless-stopped
         ports:
-            - 80:80
-        # environment:
-        #     # Development only: run the backend in dev mode. Do NOT use in production.
-        #     - NODE_ENV=development
-        env_file:
-            - .env
-        # volumes:
-            # To overwrite the contents of the about pages, mount a directory into the container
-            # The directory can contain terms.html, license.html, privacy.html and imprint.html
-            # Example
-            # - ./about:/usr/local/app/frontend/assets/about
+            - "8080:80"
+        env_file: .env
     db:
         image: docker.io/postgres:18
+        restart: unless-stopped
         volumes:
             - db:/var/lib/postgresql
-        # Use this to expose the database to your host machine
-        #ports:
-        #    - 127.0.0.1:${DFM_DB_PORT}:5432
+        ports:
+            - "${DFM_DB_PORT}:5432"
         environment:
             - POSTGRES_USER=${DFM_DB_USER}
             - POSTGRES_PASSWORD=${DFM_DB_PASSWORD}
             - POSTGRES_DB=${DFM_DB_NAME}
-    # THIS IS ONLY FOR DEVELOPMENT - for production, please use a proper configured OIDC provider
     authelia:
         image: docker.io/authelia/authelia:4.39.16
         restart: unless-stopped
         ports:
-            - 127.0.0.1:9091:9091
+            - "9091:9091"
         networks:
             default:
                 aliases:
@@ -47,6 +38,5 @@ services:
             - authelia-secrets:/secrets
 
 volumes:
-    # database is in this volume
     db:
     authelia-secrets:

@@ -43,6 +43,7 @@ import {
     organisationTable,
     exerciseTable,
     userTable,
+    organisationMembershipTable,
 } from '../schema.js';
 import { defaultCollectionData } from '../default-data/collection-default-data.js';
 import { DAG } from '../../utils/dag.js';
@@ -1637,5 +1638,44 @@ export class CollectionRepository extends BaseRepository {
                 .returning();
             return result.length;
         });
+    }
+
+    public async getAllAccessableElementsOfTypeOfUser(
+        userId: string,
+        elementType: TemplateVersionContent['type']
+    ) {
+        // User -belongs to-> Organisation -has-> Collection -has-> Element (-has property-> type)
+        const elementsOfType = await this.databaseConnection
+            .select(getTableColumns(elementTable))
+            .from(organisationMembershipTable)
+            .leftJoin(
+                collectionOrganisationMappingTable,
+                eq(
+                    collectionOrganisationMappingTable.organisationId,
+                    organisationMembershipTable.organisationId
+                )
+            )
+            .leftJoin(
+                elementCollectionMappingTable,
+                eq(
+                    elementCollectionMappingTable.collectionEntityId,
+                    collectionOrganisationMappingTable.collection
+                )
+            )
+            .innerJoin(
+                elementTable,
+                eq(
+                    elementTable.versionId,
+                    elementCollectionMappingTable.elementVersionId
+                )
+            )
+            .where(
+                and(
+                    eq(organisationMembershipTable.userId, userId),
+                    sql`${elementTable.content}->>'type' = ${elementType}`
+                )
+            );
+
+        return elementsOfType;
     }
 }

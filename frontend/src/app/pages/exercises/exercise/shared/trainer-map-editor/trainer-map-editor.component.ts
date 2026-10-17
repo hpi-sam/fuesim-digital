@@ -41,8 +41,6 @@ import {
     TransferTemplate,
 } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
-import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
-import { openEditImageTemplateModal } from '../editor-panel/edit-image-template-modal/open-edit-image-template-modal';
 import { openPartialImportOverwriteModal } from '../partial-import/open-partial-import-overwrite-modal';
 import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
 import { restrictedZoneDragTemplates } from '../editor-panel/templates/restricted-zone';
@@ -218,14 +216,6 @@ export class TrainerMapEditorComponent implements OnInit {
     public readonly transferPointTemplate = {
         image: transferPointImage,
     };
-
-    public addImageTemplate() {
-        openCreateImageTemplateModal(this.ngbModalService);
-    }
-
-    public editMapImageTemplate(mapImageTemplateId: UUID) {
-        openEditImageTemplateModal(this.ngbModalService, mapImageTemplateId);
-    }
 
     public addTechnicalChallengeTemplate() {
         openUploadTechnicalChallengeModal(this.ngbModalService);

@@ -373,10 +373,4 @@ export class ApiService {
             this.httpClient.delete(`${httpOrigin}/api/organisations/${id}`)
         );
     }
-
-    public async downloadUserdataDump() {
-        return lastValueFrom(
-            this.httpClient.get(`${httpOrigin}/api/userdata/dump`)
-        );
-    }
 }

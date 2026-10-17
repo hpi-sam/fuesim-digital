@@ -7,7 +7,7 @@ import {
     getBoundingBox,
     coordinateStringToNumber,
 } from 'fuesim-digital-shared';
-import { Collection, View } from 'ol';
+import { Collection, Feature, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';
 import OlMap from 'ol/Map';
@@ -50,7 +50,8 @@ import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
 import { SatelliteLayerManager } from './satellite-layer-manager';
 import { DrawingInteractionHandler } from './drawing-interaction-handler';
-import type { PopupService } from './popup.service';
+import type { FeatureSelectionService } from './feature-selection.service';
+import { SidebarService } from './sidebar.service';
 
 export const olMapCoordinatesSchema = z.object({
     longitude: coordinateStringToNumber,
@@ -92,7 +93,8 @@ export class OlMapManager {
         private readonly openLayersContainer: HTMLDivElement,
         private readonly transferLinesService: TransferLinesService,
         private readonly popupManager: PopupManager,
-        private readonly popupService: PopupService,
+        private readonly popupService: FeatureSelectionService,
+        private readonly sidebarService: SidebarService,
         private readonly messageService: MessageService,
         private readonly drawingInteractionService: DrawingInteractionService
     ) {
@@ -148,12 +150,35 @@ export class OlMapManager {
 
         this.registerViewportRestriction();
 
-        popupManager.registerPopupTriggers(
-            this.olMap,
-            openLayersContainer,
-            this.layerFeatureManagerDictionary,
-            this.featureNameFeatureManagerDictionary
-        );
+        // TODO: Is this a good place for this? Maybe this should be an interaction instead?
+        // popupManager.registerPopupTriggers(
+        //     this.olMap,
+        //     openLayersContainer,
+        //     this.layerFeatureManagerDictionary,
+        //     this.featureNameFeatureManagerDictionary
+        // );
+        this.olMap.on('singleclick', (event) => {
+            const hasBeenHandled = this.olMap.forEachFeatureAtPixel(
+                event.pixel,
+                (feature, layer) => {
+                    // Skip layer when unset
+                    // OpenLayers type definitions are incorrect, layer may be `null`
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                    if (layer === null) {
+                        return false;
+                    }
+                    this.layerFeatureManagerDictionary
+                        .get(layer as VectorLayer)!
+                        .onFeatureClicked(event, feature as Feature);
+                    // we only want the top one -> a truthy return breaks this loop
+                    return true;
+                },
+                { hitTolerance: 10 }
+            );
+            if (!hasBeenHandled) {
+                this.popupService.dismissPopup();
+            }
+        });
 
         this.lockZoom$
             .pipe(takeUntil(this.destroy$))
@@ -344,7 +369,8 @@ export class OlMapManager {
             this.olMap,
             this.store,
             this.exerciseService,
-            this.popupService
+            this.popupService,
+            this.sidebarService
         );
         const personnelFeatureManager = new PersonnelFeatureManager(
             this.olMap,

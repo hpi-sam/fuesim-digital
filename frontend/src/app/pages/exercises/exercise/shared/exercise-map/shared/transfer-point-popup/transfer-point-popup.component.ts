@@ -18,7 +18,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
-import { PopupService } from '../../utility/popup.service';
+import { FeatureSelectionService } from '../../utility/feature-selection.service';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectTransferPoint } from '../../../../../../../state/application/selectors/exercise.selectors';
@@ -58,7 +58,7 @@ let activeNavId: NavIds = 'names';
 export class TransferPointPopupComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
-    private readonly popupService = inject(PopupService);
+    private readonly popupService = inject(FeatureSelectionService);
 
     // These properties are only set after OnInit
     public transferPointId!: UUID;

@@ -7,7 +7,7 @@ import type { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { openSimulationTrainerModal } from '../../../simulation/trainer-modal/open-simulation-trainer-modal';
 import { openPreviewModal } from '../../../simulation/trainer-modal/open-preview-modal';
-import { PopupService } from '../../utility/popup.service';
+import { FeatureSelectionService } from '../../utility/feature-selection.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectSimulatedRegion } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
@@ -29,7 +29,7 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
 export class SimulatedRegionPopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly modalService = inject(NgbModal);
-    private readonly popupService = inject(PopupService);
+    private readonly popupService = inject(FeatureSelectionService);
 
     // These properties are only set after OnInit
     public simulatedRegionId!: UUID;

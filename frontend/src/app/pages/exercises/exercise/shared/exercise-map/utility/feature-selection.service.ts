@@ -9,6 +9,8 @@ type PopupProposal =
       }
     | { action: 'dismiss' | 'submit'; options?: undefined };
 
+// TODO: Clear selection if participant && paused
+
 /**
  * Allows for opening and closing popups using {@link togglePopup},
  * {@link submitPopup} and {@link dismissPopup}.
@@ -18,7 +20,7 @@ type PopupProposal =
 @Injectable({
     providedIn: 'root',
 })
-export class PopupService {
+export class FeatureSelectionService {
     private readonly _nextProposal$ = new BehaviorSubject<PopupProposal>({
         action: 'dismiss',
     });

@@ -2,10 +2,11 @@ import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { measureSchema } from '../../models/measure/measures.js';
 import type { ActionReducer } from '../action-reducer.js';
+import { ReducerError } from '../reducer-error.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { DrawingActionReducers } from './drawing.js';
 import { EmergencyOperationCenterActionReducers } from './emergency-operation-center.js';
-import { getMeasureTemplate } from './utils/measures.js';
+import { findCategorizedMeasureTemplate } from './measure-template-categories.js';
 import { logMeasure } from './utils/log.js';
 
 export const addMeasureActionSchema = z.strictObject({
@@ -22,7 +23,15 @@ export namespace MeasureActionReducers {
         actionSchema: addMeasureActionSchema,
         reducer: (draftState, { measure }) => {
             let newDraftState = draftState;
-            const template = getMeasureTemplate(draftState, measure.templateId);
+            const template = findCategorizedMeasureTemplate(
+                draftState,
+                measure.templateId
+            );
+            if (!template) {
+                throw new ReducerError(
+                    `MeasureTemplate with id ${measure.templateId} does not exist`
+                );
+            }
             if (template.replacePrevious) {
                 const previousInstances = Object.values(newDraftState.measures)
                     .filter((m) => m.templateId === measure.templateId)

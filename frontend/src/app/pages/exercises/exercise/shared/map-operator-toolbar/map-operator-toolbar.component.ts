@@ -9,7 +9,7 @@ import {
 import { Store } from '@ngrx/store';
 import { MeasureTemplate } from 'fuesim-digital-shared';
 import type { AppState } from '../../../../../state/app.state';
-import { selectMeasureTemplateCategories } from '../../../../../state/application/selectors/exercise.selectors';
+import { selectCategorizedMeasureTemplates } from '../../../../../state/application/selectors/exercise.selectors';
 import { MeasureService } from '../../../../../core/measure.service';
 import { ScrollButtonsComponent } from '../../../../../shared/components/scroll-buttons/scroll-buttons.component';
 import { MeasureDetailsComponent } from '../exercise-map/shared/measure-details/measure-details.component';
@@ -26,11 +26,11 @@ export class MapOperatorToolbarComponent {
 
     public readonly measureService = inject(MeasureService);
 
-    private readonly categoriesMap = this.store.selectSignal(
-        selectMeasureTemplateCategories
+    private readonly categorizedMeasureTemplates = this.store.selectSignal(
+        selectCategorizedMeasureTemplates
     );
     public readonly categories = computed(() =>
-        Object.values(this.categoriesMap())
+        Object.keys(this.categorizedMeasureTemplates())
     );
 
     public readonly isToolbarVisible = signal(false);
@@ -42,8 +42,9 @@ export class MapOperatorToolbarComponent {
             if (name === null) {
                 return [];
             }
-            const category = this.categoriesMap()[name];
-            return category ? Object.values(category.templates) : [];
+            return Object.values(
+                this.categorizedMeasureTemplates()[name]?.templates ?? {}
+            );
         }
     );
 

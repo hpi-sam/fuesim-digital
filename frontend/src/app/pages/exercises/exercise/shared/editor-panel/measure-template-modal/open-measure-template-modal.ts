@@ -16,6 +16,7 @@ export function openCreateMeasureTemplateModal(
 
 export function openEditMeasureTemplateModal(
     ngbModalService: NgbModal,
+    categoryName: string,
     measureTemplateId: UUID
 ) {
     const modalRef = ngbModalService.open(MeasureTemplateModalComponent, {
@@ -23,5 +24,6 @@ export function openEditMeasureTemplateModal(
     });
     const componentInstance =
         modalRef.componentInstance as MeasureTemplateModalComponent;
+    componentInstance.categoryName = categoryName;
     componentInstance.measureTemplateId = measureTemplateId;
 }

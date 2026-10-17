@@ -6,6 +6,7 @@ import { personnelTemplateSchema } from './personnel-template.js';
 import { materialTemplateSchema } from './material-template.js';
 import { mapImageTemplateSchema } from './map-image-template.js';
 import { alarmGroupSchema } from './alarm-group.js';
+import { measureTemplateSchema } from './measure/measures.js';
 
 export const templateSchema = z.union([
     vehicleTemplateSchema,
@@ -13,6 +14,7 @@ export const templateSchema = z.union([
     materialTemplateSchema,
     mapImageTemplateSchema,
     alarmGroupSchema,
+    measureTemplateSchema,
 ]);
 
 export type Template = Immutable<z.infer<typeof templateSchema>>;
@@ -23,15 +25,23 @@ export const templateTypeSchema = z.union(
 
 export type TemplateType = z.infer<typeof templateTypeSchema>;
 
-export function getTemplates<T extends Template['type']>(
-    draftState: Pick<ExerciseState | WritableDraft<ExerciseState>, 'templates'>,
+export function getTemplates<
+    T extends Template['type'],
+    State extends Pick<
+        ExerciseState | WritableDraft<ExerciseState>,
+        'templates'
+    >,
+>(
+    draftState: State,
     templateType: T
 ): {
-    [key: string]: Extract<Template, { type: T }>;
+    [key: string]: Extract<State['templates'][string], { type: T }>;
 } {
     return Object.fromEntries(
         Object.entries(draftState.templates).filter(
             ([_, template]) => template.type === templateType
-        ) as [key: string, value: Extract<Template, { type: T }>][]
-    );
+        )
+    ) as {
+        [key: string]: Extract<State['templates'][string], { type: T }>;
+    };
 }

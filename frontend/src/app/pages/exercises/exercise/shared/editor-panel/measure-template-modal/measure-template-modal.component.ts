@@ -1,7 +1,6 @@
 import {
     AfterViewInit,
     Component,
-    computed,
     ElementRef,
     inject,
     Injector,
@@ -13,8 +12,8 @@ import { CdkScrollable } from '@angular/cdk/scrolling';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
-    AddMeasureTemplateAction,
-    EditMeasureTemplateAction,
+    AddTemplateToCategoryAction,
+    EditCategorizedMeasureTemplateAction,
     UUID,
 } from 'fuesim-digital-shared';
 import { cloneDeepMutable, newMeasureTemplate } from 'fuesim-digital-shared';
@@ -22,10 +21,7 @@ import { MeasureTemplateFormComponent } from '../measure-template-form/measure-t
 import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
-import {
-    createSelectMeasureTemplate,
-    selectMeasureTemplateCategories,
-} from '../../../../../../state/application/selectors/exercise.selectors';
+import { createSelectCategorizedMeasureTemplate } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { MeasureTemplateValues } from '../measure-template-form/measure-template-form-utils';
 
@@ -58,13 +54,7 @@ export class MeasureTemplateModalComponent
 
     public measureTemplateValues?: MeasureTemplateValues;
 
-    public categoryName?: string;
-    public readonly categories = this.store.selectSignal(
-        selectMeasureTemplateCategories
-    );
-    public readonly categoryNames = computed(() =>
-        Object.values(this.categories()).map((v) => v.name)
-    );
+    public categoryName!: string;
 
     get isEditMode(): boolean {
         return this.measureTemplateId !== undefined;
@@ -74,25 +64,25 @@ export class MeasureTemplateModalComponent
         if (this.measureTemplateId) {
             const measureTemplate = cloneDeepMutable(
                 selectStateSnapshot(
-                    createSelectMeasureTemplate(this.measureTemplateId),
+                    createSelectCategorizedMeasureTemplate(
+                        this.categoryName,
+                        this.measureTemplateId
+                    ),
                     this.store
                 )
             );
 
-            const currentCategory = Object.values(this.categories()).find(
-                (c) => c.templates[this.measureTemplateId!] !== undefined
-            );
             this.measureTemplateValues = {
                 name: measureTemplate.name,
                 properties: measureTemplate.properties,
-                categoryName: currentCategory?.name ?? '',
+                categoryName: this.categoryName,
                 replacePrevious: measureTemplate.replacePrevious,
             };
         } else {
             this.measureTemplateValues = {
                 name: '',
                 properties: [],
-                categoryName: this.categoryName ?? '',
+                categoryName: this.categoryName,
                 replacePrevious: false,
             };
         }
@@ -130,24 +120,26 @@ export class MeasureTemplateModalComponent
         categoryName,
         replacePrevious,
     }: MeasureTemplateValues) {
-        const action: AddMeasureTemplateAction | EditMeasureTemplateAction =
-            this.isEditMode
-                ? {
-                      type: '[MeasureTemplate] Edit MeasureTemplate',
-                      id: this.measureTemplateId!,
+        const action:
+            | AddTemplateToCategoryAction
+            | EditCategorizedMeasureTemplateAction = this.isEditMode
+            ? {
+                  type: '[MeasureTemplateCategory] Edit Categorized Template',
+                  categoryName,
+                  id: this.measureTemplateId!,
+                  name,
+                  properties,
+                  replacePrevious,
+              }
+            : {
+                  type: '[MeasureTemplateCategory] Add Template To Category',
+                  categoryName,
+                  measureTemplate: newMeasureTemplate(
                       name,
                       properties,
-                      replacePrevious,
-                  }
-                : {
-                      type: '[MeasureTemplate] Add MeasureTemplate',
-                      measureTemplate: newMeasureTemplate(
-                          name,
-                          properties,
-                          replacePrevious
-                      ),
-                      categoryName,
-                  };
+                      replacePrevious
+                  ),
+              };
 
         this.exerciseService.proposeAction(action).then((response) => {
             if (response.success) {
@@ -166,7 +158,8 @@ export class MeasureTemplateModalComponent
         }
         this.exerciseService
             .proposeAction({
-                type: '[MeasureTemplate] Remove MeasureTemplate',
+                type: '[MeasureTemplateCategory] Remove Categorized Template',
+                categoryName: this.categoryName,
                 id: this.measureTemplateId!,
             })
             .then((response) => {

@@ -31,8 +31,9 @@ import { DisplayMessagesComponent } from '../../../../../feature/messages/displa
 import { MessageService } from '../../../../../core/messages/message.service';
 import { OlMapManager, olMapCoordinatesSchema } from './utility/ol-map-manager';
 import { PopupManager } from './utility/popup-manager';
-import { PopupService } from './utility/popup.service';
+import { FeatureSelectionService } from './utility/feature-selection.service';
 import { OlMapManagerService } from './utility/ol-map-manager.service';
+import { SidebarService } from './utility/sidebar.service';
 
 @Component({
     selector: 'app-exercise-map',
@@ -46,7 +47,8 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     private readonly exerciseService = inject(ExerciseService);
     readonly dragElementService = inject(DragElementService);
     readonly transferLinesService = inject(TransferLinesService);
-    private readonly popupService = inject(PopupService);
+    private readonly popupService = inject(FeatureSelectionService);
+    private readonly sidebarService = inject(SidebarService);
     private readonly modalService = inject(NgbModal);
     private readonly route = inject(ActivatedRoute);
     readonly olMapManagerService = inject(OlMapManagerService);
@@ -85,6 +87,7 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
             this.transferLinesService,
             this.popupManager,
             this.popupService,
+            this.sidebarService,
             this.messageService,
             this.drawingInteractionService
         );

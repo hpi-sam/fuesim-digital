@@ -18,7 +18,7 @@ import { PointGeometryHelper } from '../utility/point-geometry-helper';
 import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
-import type { PopupService } from '../utility/popup.service';
+import type { FeatureSelectionService } from '../utility/feature-selection.service';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
@@ -35,7 +35,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
         olMap: OlMap,
         private readonly store: Store<AppState>,
         private readonly exerciseService: ExerciseService,
-        private readonly popupService: PopupService
+        private readonly popupService: FeatureSelectionService
     ) {
         super(
             olMap,

@@ -1,14 +1,11 @@
 import type { Type, ViewContainerRef } from '@angular/core';
-import type { Feature } from 'ol';
 import { Overlay } from 'ol';
-import type VectorLayer from 'ol/layer/Vector';
 import { pairwise, Subject, takeUntil } from 'rxjs';
-import type OlMap from 'ol/Map';
 import type { UUID } from 'fuesim-digital-shared';
 import { isEqual } from 'lodash-es';
 import type { Positioning } from '../../utils/types/positioning';
 import type { FeatureManager } from './feature-manager';
-import type { PopupService } from './popup.service';
+import type { FeatureSelectionService } from './feature-selection.service';
 
 /**
  * A class that manages the creation and destruction of a single popup with freely customizable content
@@ -17,7 +14,6 @@ import type { PopupService } from './popup.service';
 export class PopupManager {
     public readonly popupOverlay: Overlay;
     private readonly destroy$ = new Subject<void>();
-    private popupsEnabled = true;
     public get currentClosingIds(): UUID[] {
         return this.popupService.currentPopupOptions?.closingUUIDs ?? [];
     }
@@ -29,7 +25,7 @@ export class PopupManager {
     constructor(
         private readonly popoverContent: ViewContainerRef,
         private readonly popoverContainer: HTMLDivElement,
-        private readonly popupService: PopupService
+        private readonly popupService: FeatureSelectionService
     ) {
         this.popupOverlay = new Overlay({
             element: this.popoverContainer,
@@ -77,54 +73,11 @@ export class PopupManager {
         });
     }
 
-    public setPopupsEnabled(enabled: boolean) {
-        this.popupsEnabled = enabled;
-        if (!enabled) {
-            // Close all open popups
-            this.popupService.dismissPopup();
-        }
-    }
-
-    public registerPopupTriggers(
-        olMap: OlMap,
-        openLayersContainer: HTMLDivElement,
-        layerFeatureManagerDictionary: Map<VectorLayer, FeatureManager<any>>,
+    public registerFeatureManagerDictionary(
         featureNameFeatureManagerDictionary: Map<string, FeatureManager<any>>
     ) {
         this.featureNameFeatureManagerDictionary =
             featureNameFeatureManagerDictionary;
-        olMap.on('singleclick', (event) => {
-            if (!this.popupsEnabled) {
-                return;
-            }
-
-            const hasBeenHandled = olMap.forEachFeatureAtPixel(
-                event.pixel,
-                (feature, layer) => {
-                    // Skip layer when unset
-                    // OpenLayers type definitions are incorrect, layer may be `null`
-                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                    if (layer === null) {
-                        return false;
-                    }
-                    layerFeatureManagerDictionary
-                        .get(layer as VectorLayer)!
-                        .onFeatureClicked(event, feature as Feature);
-                    // we only want the top one -> a truthy return breaks this loop
-                    return true;
-                },
-                { hitTolerance: 10 }
-            );
-            if (!hasBeenHandled) {
-                this.popupService.dismissPopup();
-            }
-        });
-
-        openLayersContainer.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                this.closePopup();
-            }
-        });
     }
 
     private isSamePopup(
@@ -208,7 +161,7 @@ export interface OpenPopupOptions<Component = unknown> {
     context?: Partial<Component>;
 
     /**
-     * is called, if the popup is closed without {@link PopupService.submitPopup()}
+     * is called, if the popup is closed without {@link FeatureSelectionService.submitPopup()}
      */
     onDismissCallback?: () => void;
 }

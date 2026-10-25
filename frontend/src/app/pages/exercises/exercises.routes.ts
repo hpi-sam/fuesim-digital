@@ -10,8 +10,14 @@ import { ParallelExerciseListComponent } from './parallel-exercise/list/parallel
 import { JoinParallelExerciseGuard } from './guards/join-parallel-exercise.guard';
 import { LeaveParallelExerciseGuard } from './guards/leave-parallel-exercise.guard';
 import { AreParallelExercisesEnabledGuard } from './guards/are-parallel-exercises-enabled.guard';
+import { MapViewComponent } from './exercise/shared/map-view/map-view.component';
+import { EmergencyOperationsCenterFullComponent } from './exercise/shared/emergency-operations-center/emergency-operations-center-full/emergency-operations-center-full.component';
+import { OperationsTabletViewComponent } from './exercise/shared/operations-tablet-view/operations-tablet-view.component';
+import { WaitingRoomComponent } from './exercise/shared/waiting-room/waiting-room.component';
+import { JoinTimeTravelGuard } from './guards/join-time-travel.guard';
+import { LeaveTimeTravelGuard } from './guards/leave-time-travel.guard';
 
-export const routes: Routes = [
+const exerciseRoutes: Routes = [
     {
         path: '',
         component: ExerciseListComponent,
@@ -46,11 +52,35 @@ export const routes: Routes = [
         path: ':exerciseId',
         canActivate: [JoinExerciseGuard],
         canDeactivate: [LeaveExerciseGuard],
+        component: ExerciseComponent,
         children: [
             {
                 path: '',
-                component: ExerciseComponent,
+                component: WaitingRoomComponent,
+            },
+            {
+                path: 'map',
+                component: MapViewComponent,
+                loadChildren: async () =>
+                    import('./exercise/shared/exercise-map/utility/sidebar.routes'),
+            },
+            {
+                path: 'eoc',
+                component: EmergencyOperationsCenterFullComponent,
+            },
+            {
+                path: 'operations',
+                component: OperationsTabletViewComponent,
+            },
+            {
+                path: 'replay',
+                canActivate: [JoinTimeTravelGuard],
+                canDeactivate: [LeaveTimeTravelGuard],
+                component: MapViewComponent,
+                loadChildren: async () =>
+                    import('./exercise/shared/exercise-map/utility/sidebar.routes'),
             },
         ],
     },
 ];
+export default exerciseRoutes;

@@ -1,0 +1,17 @@
+@if (exerciseStateMode() === 'timeTravel') {
+    <div class="h-100 d-flex justify-content-center">
+        <span class="my-auto text-muted text-center">
+            Klicken Sie ein Element auf der Karte an, um dessen Details zu
+            sehen.
+        </span>
+    </div>
+} @else {
+    @switch (role()) {
+        @case ('trainer') {
+            <app-trainer-map-editor />
+        }
+        @case ('participant') {
+            <app-map-operator-toolbar />
+        }
+    }
+}

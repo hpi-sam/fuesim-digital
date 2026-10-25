@@ -28,7 +28,7 @@ import { PointGeometryHelper } from '../utility/point-geometry-helper';
 import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
-import type { PopupService } from '../utility/popup.service';
+import type { FeatureSelectionService } from '../utility/feature-selection.service';
 import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
@@ -41,6 +41,7 @@ import { selectVisibleVehicles } from '../../../../../../state/application/selec
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 import { determineMarkedElements } from './utils';
+import { SidebarService } from '../utility/sidebar.service';
 
 type PossibleVehicleStatus = Exclude<PatientStatus, 'white'>;
 
@@ -195,7 +196,8 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
         olMap: OlMap,
         private readonly store: Store<AppState>,
         private readonly exerciseService: ExerciseService,
-        private readonly popupService: PopupService
+        private readonly popupService: FeatureSelectionService,
+        private readonly sidebarService: SidebarService
     ) {
         super(
             olMap,
@@ -281,6 +283,8 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
         super.onFeatureClicked(event, feature);
 
         const vehicle = this.getElementFromFeature(feature) as Vehicle;
+
+        this.sidebarService.showInSidebar(vehicle);
 
         const markedElements = determineMarkedElements(
             this.store,

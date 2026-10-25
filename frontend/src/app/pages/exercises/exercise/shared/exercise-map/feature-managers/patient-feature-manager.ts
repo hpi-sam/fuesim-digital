@@ -15,7 +15,7 @@ import { PointGeometryHelper } from '../utility/point-geometry-helper';
 import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
-import type { PopupService } from '../utility/popup.service';
+import type { FeatureSelectionService } from '../utility/feature-selection.service';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import { selectConfiguration } from '../../../../../../state/application/selectors/exercise.selectors';
@@ -137,7 +137,7 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
         private readonly store: Store<AppState>,
         olMap: OlMap,
         exerciseService: ExerciseService,
-        private readonly popupService: PopupService
+        private readonly popupService: FeatureSelectionService
     ) {
         super(
             olMap,

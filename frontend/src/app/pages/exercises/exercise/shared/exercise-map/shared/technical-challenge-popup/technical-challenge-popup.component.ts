@@ -10,7 +10,7 @@ import type {
     TechnicalChallengeId,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
-import { PopupService } from '../../utility/popup.service';
+import { FeatureSelectionService } from '../../utility/feature-selection.service';
 import { TechnicalChallengeDetailsComponent } from '../../../../../../../shared/components/technical-challenge-details/technical-challenge-details.component';
 import { AppState } from '../../../../../../../state/app.state';
 import { createSelectTechnicalChallenge } from '../../../../../../../state/application/selectors/exercise.selectors';
@@ -25,7 +25,7 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
 })
 export class TechnicalChallengePopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
-    private readonly popupService = inject(PopupService);
+    private readonly popupService = inject(FeatureSelectionService);
 
     // Set via popup context before OnInit
     public technicalChallengeId!: TechnicalChallengeId;

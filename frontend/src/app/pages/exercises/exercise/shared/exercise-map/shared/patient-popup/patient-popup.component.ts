@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import type { Patient, UUID } from 'fuesim-digital-shared';
 import { NgClass, AsyncPipe } from '@angular/common';
-import { PopupService } from '../../utility/popup.service';
+import { FeatureSelectionService } from '../../utility/feature-selection.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectPatient } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { PatientHeaderComponent } from '../../../../../../../shared/components/patient-header/patient-header.component';
@@ -29,7 +29,7 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
     ],
 })
 export class PatientPopupComponent implements OnInit {
-    private readonly popupService = inject(PopupService);
+    private readonly popupService = inject(FeatureSelectionService);
     private readonly store = inject<Store<AppState>>(Store);
 
     // These properties are only set after OnInit

@@ -22,7 +22,7 @@ import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-ma
 import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper';
 import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interaction';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
-import type { PopupService } from '../utility/popup.service';
+import type { FeatureSelectionService } from '../utility/feature-selection.service';
 import { RestrictedZonePopupComponent } from '../shared/restricted-zone-popup/restricted-zone-popup.component';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
@@ -115,7 +115,7 @@ export class RestrictedZoneFeatureManager
         olMap: OlMap,
         private readonly exerciseService: ExerciseService,
         private readonly store: Store<AppState>,
-        private readonly popupService: PopupService
+        private readonly popupService: FeatureSelectionService
     ) {
         super(
             olMap,

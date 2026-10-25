@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import type { Hospital, TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
-import { PopupService } from '../../utility/popup.service';
+import { FeatureSelectionService } from '../../utility/feature-selection.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import {
     createSelectReachableTransferPoints,
@@ -22,7 +22,7 @@ import { HospitalNameComponent } from '../../../../../../../shared/components/ho
 })
 export class ChooseTransferTargetPopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
-    private readonly popupService = inject(PopupService);
+    private readonly popupService = inject(FeatureSelectionService);
 
     // These properties are only set after OnInit
     public transferPointId!: UUID;

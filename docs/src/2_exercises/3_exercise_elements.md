@@ -322,6 +322,8 @@ Alarmgruppen werden im Fenster <kbd>Alarmgruppen</kbd> erstellt, das von Übungs
 
 In dem Fenster können neue Alarmgruppen hinzugefügt sowie wieder gelöscht werden. Jeder Gruppe kann ein individueller Name zugewiesen werden (standardmäßig „???“). Mit einem Klick auf das entsprechende Häkchen kann zudem ein Limit für die maximale Anzahl an Auslösungen festgelegt werden, wodurch sich versehentliche Doppelarmierungen vermeiden lassen.
 
+Alarmgruppen können außerdem automatisch zur Übung hinzugefügt werden, wenn eine Maßnahmen-Vorlage aus einer Sammlung (siehe [Maßnahmen](#maßnahmen)) verwendet wird, deren Alarmierung auf eine noch nicht in der Übung vorhandene Alarmgruppe verweist.
+
 Jede Alarmgruppe kann mit Fahrzeugen gefüllt werden; für jedes Fahrzeug können ein individueller Name sowie eine Eintreffzeit (in Minuten) festgelegt werden. Fahrzeuge können mit einem Klick wieder aus der Gruppe entfernt werden.
 
 ### Nutzung in Übungen
@@ -344,7 +346,7 @@ Maßnahmen sind in der FüSim Digital als generisches Baukastensystem angelegt: 
 
 Das erlaubt insbesondere auch, dass Übungsleitende mehr Maßnahmen anlegen, als für ein Szenario tatsächlich nötig oder sinnvoll sind. Durch ein solches Überangebot lässt sich verhindern, dass die vorhandenen Maßnahmen als "Checkliste" dienen und somit als Hilfestellung bei der Übungsbearbeitung fungieren.
 
-![Fenster „Maßnahmen“ mit der Standardkategorie und den vier vorbereiteten Maßnahmen](./exercise_elements_measures.png)
+![Verwaltung der Maßnahmen mit einer Kategorie und vier Maßnahmen](./exercise_elements_measures.png)
 
 Die so konfigurierten Maßnahmen stehen den Teilnehmenden während der Übungsdurchführung in der Kartenansicht zur Verfügung.
 
@@ -389,21 +391,30 @@ Aus diesen Bausteinen lassen sich beliebige weitere Maßnahmen bilden, zum Beisp
 
 ### Einstellungsmöglichkeiten
 
-Maßnahmen werden im Fenster <kbd>Maßnahmen</kbd> verwaltet, das von Übungsleitenden im [Hauptmenü in der unteren Menüleiste](2_user_interfaces.md#konfigurations--und-übersichtsfenster-nur-in-übungsleitenden-ansicht) in der Kategorie <kbd>Erstellung</kbd> aufgerufen werden kann.
+Maßnahmen werden von Übungsleitenden im [Editor](2_user_interfaces.md#platzierbare-übungselemente) im Bereich <kbd>Maßnahmen</kbd> verwaltet. Beim Aufklappen des Bereichs wird die Übungskarte durch die Verwaltung der Maßnahmen ersetzt; beim Zuklappen erscheint wieder die Karte.
 
-Die Maßnahmen sind dort in **Kategorien** gruppiert. Eine neue Kategorie wird über den Button <kbd>Kategorie hinzufügen</kbd> angelegt und erhält zunächst den Namen „Neue Kategorie“. Der Name kann direkt im Textfeld über der Kategorie geändert werden und wird automatisch gespeichert. Über das Mülleimer-Symbol neben dem Namen lässt sich eine Kategorie löschen; die enthaltenen Maßnahmen gehen dabei nicht verloren, sondern werden in eine andere Kategorie verschoben.
+Die Maßnahmen sind dort in **Kategorien** gruppiert. Eine neue Übung enthält noch keine Kategorien. Eine neue Kategorie wird über den Button <kbd>Kategorie hinzufügen</kbd> angelegt und erhält zunächst den Namen „Neue Kategorie“. Der Name kann direkt im Textfeld über der Kategorie geändert werden und wird automatisch gespeichert. Über das Mülleimer-Symbol neben dem Namen lässt sich eine Kategorie löschen.
 
-![Fenster „Maßnahmen“ mit zwei Kategorien](./exercise_elements_measures_categories.png)
+![Verwaltung der Maßnahmen mit zwei Kategorien](./exercise_elements_measures_categories.png)
 
 > [!IMPORTANT]
-> Kategorienamen müssen eindeutig sein, und die letzte verbleibende Kategorie kann nicht gelöscht werden.
+> Kategorienamen müssen eindeutig sein. Beim Löschen einer Kategorie werden auch alle darin enthaltenen Maßnahmen gelöscht.
 
 **Maßnahmen** werden über den Button <kbd>Maßnahme hinzufügen</kbd> der jeweiligen Kategorie angelegt. Jede Maßnahme wird als Kachel dargestellt und kann über das gelbe Stift-Symbol bearbeitet sowie über das rote Mülleimer-Symbol gelöscht werden. Um eine Maßnahme in eine andere Kategorie zu verschieben, wird ihre Kachel per Drag-and-Drop in den Bereich der Zielkategorie gezogen.
 
 ![Verschieben einer Maßnahme in eine andere Kategorie per Drag-and-Drop](./exercise_elements_measures_categories_dragndrop.png)
 
+Zusätzlich listet der Editor die **Maßnahmen-Vorlagen** aus den für die Übung ausgewählten Sammlungen auf. Eine Vorlage wird per Drag-and-Drop in eine Kategorie gezogen; dabei wird eine Kopie der Vorlage als Maßnahme in der Übung angelegt. Spätere Änderungen an der Vorlage wirken sich nicht auf bereits angelegte Maßnahmen aus. Die Sammlung „FüSim Digital Feuerwehr 2026“ enthält die vier [oben beschriebenen](#nutzung-in-übungen) Beispiel-Maßnahmen als Vorlagen.
+
 > [!NOTE]
-> Innerhalb einer Kategorie lassen sich Maßnahmen nicht sortieren; sie werden in der Reihenfolge ihrer Erstellung angezeigt. Auch die Reihenfolge der Kategorien lässt sich nicht ändern.
+> Verweist eine [Alarmierung](#alarmierung) der Vorlage auf Alarmgruppen, werden diese beim Hineinziehen mit den [Alarmgruppen](#alarmgruppen) der Übung verknüpft, die aus derselben Alarmgruppen-Vorlage erstellt wurden. Gibt es davon mehrere, werden alle verknüpft.
+>
+> Ist noch keine solche Alarmgruppe in der Übung vorhanden, wird die Alarmgruppen-Vorlage aus den ausgewählten Sammlungen automatisch als neue Alarmgruppe zur Übung hinzugefügt – genauso, als wäre sie von Hand in die Liste der Alarmgruppen gezogen worden. Sie erscheint anschließend in der Liste der Alarmgruppen und kann dort wie jede andere Alarmgruppe bearbeitet oder gelöscht werden. Wird sie gelöscht, wird sie auch aus der Maßnahme entfernt.
+>
+> Alarmgruppen, die weder in der Übung noch in den ausgewählten Sammlungen vorhanden sind, werden aus der Maßnahme entfernt; in diesem Fall erscheint ein Hinweis. Enthält die Alarmierung danach keine Alarmgruppe mehr, können die Teilnehmenden beim Ausführen der Maßnahme aus allen Alarmgruppen der Übung wählen.
+
+> [!NOTE]
+> Innerhalb einer Kategorie lassen sich Maßnahmen nicht sortieren; sie werden in der Reihenfolge ihrer Erstellung angezeigt. Die Kategorien werden alphabetisch sortiert.
 
 Im Bearbeitungsfenster einer Maßnahme kann Folgendes angegeben werden:
 

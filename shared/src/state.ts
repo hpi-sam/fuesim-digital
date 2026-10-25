@@ -40,7 +40,6 @@ import {
     measureTemplateCategorySchema,
 } from './models/measure/measures.js';
 import { drawingSchema } from './models/drawing.js';
-import { defaultMeasureTemplateCategories } from './data/default-state/measure-templates.js';
 import { technicalChallengeSchema } from './models/technical-challenge/technical-challenge.js';
 import { taskTypeSchema } from './models/task-type.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
@@ -60,7 +59,7 @@ import { technicalChallengeTemplateSchema } from './models/technical-challenge/t
  *
  * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
  */
-export const currentStateVersion = 65 as const;
+export const currentStateVersion = 66 as const;
 
 export const exerciseStateSchema = z.strictObject({
     id: uuidSchema,
@@ -107,6 +106,7 @@ export const exerciseStateSchema = z.strictObject({
     hospitals: getIdMapSchema(hospitalSchema),
     hospitalPatients: z.record(uuidSchema, hospitalPatientSchema),
     alarmGroups: getIdMapSchema(alarmGroupSchema),
+    measureTemplates: z.record(z.string(), measureTemplateCategorySchema),
 
     clients: getIdMapSchema(clientSchema),
     /** All client names that are currently in the exercise or joined the exercise in the past */
@@ -117,7 +117,6 @@ export const exerciseStateSchema = z.strictObject({
     operationalSections: getIdMapSchema(operationalSectionSchema),
 
     patientCategories: z.array(patientCategorySchema),
-    measureTemplates: z.record(z.string(), measureTemplateCategorySchema),
 
     scoutables: getIdMapSchema(scoutableSchema),
 
@@ -172,12 +171,12 @@ export function newExerciseState(
         },
         hospitalPatients: {},
         alarmGroups: {},
+        measureTemplates: {},
         clients: {},
         collectedClientNames: [],
         radiograms: {},
         operationalSections: {},
         patientCategories: defaultPatientCategories,
-        measureTemplates: defaultMeasureTemplateCategories,
         technicalChallengeTemplates: defaultTechnicalChallengeTemplates,
         scoutables: {},
         templates: {},

@@ -1,0 +1,39 @@
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 33%);
+    justify-content: start;
+    align-items: start;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+// Set on the item itself (not only inherited from `.cards`), as the drag preview is a copy of it outside the list.
+// Otherwise, the preview gets a list marker that pushes the card down.
+.card-item {
+    list-style: none;
+
+    &.cdk-drag-preview {
+        // The drag preview is a popover, which browsers give `overflow: auto` by default
+        overflow: visible;
+    }
+}
+
+.category-drop-list {
+    min-height: 3rem;
+    padding: 0.25rem;
+    border: 1px dashed transparent;
+    border-radius: 0.25rem;
+    transition: border-color 150ms ease;
+    margin: -1px;
+
+    &.cdk-drop-list-dragging,
+    &.cdk-drop-list-receiving {
+        border-color: var(--bs-primary);
+    }
+}
+
+.empty-hint {
+    grid-column: 1 / -1;
+    padding: 0.5rem;
+}

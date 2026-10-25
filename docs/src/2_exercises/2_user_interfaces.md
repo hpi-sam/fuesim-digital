@@ -108,6 +108,7 @@ Der Editor ist in folgende Kategorien unterteilt:
 - **Patienten:** Hier befinden sich Vorlagen für [Patienten](3_exercise_elements.md#patienten), sortiert nach initialer Sichtungskategorie und gekennzeichnet mit dem zu erwartenden Verlauf. Eine Zahl bei jeder Vorlage zeigt, wie viele Ausprägungen für diesen medizinischen Verlauf hinterlegt sind, wobei die Ausprägungen sich durch verschiedene Texte zu den medizinischen Details unterscheiden. Beim Platzieren auf der Karte wird eine der Ausprägungen für den gewählten Verlauf zufällig ausgesucht sowie Name und Stammdaten des Patienten zufällig generiert.
 - **Fahrzeuge**: Hier kann aus den Vorlagen für [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) ausgewählt werden, wobei auch neue Vorlagen erstellt und Vorlagen bearbeitet und gelöscht werden können. Es ist zu beachten, dass Änderungen einer Vorlage sich nicht auf bereits platzierte Fahrzeuge auswirken.
 - **Bilder**: Bei den [Bildern](3_exercise_elements.md#bilder) handelt es sich um frei platzierbare, dekorative Übungselemente. In diesem Teil des Editors befindet sich eine Liste aller Bild-Vorlagen, wobei auch neue Vorlagen erstellt und Vorlagen bearbeitet und gelöscht werden können. Sämtliche Bilder können nach dem Platzieren noch beliebig modifiziert werden.
+- **Maßnahmen**: Beim Aufklappen dieses Bereichs wird ein Bereich der Karte durch die Verwaltung der [Maßnahmen](3_exercise_elements.md#maßnahmen) der Übung ersetzt. Im Editor werden die Maßnahmen-Vorlagen aus den ausgewählten Sammlungen aufgelistet, die per Drag-and-Drop in eine Kategorie der Übung gezogen werden können.
 
 #### Import von Übungselementen
 
@@ -121,7 +122,6 @@ Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-
 - **Erstellung**
     - **Alarmgruppen**: In diesem Fenster können [Alarmgruppen](3_exercise_elements.md#alarmgruppen) erstellt, bearbeitet und wieder gelöscht werden.
     - **Krankenhäuser**: In diesem Fenster können [Krankenhäuser](3_exercise_elements.md#krankenhäuser) erstellt, bearbeitet und wieder gelöscht werden.
-    - **Maßnahmen**: In diesem Fenster können [Maßnahmen](3_exercise_elements.md#maßnahmen) erstellt, bearbeitet und wieder gelöscht werden.
 - **Durchführung**
     - **Teilnehmende**: Fenster zur [Verwaltung der Übungsteilnehmenden](4_conduction.md#teilnehmende-verwalten).
     - **Transferübersicht**: Fenster zur [Verwaltung von laufenden Transfers](4_conduction.md#transfers-verwalten) zwischen Transferpunkten

@@ -5,7 +5,7 @@ import {
     newMeasureTemplateCategory,
 } from '../../models/measure/measures.js';
 import type { ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
+import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
 import { getCategory } from './utils/measures.js';
 
 export const addMeasureTemplateCategoryActionSchema = z.strictObject({
@@ -28,12 +28,16 @@ export type RenameMeasureTemplateCategoryAction = z.infer<
 export const removeMeasureTemplateCategoryActionSchema = z.strictObject({
     type: z.literal('[MeasureTemplateCategory] Remove MeasureTemplateCategory'),
     name: measureTemplateCategorySchema.shape.name,
+    /**
+     * If set, the templates of the removed category are moved into this category instead of being deleted.
+     */
+    moveTemplatesTo: measureTemplateCategorySchema.shape.name.optional(),
 });
 export type RemoveMeasureTemplateCategoryAction = z.infer<
     typeof removeMeasureTemplateCategoryActionSchema
 >;
 
-export namespace MeasureTemplateActionReducers {
+export namespace MeasureTemplateCategoryActionReducers {
     export const addMeasureTemplateCategory: ActionReducer<AddMeasureTemplateCategoryAction> =
         {
             type: addMeasureTemplateCategoryActionSchema.shape.type.value,
@@ -59,9 +63,14 @@ export namespace MeasureTemplateActionReducers {
                 if (previousName === newName) return draftState;
 
                 const category = getCategory(draftState, previousName);
+                if (draftState.measureTemplates[newName] !== undefined) {
+                    throw new ExpectedReducerError(
+                        `Die Kategorie "${newName}" existiert bereits.`
+                    );
+                }
                 category.name = newName;
-                delete draftState.measureTemplates[previousName];
                 draftState.measureTemplates[newName] = category;
+                delete draftState.measureTemplates[previousName];
 
                 return draftState;
             },
@@ -71,22 +80,24 @@ export namespace MeasureTemplateActionReducers {
         {
             type: removeMeasureTemplateCategoryActionSchema.shape.type.value,
             actionSchema: removeMeasureTemplateCategoryActionSchema,
-            reducer: (draftState, { name }) => {
-                if (Object.entries(draftState.measureTemplates).length === 1) {
-                    throw new ReducerError(
-                        `Die letzte Maßnahmen-Kategorie kann nicht entfernt werden`
-                    );
-                }
+            reducer: (draftState, { name, moveTemplatesTo }) => {
                 const category = getCategory(draftState, name);
-                const templates = category.templates;
+                if (moveTemplatesTo !== undefined) {
+                    if (moveTemplatesTo === name) {
+                        throw new ReducerError(
+                            `Cannot move the templates of MeasureTemplateCategory ${name} into itself`
+                        );
+                    }
+                    const targetCategory = getCategory(
+                        draftState,
+                        moveTemplatesTo
+                    );
+                    targetCategory.templates = {
+                        ...category.templates,
+                        ...targetCategory.templates,
+                    };
+                }
                 delete draftState.measureTemplates[name];
-                const otherCategory = Object.values(
-                    draftState.measureTemplates
-                )[0]!;
-                otherCategory.templates = {
-                    ...templates,
-                    ...otherCategory.templates,
-                };
                 return draftState;
             },
             rights: 'trainer',

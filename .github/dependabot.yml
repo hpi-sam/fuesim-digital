@@ -1,0 +1,43 @@
+version: 2
+updates:
+    - package-ecosystem: 'npm'
+      versioning-strategy: increase
+      directories:
+          - '/'
+          - '/backend'
+          - '/benchmark'
+          - '/frontend'
+          - '/shared'
+      schedule:
+          interval: 'daily'
+      groups:
+          angular:
+              applies-to: version-updates
+              update-types:
+                  - minor
+                  - patch
+              patterns:
+                  - '@angular*'
+                  - '@ng-bootstrap*'
+                  - '@ngrx*'
+                  - 'ng-qrcode'
+                  - 'angular-eslint'
+          monorepo-dependencies:
+              group-by: dependency-name
+
+      ignore:
+          - dependency-name: '@angular*'
+            update-types: ['version-update:semver-major']
+          - dependency-name: '@ng-bootstrap*'
+            update-types: ['version-update:semver-major']
+          - dependency-name: '@ngrx*'
+            update-types: ['version-update:semver-major']
+          - dependency-name: 'ng-qrcode'
+            update-types: ['version-update:semver-major']
+          - dependency-name: 'angular-eslint'
+            update-types: ['version-update:semver-major']
+
+    - package-ecosystem: 'github-actions'
+      directory: '/'
+      schedule:
+          interval: 'weekly'

@@ -10,8 +10,8 @@ import {
     TemplateVersion,
     gatherAllCollectionElements,
     VersionedCollectionPartial,
-    MarketplaceElementContent,
     CollectionElements,
+    MarketplaceElementContent,
 } from 'fuesim-digital-shared';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgComponentOutlet } from '@angular/common';
@@ -118,7 +118,8 @@ export class ElementCardComponent {
                 },
                 collection,
                 element: this.element(),
-                availableCollectionElements: gatherAllCollectionElements(
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
+                availableCollectionElements: gatherAllCollectionElements<any>(
                     this.collectionElements()!
                 ),
                 hideVersionHistory: this.hideVersionHistory(),

@@ -4,6 +4,7 @@ import { MaterialTemplateFormComponent } from './modals/editor-modals/element-fo
 import { PersonnelTemplateFormComponent } from './modals/editor-modals/element-forms/personnel-template-form/personnel-template-form.component';
 import { VehicleTemplateFormMarketplaceComponent } from './modals/editor-modals/element-forms/vehicle-template-form/vehicle-template-form.component';
 import { AlarmGroupFormComponent } from './modals/editor-modals/element-forms/alarm-group-form/alarm-group-form.component.js';
+import { TechnicalChallengeTemplateFormComponent } from './modals/editor-modals/element-forms/technical-challenge-template-form/technical-challenge-template-form.component.js';
 
 interface MarketplaceItemDefintition<C extends MarketplaceElementContent> {
     elementFormComponent: any;
@@ -59,6 +60,14 @@ export const marketplaceComponentDefinitions: {
             title: content.vehicleType,
             subtitle: content.name,
             image: content.image.url,
+        }),
+    },
+    technicalChallengeTemplate: {
+        elementFormComponent: TechnicalChallengeTemplateFormComponent,
+        helpUrl: '', // TODO
+        elementCard: (content) => ({
+            title: content.name,
+            image: content.image?.url,
         }),
     },
 };

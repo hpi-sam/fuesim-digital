@@ -16,6 +16,13 @@ Nach der Registrierung kann man sich mit dem Benutzerkonto auf der Startseite ü
 
 Um eine 2-Faktor-Authentifizierung einzurichten (stark empfohlen), das Passwort zu ändern oder andere persönliche Daten zu aktualisieren, kann über den eigenen Namen oben rechts und dann den Menüpunkt [<kbd>Konto verwalten</kbd>](https://fuesim.digital/api/auth/self-service) die Kontoverwaltung geöffnet werden. Auf der Seite [<kbd>Persönliche Angaben</kbd>](https://auth.fuesim.digital/realms/fuesim-digital/account/) kann dann der eigene Name aktualisiert werden und über [<kbd>Kontosicherheit</kbd>](https://auth.fuesim.digital/realms/fuesim-digital/account/account-security/signing-in) ein zweiter Faktor hinzugefügt oder das Passwort geändert werden. Die Benutzerverwaltung führt dabei Schritt für Schritt durch die notwendigen Aktionen.
 
+## Organisationen
+
+Um [Übungen, Vorlagen und Übungselemente](../4_editing/index.md) mit anderen Nutzern zu teilen und ggf. gemeinsam zu bearbeiten können Organisationen erstellt werden.
+Dazu kann über den eigenen Namen oben rechts und dann den Menüpunkt [<kbd>Organisationen</kbd>](https://fuesim.digital/organisations) die Organisationsverwaltung geöffnet werden.
+Auf der Seite können neue Organisationen erstellt werden und bestehende Organisationen verwaltet werden. Jeder Benutzer hat dabei eine "Personliche Organisation", in welcher alle privaten Inhalte gespeichert werden können. Diese Organisation kann nicht gelöscht oder von anderen Benutzern eingesehen werden.
+Eine neue Organisation kann über den Button <kbd>Neue Organisation erstellen</kbd> erstellt werden. Nach der Erstellung kann die Organisation Inhalte und Mitglieder hinzugefügt werden.
+
 ## Benutzerkonto löschen
 
 Zum Löschen eines Benutzerkontos kann über [E-Mail](mailto:kontakt@manv-simulation.de) Kontakt zu uns aufgenommen werden.

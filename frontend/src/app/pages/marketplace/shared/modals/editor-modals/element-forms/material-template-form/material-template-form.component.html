@@ -11,7 +11,10 @@
     ></app-display-model-validation>
 </div>
 
-<app-image-partial-form [imageForm]="materialForm.image" />
+<app-image-partial-form
+    [imageForm]="materialForm.image"
+    [availableCollectionElements]="this.data().availableCollectionElements"
+/>
 
 <div class="card">
     <div class="card-body">

@@ -11,7 +11,10 @@
     ></app-display-model-validation>
 </div>
 
-<app-image-partial-form [imageForm]="mapImageForm.image" />
+<app-image-partial-form
+    [imageForm]="mapImageForm.image"
+    [availableCollectionElements]="this.data().availableCollectionElements"
+/>
 
 <app-marketplace-form-submit-button-bar
     [form]="mapImageForm"

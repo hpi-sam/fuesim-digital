@@ -33,3 +33,5 @@ export * from './drawing.js';
 export * from './technical-challenge/index.js';
 export * from './template.js';
 export * from './task-type.js';
+export * from './uploaded-image.js';
+export * from './uploaded-image.js';

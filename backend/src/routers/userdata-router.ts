@@ -7,7 +7,11 @@ export function createUserdataRouter(userDataService: UserDataService): Router {
 
     router.get('/dump', isAuthenticatedMiddleware, async (req, res) => {
         const userId = req.session!.user.id;
-        res.status(200).json(await userDataService.getUserDataDump(userId));
+
+        const archive = await userDataService.getUserDataDumpArchive(userId);
+
+        res.attachment(archive.filename);
+        archive.archive.pipe(res);
     });
 
     return router;

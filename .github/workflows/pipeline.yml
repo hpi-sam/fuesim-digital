@@ -14,9 +14,9 @@ on:
 
 env:
     NODE_VERSION: '26.5.1'
-    POSTGRES_USER: dfm
-    POSTGRES_PASSWORD: notASecurePassword_forPipelineOnly
-    POSTGRES_DB: dfm_db
+    POSTGRES_USER: fuesim-digital
+    POSTGRES_PASSWORD: fuesim-digital
+    POSTGRES_DB: fuesim-digital
 
 concurrency:
     group: ci-${{ github.ref }}
@@ -180,9 +180,6 @@ jobs:
             - name: Create .env
               run: >
                   cat ./.env.dev.example
-                  | sed -e "s/^DFM_DB_USER=.*$/DFM_DB_USER=${{ env.POSTGRES_USER }}/"
-                  | sed -e "s/^#DFM_DB_PASSWORD=.*$/DFM_DB_PASSWORD=${{ env.POSTGRES_PASSWORD }}/"
-                  | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"
                   | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
                   | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/"
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"

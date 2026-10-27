@@ -179,7 +179,7 @@ jobs:
               uses: ./.github/actions/start-authelia
             - name: Create .env
               run: >
-                  cat ./.env.example
+                  cat ./.env.dev.example
                   | sed -e "s/^DFM_DB_USER=.*$/DFM_DB_USER=${{ env.POSTGRES_USER }}/"
                   | sed -e "s/^#DFM_DB_PASSWORD=.*$/DFM_DB_PASSWORD=${{ env.POSTGRES_PASSWORD }}/"
                   | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"

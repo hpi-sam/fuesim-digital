@@ -99,7 +99,7 @@ OIDC authentication provider (e.g., [Keycloak](https://www.keycloak.org/)).
 
 ### Environment variables/configuration
 
-- All available environment variables are listed with their default values in [.env.example](./.env.example) file.
+- All available environment variables are listed with their default values in [.env.prod.example](./.env.prod.example) file.
 
 ## Administration
 

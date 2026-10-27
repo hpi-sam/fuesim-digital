@@ -2,8 +2,10 @@
 
 ## Environment Variables
 
-A [`.env.example`](../.env.example) file is provided, containing the default values for all environment variables (where such defaults exist).
-To use them, copy the file to a new file called `.env` in the same directory. You can adjust the variables there for your own needs. This file is excluded from Git to not share any sensitive information one might store in environment variables.
+A [`.env.prod.example`](../.env.prod.example) file is provided, containing the default values for all environment variables (where such defaults exist) and information on usage. This file is suitable as base for a production configuration, but has to be adapted (see [here](../README.md#production-deployment) for more information).
+In contrast, the [`.env.dev.example`](../.env.dev.example) file contains a minimal configuration suitable for direct development usage.
+To use them, copy the respective file to a new file called `.env` in the same directory. You can adjust the variables there for your own needs. This file is excluded from Git to not share any sensitive information one might store in environment variables.
+
 To use other values during automated tests, you can append `_TESTING` to a variable, which will then be preferred over the non-`_TESTING` variable.
 For a more detailed view please look at the [`Config`](src/config.ts).
 
@@ -52,9 +54,9 @@ We are using [PostgreSQL 18](https://www.postgresql.org/) for persistence with [
 
 The credentials and other parameters of the database must match the [`.env` file in the root directory](../.env).
 
-#### Start the database
+#### Provide a database
 
-There are two main ways to start the database:
+There are two main ways to provide a database:
 
 ##### Option 1 using `docker compose` (recommended)
 

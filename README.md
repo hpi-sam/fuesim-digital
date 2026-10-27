@@ -52,7 +52,7 @@ This project is currently developed as a [bachelor project](https://hpi.de/en/st
 4. Clone the repo by running `git clone https://github.com/hpi-sam/fuesim-digital`. To be able to run migration tests, you also have to clone the submodules: use `git clone --recurse-submodules https://github.com/hpi-sam/fuesim-digital` or run `git submodule update --init --recursive` if you have cloned the repo already.
 5. Run `npm run setup` from the root folder.
 6. Copy the [`.env.dev.example`](./.env.dev.example) file to `./.env`.
-7. (Optional) We have a list of recommended [VS Code](https://code.visualstudio.com/) extensions. We strongly recommend you to use them if you are developing. You can see them via [the `@recommended` filter in the extensions panel](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
+7. (Optional) We have a list of recommended [VS Code](https://code.visualstudio.com/) extensions. We strongly recommend you to use them if you are developing. You can see them via [the `@recommended` filter in the extensions panel](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions) in the section "Workspace Recommendations".
 8. (Optional) We have prepared default settings, tasks and debug configurations for VS Code. You can find them in `.vscode/*.example`. Crete a copy of those files removing the `.example` and adjust them to your needs. The files without `.example`-extensions are untracked so your adjustments won't be committed automatically.
 9. (Optional) If you want to edit the docs, setup `mdbook` by running `npm run docs:setup` in the project dir.
 
@@ -144,7 +144,7 @@ $ npm run db:delete-user-data xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 ## Before you commit
 
-- We are using [prettier](https://prettier.io/) as our code formatter. Run it via `npm run prettier` or `npm run prettier:windows` in the root to format all files and make the CI happy. Please use the [vscode extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode).
+- We are using [prettier](https://prettier.io/) as our code formatter. Run it via `npm run prettier` in the root to format all files and make the CI happy. Please use the [vscode extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode).
 - We are using [eslint](https://eslint.org/) as our linter. Run it via `npm run lint:fix` in the root to lint (and auto fix if possible) all files. Please use the [vscode extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
 
 ## Debugging

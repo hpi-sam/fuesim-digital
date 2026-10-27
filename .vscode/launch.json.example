@@ -20,11 +20,11 @@
             // "keepProfileChanges": true,
             "pathMappings": [
                 {
-                    "url": "webpack:///shared",
+                    "url": "http://localhost:4200/shared",
                     "path": "${workspaceFolder}/shared"
                 },
                 {
-                    "url": "webpack:///",
+                    "url": "http://localhost:4200",
                     "path": "${workspaceFolder}/frontend"
                 }
             ]

@@ -34,7 +34,7 @@ services:
                 aliases:
                     - authelia.localhost
         volumes:
-            - ./docker/authelia-config:/config:ro
+            - ./docker/authelia-config:/config:ro,z
             - authelia-secrets:/secrets
 
 volumes:

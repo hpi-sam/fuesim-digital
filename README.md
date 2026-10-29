@@ -80,6 +80,10 @@ On the first start, the backend job won't start because the migrations haven't b
 
 Now you can access the FüSim Digital at <http://localhost:4200>. For the development, there are two users `demo1` and `demo2` with the password `demo` that can be used for logging in.
 
+### Development with containers
+
+If you are working with the containerized version of the application (described by the [`Dockerfile`](./docker/Dockerfile)), the hostname of the OIDC provider needs to be modified in the [development `.env` file](.env.dev.example) because `localhost` / `127.0.0.1` is ambiguous. Is using Authelia from the [`docker-compose.yml`](./docker-compose.yml) file, the hostname `authelia.localhost` should be functional.
+
 ## Production deployment
 
 For running in production, we recommend using [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/). Additionally, you need a properly configured

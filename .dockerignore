@@ -36,5 +36,8 @@ frontend/cypress*
 ## more unnecessary for production, not needed inside the docker container
 
 docker-compose.yml
+docker-compose.prod.yml
+.env.dev.example
+.env.prod.example
 
 docs/book

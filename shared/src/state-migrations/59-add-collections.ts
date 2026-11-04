@@ -35,7 +35,6 @@ interface TypedState<
 }
 
 export const addCollections59: Migration = {
-    unmigratableActions: true,
     action: null,
 
     state: (state) => {

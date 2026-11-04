@@ -175,16 +175,8 @@ export function applyMigrations<H extends StateHistoryCompound | undefined>(
             migrationsToApply,
             history.initialState
         );
-        const cannotMigrateHistory = migrationsToApply.some(
-            (migration) => migration.unmigratableActions
-        );
 
         try {
-            if (cannotMigrateHistory) {
-                throw new ReducerError(
-                    'Migrating history from this version is not possible'
-                );
-            }
             const migratedActionHistory: ExerciseAction[] = [];
             const migratedCurrentState = produce(
                 migratedInitialState,
@@ -221,10 +213,7 @@ export function applyMigrations<H extends StateHistoryCompound | undefined>(
                 } as any,
             };
         } catch (e: unknown) {
-            if (
-                e instanceof ReducerError &&
-                (discardAllowed || cannotMigrateHistory)
-            ) {
+            if (e instanceof ReducerError && discardAllowed) {
                 // Fall back to migrating currentState instead of recreating it from history
                 const exerciseId = (history.initialState as { id: UUID }).id;
                 console.warn(

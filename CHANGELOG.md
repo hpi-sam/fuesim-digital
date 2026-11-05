@@ -16,6 +16,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Measures are now managed in the editor of the trainer map instead of a separate window.
 - New exercises no longer contain a default measure category; the default measures are available as templates in the collection "FüSim Digital Feuerwehr 2026".
 - Deleting a measure category now also deletes the measures it contains, and the last category can be deleted as well.
+- Default values for `DFM_DB_USER` and `DFM_DB_NAME` are changed to `fuesim-digital`.
 
 ### Fixed
 

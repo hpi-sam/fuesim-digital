@@ -10,9 +10,9 @@ export default defineConfig({
     dbCredentials: {
         host: process.env['DFM_DB_HOST'] ?? 'localhost',
         port: Number(process.env['DFM_DB_PORT']) || 5432,
-        user: process.env['DFM_DB_USER'] ?? 'dfm',
+        user: process.env['DFM_DB_USER'] ?? 'fuesim-digital',
         password: process.env['DFM_DB_PASSWORD'] ?? '',
-        database: process.env['DFM_DB_NAME'] ?? 'dfm_db',
+        database: process.env['DFM_DB_NAME'] ?? 'fuesim-digital',
         ssl: false,
     },
 });

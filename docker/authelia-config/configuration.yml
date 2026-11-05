@@ -16,6 +16,8 @@ session:
     cookies:
         - domain: authelia.localhost
           authelia_url: https://authelia.localhost:9091
+        - domain: 127.0.0.1
+          authelia_url: https://127.0.0.1:9091
 notifier:
     filesystem:
         filename: '/secrets/notification.txt'

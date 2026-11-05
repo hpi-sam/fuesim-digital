@@ -15,16 +15,16 @@
             "name": "Launch Frontend [Firefox]",
             "type": "firefox",
             "request": "launch",
-            "url": "http://127.0.0.1:4200",
+            "url": "http://localhost:4200",
             // "profile": "dev-edition-default",
             // "keepProfileChanges": true,
             "pathMappings": [
                 {
-                    "url": "webpack:///shared",
+                    "url": "http://localhost:4200/shared",
                     "path": "${workspaceFolder}/shared"
                 },
                 {
-                    "url": "webpack:///",
+                    "url": "http://localhost:4200",
                     "path": "${workspaceFolder}/frontend"
                 }
             ]
@@ -33,7 +33,7 @@
             "name": "Launch Frontend [Chrome]",
             "type": "chrome",
             "request": "launch",
-            "url": "http://127.0.0.1:4200",
+            "url": "http://localhost:4200",
             "webRoot": "${workspaceFolder}/frontend"
         },
         // See https://jestjs.io/docs/troubleshooting#debugging-in-vs-code

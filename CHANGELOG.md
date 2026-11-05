@@ -21,6 +21,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Fixed
 
 - Importing exercises with a state prior 63 now results in alarm groups to not be wronly limited to 0.
+- The label of the "Sammlung entfernen" button in the collection management modal is now also readable when hovering over the button.
 
 ## [1.0.0-rc.3] - 2026-10-04
 

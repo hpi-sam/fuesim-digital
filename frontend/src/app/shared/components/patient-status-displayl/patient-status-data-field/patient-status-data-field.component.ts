@@ -1,8 +1,7 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
-import { NgClass, NgStyle } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { type PatientStatusDataField } from 'fuesim-digital-shared';
-import { rgbColorPalette } from '../../../functions/colors';
 import { PatientStatusColorPipe } from '../../../pipes/patient-status-color.pipe';
 import { PatientBehaviorIconPipe } from '../../../pipes/patient-behavior-icon.pipe';
 import { PatientBehaviorDescriptionPipe } from '../../../pipes/patient-behavior-description.pipe';
@@ -14,7 +13,6 @@ import { PatientBehaviorDescriptionPipe } from '../../../pipes/patient-behavior-
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgClass,
-        NgStyle,
         NgbTooltip,
         PatientStatusColorPipe,
         PatientBehaviorIconPipe,
@@ -23,8 +21,4 @@ import { PatientBehaviorDescriptionPipe } from '../../../pipes/patient-behavior-
 })
 export class PatientStatusDataFieldComponent {
     readonly patientStatusDataField = input.required<PatientStatusDataField>();
-
-    public get rgbColorPalette() {
-        return rgbColorPalette;
-    }
 }

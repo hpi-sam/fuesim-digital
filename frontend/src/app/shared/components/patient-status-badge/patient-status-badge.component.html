@@ -1,9 +1,3 @@
-<span
-    class="badge rounded-pill"
-    [ngStyle]="{
-        'background-color': status() === 'white' ? 'aliceblue' : status(),
-    }"
-    [class.text-dark]="status() === 'yellow' || status() === 'white'"
->
+<span class="badge rounded-pill" [class]="'patient-status-bg-' + status()">
     {{ statusNames[status()] }}
 </span>

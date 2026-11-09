@@ -1,0 +1,25 @@
+@use 'sass:map';
+@use 'bootstrap/scss/bootstrap';
+
+// Controls the size of images
+.preview-image-container {
+    // TODO: Set the height depending on the current grid tier https://getbootstrap.com/docs/5.1/layout/breakpoints/
+    height: 70px !important;
+    padding: map.get(bootstrap.$spacers, 2) map.get(bootstrap.$spacers, 3);
+    img {
+        // fill out the whole container
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        // center it vertically
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    &.small-image {
+        height: 50px !important;
+        padding: map.get(bootstrap.$spacers, 1);
+    }
+}

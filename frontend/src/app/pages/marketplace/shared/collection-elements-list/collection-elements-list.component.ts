@@ -99,6 +99,12 @@ export class CollectionElementsListComponent {
                 this.createElementHelper('measureTemplate');
             },
         },
+        {
+            type: 'uploadedImage',
+            create: () => {
+                this.createElementHelper('uploadedImage');
+            },
+        },
     ];
 
     public getElementCardIndicatorForChangeType(

@@ -19,8 +19,10 @@ import {
     CollectionVersionStructureWithMetadata,
     collectionEntityIdSchema,
     collectionVersionIdSchema,
+    UploadedImageUploadInput,
+    UploadedImage,
 } from 'fuesim-digital-shared';
-import { BehaviorSubject, lastValueFrom } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, map } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
@@ -90,6 +92,13 @@ export class CollectionService {
             }
             this.socketErrorHandler(reason);
         });
+    }
+
+    static getUploadedImageUrl(
+        uploadedImageId: ElementVersionId | UploadedImage['id'],
+        uploadedImage: UploadedImage
+    ) {
+        return `${httpOrigin}/api/collections/image/${uploadedImageId}?secret=${uploadedImage.secret}`;
     }
 
     private socketErrorHandler(error: any) {
@@ -429,6 +438,28 @@ export class CollectionService {
         );
 
         return data.result;
+    }
+
+    public async uploadImage(
+        collectionEntityId: CollectionEntityId,
+        data: UploadedImageUploadInput
+    ) {
+        const result = await lastValueFrom(
+            this.httpClient
+                .post(
+                    `${this.ENDPOINT}/${collectionEntityId}/upload`,
+                    Marketplace.Element.UploadImage.requestSchema.encode({
+                        data,
+                    })
+                )
+                .pipe(
+                    map((v) =>
+                        Marketplace.Element.UploadImage.responseSchema.parse(v)
+                    )
+                )
+        );
+
+        return result.result;
     }
 
     public async getElementVersions(

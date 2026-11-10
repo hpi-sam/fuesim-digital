@@ -36,7 +36,7 @@ import { openEditStateMachineTemplateModal } from '../edit-state-machine-templat
     templateUrl: './technical-challenge-template-form.component.html',
 })
 export class TechnicalChallengeTemplateFormComponent {
-    readonly technicalChallengeTemplate =
+    public readonly technicalChallengeTemplate =
         model.required<TechnicalChallengeTemplate>();
 
     readonly formModel = linkedSignal({

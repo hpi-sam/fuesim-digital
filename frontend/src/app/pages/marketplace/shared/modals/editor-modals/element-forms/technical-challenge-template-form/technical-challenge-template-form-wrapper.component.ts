@@ -1,19 +1,25 @@
 import { Component, inject, input } from '@angular/core';
 import { TechnicalChallengeTemplate } from 'fuesim-digital-shared';
+import { form } from '@angular/forms/signals';
 import { UploadTechnicalChallengeTemplateFormComponent } from '../../../../../../exercises/exercise/shared/editor-panel/upload-technical-challenge-template-form/upload-technical-challenge-template-form.component.js';
 import {
     BaseVersionedElementSubmodal,
     FormOutputInjectionToken,
     VersionedElementModalData,
 } from '../../base-versioned-element-submodal.js';
+import { TechnicalChallengeTemplateFormComponent } from '../../../../../../exercises/exercise/shared/editor-panel/technical-challenge-template-form/technical-challenge-template-form.component.js';
+import { MarketplaceFormSubmitButtonBarComponent } from '../../submit-button-bar/submit-button-bar.component.js';
 
 @Component({
     selector: 'app-technical-challenge-template-form-wrapper',
-    imports: [UploadTechnicalChallengeTemplateFormComponent],
+    imports: [
+        UploadTechnicalChallengeTemplateFormComponent,
+        TechnicalChallengeTemplateFormComponent,
+        MarketplaceFormSubmitButtonBarComponent,
+    ],
     templateUrl: './technical-challenge-template-form-wrapper.component.html',
 })
 export class TechnicalChallengeTemplateFormWrapperComponent implements BaseVersionedElementSubmodal<TechnicalChallengeTemplate> {
-    // TODO: handle difference between import /viewing
     public readonly data =
         input.required<VersionedElementModalData<TechnicalChallengeTemplate>>();
     public readonly btnText = input.required<string>();
@@ -26,4 +32,6 @@ export class TechnicalChallengeTemplateFormWrapperComponent implements BaseVersi
         // TODO@Felix: Qualifications?
         this.formOutput.dataSubmit(technicalChallengeTemplate);
     }
+
+    protected readonly form = form;
 }

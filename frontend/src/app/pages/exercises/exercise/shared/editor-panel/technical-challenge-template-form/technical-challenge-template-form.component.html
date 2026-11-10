@@ -5,6 +5,7 @@
             class="form-control"
             type="text"
             [formField]="templateForm.name"
+            (change)="submit(templateForm.name)"
         />
     </div>
 

@@ -13,6 +13,7 @@ import type {
     Vehicle,
     WithPosition,
     StateMachine,
+    Task,
 } from 'fuesim-digital-shared';
 import {
     currentStateOf,
@@ -73,7 +74,6 @@ export const selectPersonnel = selectPropertyFactory('personnel');
 export const selectAlarmGroups = selectPropertyFactory('alarmGroups');
 export const selectMaterials = selectPropertyFactory('materials');
 export const selectMeasures = selectPropertyFactory('measures');
-export const selectTaskTypes = selectPropertyFactory('taskTypes');
 export const selectTransferPoints = selectPropertyFactory('transferPoints');
 export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
@@ -92,8 +92,8 @@ export const selectOperationalSections = selectPropertyFactory(
 export const selectTechnicalChallenges = selectPropertyFactory(
     'technicalChallenges'
 );
-export const selectTechnicalChallengeTemplates = selectPropertyFactory(
-    'technicalChallengeTemplates'
+export const selectTechnicalChallengeTemplates = selectTemplatesFactory(
+    'technicalChallengeTemplate'
 );
 export const selectVehicleTemplates = selectTemplatesFactory('vehicleTemplate');
 export const selectPersonnelTemplates =
@@ -140,8 +140,6 @@ export const createSelectPersonnel =
     createSelectElementFromMapFactory(selectPersonnel);
 export const createSelectMaterial =
     createSelectElementFromMapFactory(selectMaterials);
-export const createSelectTaskType =
-    createSelectElementFromMapFactory(selectTaskTypes);
 export const createSelectPatient =
     createSelectElementFromMapFactory(selectPatients);
 export const createSelectVehicle =
@@ -488,22 +486,15 @@ export function createSelectAvailableTasks(
 ) {
     return createSelector(
         createSelectTechnicalChallenge(technicalChallengeId),
-        selectTaskTypes,
-        (challenge, taskTypes) =>
+        (challenge) =>
             Object.values(challenge.stateMachines).map((stateMachine) => {
                 const currentState = currentStateOf(stateMachine);
+                const tasks: Task[] = Object.keys(currentState.possibleTasks)
+                    .map((taskId) => stateMachine.tasks[taskId])
+                    .filter((task) => !!task);
                 return {
                     stateMachine,
-                    tasks: Object.keys(currentState.possibleTasks).map(
-                        (taskId) => {
-                            const taskType = taskTypes[taskId];
-                            if (!taskType)
-                                throw new Error(
-                                    `Invalid taskTypeId ${taskId} in TechnicalChallenge(${technicalChallengeId}).StateMachine(${stateMachine.id}).`
-                                );
-                            return taskTypes[taskId];
-                        }
-                    ),
+                    tasks,
                 };
             })
     );

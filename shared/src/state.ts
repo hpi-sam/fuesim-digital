@@ -41,8 +41,6 @@ import {
 } from './models/measure/measures.js';
 import { drawingSchema } from './models/drawing.js';
 import { technicalChallengeSchema } from './models/technical-challenge/technical-challenge.js';
-import { taskTypeSchema } from './models/task-type.js';
-import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
 import {
@@ -51,8 +49,6 @@ import {
 } from './data/default-state/catch-all-hospital.js';
 import { templateSchema } from './models/template.js';
 import { versionedCollectionPartialSchema } from './marketplace/models/versioned-id-schema.js';
-import { defaultTechnicalChallengeTemplates } from './data/default-state/technical-challenge-templates.js';
-import { technicalChallengeTemplateSchema } from './models/technical-challenge/technical-challenge-template.js';
 
 /**
  * **Important**
@@ -93,13 +89,7 @@ export const exerciseStateSchema = z.strictObject({
 
     mapImages: getIdMapSchema(mapImageSchema),
 
-    taskTypes: getIdMapSchema(taskTypeSchema),
-
     technicalChallenges: getIdMapSchema(technicalChallengeSchema),
-    technicalChallengeTemplates: z.record(
-        uuidSchema,
-        technicalChallengeTemplateSchema
-    ),
 
     transferPoints: getIdMapSchema(transferPointSchema),
 
@@ -163,7 +153,6 @@ export function newExerciseState(
         measures: {},
         drawings: {},
         mapImages: {},
-        taskTypes: getDefaultTasks(),
         technicalChallenges: {},
         transferPoints: {},
         hospitals: {
@@ -177,7 +166,6 @@ export function newExerciseState(
         radiograms: {},
         operationalSections: {},
         patientCategories: defaultPatientCategories,
-        technicalChallengeTemplates: defaultTechnicalChallengeTemplates,
         scoutables: {},
         templates: {},
         eocLog: [],

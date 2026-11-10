@@ -14,10 +14,10 @@ import { sizeSchema } from '../../models/utils/size.js';
 import { ReducerError } from '../reducer-error.js';
 import {
     currentStateOf,
+    taskSchema,
     stateMachineSchema,
     stateMachineStateSchema,
 } from '../../models/technical-challenge/state-machine.js';
-import { taskTypeSchema } from '../../models/task-type.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { createScoutableTag } from '../../models/utils/tag-helpers.js';
 import { getElement } from './utils/get-element.js';
@@ -49,7 +49,7 @@ const assignTechnicalChallengeActionSchema = z.strictObject({
      */
     targetPosition: mapCoordinatesSchema,
     stateMachineId: stateMachineSchema.shape.id,
-    taskId: taskTypeSchema.shape.id,
+    taskId: taskSchema.shape.id,
 });
 
 const resizeTechnicalChallengeActionSchema = z.strictObject({
@@ -134,19 +134,26 @@ export namespace TechnicalChallengeActionReducers {
                 );
             }
 
-            if (!(taskId in currentStateOf(stateMachine).possibleTasks)) {
+            const task = stateMachine.tasks[taskId];
+            if (!task) {
                 throw new ReducerError(
-                    `Task ${taskId} is not possible in current state ${stateMachine.currentStateId}`
+                    `Task ${taskId} does not exist in state machine ${stateMachineId}`
                 );
             }
+            if (!(taskId in currentStateOf(stateMachine).possibleTasks)) {
+                throw new ReducerError(
+                    `Task ${task.name}(${taskId}) is not possible in current state ${stateMachine.currentStateId}`
+                );
+            }
+            const personnel = getElement(draftState, 'personnel', personnelId);
 
             stateMachine.assignedPersonnel[personnelId] = taskId;
 
             logTechnicalChallengePersonnelAssigned(
                 draftState,
-                technicalChallengeId,
-                personnelId,
-                taskId
+                technicalChallenge,
+                personnel,
+                task
             );
 
             PersonnelActionReducers.movePersonnel.reducer(draftState, {
@@ -224,7 +231,7 @@ export namespace TechnicalChallengeActionReducers {
                 draftState,
                 [createScoutableTag(stateMachine.name, state.id)],
                 `Es wurde "${state.title}" erkundet.`,
-                challenge.id
+                challenge
             );
             return draftState;
         },

@@ -1,0 +1,20 @@
+@let _data = data();
+@if (_data.mode === 'create') {
+    <app-upload-technical-challenge-template-form
+        (outputTemplate)="submit($event.technicalChallengeTemplate)"
+    >
+    </app-upload-technical-challenge-template-form>
+} @else {
+    <app-technical-challenge-template-form
+        #editFormComponent
+        [technicalChallengeTemplate]="_data.element.content"
+    >
+    </app-technical-challenge-template-form>
+    <app-marketplace-form-submit-button-bar
+        [form]="editFormComponent.templateForm"
+        [type]="_data.type"
+        [disabled]="disabled()"
+        (submitData)="submit(editFormComponent.technicalChallengeTemplate())"
+        (discardChanges)="formOutput.discardChanges()"
+    />
+}

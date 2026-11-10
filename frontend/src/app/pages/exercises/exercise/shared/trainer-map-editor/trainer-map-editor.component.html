@@ -15,10 +15,7 @@
     let-emptyText="emptyText"
 >
     <div class="sidebar-collection-sections">
-        @for (
-            collection of selectedCollections$();
-            track collection.versionId
-        ) {
+        @for (collection of selectedCollections(); track collection.versionId) {
             @let elementsOfCollection =
                 filterElementsToCollection(elements, collection.entityId);
             @if (elementsOfCollection.length > 0) {

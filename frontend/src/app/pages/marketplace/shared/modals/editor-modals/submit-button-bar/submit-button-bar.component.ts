@@ -19,8 +19,7 @@ import {
     imports: [],
 })
 export class MarketplaceFormSubmitButtonBarComponent {
-    public readonly form =
-        input.required<FieldTree<MarketplaceElementContent>>();
+    public readonly form = input.required<FieldTree<unknown>>();
     public readonly type = input.required<MarketplaceElementContent['type']>();
     public readonly disabled = input<boolean>(false);
 

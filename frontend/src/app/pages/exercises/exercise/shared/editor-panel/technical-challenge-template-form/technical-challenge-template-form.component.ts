@@ -2,7 +2,6 @@ import {
     Component,
     computed,
     inject,
-    input,
     linkedSignal,
     model,
 } from '@angular/core';
@@ -13,10 +12,10 @@ import {
 import { FormsModule } from '@angular/forms';
 import {
     applyEach,
-    disabled,
     form,
     FormField,
     readonly,
+    submit,
 } from '@angular/forms/signals';
 import { castDraft, type WritableDraft } from 'immer';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -30,7 +29,6 @@ import {
     CdkDropList,
     moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import type { TaskNameMap } from '../edit-state-machine-form/edit-state-machine-form.component.js';
 import { openEditStateMachineTemplateModal } from '../edit-state-machine-template-modal/edit-state-machine-template-modal.component.js';
 @Component({
     selector: 'app-technical-challenge-template-form',
@@ -38,9 +36,8 @@ import { openEditStateMachineTemplateModal } from '../edit-state-machine-templat
     templateUrl: './technical-challenge-template-form.component.html',
 })
 export class TechnicalChallengeTemplateFormComponent {
-    readonly technicalChallengeTemplate =
+    public readonly technicalChallengeTemplate =
         model.required<TechnicalChallengeTemplate>();
-    readonly taskNameMap = input.required<TaskNameMap>();
 
     readonly formModel = linkedSignal({
         source: this.technicalChallengeTemplate,
@@ -51,7 +48,6 @@ export class TechnicalChallengeTemplateFormComponent {
         this.formModel,
         (schema) => {
             readonly(schema.id);
-            disabled(schema.name);
             applyEach(schema.stateMachines, readonly);
         },
         {
@@ -84,8 +80,7 @@ export class TechnicalChallengeTemplateFormComponent {
                         castDraft(updatedStateMachine);
                     return updatedTemplate;
                 });
-            },
-            computed(() => this.taskNameMap())
+            }
         );
     }
 
@@ -118,6 +113,8 @@ export class TechnicalChallengeTemplateFormComponent {
             stateMachines,
         };
     }
+
+    protected readonly submit = submit;
 }
 
 interface TechnicalChallengeFormModel {

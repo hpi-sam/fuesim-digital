@@ -8,6 +8,3 @@ export * from './default-state/personnel-templates.js';
 export * from './default-state/firefighting-templates.js';
 export * from './default-state/measure-templates.js';
 export * from './dummy-objects/patient.js';
-
-export { getDefaultTechnicalChallengeTemplate } from './default-state/tmp-default-technical-challenge.js';
-export { getBasementExplosionTechnicalChallenge } from './default-state/tmp-basementexplosion-technical-challenge.js';

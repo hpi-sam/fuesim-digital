@@ -8,6 +8,7 @@ import {
 } from '../utils/image-properties.js';
 import { newNoPosition } from '../utils/position/no-position.js';
 import { newSize } from '../utils/size.js';
+import { versionedElementModelSchema } from '../../marketplace/models/versioned-element-model.js';
 import {
     type StateMachine,
     type StateMachineDefinition,
@@ -22,6 +23,7 @@ import { technicalChallengeSchema } from './technical-challenge.js';
 
 export const technicalChallengeTemplateSchema = z
     .strictObject({
+        ...versionedElementModelSchema.shape,
         type: z.literal('technicalChallengeTemplate'),
         stateMachines: z
             .record(stateMachineSchema.shape.id, stateMachineDefinitionSchema)

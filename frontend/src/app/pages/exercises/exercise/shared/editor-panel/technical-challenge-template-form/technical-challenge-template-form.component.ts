@@ -12,10 +12,10 @@ import {
 import { FormsModule } from '@angular/forms';
 import {
     applyEach,
-    disabled,
     form,
     FormField,
     readonly,
+    submit,
 } from '@angular/forms/signals';
 import { castDraft, type WritableDraft } from 'immer';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -48,7 +48,6 @@ export class TechnicalChallengeTemplateFormComponent {
         this.formModel,
         (schema) => {
             readonly(schema.id);
-            disabled(schema.name);
             applyEach(schema.stateMachines, readonly);
         },
         {
@@ -114,6 +113,8 @@ export class TechnicalChallengeTemplateFormComponent {
             stateMachines,
         };
     }
+
+    protected readonly submit = submit;
 }
 
 interface TechnicalChallengeFormModel {

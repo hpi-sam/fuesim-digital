@@ -5,7 +5,6 @@ import { type ImageProperties } from '../utils/image-properties.js';
 import { positionSchema } from '../utils/position/position.js';
 import { sizeSchema } from '../utils/size.js';
 
-// eslint-disable-next-line import-x/no-cycle
 import {
     type StateMachine,
     stateMachineSchema,

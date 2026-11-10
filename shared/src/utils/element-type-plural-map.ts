@@ -13,12 +13,12 @@ export const elementTypePluralMap = {
     patient: 'patients',
     personnel: 'personnel',
     simulatedRegion: 'simulatedRegions',
-    taskType: 'taskTypes',
     technicalChallenge: 'technicalChallenges',
     transferPoint: 'transferPoints',
     vehicle: 'vehicles',
     viewport: 'viewports',
     scoutable: 'scoutables',
 } as const satisfies { [Key in Element['type']]: keyof ExerciseState };
+// TODO@Felix: add qualifications
 
 export type ElementTypePluralMap = typeof elementTypePluralMap;

@@ -1,5 +1,5 @@
 import { Component, inject, input } from '@angular/core';
-import { TechnicalChallengeTemplate, TaskType } from 'fuesim-digital-shared';
+import { TechnicalChallengeTemplate } from 'fuesim-digital-shared';
 import { UploadTechnicalChallengeTemplateFormComponent } from '../../../../../../exercises/exercise/shared/editor-panel/upload-technical-challenge-template-form/upload-technical-challenge-template-form.component.js';
 import {
     BaseVersionedElementSubmodal,
@@ -8,11 +8,11 @@ import {
 } from '../../base-versioned-element-submodal.js';
 
 @Component({
-    selector: 'app-technical-challenge-template-form',
+    selector: 'app-technical-challenge-template-form-wrapper',
     imports: [UploadTechnicalChallengeTemplateFormComponent],
-    templateUrl: './technical-challenge-template-form.component.html',
+    templateUrl: './technical-challenge-template-form-wrapper.component.html',
 })
-export class TechnicalChallengeTemplateFormComponent implements BaseVersionedElementSubmodal<TechnicalChallengeTemplate> {
+export class TechnicalChallengeTemplateFormWrapperComponent implements BaseVersionedElementSubmodal<TechnicalChallengeTemplate> {
     // TODO: handle difference between import /viewing
     public readonly data =
         input.required<VersionedElementModalData<TechnicalChallengeTemplate>>();
@@ -21,12 +21,9 @@ export class TechnicalChallengeTemplateFormComponent implements BaseVersionedEle
     public formOutput = inject(FormOutputInjectionToken);
 
     public async submit(
-        technicalChallengeTemplate: TechnicalChallengeTemplate,
-        additionalTasks: readonly TaskType[]
+        technicalChallengeTemplate: TechnicalChallengeTemplate
     ) {
-        // TODO: how to handle tasks here?
+        // TODO@Felix: Qualifications?
         this.formOutput.dataSubmit(technicalChallengeTemplate);
-
-        // TODO: add tasks to marketplace
     }
 }

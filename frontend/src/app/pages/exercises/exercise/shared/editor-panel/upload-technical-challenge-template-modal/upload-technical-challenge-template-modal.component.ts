@@ -1,12 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal, type NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {
-    technicalChallengeTemplateSchema,
-    taskTypeSchema,
-    TechnicalChallengeTemplate,
-    TaskType,
-} from 'fuesim-digital-shared';
-import { z } from 'zod';
+import { TechnicalChallengeTemplate } from 'fuesim-digital-shared';
 import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 import { ExerciseService } from '../../../../../../core/exercise.service.js';
 import { MessageService } from '../../../../../../core/messages/message.service.js';
@@ -17,13 +11,6 @@ export function openUploadTechnicalChallengeModal(ngbModal: NgbModal) {
         size: 'lg',
     });
 }
-
-const uploadTechnicalChallengeTemplateSchema = z.strictObject({
-    type: z.literal('technicalChallengeImport'),
-    version: z.literal('v1'),
-    technicalChallengeTemplate: technicalChallengeTemplateSchema,
-    requiredTaskTypes: z.array(taskTypeSchema),
-});
 
 @Component({
     selector: 'app-upload-technical-challenge-template-modal',
@@ -39,13 +26,11 @@ class UploadTechnicalChallengeTemplateModalComponent {
     private readonly messageService = inject(MessageService);
 
     public async importTemplate(
-        technicalChallengeTemplate: TechnicalChallengeTemplate,
-        additionalTasks: readonly TaskType[]
+        technicalChallengeTemplate: TechnicalChallengeTemplate
     ) {
         await this.exerciseService.proposeAction({
-            type: '[TechnicalChallengeTemplate] Import a new template with tasks',
+            type: '[TechnicalChallengeTemplate] Import a new template',
             technicalChallengeTemplate,
-            additionalTasks,
         });
 
         this.messageService.postMessage({

@@ -14,10 +14,7 @@ import type {
     StateMachineDefinition,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
-import {
-    EditStateMachineFormComponent,
-    type TaskNameMap,
-} from '../../../editor-panel/edit-state-machine-form/edit-state-machine-form.component.js';
+import { EditStateMachineFormComponent } from '../../../editor-panel/edit-state-machine-form/edit-state-machine-form.component.js';
 import type { AppState } from '../../../../../../../state/app.state.js';
 import { ExerciseService } from '../../../../../../../core/exercise.service.js';
 import { createSelectTechnicalChallenge } from '../../../../../../../state/application/selectors/exercise.selectors.js';
@@ -27,8 +24,7 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
 export function openEditStateMachineModalComponent(
     ngbModalService: NgbModal,
     containingTechnicalChallengeId: UUID,
-    stateMachineId: UUID,
-    taskNameMap: Signal<TaskNameMap>
+    stateMachineId: UUID
 ) {
     const modalRef = ngbModalService.open(EditStateMachineModalComponent, {
         size: 'xl',
@@ -38,8 +34,6 @@ export function openEditStateMachineModalComponent(
     componentInstance.initialStateMachineId = stateMachineId;
     componentInstance.containingTechnicalChallengeId =
         containingTechnicalChallengeId;
-    // @ts-expect-error assigning to readonly
-    componentInstance.taskNameMap = taskNameMap;
 }
 
 @Component({
@@ -56,7 +50,6 @@ class EditStateMachineModalComponent implements OnInit {
     // all set, when instantiating component
     containingTechnicalChallengeId!: UUID;
     initialStateMachineId: UUID | undefined;
-    readonly taskNameMap!: Signal<TaskNameMap>;
 
     private readonly technicalChallenge!: Signal<TechnicalChallenge>;
     readonly stateMachine!: Signal<StateMachine>;

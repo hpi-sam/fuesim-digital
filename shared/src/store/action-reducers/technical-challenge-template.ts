@@ -4,14 +4,11 @@ import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { technicalChallengeTemplateSchema } from '../../models/technical-challenge/technical-challenge-template.js';
-import { taskTypeSchema } from '../../models/task-type.js';
 
 const importTechnicalChallengeTemplateActionSchema = z.strictObject({
-    type: z.literal(
-        '[TechnicalChallengeTemplate] Import a new template with tasks'
-    ),
+    type: z.literal('[TechnicalChallengeTemplate] Import a new template'),
     technicalChallengeTemplate: technicalChallengeTemplateSchema,
-    additionalTasks: z.array(taskTypeSchema),
+    // TODO@Felix: How to handle nonexisting qualifications?
 });
 
 const updateTechnicalChallengeTemplateActionSchema = z.strictObject({
@@ -25,15 +22,9 @@ export namespace TechnicalChallengeTemplateActionReducers {
     > = {
         type: importTechnicalChallengeTemplateActionSchema.shape.type.value,
         actionSchema: importTechnicalChallengeTemplateActionSchema,
-        reducer: (
-            draftState,
-            { technicalChallengeTemplate, additionalTasks }
-        ) => {
+        reducer: (draftState, { technicalChallengeTemplate }) => {
             draftState.templates[technicalChallengeTemplate.id] =
                 cloneDeepMutable(technicalChallengeTemplate);
-            for (const taskType of additionalTasks) {
-                draftState.taskTypes[taskType.id] = cloneDeepMutable(taskType);
-            }
 
             return draftState;
         },

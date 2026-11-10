@@ -7,28 +7,10 @@
             (technicalChallengeTemplateChange)="
                 uploadedTechnicalChallenge.set($event)
             "
-            [taskNameMap]="taskNameMap()"
         >
         </app-technical-challenge-template-form>
 
-        <div>
-            <h5>Zusätzliche Aufgabentypen</h5>
-            <div
-                class="alert alert-info small px-2 py-1 d-flex align-items-center"
-            >
-                <i class="bi bi-info-circle me-2"></i>
-                Diese Aufgabentypen werden von der technischen Herausforderung
-                benötigt und dafür automatisch importiert.
-            </div>
-            <ul class="list-group">
-                @for (
-                    taskType of uploadedAdditionalTasks();
-                    track taskType.id
-                    ) {
-                    <li class="list-group-item">{{ taskType.taskName }}</li>
-                }
-            </ul>
-        </div>
+        <!--   TODO@Felix: Qualification import?     -->
 
         <button class="btn btn-primary mt-3" (click)="importTemplate()">
             Technische Herausforderung importieren

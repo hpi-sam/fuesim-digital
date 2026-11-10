@@ -3,7 +3,7 @@
         Technische Herausforderung importieren
         <app-help-button
             url="2_exercises/3_exercise_elements.html#technische-herausforderungen"
-            [trainerOnly]="true"
+            [trainerOnly]="false"
         />
     </h4>
     <button type="button" class="btn-close" (click)="close()"></button>
@@ -11,7 +11,6 @@
 
 <div class="modal-body">
     <app-upload-technical-challenge-template-form
-        (outputTemplate)="importTemplate($event.technicalChallengeTemplate, $event.additionalTasks)"
-
+        (outputTemplate)="importTemplate($event.technicalChallengeTemplate)"
     ></app-upload-technical-challenge-template-form>
 </div>

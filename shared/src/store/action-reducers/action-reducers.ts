@@ -5,7 +5,6 @@ import { ClientActionReducers } from './client.js';
 import { ExerciseActionReducers } from './exercise.js';
 import { ConfigurationActionReducers } from './configuration.js';
 import { HospitalActionReducers } from './hospital.js';
-import { MapImageTemplatesActionReducers } from './map-image-template.js';
 import { MapImagesActionReducers } from './map-image.js';
 import { MaterialActionReducers } from './material.js';
 import { PatientActionReducers } from './patient.js';
@@ -27,12 +26,14 @@ import { MeasureTemplateCategoryActionReducers } from './measure-template-catego
 import { DrawingActionReducers } from './drawing.js';
 import { TechnicalChallengeActionReducers } from './technical-challenge.js';
 import { CollectionReducers } from './collections.js';
-
 import { TechnicalChallengeTemplateActionReducers } from './technical-challenge-template.js';
+import { DeprecatedActionReducers } from './deprecated.js';
+
 /**
  * All action reducers of the exercise must be registered here
  */
 const actionReducers = {
+    ...DeprecatedActionReducers,
     ...ClientActionReducers,
     ...ExerciseActionReducers,
     ...MaterialActionReducers,
@@ -44,7 +45,6 @@ const actionReducers = {
     ...TransferPointActionReducers,
     ...ConfigurationActionReducers,
     ...AlarmGroupActionReducers,
-    ...MapImageTemplatesActionReducers,
     ...TransferActionReducers,
     ...HospitalActionReducers,
     ...EmergencyOperationCenterActionReducers,

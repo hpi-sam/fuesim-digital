@@ -18,7 +18,7 @@
                         <button
                             [class.active]="behavior === selectedBehavior"
                             (click)="onBehaviorSelect(behavior)"
-                            class="list-group-item list-group-item-action d-flex align-items-center flex-nowrap"
+                            class="list-group-item list-group-item-action d-flex align-items-center flex-nowrap text-break"
                         >
                             {{ behavior.type | behaviorTypeToGermanName }}
                         </button>

@@ -7,7 +7,7 @@ import {
     ChangeDetectionStrategy,
 } from '@angular/core';
 import type { Patient, UUID } from 'fuesim-digital-shared';
-import { NgClass, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectPatient } from '../../../../../../../state/application/selectors/exercise.selectors';
@@ -21,7 +21,6 @@ import { HelpButtonComponent } from '../../../../../../../help-button/help-butto
     styleUrls: ['./patient-popup.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
-        NgClass,
         PatientHeaderComponent,
         PatientsDetailsComponent,
         AsyncPipe,

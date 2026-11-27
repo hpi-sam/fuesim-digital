@@ -1,5 +1,4 @@
-import { ReducerError } from 'fuesim-digital-shared';
-import { ZodError } from 'zod';
+import { ReducerError, ValidationError } from 'fuesim-digital-shared';
 import { DatabaseService } from './database/services/database-service.js';
 import { RestoreError } from './utils/restore-error.js';
 import { Config } from './config.js';
@@ -137,10 +136,10 @@ async function main() {
             );
         } catch (e: unknown) {
             console.error('❌ An error occurred while loading exercises.');
-            if (e instanceof ZodError) {
+            if (e instanceof ValidationError) {
                 console.error(
                     'The validation of the exercises and actions in the database failed:',
-                    e.message
+                    e.getMessage()
                 );
                 return;
             } else if (e instanceof ReducerError) {

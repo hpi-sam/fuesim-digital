@@ -24,7 +24,6 @@ import {
 import { type UUID, uuid } from '../../utils/uuid.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import type { ParticipantKey } from '../../exercise-keys.js';
 import { simulateAllTechnicalChallenges } from '../../models/technical-challenge/state-machine.js';
 import { getTemplates } from '../../models/template.js';
 import { viewportSchema } from '../../models/viewport.js';
@@ -86,23 +85,6 @@ export const importTemplatesActionSchema = z.strictObject({
 });
 export type ImportTemplatesAction = Immutable<
     z.infer<typeof importTemplatesActionSchema>
->;
-
-/**
- * WARNING: THIS IS ABSOLUTELY LEGACY
- * --- DO NOT USE ---
- * This is used only for legacy purposes for exercises created with an empty intitialState participantId (stateVersion <4)
- * We cannot migrate them properly without this action
- *
- * @deprecated
- */
-export const setParticipantIdActionSchema = z.strictObject({
-    type: z.literal('[Exercise] Set Participant Id'),
-    participantId: z.string(),
-});
-/* @deprecated */
-export type SetParticipantIdAction = Immutable<
-    z.infer<typeof setParticipantIdActionSchema>
 >;
 
 export namespace ExerciseActionReducers {
@@ -262,23 +244,6 @@ export namespace ExerciseActionReducers {
             return draftState;
         },
         rights: 'trainer',
-    };
-    /**
-     * WARNING: THIS IS ABSOLUTELY LEGACY
-     * --- DO NOT USE ---
-     * This is used only for legacy purposes for exercises created with an empty intitialState participantId (stateVersion <4)
-     * We cannot migrate them properly without this action
-     *
-     * @deprecated
-     */
-    export const setParticipantId: ActionReducer<SetParticipantIdAction> = {
-        type: '[Exercise] Set Participant Id',
-        actionSchema: setParticipantIdActionSchema,
-        reducer: (draftState, { participantId }) => {
-            draftState.participantKey = participantId as ParticipantKey;
-            return draftState;
-        },
-        rights: 'server',
     };
 }
 

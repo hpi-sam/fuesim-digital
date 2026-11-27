@@ -1,6 +1,6 @@
 import { newExerciseState } from './state.js';
 import type { ParticipantKey } from './exercise-keys.js';
-import { validateExerciseState } from './store/validate-exercise-state.js';
+import { validateExerciseState } from './store/validate.js';
 
 describe('ExerciseState', () => {
     // If this fails, either the created state is invalid, or a validator is incorrect/missing in a model.

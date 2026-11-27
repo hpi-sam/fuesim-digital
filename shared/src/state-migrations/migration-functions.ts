@@ -86,7 +86,6 @@ type MigrateStateFunction = (state: object) => void;
 export interface Migration {
     action: MigrateActionFunction | null;
     state: MigrateStateFunction | null;
-    unmigratableActions?: true | undefined;
 }
 
 export const migrations: {

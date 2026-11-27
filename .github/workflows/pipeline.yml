@@ -305,7 +305,7 @@ jobs:
             - name: Add commit hash to version
               uses: ./.github/actions/add-commit-hash-to-version
             - name: Login to GitHub Container Registry
-              uses: docker/login-action@v3
+              uses: docker/login-action@v4
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}
@@ -342,7 +342,7 @@ jobs:
             - name: Add commit hash to version
               uses: ./.github/actions/add-commit-hash-to-version
             - name: Login to GitHub Container Registry
-              uses: docker/login-action@v3
+              uses: docker/login-action@v4
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}
@@ -373,7 +373,7 @@ jobs:
             - uses: ./.github/actions/extract-version
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Login to GitHub Container Registry
-              uses: docker/login-action@v3
+              uses: docker/login-action@v4
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}

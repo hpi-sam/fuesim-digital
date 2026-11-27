@@ -94,7 +94,7 @@ jobs:
             - name: Build shared
               run: cd shared && npm run build
             - name: Upload shared dist
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: shared-dist
                   path: shared/dist
@@ -198,7 +198,7 @@ jobs:
               run: npm run merge-coverage
               if: always()
             - name: Upload coverage
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: always()
               with:
                   name: coverage-output
@@ -260,7 +260,7 @@ jobs:
                   command-prefix: '--' # So cypress is using our node version: https://github.com/cypress-io/github-action/issues/489#issuecomment-1021379037
             - name: Archive cypress screenshots
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: cypress-screenshots-${{ matrix.browser }}
                   path: frontend/cypress/screenshots

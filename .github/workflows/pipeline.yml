@@ -28,7 +28,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup-install
               with:
                   cache-only: true
@@ -45,7 +45,7 @@ jobs:
         continue-on-error: true
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup-install
               with:
                   download-shared: false
@@ -70,7 +70,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - name: Build docker image
               uses: docker/build-push-action@v6
               with:
@@ -86,7 +86,7 @@ jobs:
         needs: cache-dependencies
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup-install
               with:
                   install-command: cd shared && npm ci --no-audit
@@ -106,7 +106,7 @@ jobs:
         needs: build-shared
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup-install
               with:
                   install-command: (cd shared && npm ci --no-audit) && (cd frontend && npm ci --no-audit)
@@ -120,7 +120,7 @@ jobs:
         needs: build-shared
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup-install
               with:
                   install-command: (cd shared && npm ci --no-audit) && (cd backend && npm ci --no-audit)
@@ -134,7 +134,7 @@ jobs:
         needs: build-shared
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup-install
             - name: Run ESLint
               run: npm run lint
@@ -171,7 +171,7 @@ jobs:
                     --tmpfs /var/lib/postgresql
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
               with:
                   submodules: true
             - uses: ./.github/actions/setup-install
@@ -235,7 +235,7 @@ jobs:
             fail-fast: false
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/setup-install
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
@@ -295,7 +295,7 @@ jobs:
             packages: write
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             # We need the correct node/npm version for add-commit-hash-to-version to work properly
             - uses: ./.github/actions/setup-install
               with:
@@ -332,7 +332,7 @@ jobs:
             packages: write
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             # We need the correct node/npm version for add-commit-hash-to-version to work properly
             - uses: ./.github/actions/setup-install
               with:
@@ -369,7 +369,7 @@ jobs:
             packages: write
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/extract-version
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Login to GitHub Container Registry
@@ -396,7 +396,7 @@ jobs:
         permissions:
             contents: write
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/extract-version
             - name: Extract release notes
               id: extract_release_notes

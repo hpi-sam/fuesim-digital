@@ -1,6 +1,7 @@
 import './utils/dotenv-config.js';
 import dotenv from 'dotenv';
 import { bool, cleanEnv, makeValidator, num, str, url } from 'envalid';
+import bytes from 'bytes';
 
 export class Config {
     private static _websocketPort?: number;
@@ -12,6 +13,8 @@ export class Config {
     private static _httpFrontendUrl?: string;
 
     private static _uploadLimit?: string;
+
+    private static _imageUploadLimit?: string;
 
     private static _autoDeleteDays?: number;
 
@@ -38,6 +41,12 @@ export class Config {
     private static _authUserRegistrationAdapter?: string;
 
     private static _authSelfServiceUrl?: string;
+
+    private static _s3Endpoint?: string;
+    private static _s3Region?: string;
+    private static _s3Bucket?: string;
+    private static _s3AccessKeyId?: string;
+    private static _s3SecretAccessKey?: string;
 
     private static _devNoWaitingRoom?: boolean;
 
@@ -70,6 +79,15 @@ export class Config {
     public static get uploadLimit(): string {
         this.throwIfNotInitialized();
         return this._uploadLimit!;
+    }
+
+    public static get imageUploadLimit(): number {
+        this.throwIfNotInitialized();
+        const parsedLimit = bytes.parse(`${this._imageUploadLimit!}b`);
+        if (!parsedLimit) {
+            throw new Error(`${this._imageUploadLimit} is not a valid size.`);
+        }
+        return parsedLimit;
     }
 
     public static get autoDeleteDays(): number {
@@ -137,6 +155,31 @@ export class Config {
         return this._authSelfServiceUrl!;
     }
 
+    public static get s3Endpoint(): string {
+        this.throwIfNotInitialized();
+        return this._s3Endpoint!;
+    }
+
+    public static get s3Region(): string {
+        this.throwIfNotInitialized();
+        return this._s3Region!;
+    }
+
+    public static get s3Bucket(): string {
+        this.throwIfNotInitialized();
+        return this._s3Bucket!;
+    }
+
+    public static get s3AccessKeyId(): string {
+        this.throwIfNotInitialized();
+        return this._s3AccessKeyId!;
+    }
+
+    public static get s3SecretAccessKey(): string {
+        this.throwIfNotInitialized();
+        return this._s3SecretAccessKey!;
+    }
+
     public static get devNoWaitingRoom(): boolean {
         this.throwIfNotInitialized();
         return this._devNoWaitingRoom!;
@@ -187,6 +230,7 @@ export class Config {
                 default: 'http://localhost:14200',
             }),
             DFM_UPLOAD_LIMIT: str({ default: '200m' }),
+            DFM_IMAGE_UPLOAD_LIMIT: str({ default: '4m' }),
             DFM_AUTO_DELETE_DAYS: num({ default: 30 }),
             DFM_USE_DB: bool(),
             DFM_USE_DB_TESTING: bool({ default: undefined }),
@@ -233,6 +277,11 @@ export class Config {
             }),
             DFM_AUTH_SELF_SERVICE_URL: url({ default: '' }),
             DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
+            DFM_S3_ENDPOINT: str({ default: 'http://localhost:9092' }),
+            DFM_S3_REGION: str({ default: 'garage' }),
+            DFM_S3_BUCKET: str({ default: 'fuesim-digital' }),
+            DFM_S3_ACCESS_KEY_ID: str({ default: 'fuesim-digital-key' }),
+            DFM_S3_SECRET_ACCESS_KEY: str({ default: '' }),
             DFM_DEV_NO_WAITING_ROOM: bool({ default: false }),
             DFM_PARALLEL_EXERCISES_ENABLED: bool({ default: true }),
             DFM_BANNER_TYPE: str({ default: undefined }),
@@ -271,6 +320,7 @@ export class Config {
                 ? env.DFM_HTTP_FRONTEND_URL_TESTING
                 : env.DFM_HTTP_FRONTEND_URL;
         this._uploadLimit = env.DFM_UPLOAD_LIMIT;
+        this._imageUploadLimit = testing ? '500b' : env.DFM_IMAGE_UPLOAD_LIMIT;
         this._autoDeleteDays = env.DFM_AUTO_DELETE_DAYS;
         this._useDb =
             testing && env.DFM_USE_DB_TESTING
@@ -320,6 +370,11 @@ export class Config {
             testing && env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 ? env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 : env.DFM_AUTH_SELF_SERVICE_URL;
+        this._s3Endpoint = env.DFM_S3_ENDPOINT;
+        this._s3Region = env.DFM_S3_REGION;
+        this._s3Bucket = env.DFM_S3_BUCKET;
+        this._s3AccessKeyId = env.DFM_S3_ACCESS_KEY_ID;
+        this._s3SecretAccessKey = env.DFM_S3_SECRET_ACCESS_KEY;
         this._devNoWaitingRoom = env.DFM_DEV_NO_WAITING_ROOM;
         this._parallelExercisesEnabled = testing
             ? true

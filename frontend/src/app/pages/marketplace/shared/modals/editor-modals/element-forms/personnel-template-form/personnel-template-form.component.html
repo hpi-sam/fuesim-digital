@@ -39,7 +39,10 @@
     </div>
 </div>
 
-<app-image-partial-form [imageForm]="personnelForm.image" />
+<app-image-partial-form
+    [imageForm]="personnelForm.image"
+    [availableCollectionElements]="this.data().availableCollectionElements"
+/>
 
 <div class="card">
     <div class="card-body">

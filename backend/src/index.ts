@@ -21,6 +21,7 @@ import { OrganisationRepository } from './database/repositories/organisation-rep
 import { CollectionRepository } from './database/repositories/collection-repository.js';
 import { CollectionService } from './database/services/collection-service.js';
 import { UserDataService } from './database/services/userdata-service.js';
+import { S3Service } from './s3/s3-service.js';
 
 async function main() {
     Config.initialize();
@@ -39,6 +40,8 @@ async function main() {
         throw e;
     }
     console.log('Successfully connected to the database.');
+
+    const s3Service = await S3Service.createNewConnection();
 
     const repositories: Repositories = {
         exerciseRepository: new ExerciseRepository(
@@ -87,16 +90,19 @@ async function main() {
         repositories.userRepository
     );
     const collectionService = new CollectionService(
+        s3Service,
         exerciseService,
         organisationService,
         repositories.collectionRepository
     );
     const userDataService = new UserDataService(
+        s3Service,
         repositories.exerciseRepository,
         repositories.sessionRepository,
         repositories.userRepository,
         repositories.parallelExerciseRepository,
-        repositories.organisationRepository
+        repositories.organisationRepository,
+        repositories.collectionRepository
     );
 
     await collectionService.initialize();
@@ -122,6 +128,7 @@ async function main() {
         organisationService,
         collectionService,
         userDataService,
+        s3Service,
     };
 
     if (Config.useDb) {

@@ -1,0 +1,35 @@
+<div class="d-flex flex-column gap-2">
+    @let template = uploadedTechnicalChallenge();
+    @if (template) {
+        <app-technical-challenge-template-form
+            class="mb-2"
+            [technicalChallengeTemplate]="template"
+            (technicalChallengeTemplateChange)="
+                uploadedTechnicalChallenge.set($event)
+            "
+        >
+        </app-technical-challenge-template-form>
+
+        <!--   TODO@Felix: Qualification import?     -->
+
+        <button class="btn btn-primary mt-3" (click)="importTemplate()">
+            Technische Herausforderung importieren
+        </button>
+    } @else {
+        <p class="text-center text-muted">
+            Hier können Sie Vorlagen für technische Herausforderung hochladen
+            und importieren, welche mit dem bald verfügbaren
+            Herausforderungseditor erstellt wurden.
+        </p>
+        <label class="btn btn-outline-primary my-2">
+            <i class="bi-cloud-upload me-2"> </i>
+            Vorlage importieren
+            <input
+                (appFileInput)="uploadTechnicalChallengeTemplate($event)"
+                type="file"
+                accept="application/json"
+                class="d-none"
+            />
+        </label>
+    }
+</div>

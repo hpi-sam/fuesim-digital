@@ -45,9 +45,12 @@ import type { Vehicle } from '../../../models/vehicle.js';
 import { formatDuration } from '../../../utils/format-duration.js';
 import type { ExerciseRadiogram } from '../../../models/radiogram/exercise-radiogram.js';
 import { TypeAssertedObject } from '../../../utils/type-asserted-object.js';
-import type { StateMachineState } from '../../../models/technical-challenge/state-machine.js';
-// eslint-disable-next-line import-x/no-cycle
-import { TechnicalChallenge } from '../../../models/technical-challenge/technical-challenge.js';
+import type {
+    StateMachineState,
+    Task,
+} from '../../../models/technical-challenge/state-machine.js';
+
+import type { TechnicalChallenge } from '../../../models/technical-challenge/technical-challenge.js';
 import {
     getElement,
     getExerciseBehaviorById,
@@ -948,87 +951,64 @@ export function logTechnicalChallenge(
     state: WritableDraft<ExerciseState>,
     additionalTags: Tag[],
     description: string,
-    technicalChallengeId: UUID
+    technicalChallenge: TechnicalChallenge
 ) {
     if (!logActive(state)) return;
 
-    const technicalChallenge = getElement(
-        state,
-        'technicalChallenge',
-        technicalChallengeId
-    );
-
     log(
         state,
-        [
-            createTechnicalChallengeTag(state, technicalChallenge),
-            ...additionalTags,
-        ],
+        [createTechnicalChallengeTag(technicalChallenge), ...additionalTags],
         description
     );
 }
 
 export function logTechnicalChallengePersonnelAssigned(
     state: WritableDraft<ExerciseState>,
-    technicalChallengeId: UUID,
-    personnelId: UUID,
-    taskId: UUID
+    technicalChallenge: TechnicalChallenge,
+    personnel: Personnel,
+    task: Task
 ) {
     if (!logActive(state)) return;
 
-    const personnel = getElement(state, 'personnel', personnelId);
-    const task = getElement(state, 'taskType', taskId);
     logTechnicalChallenge(
         state,
-        [createPersonnelTypeTag(state, personnel), createTaskTag(state, task)],
+        [createPersonnelTypeTag(state, personnel), createTaskTag(task)],
         'Personal wurde zu einer technischen Herausforderung zugewiesen.',
-        technicalChallengeId
+        technicalChallenge
     );
 }
 
 export function logTechnicalChallengePersonnelUnassigned(
     state: WritableDraft<ExerciseState>,
-    technicalChallengeId: UUID,
-    personnelId: UUID,
-    taskId: UUID
+    technicalChallenge: TechnicalChallenge,
+    personnel: Personnel,
+    task: Task
 ) {
     if (!logActive(state)) return;
 
-    const personnel = getElement(state, 'personnel', personnelId);
-    const task = getElement(state, 'taskType', taskId);
     logTechnicalChallenge(
         state,
-        [createPersonnelTypeTag(state, personnel), createTaskTag(state, task)],
+        [createPersonnelTypeTag(state, personnel), createTaskTag(task)],
         'Personal wurde von einer Aufgabe in einer technischen Herausforderung entfernt.',
-        technicalChallengeId
+        technicalChallenge
     );
 }
 
 export function logTechnicalChallengeStateTransition(
     state: WritableDraft<ExerciseState>,
-    technicalChallengeId: UUID,
-    fromId: StateMachineState['id'],
-    toId: StateMachineState['id']
+    technicalChallenge: TechnicalChallenge,
+    fromState: StateMachineState,
+    toState: StateMachineState
 ) {
     if (!logActive(state)) return;
 
-    const technicalChallenge = getElement(
-        state,
-        'technicalChallenge',
-        technicalChallengeId
-    );
-    const fromState = TechnicalChallenge.getStateById(
-        technicalChallenge,
-        fromId
-    )!;
-    const toState = TechnicalChallenge.getStateById(technicalChallenge, toId)!;
     logTechnicalChallenge(
         state,
         [
-            createStateTag(state, fromState, 'Startzustand'),
-            createStateTag(state, toState, 'Endzustand'),
+            createStateTag(fromState, 'Startzustand'),
+            createStateTag(toState, 'Endzustand'),
         ],
         'Technische Herausforderung hat den Zustand gewechselt.',
-        technicalChallengeId
+        technicalChallenge
     );
 }

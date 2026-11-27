@@ -1,4 +1,4 @@
-@if (this.currentRole() === 'trainer') {
+@if (!currentlyInExercise() || currentRole() === 'trainer') {
     <div>
         <div class="NgxEditor__Wrapper mb-2">
             <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">

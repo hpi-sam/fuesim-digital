@@ -6,7 +6,7 @@ import {
     ChangeDetectionStrategy,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { TaskType, TechnicalChallengeId, UUID } from 'fuesim-digital-shared';
+import { Task, TechnicalChallengeId, UUID } from 'fuesim-digital-shared';
 import type { StateMachine } from 'fuesim-digital-shared';
 import { PopupService } from '../../utility/popup.service';
 import { AppState } from '../../../../../../../state/app.state';
@@ -28,19 +28,16 @@ export class ChooseTaskPopupComponent implements OnInit {
     public personnelId!: UUID;
     public assignTaskCallback!: (
         stateMachineId: StateMachine['id'],
-        taskTypeId: TaskType['id']
+        taskId: Task['id']
     ) => void;
 
     /** Available tasks, grouped by their containing state machine */
     public readonly availableTasks!: Signal<
-        { stateMachine: StateMachine; tasks: TaskType[] }[]
+        { stateMachine: StateMachine; tasks: Task[] }[]
     >;
 
-    public assignTask(
-        stateMachineId: StateMachine['id'],
-        taskTypeId: TaskType['id']
-    ) {
-        this.assignTaskCallback(stateMachineId, taskTypeId);
+    public assignTask(stateMachineId: StateMachine['id'], taskId: Task['id']) {
+        this.assignTaskCallback(stateMachineId, taskId);
         this.popupService.submitPopup();
     }
 

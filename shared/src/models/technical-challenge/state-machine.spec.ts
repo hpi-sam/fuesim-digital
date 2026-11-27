@@ -3,6 +3,7 @@ import { produce } from 'immer';
 import type { ParticipantKey } from '../../exercise-keys.js';
 import type { ExerciseState } from '../../state.js';
 import { newExerciseState } from '../../state.js';
+// TODO@Felix: create new sample test data.
 import {
     getDefaultTechnicalChallengeTemplate,
     StateMachineTesting,

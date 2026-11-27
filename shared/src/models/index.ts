@@ -32,4 +32,3 @@ export * from './user-generated-content.js';
 export * from './drawing.js';
 export * from './technical-challenge/index.js';
 export * from './template.js';
-export * from './task-type.js';

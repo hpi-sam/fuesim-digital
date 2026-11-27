@@ -2,9 +2,9 @@ import { Component, computed, inject, input, Signal } from '@angular/core';
 import type {
     StateMachine,
     Personnel,
-    TaskType,
     Guard,
     StateMachineState,
+    Task,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import {
@@ -15,13 +15,10 @@ import {
 import { ProgressBarComponent } from '../progress-bar/progress-bar.component.js';
 import {
     createSelectPersonnel,
-    createSelectTaskType,
     selectCurrentTime,
     selectExerciseStatus,
-    selectTaskTypes,
 } from '../../../state/application/selectors/exercise.selectors.js';
 import type { AppState } from '../../../state/app.state.js';
-import { selectStateSnapshot } from '../../../state/get-state-snapshot.js';
 
 @Component({
     selector: 'app-state-machine-details',
@@ -52,15 +49,13 @@ export class StateMachineDetailsComponent {
         );
     });
 
-    public readonly assignedPersonnel = computed<[Personnel, TaskType][]>(
-        () => {
-            const assignments = this.stateMachine().assignedPersonnel;
-            return Object.entries(assignments).map(([personnelId, taskId]) => [
-                this.store.selectSignal(createSelectPersonnel(personnelId))(),
-                this.store.selectSignal(createSelectTaskType(taskId))(),
-            ]);
-        }
-    );
+    public readonly assignedPersonnel = computed<[Personnel, Task][]>(() => {
+        const assignments = this.stateMachine().assignedPersonnel;
+        return Object.entries(assignments).map(([personnelId, taskId]) => [
+            this.store.selectSignal(createSelectPersonnel(personnelId))(),
+            this.stateMachine().tasks[taskId]!, // TODO@Felix: fix assertion
+        ]);
+    });
 
     public readonly transitions: Signal<
         {
@@ -99,15 +94,13 @@ export class StateMachineDetailsComponent {
             };
         })
     );
-    public readonly taskTypes = this.store.selectSignal(selectTaskTypes);
     public readonly tasks = computed(() =>
         Object.values(this.stateMachine().tasks).map((task) => ({
-            id: task.taskTypeId,
+            id: task.id,
             totalDuration: task.totalDuration / 1000,
-            name: this.taskTypes()[task.taskTypeId]!.taskName,
+            name: task.name,
             current:
-                getTaskProgress(task.taskTypeId, this.stateMachine())
-                    .timeSpent / 1000,
+                getTaskProgress(task.id, this.stateMachine()).timeSpent / 1000,
         }))
     );
 
@@ -121,10 +114,7 @@ export class StateMachineDetailsComponent {
     private getGuardName(guard: Guard, stateMachine: StateMachine): string {
         switch (guard.type) {
             case 'taskGuard':
-                return selectStateSnapshot(
-                    createSelectTaskType(guard.taskId),
-                    this.store
-                ).taskName;
+                return stateMachine.tasks[guard.taskId]!.name;
             case 'timerGuard':
                 return stateMachine.timers[guard.timerId]!.name;
             case 'andGuard': {

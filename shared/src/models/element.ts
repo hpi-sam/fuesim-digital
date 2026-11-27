@@ -15,7 +15,6 @@ import { vehicleSchema } from './vehicle.js';
 import { viewportSchema } from './viewport.js';
 import { scoutableSchema } from './scoutable.js';
 import { technicalChallengeSchema } from './technical-challenge/technical-challenge.js';
-import { taskTypeSchema } from './task-type.js';
 
 export const elementSchema = z.discriminatedUnion('type', [
     alarmGroupSchema,
@@ -28,7 +27,6 @@ export const elementSchema = z.discriminatedUnion('type', [
     personnelSchema,
     restrictedZoneSchema,
     simulatedRegionSchema,
-    taskTypeSchema,
     technicalChallengeSchema,
     transferPointSchema,
     vehicleSchema,

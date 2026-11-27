@@ -5,6 +5,7 @@ import { PersonnelTemplateFormComponent } from './modals/editor-modals/element-f
 import { VehicleTemplateFormMarketplaceComponent } from './modals/editor-modals/element-forms/vehicle-template-form/vehicle-template-form.component';
 import { AlarmGroupFormComponent } from './modals/editor-modals/element-forms/alarm-group-form/alarm-group-form.component.js';
 import { MeasureTemplateFormMarketplaceComponent } from './modals/editor-modals/element-forms/measure-template-form/measure-template-form.component';
+import { TechnicalChallengeTemplateFormWrapperComponent } from './modals/editor-modals/element-forms/technical-challenge-template-form/technical-challenge-template-form-wrapper.component.js';
 
 interface MarketplaceItemDefintition<C extends MarketplaceElementContent> {
     elementFormComponent: any;
@@ -68,6 +69,14 @@ export const marketplaceComponentDefinitions: {
         elementCard: (content) => ({
             title: content.name,
             subtitle: `${content.properties.length} Schritte`,
+        }),
+    },
+    technicalChallengeTemplate: {
+        elementFormComponent: TechnicalChallengeTemplateFormWrapperComponent,
+        helpUrl: '', // TODO
+        elementCard: (content) => ({
+            title: content.name,
+            image: content.image?.url,
         }),
     },
 };

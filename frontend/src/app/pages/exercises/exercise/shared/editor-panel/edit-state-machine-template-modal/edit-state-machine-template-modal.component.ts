@@ -10,10 +10,7 @@ import type {
     StateMachine,
     StateMachineDefinition,
 } from 'fuesim-digital-shared';
-import {
-    EditStateMachineFormComponent,
-    type TaskNameMap,
-} from '../edit-state-machine-form/edit-state-machine-form.component.js';
+import { EditStateMachineFormComponent } from '../edit-state-machine-form/edit-state-machine-form.component.js';
 import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 export function openEditStateMachineTemplateModal(
@@ -22,8 +19,7 @@ export function openEditStateMachineTemplateModal(
     isPrimaryStateMachine: Signal<boolean>,
     updateStateMachineCallback: (
         updatedStateMachine: StateMachineDefinition
-    ) => Promise<void>,
-    taskNameMap: Signal<TaskNameMap>
+    ) => Promise<void>
 ) {
     const modalRef = ngbModal.open(EditStateMachineTemplateModalComponent, {
         size: 'xl',
@@ -36,8 +32,6 @@ export function openEditStateMachineTemplateModal(
     // @ts-expect-error initializing readonly signal
     componentInstance.isPrimaryStateMachine = isPrimaryStateMachine;
     componentInstance.updateStateMachineCallback = updateStateMachineCallback;
-    // @ts-expect-error initializing readonly signal
-    componentInstance.taskNameMap = taskNameMap;
 }
 
 @Component({
@@ -55,7 +49,6 @@ class EditStateMachineTemplateModalComponent {
     updateStateMachineCallback!: (
         updatedStateMachine: StateMachineDefinition
     ) => Promise<void>;
-    readonly taskNameMap!: Signal<TaskNameMap>;
 
     readonly modalTitle = computed(
         () => `Teilherausforderung: ${this.stateMachine().name}`

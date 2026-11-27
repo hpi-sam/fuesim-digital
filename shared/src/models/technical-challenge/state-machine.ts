@@ -2,7 +2,6 @@ import { z } from 'zod';
 import type { Immutable, WritableDraft } from 'immer';
 import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 import type { ExerciseState } from '../../state.js';
-import { type TaskType, taskTypeSchema } from '../task-type.js';
 import {
     type ImageProperties,
     imagePropertiesSchema,
@@ -14,19 +13,17 @@ import {
 } from '../user-generated-content.js';
 import { type Personnel, personnelSchema } from '../personnel.js';
 import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
-// eslint-disable-next-line import-x/no-cycle
+
 import {
     logTechnicalChallengePersonnelUnassigned,
     logTechnicalChallengeStateTransition,
 } from '../../store/action-reducers/utils/log.js';
+import { getElement } from '../../store/action-reducers/utils/get-element.js';
 import type { TechnicalChallenge } from './technical-challenge.js';
 
-const taskSchema = z.object({
-    /**
-     * As there are never more than a single task of a type per state machine,
-     * `taskTypeId` is also the primary key for tasks.
-     */
-    taskTypeId: taskTypeSchema.shape.id,
+export const taskSchema = z.object({
+    id: uuidSchema,
+    name: z.string().nonempty(),
     totalDuration: z.number().nonnegative(),
 });
 export type Task = Immutable<z.infer<typeof taskSchema>>;
@@ -42,7 +39,7 @@ const taskGuardSchema = z.object({
     type: z.literal('taskGuard'),
     /** Percentage of Task.totalDuration */
     minProgress: z.number().min(0).max(1),
-    taskId: taskSchema.shape.taskTypeId,
+    taskId: taskSchema.shape.id,
 });
 export type TaskGuard = Immutable<z.infer<typeof taskGuardSchema>>;
 
@@ -112,7 +109,7 @@ export const stateMachineStateSchema = z.object({
     /**
      * maps taskId to the task-specific progress multiplier (default 1)
      * */
-    possibleTasks: z.record(taskTypeSchema.shape.id, z.number()),
+    possibleTasks: z.record(taskSchema.shape.id, z.number()),
     outgoingTransitions: z.array(transitionSchema),
 });
 export type StateMachineState = Immutable<
@@ -160,7 +157,7 @@ export function addTransitionTo(
 }
 
 export function getTaskProgress(
-    taskId: TaskType['id'],
+    taskId: Task['id'],
     stateMachine: StateMachine
 ): TaskProgress {
     console.assert(
@@ -265,7 +262,7 @@ export const stateMachineDefinitionSchema = z.strictObject({
     name: z.string(),
     states: z.record(stateMachineStateSchema.shape.id, stateMachineStateSchema),
     initialStateId: stateMachineStateSchema.shape.id,
-    tasks: z.record(taskTypeSchema.shape.id, taskSchema),
+    tasks: z.record(taskSchema.shape.id, taskSchema),
     timers: z.record(timerSchema.shape.id, timerSchema),
 });
 
@@ -275,13 +272,10 @@ export const stateMachineSchema = z
         // runtime values:
         simulationStartTime: z.number().default(0),
         currentStateId: stateMachineStateSchema.shape.id,
-        taskTimeSpent: z.record(
-            taskTypeSchema.shape.id,
-            z.number().nonnegative()
-        ),
+        taskTimeSpent: z.record(taskSchema.shape.id, z.number().nonnegative()),
         assignedPersonnel: z.record(
             personnelSchema.shape.id,
-            taskTypeSchema.shape.id
+            taskSchema.shape.id
         ),
     })
     .superRefine((val, ctx) => {
@@ -313,9 +307,7 @@ export function currentStateOf(
     return state!;
 }
 
-function currentlyPossibleTaskIds(
-    stateMachine: StateMachine
-): TaskType['id'][] {
+function currentlyPossibleTaskIds(stateMachine: StateMachine): Task['id'][] {
     const currentState = currentStateOf(stateMachine);
 
     return TypeAssertedObject.keys(currentState.possibleTasks);
@@ -323,17 +315,17 @@ function currentlyPossibleTaskIds(
 
 function unassignFromNonexistentTasks(
     stateMachine: WritableDraft<StateMachine>
-): { personnelId: Personnel['id']; taskTypeId: TaskType['id'] }[] {
+): { personnelId: Personnel['id']; taskId: Task['id'] }[] {
     const unassignedPersonnel: {
-        taskTypeId: TaskType['id'];
+        taskId: Task['id'];
         personnelId: Personnel['id'];
     }[] = [];
-    for (const [personnelId, taskTypeId] of Object.entries(
+    for (const [personnelId, taskId] of Object.entries(
         stateMachine.assignedPersonnel
     )) {
-        if (!currentlyPossibleTaskIds(stateMachine).includes(taskTypeId)) {
+        if (!currentlyPossibleTaskIds(stateMachine).includes(taskId)) {
             delete stateMachine.assignedPersonnel[personnelId];
-            unassignedPersonnel.push({ taskTypeId, personnelId });
+            unassignedPersonnel.push({ taskId, personnelId });
         }
     }
     return unassignedPersonnel;
@@ -364,8 +356,8 @@ function simulateStateMachine(
     tickInterval: number,
     logStateTransition?: (targetStateId: StateMachineState['id']) => void,
     logPersonnelUnassigned?: (
-        personnelId: Personnel['id'],
-        taskTypeId: TaskType['id']
+        personnel: Personnel['id'],
+        task: Task['id']
     ) => void
 ): void {
     const state = currentStateOf(stateMachine);
@@ -394,8 +386,8 @@ function simulateStateMachine(
     const unassignedPersonnel = unassignFromNonexistentTasks(stateMachine);
 
     if (unassignedPersonnel.length > 0 && logPersonnelUnassigned) {
-        for (const { personnelId, taskTypeId } of unassignedPersonnel) {
-            logPersonnelUnassigned(personnelId, taskTypeId);
+        for (const { personnelId, taskId } of unassignedPersonnel) {
+            logPersonnelUnassigned(personnelId, taskId);
         }
     }
 }
@@ -408,7 +400,7 @@ export function simulateTechnicalChallenge(
     for (const stateMachine of Object.values(
         technicalChallenge.stateMachines
     )) {
-        const currentStateId = stateMachine.currentStateId;
+        const currentState = currentStateOf(stateMachine);
         simulateStateMachine(
             stateMachine,
             exerciseState.currentTime,
@@ -416,16 +408,16 @@ export function simulateTechnicalChallenge(
             (targetStateId) =>
                 logTechnicalChallengeStateTransition(
                     exerciseState,
-                    technicalChallenge.id,
-                    currentStateId,
-                    targetStateId
+                    technicalChallenge,
+                    currentState,
+                    stateMachine.states[targetStateId]! // TODO@Felix: I am unhappy about those assertions
                 ),
-            (personnelId, taskTypeId) =>
+            (personnelId, taskId) =>
                 logTechnicalChallengePersonnelUnassigned(
                     exerciseState,
-                    technicalChallenge.id,
-                    personnelId,
-                    taskTypeId
+                    technicalChallenge,
+                    getElement(exerciseState, 'personnel', personnelId),
+                    stateMachine.tasks[taskId]!
                 )
         );
     }

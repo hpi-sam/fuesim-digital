@@ -5,11 +5,9 @@ import type {
     StateMachineState,
     ImageProperties,
     UserGeneratedContent,
-    Task,
     Timer,
     StateMachineDefinition,
-    TaskType,
-    UUID,
+    Task,
 } from 'fuesim-digital-shared';
 import { uuid, cloneDeepMutable } from 'fuesim-digital-shared';
 import {
@@ -21,13 +19,12 @@ import {
     NgbAccordionItem,
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgOptimizedImage } from '@angular/common';
+import { always } from 'ol/events/condition.js';
 import { UserGeneratedContentEditorComponent } from '../../../../../../shared/components/user-generated-content-editor/user-generated-content-editor.component.js';
 import {
     TimeInputComponent,
     TimeUnit,
 } from '../../../../../../shared/components/time-input/time-input.component.js';
-
-export type TaskNameMap = Map<UUID, TaskType>;
 
 @Component({
     selector: 'app-edit-state-machine-form',
@@ -53,7 +50,6 @@ export class EditStateMachineFormComponent {
         computation: domainToFormModel,
     });
     readonly isPrimaryStateMachine = input<boolean>(false);
-    readonly taskNameMap = input.required<TaskNameMap>();
 
     readonly showStateImage = this.isPrimaryStateMachine;
 
@@ -74,13 +70,8 @@ export class EditStateMachineFormComponent {
         });
     }
 
-    nameOfTask(taskTypeId: TaskType['id']): string {
-        return (
-            this.taskNameMap().get(taskTypeId)?.taskName ?? 'Unbenannte Aufgabe'
-        );
-    }
-
     protected readonly timeUnit = TimeUnit.s;
+    protected readonly always = always;
 }
 
 interface StateFormModel {
@@ -157,7 +148,7 @@ function formModelToDomain(
             ])
         ),
         tasks: Object.fromEntries(
-            formModel.tasks.map((task) => [task.taskTypeId, task])
+            formModel.tasks.map((task) => [task.id, task])
         ),
         timers: Object.fromEntries(
             formModel.timers

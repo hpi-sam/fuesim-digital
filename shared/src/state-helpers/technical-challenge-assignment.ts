@@ -8,9 +8,11 @@ import {
 } from '../models/utils/position/position-helpers.js';
 import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
-import type { TaskType } from '../models/task-type.js';
 import { TypeAssertedObject } from '../utils/type-asserted-object.js';
-import type { StateMachine } from '../models/technical-challenge/state-machine.js';
+import type {
+    StateMachine,
+    Task,
+} from '../models/technical-challenge/state-machine.js';
 
 // TODO: maybe only remove personnelId
 export function getAssignmentsOnTechnicalChallenge(
@@ -18,14 +20,14 @@ export function getAssignmentsOnTechnicalChallenge(
 ): {
     personnelId: Personnel['id'];
     stateMachineId: StateMachine['id'];
-    taskTypeId: TaskType['id'];
+    taskId: Task['id'];
 }[] {
     return Object.values(technicalChallenge.stateMachines).flatMap(
         (stateMachine) =>
             TypeAssertedObject.entries(stateMachine.assignedPersonnel).map(
-                ([personnelId, taskTypeId]) => ({
+                ([personnelId, taskId]) => ({
                     personnelId,
-                    taskTypeId,
+                    taskId,
                     stateMachineId: stateMachine.id,
                 })
             )

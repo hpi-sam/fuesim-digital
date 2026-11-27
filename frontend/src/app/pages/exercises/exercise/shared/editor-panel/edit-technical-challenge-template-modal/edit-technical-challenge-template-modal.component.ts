@@ -4,21 +4,16 @@ import {
     type OnInit,
     type WritableSignal,
     ChangeDetectionStrategy,
-    computed,
 } from '@angular/core';
-import { TypeAssertedObject, UUID } from 'fuesim-digital-shared';
+import { UUID } from 'fuesim-digital-shared';
 import type { TechnicalChallengeTemplate } from 'fuesim-digital-shared';
 import { NgbActiveModal, type NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../../../state/app.state.js';
-import {
-    createSelectTechnicalChallengeTemplate,
-    selectTaskTypes,
-} from '../../../../../../state/application/selectors/exercise.selectors.js';
+import { createSelectTechnicalChallengeTemplate } from '../../../../../../state/application/selectors/exercise.selectors.js';
 import { TechnicalChallengeTemplateFormComponent } from '../technical-challenge-template-form/technical-challenge-template-form.component.js';
 import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 import { ExerciseService } from '../../../../../../core/exercise.service.js';
-import type { TaskNameMap } from '../edit-state-machine-form/edit-state-machine-form.component.js';
 
 export function openEditTechnicalChallengeTemplateModal(
     ngbModalService: NgbModal,
@@ -48,11 +43,6 @@ class EditTechnicalChallengeTemplateModalComponent implements OnInit {
 
     // This is set after the modal creation and therefore accessible in ngOnInit
     technicalChallengeTemplateId!: UUID;
-    readonly taskNameMap = computed<TaskNameMap>(() => {
-        const tasks = this.store.selectSignal(selectTaskTypes)();
-
-        return new Map(TypeAssertedObject.entries(tasks));
-    });
 
     readonly technicalChallengeTemplate!: WritableSignal<TechnicalChallengeTemplate>;
 

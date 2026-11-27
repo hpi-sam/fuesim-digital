@@ -4,8 +4,8 @@ import type {
     StateMachineState,
     TechnicalChallengeId,
     Element as StateElement,
-    TaskType,
     ImageProperties,
+    Task,
 } from 'fuesim-digital-shared';
 import {
     currentStateOf,
@@ -201,7 +201,7 @@ export class TechnicalChallengeFeatureManager
         };
         const assignTaskCallback = async (
             stateMachineId: StateMachine['id'],
-            taskId: TaskType['id']
+            taskId: Task['id']
         ) => {
             const response = await this.exerciseService.proposeAction(
                 {

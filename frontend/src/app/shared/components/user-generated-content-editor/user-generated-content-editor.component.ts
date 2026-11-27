@@ -12,9 +12,9 @@ import { Store } from '@ngrx/store';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 import { FormsModule } from '@angular/forms';
 import type { UserGeneratedContent } from 'fuesim-digital-shared';
-import { ExerciseService } from '../../../core/exercise.service';
 import { AppState } from '../../../state/app.state';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
+import { selectExerciseStateMode } from '../../../state/application/selectors/application.selectors.js';
 
 @Component({
     selector: 'app-user-generated-content-editor',
@@ -24,7 +24,6 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     imports: [NgxEditorModule, FormsModule],
 })
 export class UserGeneratedContentEditorComponent implements OnInit, OnDestroy {
-    private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
 
     readonly userGeneratedContent = model.required<UserGeneratedContent>();
@@ -35,6 +34,10 @@ export class UserGeneratedContentEditorComponent implements OnInit, OnDestroy {
     public readonly currentRole = this.store.selectSignal(
         selectCurrentMainRole
     );
+    public readonly currentlyInExercise = computed<boolean>(
+        () => !!this.store.selectSignal(selectExerciseStateMode)()
+    );
+
     public readonly isChanged = computed<boolean>(
         () => this.editorContent() !== this.userGeneratedContent().content
     );

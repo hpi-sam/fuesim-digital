@@ -85,7 +85,7 @@
                     @for (task of stateMachineForm.tasks; track $index) {
                         <li class="list-group-item d-flex align-items-baseline">
                             <span class="flex-grow-1">{{
-                                nameOfTask(task.taskTypeId().value())
+                                task.name().value()
                             }}</span>
                             <app-time-input
                                 class="flex-grow-0"

@@ -3,7 +3,7 @@
         Vorlage der Technischen Herausforderung bearbeiten
         <app-help-button
             url="2_exercises/3_exercise_elements.html#technische-herausforderungen"
-            [trainerOnly]="true"
+            [trainerOnly]="false"
         />
     </h4>
     <button type="button" class="btn-close" (click)="close()"></button>
@@ -14,7 +14,6 @@
         (technicalChallengeTemplateChange)="
             updateTechnicalChallengeTemplate($event)
         "
-        [taskNameMap]="taskNameMap()"
     >
     </app-technical-challenge-template-form>
 </div>

@@ -17,8 +17,10 @@ import {
 import { applyAction } from '../store/reduce-exercise-state.js';
 import { ReducerError } from '../store/reducer-error.js';
 import { cloneDeepMutable } from '../utils/clone-deep.js';
-import { validateExerciseState } from '../store/validate-exercise-state.js';
-import { validateExerciseAction } from '../store/validate-exercise-action.js';
+import {
+    validateExerciseState,
+    validateExerciseAction,
+} from '../store/validate.js';
 import type { UUID } from '../utils/uuid.js';
 import { getTemplates } from '../models/template.js';
 import { defaultPersonnelTemplatesById } from '../data/default-state/personnel-templates.js';

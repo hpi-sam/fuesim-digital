@@ -4,8 +4,8 @@ import {
     ExpectedReducerError,
     validateExerciseAction,
     validatePermissions,
+    ValidationError,
 } from 'fuesim-digital-shared';
-import { ZodError } from 'zod';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
 import { ExerciseClientWrapper } from '../client-wrapper.js';
@@ -29,14 +29,14 @@ export function registerProposeActionHandler(
                 return;
             }
 
-            // 1. validate json
+            // 1. validate JSON
             try {
                 validateExerciseAction(action);
             } catch (err) {
-                if (err instanceof ZodError) {
+                if (err instanceof ValidationError) {
                     callback({
                         success: false,
-                        message: `Invalid payload: ${err.message}`,
+                        message: err.getMessage(),
                         expected: false,
                     });
                     return;

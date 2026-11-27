@@ -1,7 +1,7 @@
 import { ZodError } from 'zod';
 import type { MapCoordinates } from '../models/utils/position/map-coordinates.js';
 import { newViewport } from '../models/viewport.js';
-import { validateExerciseAction } from './validate-exercise-action.js';
+import { validateExerciseAction } from './validate.js';
 
 describe('validateExerciseAction', () => {
     it('should accept a valid action object', () => {

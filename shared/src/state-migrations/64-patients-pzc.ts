@@ -29,6 +29,12 @@ interface PatientCategory {
 
 type Action =
     | {
+          type: '[Exercise] Import Templates';
+          partialExport: {
+              patientCategories?: PatientCategory[];
+          };
+      }
+    | {
           type: '[Patient] Add patient';
           patient: Patient;
       }
@@ -61,12 +67,30 @@ function migrateHospitalPatient(patient: HospitalPatient) {
     patient.pzc = 0;
 }
 
+function migratePatientCategories(patientCategories: PatientCategory[]) {
+    for (const patientCategory of patientCategories) {
+        for (const patientTemplate of patientCategory.patientTemplates) {
+            patientTemplate.pzc = findPzc(
+                patientCategory.name,
+                patientTemplate.biometricInformation.externalFeatures
+            );
+        }
+    }
+}
+
 export const patientsPzc64: Migration = {
     action: (_, action) => {
         const typedAction = action as Action;
         switch (typedAction.type) {
             case '[Patient] Add patient':
                 migratePatient(typedAction.patient);
+                break;
+            case '[Exercise] Import Templates':
+                if (typedAction.partialExport.patientCategories?.length) {
+                    migratePatientCategories(
+                        typedAction.partialExport.patientCategories
+                    );
+                }
                 break;
             default:
                 break;
@@ -85,14 +109,7 @@ export const patientsPzc64: Migration = {
             patientCategories: PatientCategory[];
         };
 
-        for (const patientCategory of typedState.patientCategories) {
-            for (const patientTemplate of patientCategory.patientTemplates) {
-                patientTemplate.pzc = findPzc(
-                    patientCategory.name,
-                    patientTemplate.biometricInformation.externalFeatures
-                );
-            }
-        }
+        migratePatientCategories(typedState.patientCategories);
 
         Object.values(typedState.patients).forEach(migratePatient);
         Object.values(typedState.hospitalPatients).forEach(

@@ -21,6 +21,7 @@ interface VehicleTemplate {
     name: string;
     patientCapacity: number;
     image: ImageProperties;
+    patientLoadMinutes: number;
 }
 
 interface Personnel {
@@ -223,6 +224,10 @@ type Action =
           alarmGroup: AlarmGroup;
       }
     | {
+          type: '[AlarmGroup] Edit AlarmGroupVehicle';
+          name: string;
+      }
+    | {
           type: '[AlarmGroup] Limit AlarmGroup';
           triggerLimit: number | null;
       }
@@ -250,6 +255,13 @@ type Action =
           sortedVehicleParameters: VehicleParameters[];
       }
     | {
+          type: '[Exercise] Import Templates';
+          partialExport: {
+              vehicleTemplates?: VehicleTemplate[];
+              mapImageTemplates?: MapImageTemplate[];
+          };
+      }
+    | {
           type: '[MapImage] Add MapImage';
           mapImage: MapImage;
       }
@@ -261,6 +273,10 @@ type Action =
           type: '[MapImageTemplate] Edit mapImageTemplate';
           name: string;
           image: ImageProperties;
+      }
+    | {
+          type: '[RestrictedZone] Set capacity';
+          newCapacity: number;
       }
     | {
           type: '[Vehicle] Add vehicle';
@@ -389,10 +405,40 @@ export const fixValidation63: Migration = {
                     typedAction.name = '-';
                 }
                 break;
+            case '[AlarmGroup] Edit AlarmGroupVehicle':
+                if (typedAction.name.trim() === '') {
+                    typedAction.name = '-';
+                }
+                break;
             case '[Collection] Add Collection':
             case '[Collection] Upgrade Collection':
             case '[Collection] Remove Collection':
                 migrateTemplates(typedAction.overwriteTemplates);
+                break;
+            case '[RestrictedZone] Set capacity':
+                if (typedAction.newCapacity < 0) {
+                    typedAction.newCapacity = 0;
+                }
+                break;
+            case '[Exercise] Import Templates':
+                if (typedAction.partialExport.vehicleTemplates?.length) {
+                    for (const vehicleTemplate of typedAction.partialExport
+                        .vehicleTemplates) {
+                        migrateVehicleTemplate(vehicleTemplate);
+
+                        vehicleTemplate.patientLoadMinutes = 2;
+                        vehicleTemplate.name = vehicleTemplate.name.replaceAll(
+                            '???',
+                            '#'
+                        );
+                    }
+                }
+                if (typedAction.partialExport.mapImageTemplates?.length) {
+                    for (const mapImageTemplate of typedAction.partialExport
+                        .mapImageTemplates) {
+                        migrateMapImageTemplate(mapImageTemplate);
+                    }
+                }
                 break;
             default:
                 break;

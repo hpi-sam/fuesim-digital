@@ -143,6 +143,8 @@ export function migratePartialExport(
     }
 
     return newMigratedPartialExport(
+        partialExport.fileVersion,
+        currentStateVersion,
         patientCategories,
         vehicleTemplates,
         mapImageTemplates

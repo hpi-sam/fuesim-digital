@@ -31,8 +31,10 @@ export type MoveMapImageAction = Immutable<
 export const scaleMapImageActionSchema = z.strictObject({
     type: z.literal('[MapImage] Scale MapImage'),
     mapImageId: mapImageSchema.shape.id,
-    newHeight: mapImageSchema.shape.image.shape.height.optional(),
-    newAspectRatio: mapImageSchema.shape.image.shape.aspectRatio.optional(),
+    newHeight: mapImageSchema.shape.image.shape.height.nullable().optional(),
+    newAspectRatio: mapImageSchema.shape.image.shape.aspectRatio
+        .nullable()
+        .optional(),
 });
 export type ScaleMapImageAction = Immutable<
     z.infer<typeof scaleMapImageActionSchema>

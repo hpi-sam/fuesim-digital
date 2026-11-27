@@ -36,6 +36,7 @@ export const partialExportSchema = z.strictObject({
 export type PartialExport = Immutable<z.infer<typeof partialExportSchema>>;
 
 export const migratedPartialExportSchema = z.strictObject({
+    ...exportImportFileSchema.shape,
     type: z.literal('partial'),
     patientCategories: z.array(patientCategorySchema).optional(),
     vehicleTemplates: z.array(vehicleTemplateSchema).optional(),
@@ -46,12 +47,16 @@ export type MigratedPartialExport = Immutable<
 >;
 
 export function newMigratedPartialExport(
+    fileVersion: number,
+    dataVersion: number,
     patientCategories?: readonly PatientCategory[],
     vehicleTemplates?: readonly VehicleTemplate[],
     mapImageTemplates?: readonly MapImageTemplate[]
 ): MigratedPartialExport {
     return {
         type: 'partial',
+        fileVersion,
+        dataVersion,
         patientCategories,
         vehicleTemplates,
         mapImageTemplates,
